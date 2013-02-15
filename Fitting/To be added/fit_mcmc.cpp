@@ -2,6 +2,7 @@
 // written by Anna Sajina 09/28/12
 // The purpose of this program is to read-in the parameters set in the idl wrapper (simulation.pro) and to use MCMC to determine the best-fit set of parameters. // Specifically it runs through a number of iterations (runs) in each stage calling on simulator.cpp to compute the chi2 for a given set of parameters
 // then the metrop algorithm is invoked to decide whether or not a given trial run is accepted. If so it is added to a chain of mcmc values.
+// just testing
 //****************************************************************************
 
 #include "simulator.h"
