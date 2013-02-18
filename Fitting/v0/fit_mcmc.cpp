@@ -6,10 +6,6 @@
 
 #include "simulator.h"
 #include "functions.h"
-//#include "hist_lib.h"
-//#include <typeinfo>
-//#include "constants.h"
-//#include "cosmo.h"
 
 using namespace std;
 
@@ -45,10 +41,10 @@ int main(int argc,char** argv){
   const gsl_rng_type * T;
   
   int npar=2; 
-  //int nlambda=627;
-  //int ntempl=15;
   double p_o[npar],dp[npar],p_min[npar],p_max[npar]; //the initial guesses of the parameters, the width of the proposal distribution and the acceptable min/max range
+  double chain[npar][runs];
 
+  //Note, these have to come from the widget, not be hardwired here!
   string outfile("/Users/annie/students/noah_kurinsky/Fitting/output.fits");
   string modfile("/Users/annie/students/noah_kurinsky/Fitting/model.fits");
   string sedfile("/Users/annie/students/noah_kurinsky/Fitting/sf_templates.fits");
@@ -80,9 +76,9 @@ int main(int argc,char** argv){
     obs_table.readKey("WAVE_"+pi[i+1],bs[i]);
     obs_table.readKey("W"+pi[i+1]+"_FMIN",flims[i]);
     obs_table.readKey("W"+pi[i+1]+"_FERR",errs[i]);
-    bs[i]*=1.e+06; //convert to microns
-    flims[i]*=1e-3;
-    errs[i]*=1e-3;
+    //bs[i]*=1.e+06; //convert to microns -- Not needed, provide in microns to begin with!
+    //flims[i]*=1e-3; //this is to turn it in Janskys, but I think lets work in mJy anyway
+    //errs[i]*=1e-3;
   }
   
 //=================================================================
@@ -143,13 +139,13 @@ int main(int argc,char** argv){
   // at each step, from some initial paramer value "p" call on the simulator.cpp //program to evaluate the chi2 for that particular color-color plot. Then use the metrop algorithm (below) to decide whether or not to keep a particular guess
   //the chain results are stored in ?
   //int i,j;
-  //double chi_min=1000.0; //the initial chi2_min value, this is iterated each time a better value is found
-  //double previous=chi_min;
-  //double trial;
-  //int minlink;
+  double chi_min=1000.0; //the initial chi2_min value, this is iterated each time a better value is found
+  double previous=chi_min;
+  double trial;
+  int minlink;
   //bool metrop;
-  //long acceptot=0;
-  //bool ans;
+  long acceptot=0;
+  bool ans;
   static double nr[2];
   nr[0]=-1;
   nr[1]=1;
@@ -174,11 +170,13 @@ int main(int argc,char** argv){
     T=gsl_rng_default;
     r=gsl_rng_alloc(T);
   
-    //double my_dvdz;
     double area;
     double test_chi2;
 
-    //area=4.0*M_PI;
+    //note need to be able to pass the survey area down from the widget!!!
+    //this is necessary for correct cosmological volume determinations
+    //hence correct number count predictions
+    //the value of area here is just a placeholder
     //e.g. 2 sq.degrees
     area=pow((1.4*M_PI/180.0),2);
 
@@ -197,28 +195,22 @@ int main(int argc,char** argv){
 
     cout<<"Model chi2 :"<<test_chi2<<endl;
 
-    /*
-   // call simulator
-    //make chi2 from that particular run the trial chi2
-    trial=10.0; //get_chi2();
+    trial=test_chi2;
     double r=trial-chi_min;
     if(trial < chi_min){
       chi_min=trial;
       minlink=i;
     }
-    ans = metrop(r,temp);
-    //if proposal move is accepted
-    if (ans=true){
+    ans=metrop(r,temp);
+    if(ans=true){
       acceptot++;
       previous=trial;
       //update mcmc chain with accepted values
-      for (long l=0;l<=npar; l++){
-	chain[l][i]=0.0;
-      }
+	chain[0][i]=lpars[4];
+	chain[1][i]=lpars[5];
     }
-    */
-
   }
+
   gsl_rng_free (r);
 
   return 0;
