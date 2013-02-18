@@ -1,1 +1,1 @@
-g++ test_fit.cpp simulator.cpp model_lib.cpp distributions.cpp functions.cpp sim.cpp hist_lib.cpp obs_lib.cpp -g -pg -lgsl -lcfitsio -lccfits -o test_fit -Wall -Werror -fexceptions -lgslcblas
+g++ fit_mcmc.cpp simulator.cpp lumfunct.cpp functions.cpp hist_lib.cpp model_lib.cpp -g -lgsl -/scisoft/CCfits/include/CCfits -/scisoft/cfitsio/lcfitsio -lccfits -o z_fit -Wall -Werror -fexceptions -lgslcblas -O3

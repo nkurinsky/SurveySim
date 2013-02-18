@@ -98,7 +98,7 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
 
   //========================================================================
   //1st step: define the lambda and luminosity array 
-  //these are really setup when the sf_templaes.fits is set
+  //these are really set up when the sf_templates.fits is set
   //*************************************************************************
 
   FITS *pInfile;
@@ -152,7 +152,7 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
   }
   
   //=========================================================================
-  //3rd step: determine the sources in each L-z bin, depending on the LF model
+  //3rd step: determine the # of sources in each L-z bin, depending on the LF model
   //*************************************************************************
 
   lumfunct lf; //
@@ -251,7 +251,9 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
 	      flux_sim[2]=(seds0[hit3][js]/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2)))/Wm2Hz_TO_mJy;
 	      flux_sim[2]+=noise[2][src_iter];
 	      //check for detectability, if "Yes" add to list
-	      if(flux_sim[0] >= 8.0) //include real flux limits but had errors for some reason
+	      //	      if(flux_sim[0] >= 8.0) //include real flux limits but had errors for some reason
+              cout<<f_lims[0]<<endl;
+              if(flux_sim[0] >=f_lims[0])
 	      {
 		//cout<<flux_sim[0]<<endl;
 		temp_src = new sprop(0.0,zarray[is],b,flux_sim,lumarray[js]);
