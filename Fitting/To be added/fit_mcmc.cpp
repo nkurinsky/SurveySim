@@ -110,7 +110,6 @@ int main(int argc,char** argv){
  
   lums.initialize();
 
-  
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
   fixed_params ps;
   ps.pnum = pnum;
