@@ -15,8 +15,8 @@ mods::mods(double * f,double *bands){
   }
 
   if(do_colors){
-    c1 = get_color(fluxes[2],fluxes[0],bands[2],bands[0]);
-    c2 = get_color(fluxes[2],fluxes[1],bands[2],bands[1]);
+    c1 = log10(fluxes[2]/fluxes[0]) ; //get_color(fluxes[2],fluxes[0],bands[2],bands[0]);
+    c2 = log10(fluxes[2]/fluxes[1]) ; //get_color(fluxes[2],fluxes[1],bands[2],bands[1]);
   }
   else{
     c1 = -99.0;

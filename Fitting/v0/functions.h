@@ -5,6 +5,7 @@
 
 //standard includes used by all programs in simulation
 #include <cstdio>
+#include <stdio.h>
 #include <string>
 #include <cmath>
 #include <time.h>

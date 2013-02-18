@@ -1,4 +1,5 @@
 #include "simulator.h"
+#include "functions.h"
 #include "constants.h"
 #include "cosmo.h"
 
@@ -198,7 +199,8 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
   //ultimately want to convolve with filter but this is quick for now. 
 
   static double nrange[2];
-  double ** noise = new double*[3];
+  //double ** noise = new double*[3];
+  double noise[3];
 
   sources.clear();
 
@@ -233,23 +235,26 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
 	  //printf("L-z bin: %lf %lf \n",zarray[is],lumarray[js]);
 	  //cout<<"Number of sources"<<endl;
 	  //cout<<nsrcs[is][js]<<endl;
-	  for (int i=0;i<3;i++){
-	    nrange[0] = b_err[i]*-5.0;
-	    nrange[1] = b_err[i]*5.0;
-	    //noise[i]=0;
-	    noise[i] = gauss_random(r,nrange,0.0,b_err[i],nsrcs[is][js]); //DOUBLE CHECK THIS!
-	  }
+	  
 	  
 	  for (src_iter=0;src_iter<nsrcs[is][js];src_iter++)
 	    {
+	      for (int i=0;i<3;i++){
+  //	    nrange[0] = b_err[i]*-5.0;
+  //    nrange[1] = b_err[i]*5.0;
+	    //noise[i]=0;
+	    noise[i]=gsl_ran_gaussian(r,b_err[i]);
+	    //noise[i] = gauss_random(r,nrange,0.0,b_err[i],nsrcs[is][js]); //this keeps giving me compiler/linker errors
+	      }
+
 	      //cout<<src_iter<<endl;
 	      
 	      flux_sim[0]=(seds0[hit1][js]/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2)))/Wm2Hz_TO_mJy;
-	      flux_sim[0]+=noise[0][src_iter];
+	      flux_sim[0]+=noise[0]; //[src_iter];
 	      flux_sim[1]=(seds0[hit2][js]/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2)))/Wm2Hz_TO_mJy;
-	      flux_sim[1]+=noise[1][src_iter];
+	      flux_sim[1]+=noise[1]; //[src_iter];
 	      flux_sim[2]=(seds0[hit3][js]/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2)))/Wm2Hz_TO_mJy;
-	      flux_sim[2]+=noise[2][src_iter];
+	      flux_sim[2]+=noise[2]; //[src_iter];
 	      //check for detectability, if "Yes" add to list
 	      //	      if(flux_sim[0] >= 8.0) //include real flux limits but had errors for some reason
               cout<<f_lims[0]<<endl;
@@ -361,6 +366,9 @@ void simulator::set_bands(double b[],double b_err[],double f_lims[]){
     flux_limits[i]= f_lims[i];
   }
 }
+
+
+
 
 /*
 void simulator::set_lumfunct(lumfunct *lf){

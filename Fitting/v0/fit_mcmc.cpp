@@ -33,6 +33,7 @@ bool metrop(double de,double t){
   return (ans);
 }
 
+//note here we have arguments that are being passed to this (as in by the idl widget), but never seem to do anything with them
 int main(int argc,char** argv){
   
   long int runs=30;
@@ -83,6 +84,8 @@ int main(int argc,char** argv){
   
 //=================================================================
 // Before doing any fits, initialize the observed diagnostic histogram
+// best to do it here, so don't have to re-do it everytime we call on
+// simulator
 //------------------------------------------------------------------
 
   //double *c1,*c2;
@@ -146,25 +149,13 @@ int main(int argc,char** argv){
   //bool metrop;
   long acceptot=0;
   bool ans;
-  static double nr[2];
-  nr[0]=-1;
-  nr[1]=1;
+
+  //double nr[2];
+  //nr[0]=-1;
+  //nr[1]=1;
+
   double p0_rng[runs];
   double q0_rng[runs];
-  //double lumarr[30];
-  //double zarr[40];
-  //
-
-  //setup z array and luminosity array
-  //for (i=1;i<=40;i++){
-  //  zarr[i]=0.1*i;
-  // }
-
-  //for (j=1;j<=30;j++){
-  //  lumarr[j]=8+j*0.2;
-  //}
-
-  //double ** p0_rng = new double*[runs];
 
   gsl_rng_default_seed=time(NULL);
     T=gsl_rng_default;
@@ -181,10 +172,17 @@ int main(int argc,char** argv){
     area=pow((1.4*M_PI/180.0),2);
 
     int nruns=1;
+    //int gsize=1; //the size for gauss_random
+
+    //double pmean,qmean;
+    //pmean=0.0;
+    //qmean=0.0;
 
   for (int i=0;i<nruns;i++){
-    p0_rng[i]=*gauss_random(r,nr,0.0,dp[0],1);
-    q0_rng[i]=*gauss_random(r,nr,0.0,dp[1],1);
+    p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
+    q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
+    //p0_rng[i]=*gauss_random(r,nr,pmean,dp[0],gsize);
+    //q0_rng[i]=*gauss_random(r,nr,qmean,dp[1],gsize);
     temp=p_o[0]+p0_rng[i];  
     if((temp >= p_min[0]) && (temp <= p_max[0])) lpars[4]=temp;
     temp=p_o[1]+q0_rng[i];

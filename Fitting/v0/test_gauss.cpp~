@@ -1,0 +1,10 @@
+
+#include "function.h"
+
+gsl_rng * r;  /* global generator */
+
+int main(){
+
+
+
+}
