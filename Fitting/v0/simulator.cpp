@@ -291,6 +291,7 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
   int msize = nz*nlum; //distributions->size();
 
   //cout<<osize<<endl;
+  cout<<" The n_z x n_lum size: "<<endl;
   cout<<msize<<endl;
 
     if (diagnostic == NULL)
