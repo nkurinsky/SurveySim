@@ -1,1 +1,2 @@
-g++ fit_mcmc.cpp simulator.cpp lumfunct.cpp functions.cpp hist_lib.cpp model_lib.cpp -g -lgsl -/scisoft/CCfits/include/CCfits -/scisoft/cfitsio/lcfitsio -lccfits -o z_fit -Wall -Werror -fexceptions -lgslcblas -O3
+g++ -c simulator.cpp lumfunct.cpp 
+# g++ -g -lgsl -/scisoft/CCfits/include/CCfits -/scisoft/cfitsio/lcfitsio -lccfits simulator.o lumfunct.o -o fitter -Wall -Werror -fexceptions -lgslcblas -O3

@@ -32,9 +32,8 @@ double lumfunct::get_nsrcs(double redshift,double lum){
   double ratio,lf;
   ratio=pow(10,lum)/t2;
   lf=t1/(pow(ratio,alpha)+pow(ratio,beta));
-  //cout<<lf<<endl;
+  cout<<lf<<endl;
   //nsrcs=static_cast<int>(lf+0.5);
   nsrcs=lf;
   return nsrcs;
 }
-
