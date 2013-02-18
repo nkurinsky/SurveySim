@@ -109,19 +109,35 @@ int main(int argc,char** argv){
   p_max[1]=5.0;
  
   lums.initialize();
+  
+  //  simulator tester(bs,errs,flims,&lums,modfile,obsfile);
+  // //tester.set_zrange(zrange);
 
   
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
   fixed_params ps;
   ps.pnum = pnum;
 
+  //ps.znum = znum;
   ps.p = new mparam[pnum];
+  //ps.sim = &tester;
+  
 
+  /*  
+  for (int i=0;i<pnum;i++){
+    ps.p[i].p_id = i;
+    params_table.readKey("P"+pi[i]+"_MEAN",ps.p[i].mean);
+    params_table.readKey("P"+pi[i]+"_SIGMA",ps.p[i].sigma);
+    params_table.readKey("P"+pi[i]+"_MIN",ps.p[i].min);
+    params_table.readKey("P"+pi[i]+"_MAX",ps.p[i].max);
+    printf("Mean: %5.3f, Sigma: %5.3f\n",ps.p[i].mean,ps.p[i].sigma);
+  }
+  */
   delete pInfile;
   delete pInfile2;
   
   //loop trough the mcmc runs
-  // at each step, from some initial paramer value "p" call on the simulator.cpp //program to evaluate the chi2 for that particular color-color plot. Then use the metrop algorithm (top) to decide whether or not to keep a particular guess
+  // at each step, from some initial paramer value "p" call on the simulator.cpp //program to evaluate the chi2 for that particular color-color plot. Then use the metrop algorithm (below) to decide whether or not to keep a particular guess
   //the chain results are stored in ?
   
   double chi_min=1000.0; //the initial chi2_min value, this is iterated each time a better value is found
