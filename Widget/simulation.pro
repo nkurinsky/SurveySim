@@ -8,14 +8,13 @@
 
 pro simulation
 
-  COMMON simulation_com,cdir,info,ot,ldist,lum,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,ldist,lum,settings,bands
 
 ;==================================================================
 ;the directory where the fitting code lives
-;this should be generalized
 ;------------------------------------------------------------------
-cdir='/Users/annie/students/noah_kurinsky/Fitting/v4/'
-  
+cdir='/Users/annie/students/noah_kurinsky/SurveySim/v0'  
+
 ;==================================================================
 ;the INFO structure holds the key widget control parameters as well as 
 ;the basic simulation settings
@@ -25,23 +24,23 @@ cdir='/Users/annie/students/noah_kurinsky/Fitting/v4/'
        base: 0L, $
        base1: 0L, $
        base2: 0L, $
-       base3:0L, $
+       ;base3:0L, $
        base_out: 0L, $
        base1_out: 0L, $
        base2_out: 0L, $
-       base4:0L, $
-       base5:0L, $
+       ;base4:0L, $
+       ;base5:0L, $
        xsize1:150., $
        ysize1:100., $
        xsize2:150., $
        ysize2:100., $
-       magnification:1.0, $  
+       magnification:1.00, $  
        draw1:0L, $
        draw2:0L, $
        draw3:0L, $
-       draw4:0L, $
-       draw5:0L, $
-       draw6:0L, $     
+       ;draw4:0L, $
+       ;draw5:0L, $
+       ;draw6:0L, $     
        win_id1:0L, $
        win_id2:0L, $
        win_id3:0L, $
@@ -49,9 +48,11 @@ cdir='/Users/annie/students/noah_kurinsky/Fitting/v4/'
 ;basic simulation settings
        ofile:'observation.save', $
        mfile:'model.save', $
-       oname:'output.fits', $
-       pnum:2,$
-       znum:2 }
+       sedfile: 'sf_templates.fits', $
+       oname:'output.fits' } ;, $
+;definitely don't need znum, and not sure we need pnum either
+       ;pnum:2 } ;,$
+       ;znum:2 }
 ;====================================================================
 ; Colors
 ;--------------------------------------------------------------------
@@ -72,10 +73,10 @@ cdir='/Users/annie/students/noah_kurinsky/Fitting/v4/'
   plotSize = 100.
   info.magnification = size_screen[1]/(plotSize+info.ysize1)*0.9
   
-  ofile = info.ofile
-  mfile = info.mfile
-  pnum = long(info.pnum)
-  znum = long(info.znum)
+  ;ofile = info.ofile
+  ;mfile = info.mfile
+  ;pnum = long(info.pnum)
+  ;znum = long(info.znum)
 
 ;;widget base initialization
   info.base = widget_base(title='Model Setup and Initialization',/column) ;main base
@@ -86,27 +87,37 @@ cdir='/Users/annie/students/noah_kurinsky/Fitting/v4/'
   dbase = widget_base(p_main,/column,/align_center) ; base for file dialogs
   button_base = widget_base(p_main,/row,/align_center) ; base for buttons
 
-;Buttons at bottom 
-  run_btn = widget_button(button_base,uvalue='go',value='Run Simulation',xsize=100,ysize=25)
-  replot_btn = widget_button(button_base,uvalue='replot',value='Plot Last Run',xsize=100,ysize=25)
-  quit_btn = widget_button(button_base,uvalue='quit',value='Quit',xsize=50,ysize=25)
-  info_btn = widget_button(button_base,uvalue='info',value='Info',xsize=50,ysize=25)
-
 ;output file select
-  obsname = fsc_fileselect(dbase,LabelName='Observation Save File',filename=ofile)
-  oname = fsc_fileselect(dbase,LabelName='Output FITS file: ',filename=info.oname)
+CD, Current=thisDir
+obsname = fsc_fileselect(dbase,Directory=thisDir,filename=info.ofile,/NoMaxSize,LabelName='Observation Save File') ;,ObjectRef=obsObject) 
+sedfile=fsc_fileselect(dbase,Directory=thisDir,filename=info.sedfile,ObjectRef=sedObject,/NoMaxSize,LabelName='SED Templates file')
 
+;=============================================================
 ;survey parameter initialization
- if(file_test('params.save')) then begin
-     restore,'params.save'
-  endif else begin
+;-------------------------------------------------------------
+;don't want to use the existing params.save as the wavelength
+;is in meters, whereas we use microns normally
+; if(file_test('params.save')) then begin
+;     restore,'params.save'
+;  endif else begin
      band1 = {wave:250.d0,fmin:25.0,ferr:6.2}
      band2 = {wave:350.d0,fmin:20.0,ferr:5.8}
      band3 = {wave:500.d0,fmin:15.0,ferr:6.2}
      bands = [band1,band2,band3]
-  endelse
+;  endelse
 
+  bname = ["Band 1","Band 2","Band 3"]
+  ocols = ["Wavelength (um)","Flux limit (mJy)","Standard Error (mJy)"]
+  f = ['(e9.2)','(f7.4)','(f7.4)']
+  fmt = [[f],[f],[f]]
+
+;The Survey properties table
+  lo = widget_label(obs_table,value="Survey Properties")
+  ot = widget_table(obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150,140],format=fmt)
+
+;=============================================================
 ;luminosity function parameter initialization
+;-------------------------------------------------------------
   ldat={phi0:-2.2,lo:23.64,alpha:0.47,beta:2.88,p:-6.7,q:3.5}
   ldata=replicate(ldat,2) 
   ;the fixed values: =1 if held fixed, =0 if variable
@@ -118,43 +129,48 @@ cdir='/Users/annie/students/noah_kurinsky/Fitting/v4/'
   ldata(1).q=0
   lrows=["Initial","Fixed"]
 
-  bname = ["Band 1","Band 2","Band 3"]
-  ocols = ["Wavelength (um)","Flux limit (mJy)","Standard Error (mJy)"]
-  f = ['(e9.2)','(f7.4)','(f7.4)']
-  fmt = [[f],[f],[f]]
-
-;The Survey properties table
-  lo = widget_label(obs_table,value="Survey Properties")
-  ot = widget_table(obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150,140],format=fmt)
-
 ;Luminosity Function Paramters
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
   t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldat),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck')
 
-;===================================================================================
+;============================================================================
 ;Show SED templates
-;-----------------------------------------------------------------------------------
+;----------------------------------------------------------------------------
 info.draw3 = widget_draw(info.base2, xsize=info.magnification*info.xsize2,$
                          ysize=info.magnification*info.ysize1 $
                          ,uvalue="DRAW_WINDOW3",retain=2 $
                          ,/button_events, keyboard_events=1,/tracking_events)
 
 ;initialize widget and establish control
-widget_control,/realize,info.base,xoffset=0,yoffset=0
+widget_control,/realize,info.base,xoffset=0,yoffset=0,Set_UValue=theObject
 widget_control, info.draw3, get_value=win_id3 & info.win_id3=win_id3
 xmanager,'simulation',info.base,/NO_BLOCK
 wset,info.win_id3
 
 ;plot SEDs (generalize to any SED template file
-templ=mrdfits('sf_templates.fits')
+;templ=mrdfits('sf_templates.fits')
+;this seems to be hardwired now -- how to ensure can select different
+;                                  SED template files?
+widget_control,sedfile,get_value=value
+;templ=mrdfits(sedfile)
+templ=mrdfits(info.sedfile) 
+
 plot,templ[*,0],templ[*,1],/xlog,/ylog,yrange=[1.d20,1.d28],ystyle=1,xtitle=TeXtoIDL('\lambda [\mum]'),ytitle=TeXtoIDL('L_{\nu} [W/Hz]')
 for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
+
+;===========================================================================
+;Buttons at bottom 
+;---------------------------------------------------------------------------
+  run_btn = widget_button(button_base,uvalue='go',value='Run Simulation',xsize=100,ysize=25)
+  ;replot_btn = widget_button(button_base,uvalue='replot',value='Plot Last Run',xsize=100,ysize=25)
+  quit_btn = widget_button(button_base,uvalue='quit',value='Quit',xsize=50,ysize=25)
+  info_btn = widget_button(button_base,uvalue='info',value='Info',xsize=50,ysize=25)
 
 END
 
 ;widget event handling routine
 PRO simulation_event,ev
-  COMMON simulation_com,cdir,info,ot,ldist,lum,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,ldist,lum,settings,bands
 
   ; get event identifier
   widget_control,ev.id,get_uvalue=uvalue
@@ -173,8 +189,8 @@ PRO simulation_event,ev
         flux_err = [bvals[0].ferr,bvals[1].ferr,bvals[2].ferr]
 
         widget_control,obsname,get_value=value
-        print,value
         if (file_test(info.ofile)) then begin
+           print,info.ofile
            restore,info.ofile
            values = dblarr(n_elements(wave),n_elements(f1))
         endif else begin
@@ -205,7 +221,7 @@ PRO simulation_event,ev
 
         ;make model fits file
 
-        widget_control,t1a,get_value=zvals
+        ;widget_control,t1a,get_value=zvals
         widget_control,t1b,get_value=pvals
 
         restore,info.mfile
@@ -214,36 +230,37 @@ PRO simulation_event,ev
         templates = reform(templates,n_elements(templates))
         
         sxaddpar, hdr2, 'DATE', systime(),'Date of creation'
-        sxaddpar, hdr2, 'P_NUM',info.pnum,'Number of Model Parameters'
-        sxaddpar, hdr2, 'Z_NUM',info.znum,'Number of Redshift Distributions'
+        ;sxaddpar, hdr2, 'P_NUM',info.pnum,'Number of Model Parameters'
+        ;sxaddpar, hdr2, 'Z_NUM',info.znum,'Number of Redshift Distributions'
 
         n_els = n_elements(wave)
         wave_min = wave[0]
         wave_max = wave[n_els-1]
         wave_sep = (wave_max-wave_min)/(n_els-1)
         
-        sxaddpar, hdr2, 'WAVE_MIN',wave_min,'Domain Lower Bound'
-        sxaddpar, hdr2, 'WAVE_MAX',wave_max,'Domain Upper Bound'
-        sxaddpar, hdr2, 'WAVE_SEP',wave_sep,'Domain Step Size'
+        sxaddpar, hdr2, 'WAVE_MIN',wave_min,'Minimum wavelength'
+        sxaddpar, hdr2, 'WAVE_MAX',wave_max,'Maximum wavelength'
+        sxaddpar, hdr2, 'WAVE_SEP',wave_sep,'wavelength step'
         
-        for i=0,info.znum-1 do begin
-           z_tmp = strcompress(string(i),/remove_all)
-           sxaddpar, hdr2, 'Z'+z_tmp+'_MAX',zvals[i].max,'Parameter '+z_tmp+' Upper Limit'
-           sxaddpar, hdr2, 'Z'+z_tmp+'_MIN',zvals[i].min,'Parameter '+z_tmp+' Lower Limit'
-           sxaddpar, hdr2, 'Z'+z_tmp+'_MEAN',zvals[i].mean,'Parameter '+z_tmp+' Distribution Mean'
-           sxaddpar, hdr2, 'Z'+z_tmp+'_SIGMA',zvals[i].sigma,'Parameter '+z_tmp+' Distribution Width'
-           sxaddpar, hdr2, 'Z'+z_tmp+'_FIXED',zvals[i].fixed,'Parameter '+z_tmp+' Fixed or Variable'
-        endfor
+;don't need any of this
+;        for i=0,info.znum-1 do begin
+;           z_tmp = strcompress(string(i),/remove_all)
+;           sxaddpar, hdr2, 'Z'+z_tmp+'_MAX',zvals[i].max,'Parameter '+z_tmp+' Upper Limit'
+;           sxaddpar, hdr2, 'Z'+z_tmp+'_MIN',zvals[i].min,'Parameter '+z_tmp+' Lower Limit'
+;           sxaddpar, hdr2, 'Z'+z_tmp+'_MEAN',zvals[i].mean,'Parameter '+z_tmp+' Distribution Mean'
+;           sxaddpar, hdr2, 'Z'+z_tmp+'_SIGMA',zvals[i].sigma,'Parameter '+z_tmp+' Distribution Width'
+;           sxaddpar, hdr2, 'Z'+z_tmp+'_FIXED',zvals[i].fixed,'Parameter '+z_tmp+' Fixed or Variable'
+;        endfor
 
-        for i=0,info.pnum-1 do begin
-           p_tmp = strcompress(string(i),/remove_all)
-           sxaddpar, hdr2, 'P'+p_tmp+'_SIZE',tmp_info[i+1],'Parameter '+p_tmp+' Upper Limit'
-           sxaddpar, hdr2, 'P'+p_tmp+'_MAX',pvals[i].max,'Parameter '+p_tmp+' Upper Limit'
-           sxaddpar, hdr2, 'P'+p_tmp+'_MIN',pvals[i].min,'Parameter '+p_tmp+' Lower Limit'
-           sxaddpar, hdr2, 'P'+p_tmp+'_MEAN',pvals[i].mean,'Parameter '+p_tmp+' Distribution Mean'
-           sxaddpar, hdr2, 'P'+p_tmp+'_SIGMA',pvals[i].sigma,'Parameter '+p_tmp+' Distribution Width'
-           sxaddpar, hdr2, 'P'+p_tmp+'_FIXED',pvals[i].fixed,'Parameter '+p_tmp+' Fixed or Variable'
-        endfor
+;        for i=0,info.pnum-1 do begin
+;           p_tmp = strcompress(string(i),/remove_all)
+;           sxaddpar, hdr2, 'P'+p_tmp+'_SIZE',tmp_info[i+1],'Parameter '+p_tmp+' Upper Limit'
+;           sxaddpar, hdr2, 'P'+p_tmp+'_MAX',pvals[i].max,'Parameter '+p_tmp+' Upper Limit'
+;           sxaddpar, hdr2, 'P'+p_tmp+'_MIN',pvals[i].min,'Parameter '+p_tmp+' Lower Limit'
+;           sxaddpar, hdr2, 'P'+p_tmp+'_MEAN',pvals[i].mean,'Parameter '+p_tmp+' Distribution Mean'
+;           sxaddpar, hdr2, 'P'+p_tmp+'_SIGMA',pvals[i].sigma,'Parameter '+p_tmp+' Distribution Width'
+;           sxaddpar, hdr2, 'P'+p_tmp+'_FIXED',pvals[i].fixed,'Parameter '+p_tmp+' Fixed or Variable'
+;        endfor
         
         widget_control,t1,get_value=lparam
 
@@ -256,28 +273,35 @@ PRO simulation_event,ev
 
         print,"Luminosity function parameters: ",lparam
 
+;why do we actually need this? isn't model.fits basically the
+;same as sf_templates.fits ?
+;why not just pass along the name of the SED templates file defined
+;here, without making a new fits file?
+;or is "model.fits" hardwired in the fitting code?
         mwrfits,templates,'model.fits',hdr2,/create
 
-;Actual simulation
-        
+;===============================================================
+;Run the actual simulation
+;---------------------------------------------------------------        
         spawn,cdir+'z_fit'
 
         read_output
         graphs
      end
-     'replot': begin
-        read_output
-        graphs
-     end
+     ;'replot': begin
+     ;   read_output
+     ;   graphs
+     ;end
      'quit': begin
         widget_control,ev.top,/destroy
      end
-     't1' :
+     ;'t1' :
      'ot': widget_control,ot,get_value=bands
      'size': widget_control,size,get_value=settings
      'info': fit_info
      ELSE:
   ENDCASE
+
 END
 
 pro bcheck,ev
@@ -288,9 +312,9 @@ pro bcheck,ev
   if(value[i].fixed lt 0) then begin
      value[i].fixed=0
      widget_control,ev.id,set_value=value
-  endif else if(value[i].fixed gt 1) then begin
-     value[i].fixed=1
-     widget_control,ev.id,set_value=value
+  ;endif else if(value[i].fixed gt 1) then begin
+  ;   value[i].fixed=1
+  ;   widget_control,ev.id,set_value=value
   endif
 
 end
@@ -298,7 +322,7 @@ end
 pro fit_info
   
   main = widget_base(title="Information about Fitting Methodology",/column)
-  t1 = widget_text(main,value="this is text")
+  ;t1 = widget_text(main,value="this is text")
   bt = widget_button(main,uvalue='close',value='Close',xsize=50,ysize=25)
 
   widget_control,main,/realize
