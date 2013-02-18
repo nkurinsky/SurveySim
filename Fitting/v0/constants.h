@@ -8,7 +8,7 @@
 
 //general astronomy/physics constants
 #define MPC_TO_METER (3.08568025e22) // m/MPc
-#define W_TO_mJy (1.e-29) // W/mJy
+#define Wm2Hz_TO_mJy (1.e-29) // W/m2/Hz to mJy
 #define LSUN (3.839e26) // solar luminosity
 #define speed_of_light (2.998e8) // c [m/s]
 
