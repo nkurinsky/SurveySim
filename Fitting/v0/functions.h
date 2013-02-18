@@ -33,8 +33,6 @@
 #include <gsl/gsl_multimin.h>
 #include <gsl/gsl_vector.h>
 
-#define MPC_TO_METER (3.08568025e22) // m / MPc
-
 using namespace std;
 
 //Generate random numbers by use of procedures outlined in GNU Scientific Library Ch. 18 (Sections 1-5)
