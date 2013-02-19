@@ -11,6 +11,8 @@ using namespace std;
 
 gsl_rng * r;  /* global generator */
 
+//here de is effectively Delta(Energy), and t is the temperature
+//as in the boltzman factor exp(-de/t)
 bool metrop(double de,double t){
   
   bool ans;
@@ -36,8 +38,7 @@ bool metrop(double de,double t){
 //note here we have arguments that are being passed to this (as in by the idl widget), but never seem to do anything with them
 int main(int argc,char** argv){
   
-  long int runs=30;
-  //cout << typeid(runs).name() << endl;
+  long int runs=30; //temporary, of course in the end this will be much longer perhaps 100,000-500,000 
   
   const gsl_rng_type * T;
   
@@ -118,16 +119,18 @@ int main(int argc,char** argv){
   lpars[4]=temp;
   params_table.readKey("Q",temp);
   lpars[5]=temp;
-
-  //for (int fi=0;fi<6;fi++) cout<<lpars[fi]<<endl;
   
+  //note that the dp values here are the widths of the "proposal distribution"
+  //the smaller they are the slower will converge onto the right answer
+  //the bigger they are, the less well sampled the probability distribution will be and hence the less accurate the final answer
+  //needs to find the "goldilocks" zone here but that's very problem specific so requires trial and error as we actually start fitting data.
   p_o[0]=lpars[4]; 
-  dp[0]=0.1;
+  dp[0]=0.3;
   p_min[0]=0.0;
   p_max[0]=7.0;
   
   p_o[1]=lpars[5];
-  dp[1]=0.1;
+  dp[1]=0.3;
   p_min[1]=0.0;
   p_max[1]=5.0;
   
@@ -140,66 +143,59 @@ int main(int argc,char** argv){
   
   //loop trough the mcmc runs
   // at each step, from some initial paramer value "p" call on the simulator.cpp //program to evaluate the chi2 for that particular color-color plot. Then use the metrop algorithm (below) to decide whether or not to keep a particular guess
-  //the chain results are stored in ?
-  //int i,j;
+  //the chain results (including all accepted guesses) will provide us with the posterior probability distributions for the fitted parameters.
+
   double chi_min=1000.0; //the initial chi2_min value, this is iterated each time a better value is found
   double previous=chi_min;
   double trial;
   int minlink;
-  //bool metrop;
   long acceptot=0;
   bool ans;
-
-  //double nr[2];
-  //nr[0]=-1;
-  //nr[1]=1;
 
   double p0_rng[runs];
   double q0_rng[runs];
 
   gsl_rng_default_seed=time(NULL);
-    T=gsl_rng_default;
-    r=gsl_rng_alloc(T);
+  T=gsl_rng_default;
+  r=gsl_rng_alloc(T);
   
-    double area;
-    double test_chi2;
+  double area;
+  double test_chi2;
 
-    //note need to be able to pass the survey area down from the widget!!!
-    //this is necessary for correct cosmological volume determinations
-    //hence correct number count predictions
-    //the value of area here is just a placeholder
-    //e.g. 2 sq.degrees
-    area=pow((1.4*M_PI/180.0),2);
+  //note need to be able to pass the survey area down from the widget!!!
+  //this is necessary for correct cosmological volume determinations
+  //hence correct number count predictions
+  //this value of area here is just a placeholder
+  area=pow((1.4*M_PI/180.0),2);
 
-    int nruns=1;
-    //int gsize=1; //the size for gauss_random
+  double t=100; // the temperature, keep fixed for now, but can also try annealing in the future, this has similar effect as the width of the proposal distribution, as determines how likely a far flung guess is of being accepted (see metrop function on top)
 
-    //double pmean,qmean;
-    //pmean=0.0;
-    //qmean=0.0;
+    //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
+    p_o[0]=6.0;
 
-  for (int i=0;i<nruns;i++){
+  for (int i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
     q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
-    //p0_rng[i]=*gauss_random(r,nr,pmean,dp[0],gsize);
-    //q0_rng[i]=*gauss_random(r,nr,qmean,dp[1],gsize);
     temp=p_o[0]+p0_rng[i];  
     if((temp >= p_min[0]) && (temp <= p_max[0])) lpars[4]=temp;
     temp=p_o[1]+q0_rng[i];
     if((temp >= p_min[1]) && (temp <= p_max[1])) lpars[5]=temp;
-    
+    // this should be commented out when the runs number gets longer as it will slow things down alot to have to display each guess
+    cout<<i+1<<" "<<lpars[4]<<" "<<lpars[5]<<endl; //check to see if sensible guesses, need to also do some test the randomness at some point
+
+    /*
     simulator tester(bs,errs,area,flims,lpars,modfile,obsfile,sedfile);
     test_chi2=tester.model_chi2();
 
     cout<<"Model chi2 :"<<test_chi2<<endl;
 
     trial=test_chi2;
-    double r=trial-chi_min;
+    double de=trial-chi_min;
     if(trial < chi_min){
       chi_min=trial;
       minlink=i;
     }
-    ans=metrop(r,temp);
+    ans=metrop(de,t);
     if(ans=true){
       acceptot++;
       previous=trial;
@@ -207,6 +203,7 @@ int main(int argc,char** argv){
 	chain[0][i]=lpars[4];
 	chain[1][i]=lpars[5];
     }
+    */
   }
 
   gsl_rng_free (r);
