@@ -1,5 +1,6 @@
 //****************************************************************************
 // written by Anna Sajina 09/28/12
+// updated by Anna Sajina 02/19/13
 // The purpose of this program is to read-in the parameters set in the idl wrapper (simulation.pro) and to use MCMC to determine the best-fit set of parameters. // Specifically it runs through a number of iterations (runs) in each stage calling on simulator.cpp to compute the chi2 for a given set of parameters
 // then the metrop algorithm is invoked to decide whether or not a given trial run is accepted. If so it is added to a chain of mcmc values.
 //****************************************************************************
@@ -44,7 +45,7 @@ int main(int argc,char** argv){
   
   int npar=2; 
   double p_o[npar],dp[npar],p_min[npar],p_max[npar]; //the initial guesses of the parameters, the width of the proposal distribution and the acceptable min/max range
-  double chain[npar][runs];
+  double chain[npar+1][runs]; //note the chain is npar+1 as the last column holds the chi2 values for the particular "guess"
 
   //Note, these have to come from the widget, not be hardwired here!
   string outfile("/Users/annie/students/noah_kurinsky/Fitting/output.fits");
@@ -160,8 +161,6 @@ int main(int argc,char** argv){
   r=gsl_rng_alloc(T);
   
   double area;
-  double test_chi2;
-
   //note need to be able to pass the survey area down from the widget!!!
   //this is necessary for correct cosmological volume determinations
   //hence correct number count predictions
@@ -183,13 +182,11 @@ int main(int argc,char** argv){
     // this should be commented out when the runs number gets longer as it will slow things down alot to have to display each guess
     cout<<i+1<<" "<<lpars[4]<<" "<<lpars[5]<<endl; //check to see if sensible guesses, need to also do some test the randomness at some point
 
-    /*
     simulator tester(bs,errs,area,flims,lpars,modfile,obsfile,sedfile);
-    test_chi2=tester.model_chi2();
+    trial=tester.model_chi2();
 
-    cout<<"Model chi2 :"<<test_chi2<<endl;
+    cout<<"Model chi2 :"<<trial<<endl;
 
-    trial=test_chi2;
     double de=trial-chi_min;
     if(trial < chi_min){
       chi_min=trial;
@@ -202,9 +199,12 @@ int main(int argc,char** argv){
       //update mcmc chain with accepted values
 	chain[0][i]=lpars[4];
 	chain[1][i]=lpars[5];
+	chain[2][i]=trial;
     }
-    */
   }
+
+  // here will call on code that genrates output to be send back to the idl wrapper, here also need new code that will analyze the results in the chain and return maximum likelihood values as well as associated 68% probabilities (need to decide whether its better to do this here or in the idl wrapper).
+  //perhaps the easiest thing to start off is to save the chain in a fits format and send it back to idl like that?
 
   gsl_rng_free (r);
 
