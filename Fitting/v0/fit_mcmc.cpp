@@ -175,7 +175,7 @@ int main(int argc,char** argv){
   for (int i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
     q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
-    temp=p_o[0]+p0_rng[i];  
+    temp=p_o[0]+p0_rng[i];  //fix this (not just the initial guess)  
     if((temp >= p_min[0]) && (temp <= p_max[0])) lpars[4]=temp;
     temp=p_o[1]+q0_rng[i];
     if((temp >= p_min[1]) && (temp <= p_max[1])) lpars[5]=temp;
@@ -212,3 +212,4 @@ int main(int argc,char** argv){
 }
 
 
+//at every iteration, keep distributions of source properties but not every source
