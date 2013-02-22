@@ -55,17 +55,6 @@ sprop::sprop(){
 }
 
 /*
-sprop simulator::get(int i){
-  if (simulated){
-    return sources[i];
-  }
-  else{
-    static sprop retval;
-    return retval;
-  }
-}
-*/
-/*
 simulator::simulator(){
   //distributions = NULL;
   luminosity_function = NULL;
@@ -113,7 +102,6 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
   int nlambda = image.axis(0);
   int nlum = image.axis(1)-1; //since the first row here is the lambda array
 
-  //double * lambda = new double[nlambda];
   int fi;
   double lambda[nlambda];
   //for (int fi=0;fi<nlambda;fi++){

@@ -41,7 +41,6 @@ class simulator{
       m_chi2=0;
     }; //this defines the constructor simulator
   simulator(double b[],double b_err[],double area,double f_lims[],double lpars[],string modfile,string obsfile,string sedfile);
-  //sprop get(int i);
   void set_bands(double b[],double b_err[],double f_lims[]);
   void set_lumfunct(lumfunct *lf);
   void set_model_lib(string modfile);

@@ -1,4 +1,4 @@
-#include "lumfunc.h" //See this header for more information on the following funcitons
+#include "lumfunct.h" //See this header for more information on the following funcitons
 
 void lumfunct::set_phi0(double val){
   phi0=val;
