@@ -8,58 +8,36 @@
 #include "simulator.h"
 #include "functions.h"
 
+#DEFINE BANDS 3
+
 using namespace std;
 
 gsl_rng * r;  /* global generator */
-
-//here de is effectively Delta(Energy), and t is the temperature
-//as in the boltzman factor exp(-de/t)
-bool metrop(double de,double t){
-  
-  bool ans;
-  
-  const gsl_rng_type * T;
-  gsl_rng_env_setup();   
-
-  gsl_rng_default_seed = time(NULL);
-  T = gsl_rng_default;
-  r = gsl_rng_alloc(T);
-
-  //want uniform random number from 0-1
-  double itemp=gsl_rng_uniform(r);
-  //cout<<itemp;
-
-  if ((de < 0.0) or (itemp < exp(-de/t))){
-      ans=true;
-    } else ans=false;
-  
-  return (ans);
-}
+bool metrop(double de,double t);
 
 //note here we have arguments that are being passed to this (as in by the idl widget), but never seem to do anything with them
 int main(int argc,char** argv){
   
-  long int runs=30; //temporary, of course in the end this will be much longer perhaps 100,000-500,000 
+  if(argc < 4){
+    cout << "ERROR: Invalid number of arguments. Calling sequence should be 'fit obsfile modfile sedfile [output]'";
+    return 1;}
   
+  //File names passed in by Widget
+  string outfile("/Users/annie/students/noah_kurinsky/Fitting/output.fits");
+  string obsfile(argv[2]);
+  string modfile(argv[3]);
+  string sedfile(argv[4]);
+  //If outfile specified as argument, change from default
+  if(argc > 4)
+    outfile = argv[5];
+
+  long int runs=30; //temporary, of course in the end this will be much longer perhaps 100,000-500,000   
   const gsl_rng_type * T;
-  
-  int npar=2; 
+  int npar=2; //should eventually be set by the widget, most likely passed in by the pfile
   double p_o[npar],dp[npar],p_min[npar],p_max[npar]; //the initial guesses of the parameters, the width of the proposal distribution and the acceptable min/max range
   double chain[npar+1][runs]; //note the chain is npar+1 as the last column holds the chi2 values for the particular "guess"
-
-  //Note, these have to come from the widget, not be hardwired here!
-  string outfile("/Users/annie/students/noah_kurinsky/Fitting/output.fits");
-  string modfile("/Users/annie/students/noah_kurinsky/Fitting/model.fits");
-  string sedfile("/Users/annie/students/noah_kurinsky/Fitting/sf_templates.fits");
-  string obsfile("/Users/annie/students/noah_kurinsky/Fitting/observation.fits");
-  
-  if(argc > 1)
-    outfile = argv[1];
-  
-  int pnum; 
   
   FITS *pInfile,*pInfile2;
-  
   pInfile = new FITS(modfile,Read);
   pInfile2 = new FITS(obsfile,Read);
   
@@ -67,21 +45,12 @@ int main(int argc,char** argv){
   HDU& params_table = pInfile->pHDU();
   HDU& obs_table = pInfile2->pHDU();
 
-  //get number of parameters and initialize dynamic memory
-  params_table.readKey("P_NUM",pnum);
+  double bs[BANDS],errs[BANDS],flims[BANDS];
 
-  string pi[] = {"0","1","2","3","4","5"};
-
-  int bands=3;
-  double bs[bands],errs[bands],flims[bands];
-
-  for(int i=0;i<3;i++){
-    obs_table.readKey("WAVE_"+pi[i+1],bs[i]);
-    obs_table.readKey("W"+pi[i+1]+"_FMIN",flims[i]);
+  for(int i=0;i<BANDS;i++){
+    obs_table.readKey("WAVE_"+pi[i+1],bs[i]); //should already be in microns
+    obs_table.readKey("W"+pi[i+1]+"_FMIN",flims[i]); //should be in mJy
     obs_table.readKey("W"+pi[i+1]+"_FERR",errs[i]);
-    //bs[i]*=1.e+06; //convert to microns -- Not needed, provide in microns to begin with!
-    //flims[i]*=1e-3; //this is to turn it in Janskys, but I think lets work in mJy anyway
-    //errs[i]*=1e-3;
   }
   
 //=================================================================
@@ -107,19 +76,13 @@ int main(int argc,char** argv){
 
 //this array holds phi0,L0,alpha,beta,p, and q
   double lpars[6];
-  double temp;
-  params_table.readKey("PHI0",temp);
-  lpars[0]=temp;
-  params_table.readKey("L0",temp);
-  lpars[1]=temp;
-  params_table.readKey("ALPHA",temp);
-  lpars[2]=temp;
-  params_table.readKey("BETA",temp);
-  lpars[3]=temp;
-  params_table.readKey("P",temp);
-  lpars[4]=temp;
-  params_table.readKey("Q",temp);
-  lpars[5]=temp;
+  params_table.readKey("PHI0",lpars[0]);
+  params_table.readKey("L0",lpars[1]);
+  params_table.readKey("ALPHA",lpars[2]);
+  params_table.readKey("BETA",lpars[3]);
+  params_table.readKey("P",lpars[4]);
+  params_table.readKey("Q",lpar[5]);
+
   
   //note that the dp values here are the widths of the "proposal distribution"
   //the smaller they are the slower will converge onto the right answer
@@ -134,17 +97,23 @@ int main(int argc,char** argv){
   dp[1]=0.3;
   p_min[1]=0.0;
   p_max[1]=5.0;
-  
+ 
+  //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
+  p_o[0]=6.0;
+ 
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
   fixed_params ps;
-  ps.pnum = pnum;
+  ps.npar = npar;
 
   delete pInfile;
   delete pInfile2;
-  
-  //loop trough the mcmc runs
-  // at each step, from some initial paramer value "p" call on the simulator.cpp //program to evaluate the chi2 for that particular color-color plot. Then use the metrop algorithm (below) to decide whether or not to keep a particular guess
-  //the chain results (including all accepted guesses) will provide us with the posterior probability distributions for the fitted parameters.
+
+  /*
+    Loop trough the mcmc runs
+    At each step, from some initial paramer value "p" call on the simulator.cpp //program to evaluate the chi2 for that particular color-color plot. 
+    Then use the metrop algorithm (below) to decide whether or not to keep a particular guess
+    The chain results (including all accepted guesses) will provide us with the posterior probability distributions for the fitted parameters.
+  */
 
   double chi_min=1000.0; //the initial chi2_min value, this is iterated each time a better value is found
   double previous=chi_min;
@@ -168,9 +137,6 @@ int main(int argc,char** argv){
   area=pow((1.4*M_PI/180.0),2);
 
   double t=100; // the temperature, keep fixed for now, but can also try annealing in the future, this has similar effect as the width of the proposal distribution, as determines how likely a far flung guess is of being accepted (see metrop function on top)
-
-    //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
-    p_o[0]=6.0;
 
   for (int i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
@@ -212,4 +178,24 @@ int main(int argc,char** argv){
 }
 
 
+bool metrop(double de,double t){
+//here de is effectively Delta(Energy), and t is the temperature
+//as in the boltzman factor exp(-de/t)
+  
+  static bool ans;
+  static const gsl_rng_type * T;
+  static double itemp;
+
+  gsl_rng_env_setup();   
+  gsl_rng_default_seed = time(NULL);
+  T = gsl_rng_default;
+  r = gsl_rng_alloc(T);
+  itemp=gsl_rng_uniform(r);   //want uniform random number from 0-1
+
+  ans = ((de < 0.0) or (itemp < exp(-de/t))) ? true : false;
+
+  return ans;
+}
+
+//Notes:
 //at every iteration, keep distributions of source properties but not every source

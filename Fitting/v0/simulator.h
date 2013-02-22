@@ -64,7 +64,7 @@ struct mparam{
 
 struct fixed_params{
   simulator * sim;
-  int pnum;
+  int npar;
   int znum;
   mparam *p;
 };
