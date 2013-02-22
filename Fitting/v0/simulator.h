@@ -1,7 +1,6 @@
 //#include "obs_lib.h"
 #include "model_lib.h"
-//#include "sed_models.h"
-#include "lumfunc.h"
+#include "lumfunct.h"
 #include "hist_lib.h"
 
 //Storage structure for each individual source

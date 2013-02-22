@@ -54,26 +54,6 @@ sprop::sprop(){
   c2 = -99.0;
 }
 
-/*
-simulator::simulator(){
-  //distributions = NULL;
-  luminosity_function = NULL;
-  models = NULL;
-  //  observations = NULL;
-  diagnostic = NULL;
-  //distribution_size = 1000;
-
-  redshift_range[0] = 0.0;
-  redshift_range[1] = 10.0;
-
-  for (int i=0;i<3;i++){
-    bands[i] = -1;
-    band_errs[i] = -1;
-    flux_limits[i]= -1;
-  }
-}
-*/
-
 void simulator::init_rand(){
   gsl_rng * r;
   const gsl_rng_type * T;
@@ -355,17 +335,14 @@ void simulator::set_bands(double b[],double b_err[],double f_lims[]){
   }
 }
 
-
-
-
-/*
 void simulator::set_lumfunct(lumfunct *lf){
   if(lf != NULL)
     luminosity_function = lf;
   else
     cout << "ERROR: NULL Pointer Passed to Simulator" << endl;
 }
-*/
+
+
 //void simulator::set_model_lib(string modfile){
 //  models = new model_lib(modfile);
 //}

@@ -8,7 +8,7 @@
 #include "simulator.h"
 #include "functions.h"
 
-#DEFINE BANDS 3
+#define BANDS 3
 
 using namespace std;
 
@@ -19,7 +19,7 @@ bool metrop(double de,double t);
 int main(int argc,char** argv){
   
   if(argc < 4){
-    cout << "ERROR: Invalid number of arguments. Calling sequence should be 'fit obsfile modfile sedfile [output]'";
+    cout << "ERROR: Invalid number of arguments." << endl << "Calling sequence should be 'fit obsfile modfile sedfile [output]'" << endl;
     return 1;}
   
   //File names passed in by Widget
@@ -46,6 +46,7 @@ int main(int argc,char** argv){
   HDU& obs_table = pInfile2->pHDU();
 
   double bs[BANDS],errs[BANDS],flims[BANDS];
+  string pi[] = {"0","1","2","3","4","5"};
 
   for(int i=0;i<BANDS;i++){
     obs_table.readKey("WAVE_"+pi[i+1],bs[i]); //should already be in microns
@@ -81,7 +82,7 @@ int main(int argc,char** argv){
   params_table.readKey("ALPHA",lpars[2]);
   params_table.readKey("BETA",lpars[3]);
   params_table.readKey("P",lpars[4]);
-  params_table.readKey("Q",lpar[5]);
+  params_table.readKey("Q",lpars[5]);
 
   
   //note that the dp values here are the widths of the "proposal distribution"
@@ -137,6 +138,7 @@ int main(int argc,char** argv){
   area=pow((1.4*M_PI/180.0),2);
 
   double t=100; // the temperature, keep fixed for now, but can also try annealing in the future, this has similar effect as the width of the proposal distribution, as determines how likely a far flung guess is of being accepted (see metrop function on top)
+  double temp;
 
   for (int i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
@@ -199,3 +201,4 @@ bool metrop(double de,double t){
 
 //Notes:
 //at every iteration, keep distributions of source properties but not every source
+//how do we handle redshift?
