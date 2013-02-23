@@ -71,11 +71,34 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
   //these are really set up when the sf_templates.fits is set
   //*************************************************************************
 
-  //NOTE: THIS IS BEING INTEGRATED INTO SED_LIB, ALL MODEL FUNCTIONS WILL BE
-  //LOCATED IN THAT CLASS
-  //NOT FULLY FUNCTIONAL!!!!!!!!!!!!!!!!!!!!!!!!!
+  FITS *pInfile;
+  
+  pInfile = new FITS(sedfile,Read);
 
-  seds = new sed_lib(sedfile);
+  std::valarray<double> seds;
+  PHDU& image = pInfile->pHDU();
+  image.read(seds); //store contents of image into the array "seds"
+
+  int nlambda = image.axis(0);
+  int nlum = image.axis(1)-1; //since the first row here is the lambda array
+
+  int fi;
+  double lambda[nlambda];
+  //for (int fi=0;fi<nlambda;fi++){
+  //  lambda[fi]=seds[fi];
+  //}
+
+ //read in the total IR luminosities associated with the different z=0 SED templates
+  double lumarray[nlum];
+  double temp;
+  HDU& header = pInfile->pHDU();
+  
+  for (int i=0;i<nlum;i++) {
+    std::string a = "ROW";
+    a+= static_cast<ostringstream*>( &(ostringstream() << i+1) )->str();
+    header.readKey(a,temp);
+    lumarray[i]=temp;  
+  }
  
   //=========================================================================
   //2nd step: setup redshift array
@@ -88,26 +111,27 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
   for (int fi=0;fi<nz;fi++)
     zarray[fi]=0.1+fi*dz;
 
-  // double seds0[nlambda][nlum];
+  double seds0[nlambda][nlum];
 
-  // for (int fi=0;fi<nlambda;fi++){
-  //   lambda[fi]=seds[fi];
-  //   for (int fj=0;fj<nlum;fj++){
-  //     seds0[fi][fj]=seds[fi+nlambda*(fj+1)];
-  //   }
-  // }
+  for (int fi=0;fi<nlambda;fi++){
+    lambda[fi]=seds[fi];
+    for (int fj=0;fj<nlum;fj++){
+      seds0[fi][fj]=seds[fi+nlambda*(fj+1)];
+    }
+  }
   
   //=========================================================================
   //3rd step: determine the # of sources in each L-z bin, depending on the LF model
   //*************************************************************************
 
-  lf = new lumfunct;  
-  lf->set_phi0 (lpars[0]);
-  lf->set_L0 (lpars[1]);
-  lf->set_alpha (lpars[2]);
-  lf->set_beta (lpars[3]);
-  lf->set_p (lpars[4]);
-  lf->set_q (lpars[5]);
+  lumfunct lf; //
+  
+  lf.set_phi0 (lpars[0]);
+  lf.set_L0 (lpars[1]);
+  lf.set_alpha (lpars[2]);
+  lf.set_beta (lpars[3]);
+  lf.set_p (lpars[4]);
+  lf.set_q (lpars[5]);
 
   int is,js;
   double tmpz,vol;
@@ -121,7 +145,7 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
       vol=(dvdz(tmpz,area)*dz)/(1.e+05);
       for (js=0;js<nlum;js++)
 	{
-	  nsrcs[is][js]=vol*lf->get_nsrcs(zarray[is],lumarray[js]);
+	  nsrcs[is][js]=vol*lf.get_nsrcs(zarray[is],lumarray[js]);
 	  //cout<<nsrcs[is][js]<<endl;
 	}
     }
@@ -392,14 +416,15 @@ bool simulator::save(string outfile){
 
 simulator::~simulator(){
 
+  //if(distributions != NULL)
+  //  delete distributions;
+
   //  if(models != NULL)
   //  delete models;
   
   //  if(observations != NULL)
   //delete observations;
 
-  if(lf != NULL)
-    delete lf;
   if(diagnostic != NULL)
     delete diagnostic;
 }

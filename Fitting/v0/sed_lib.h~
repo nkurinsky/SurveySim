@@ -10,7 +10,7 @@ class sed{
  public:
   double *fluxes;
   sed();
-  sed(double *f,double *bands);
+  sed(double *f,vector<double> &bands);
   double get_flux(double band);
   ~sed();
 };
@@ -19,8 +19,7 @@ class sed_lib{
  private:
   vector<sed*> seds;
   vector<double> lums;
-  double *bands;
-  int bandnum;
+  vector<double> bands;
  public:
   sed_lib(string fitsfile);
   double get_flux(double lum,double band);

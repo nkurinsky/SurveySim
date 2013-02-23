@@ -24,8 +24,8 @@ class simulator{
   //sim *distributions;
   vector<sprop> sources;
   //bool simulated;
-  lumfunct *lf;
-  sed_lib *seds;
+  lumfunct *luminosity_function;
+  model_lib *models;
   //  obs_lib *observations;
   hist_lib * diagnostic;
   double bands[3];

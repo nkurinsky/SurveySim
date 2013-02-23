@@ -29,9 +29,48 @@ sed::~sed(){
 
 //modify to read Anna's type of file
 model_lib::sed_lib(string fitsfile){
+  //initialize FITS input
+  FITS* pInfile;
+  pInfile = new FITS(fitsfile,Read);
+  
+  //reading primary header from fits file
+  HDU& table = pInfile->pHDU();
+  //extracting conents of image from fits file
+  std::valarray<double> contents;
+  PHDU& image = pInfile->pHDU();
+  image.read(contents);
+
+  static string ti[3] = {"1","2","3"};
+  double btemp,fetemp,fltemp;
+  seds.resize(image.axis(1));
+
+  if(image.axis(0) != 3){
+    printf("%s \n","ERROR: (Obs_Lib) Incorrect Number of Bands");
+  }
+  else{
+
+    for (int i=0;i<3;i++){
+      table.readKey("WAVE_"+ti[i],btemp);
+      table.readKey("W"+ti[i]+"_FERR",fetemp);
+      table.readKey("W"+ti[i]+"_FMIN",fltemp);
+      bands[i]=btemp;
+      ferr[i]=fetemp;
+      flim[i]=fltemp;
+    }
+    
+    sed *new_sed;
+    double fluxes[3];
+    
+    for (unsigned int i=0;i<seds.size();i++){
+      for (int j=0;j<3;j++)
+	fluxes[j]=contents[i*3+j];
+      new_sed = new sed(fluxes,bands);
+      seds[i] = new_mods;
+    }
+  }
   
   FITS *pInfile;  
-  pInfile = new FITS(fitsfile,Read);
+  pInfile = new FITS(sedfile,Read);
 
   std::valarray<double> contents;
   PHDU& image = pInfile->pHDU();
@@ -39,7 +78,6 @@ model_lib::sed_lib(string fitsfile){
 
   bandnum = image.axis(0);
   lums.resize(image.axis(1)-1); //since the first row here is the lambda array
-  seds.resize(image.axis(1)-1);
   bands = new double[bandnum];
 
  //read in the total IR luminosities associated with the different z=0 SED templates
@@ -54,7 +92,6 @@ model_lib::sed_lib(string fitsfile){
   }
 
   double fluxes[bandnum];
-  sed *new_sed;
   
   for (int fi=0;fi<bandnum;fi++){
     bands[fi]=contents[fi];
@@ -62,19 +99,13 @@ model_lib::sed_lib(string fitsfile){
   
   for (int fj=1;fj<(nlum+1);fj++){
     for (int fi=0;fi<bandnum;fi++)
-      fluxes[fi]=contents[fi+bandnum*fj];
-    new_sed = new sed(fluxes,bands);
-    seds[i] = new_sed;
+	   fluxes[fi]=contents[fi+bandnum*fj];
+	 }
+    delete pInfile;
   }
   
-  delete pInfile;
-  
-}
-
-//needs to interpolate to correct luminosity 
-//make sure lums sorted in order!!! 
 double sed_lib::get_flux(double lum,double band){
-  if(lum < seds.size())
+  if(i < int(seds.size()))
     return seds[i]->get_flux(band);
   else
     return -1;
