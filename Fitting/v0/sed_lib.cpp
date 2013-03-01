@@ -8,7 +8,7 @@ sed::sed(){
 sed::sed(double * f,double *bands, int bnum){
   fluxes = new double[bnum];
   for (int i=0;i<bnum;i++){
-    fluxes[i] = f[i];
+    fluxes[i] = f[i];}
 
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline,bnum);
@@ -35,7 +35,7 @@ sed::~sed(){
 }
 
 //modify to read Anna's type of file
-model_lib::sed_lib(string fitsfile){
+sed_lib::sed_lib(string fitsfile){
   
   double *bands;
   FITS *pInfile;  
@@ -48,7 +48,7 @@ model_lib::sed_lib(string fitsfile){
   bandnum = image.axis(0);
   lnum = image.axis(1)-1; //since the first row here is the lambda array
   lums = new double[lnum];
-  int inds[lnum];
+  double inds[lnum];
   seds.resize(image.axis(1)-1);
   bands = new double[bandnum];
 
@@ -76,11 +76,11 @@ model_lib::sed_lib(string fitsfile){
     bands[fi]=contents[fi];
   }
   
-  for (int fj=1;fj<(nlum+1);fj++){
+  for (int fj=1;fj<(lnum+1);fj++){
     for (int fi=0;fi<bandnum;fi++)
       fluxes[fi]=contents[fi+bandnum*fj];
     new_sed = new sed(fluxes,bands,bandnum);
-    seds[i] = new_sed;
+    seds[fj] = new_sed;
   }
   
   delete[] bands;
@@ -91,15 +91,12 @@ model_lib::sed_lib(string fitsfile){
 //rounds to nearest template, in future may average/interp
 //make sure lums sorted in order!!! currently an assumption
 double sed_lib::get_flux(double lum,double band){
-  if(interp_init){
-    int i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
-    if (i < 0)
-      i = 0;
-    if (i >= lnum)
-      i = lnum-1;
-    return seds[i]->get_flux(band);}
-  else
-    return -1;
+  int i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
+  if (i < 0)
+    i = 0;
+  if (i >= lnum)
+    i = lnum-1;
+  return seds[i]->get_flux(band);
 }
 
 sed_lib::~sed_lib(){
