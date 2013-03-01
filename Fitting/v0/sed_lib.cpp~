@@ -37,7 +37,6 @@ sed::~sed(){
 //modify to read Anna's type of file
 model_lib::sed_lib(string fitsfile){
   
-  double *bands;
   FITS *pInfile;  
   pInfile = new FITS(fitsfile,Read);
 
@@ -46,9 +45,7 @@ model_lib::sed_lib(string fitsfile){
   image.read(contents); //store contents of image into the array "seds"
 
   bandnum = image.axis(0);
-  lnum = image.axis(1)-1; //since the first row here is the lambda array
-  lums = new double[lnum];
-  int inds[lnum];
+  lums.resize(image.axis(1)-1); //since the first row here is the lambda array
   seds.resize(image.axis(1)-1);
   bands = new double[bandnum];
 
@@ -56,18 +53,13 @@ model_lib::sed_lib(string fitsfile){
   double temp;
   HDU& header = pInfile->pHDU();
   
-  for (int i=0;i<lnum;i++) {
+  for (int i=0;i<nlum;i++) {
     std::string a = "ROW";
     //convert integer to string...may not be best way
     a+= static_cast<ostringstream*>( &(ostringstream() << i+1) )->str();
     header.readKey(a,temp);
-    lums[i] = temp;
-    inds[i] = i;
+    lums[i]=temp;  
   }
-
-  acc = gsl_interp_accel_alloc();
-  spline = gsl_spline_alloc(gsl_interp_cspline,lnum);
-  gsl_spline_init(spline,lums,inds,lnum);
 
   double fluxes[bandnum];
   sed *new_sed;
@@ -83,21 +75,15 @@ model_lib::sed_lib(string fitsfile){
     seds[i] = new_sed;
   }
   
-  delete[] bands;
   delete pInfile;
+  
 }
 
 //needs to interpolate to correct luminosity 
-//rounds to nearest template, in future may average/interp
-//make sure lums sorted in order!!! currently an assumption
+//make sure lums sorted in order!!! 
 double sed_lib::get_flux(double lum,double band){
-  if(interp_init){
-    int i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
-    if (i < 0)
-      i = 0;
-    if (i >= lnum)
-      i = lnum-1;
-    return seds[i]->get_flux(band);}
+  if(lum < seds.size())
+    return seds[i]->get_flux(band);
   else
     return -1;
 }
@@ -106,7 +92,4 @@ sed_lib::~sed_lib(){
   for (unsigned int i=0;i<seds.size();i++){
     delete seds[i];
   }
-  gsl_spline_free(spline);
-  gsl_interp_accel_free(acc);
-  delete[] lums;
 }

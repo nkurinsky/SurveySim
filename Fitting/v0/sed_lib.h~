@@ -15,16 +15,12 @@ class sed{
   ~sed();
 };
 
-//eventually, multiple SEDs per luminosity will be used in 
-//specified porportions. Currently, one SED per luminosity
 class sed_lib{
  private:
   vector<sed*> seds;
-  double *lums;
-  int lnum;
+  vector<double> lums;
+  double *bands;
   int bandnum;
-  gsl_interp_accel *acc;
-  gsl_spline *spline;
  public:
   sed_lib(string fitsfile);
   double get_flux(double lum,double band);
