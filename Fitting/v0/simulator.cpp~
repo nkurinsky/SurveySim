@@ -71,6 +71,10 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
   //these are really set up when the sf_templates.fits is set
   //*************************************************************************
 
+  //NOTE: THIS IS BEING INTEGRATED INTO SED_LIB, ALL MODEL FUNCTIONS WILL BE
+  //LOCATED IN THAT CLASS
+  //NOT FULLY FUNCTIONAL!!!!!!!!!!!!!!!!!!!!!!!!!
+
   seds = new sed_lib(sedfile);
  
   //=========================================================================
@@ -84,6 +88,15 @@ simulator::simulator(double b[],double b_err[],double area,double f_lims[],doubl
   for (int fi=0;fi<nz;fi++)
     zarray[fi]=0.1+fi*dz;
 
+  // double seds0[nlambda][nlum];
+
+  // for (int fi=0;fi<nlambda;fi++){
+  //   lambda[fi]=seds[fi];
+  //   for (int fj=0;fj<nlum;fj++){
+  //     seds0[fi][fj]=seds[fi+nlambda*(fj+1)];
+  //   }
+  // }
+  
   //=========================================================================
   //3rd step: determine the # of sources in each L-z bin, depending on the LF model
   //*************************************************************************

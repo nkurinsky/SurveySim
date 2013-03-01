@@ -28,6 +28,7 @@ class lumfunct {
   void set_q(double val);
   //for getting the number of sources/Mpc^3 for a given L,z pair
   double get_nsrcs(double redshift,double lum);
+  //void initialize();
   //~lumfunct();
 };
 
