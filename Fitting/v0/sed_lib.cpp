@@ -5,18 +5,24 @@ sed::sed(){
   interp_init = false;
 }
 
-sed::sed(double * f,double *bands){
-  for (int i=0;i<3;i++){
+sed::sed(double * f,double *bands, int bnum){
+  fluxes = new double[bnum];
+  for (int i=0;i<bnum;i++){
     fluxes[i] = f[i];
 
   acc = gsl_interp_accel_alloc();
-  spline = gsl_spline_alloc(gsl_interp_cspline,3);
-  gsl_spline_init(spline,bands,f,3);
+  spline = gsl_spline_alloc(gsl_interp_cspline,bnum);
+  gsl_spline_init(spline,bands,f,bnum);
   interp_init = true;
 }
 
 double sed::get_flux(double band){
-  return gsl_spline_eval(spline,band,acc);
+  if (interp_init)
+    return gsl_spline_eval(spline,band,acc);
+  else{
+    printf("%s \n","ERROR: SED Model Not Initialized");
+    return -1;
+  }
 }
 
 sed::~sed(){
@@ -24,7 +30,8 @@ sed::~sed(){
     gsl_spline_free(spline);
     gsl_interp_accel_free(acc);
   }
-  delete [] fluxes;
+  if (fluxes != NULL)
+    delete [] fluxes;
 }
 
 //modify to read Anna's type of file
@@ -48,6 +55,7 @@ model_lib::sed_lib(string fitsfile){
   
   for (int i=0;i<nlum;i++) {
     std::string a = "ROW";
+    //convert integer to string...may not be best way
     a+= static_cast<ostringstream*>( &(ostringstream() << i+1) )->str();
     header.readKey(a,temp);
     lums[i]=temp;  
@@ -63,7 +71,7 @@ model_lib::sed_lib(string fitsfile){
   for (int fj=1;fj<(nlum+1);fj++){
     for (int fi=0;fi<bandnum;fi++)
       fluxes[fi]=contents[fi+bandnum*fj];
-    new_sed = new sed(fluxes,bands);
+    new_sed = new sed(fluxes,bands,bandnum);
     seds[i] = new_sed;
   }
   

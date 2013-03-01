@@ -10,7 +10,7 @@ class sed{
  public:
   double *fluxes;
   sed();
-  sed(double *f,double *bands);
+  sed(double *f,double *bands, int bnum);
   double get_flux(double band);
   ~sed();
 };
