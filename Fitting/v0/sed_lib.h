@@ -28,6 +28,9 @@ class sed_lib{
  public:
   sed_lib(string fitsfile);
   double get_flux(double lum,double band);
+  int lnum(){
+    return lnum;}
+  void get_lums(double luminosities[])
   int get_snum(){
     return seds.size();}
   ~sed_lib();

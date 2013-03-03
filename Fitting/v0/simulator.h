@@ -20,35 +20,28 @@ struct sprop{
 
 class simulator{
  private:
-  double m_chi2;
-  //sim *distributions;
+  double chisq;
   vector<sprop> sources;
-  //bool simulated;
+  bool simulated;
   lumfunct *lf;
   sed_lib *seds;
-  //  obs_lib *observations;
+  obs_lib *observations;
   hist_lib * diagnostic;
   double bands[3];
   double band_errs[3];
   double flux_limits[3];
   double distribution_size;
-  double redshift_range[2];
   void init_rand(); //Initializes GNU random number generator (see functions.h)
  public:
-  simulator()
-    {
-      m_chi2=0;
-    }; //this defines the constructor simulator
-  simulator(double b[],double b_err[],double area,double f_lims[],double lpars[],string modfile,string obsfile,string sedfile);
+  simulator() {chisq=0;}
+  simulator(double b[],double b_err[],double f_lims[],string obsfile,string sedfile);
   void set_bands(double b[],double b_err[],double f_lims[]);
-  void set_lumfunct(lumfunct *lf);
-  void set_model_lib(string modfile);
-  void set_obs_lib(string obsfile);
-  void set_zrange(double zrange[]);
-  void set_simulated_size(double size);
+  void set_lumfunct(lumfunct *lf, double area, int nz,double dz);
+  void set_sed_lib(string sedfile);
+  void set_obs(string obsfile);
   void reset();
-  double simulate(const gsl_vector *v,void *params);
-  double model_chi2() { return m_chi2; }
+  double simulate(double area, int nz, double dz);
+  double model_chisq() { return chisq; }
   bool save(string outfile);
   ~simulator();
 };

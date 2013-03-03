@@ -99,6 +99,11 @@ double sed_lib::get_flux(double lum,double band){
   return seds[i]->get_flux(band);
 }
 
+void sed_lib::get_lums(double luminosities){
+  for (int i=0;i < lnum; i++)
+    luminosities[i] = lums[i];
+}
+
 sed_lib::~sed_lib(){
   for (unsigned int i=0;i<seds.size();i++){
     delete seds[i];

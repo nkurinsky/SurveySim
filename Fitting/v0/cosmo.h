@@ -27,7 +27,6 @@ double dvdz (double zmax, double area)
 {
   double ez;
   double my_dvdz;
-
   double dl;
 
   dl=lumdist(zmax);

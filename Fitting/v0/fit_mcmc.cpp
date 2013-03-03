@@ -54,23 +54,6 @@ int main(int argc,char** argv){
     obs_table.readKey("W"+pi[i+1]+"_FERR",errs[i]);
   }
   
-//=================================================================
-// Before doing any fits, initialize the observed diagnostic histogram
-// best to do it here, so don't have to re-do it everytime we call on
-// simulator
-//------------------------------------------------------------------
-
-  //double *c1,*c2;
-  //  hist_lib hist_lib(obsfile,bands);
-  //obs_lib obs;
-  //observations.get_all_colors(c1,c2);
-  //int osize;
-  //obs_lib get_snum();
-  //hist_lib();
-  //hist_lib(c1,c2,osize);
-    //hist_lib
-
-
 //=================================================================  
 //Read-in Luminosity Function Parameters
 //-----------------------------------------------------------------
@@ -83,7 +66,6 @@ int main(int argc,char** argv){
   params_table.readKey("BETA",lpars[3]);
   params_table.readKey("P",lpars[4]);
   params_table.readKey("Q",lpars[5]);
-
   
   //note that the dp values here are the widths of the "proposal distribution"
   //the smaller they are the slower will converge onto the right answer
@@ -100,11 +82,9 @@ int main(int argc,char** argv){
   p_max[1]=5.0;
  
   //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
-  p_o[0]=6.0;
+  //p_o[0]=6.0;
  
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
-  fixed_params ps;
-  ps.npar = npar;
 
   delete pInfile;
   delete pInfile2;
