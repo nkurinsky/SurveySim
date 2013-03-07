@@ -1,5 +1,5 @@
-#include "obs_lib.h"
-#include "sed_lib.h"
+//#include "obs_lib.h"
+#include "model_lib.h"
 #include "lumfunct.h"
 #include "hist_lib.h"
 

@@ -18,7 +18,6 @@ class lumfunct {
   double beta;
   double p,q; //Parameters which evolve Phi and L
  public:
-  lumfunct();
   //lumfunct(double lpar[6]);
 //For changing parameters
   void set_phi0(double val);
