@@ -96,6 +96,12 @@ void simulator::set_bands(double b[],double b_err[],double f_lims[]){
 void simulator::set_lumfunct(lumfunct *lf){
   if(lf != NULL){
     luminosity_function = lf;
+
+    //setup redshift array    
+    double zarray[nz];
+    
+    for (int fi=0;fi<nz;fi++)
+      zarray[fi]=0.1+fi*dz;
   }
   else
     cout << "ERROR: NULL Pointer Passed to Simulator" << endl;

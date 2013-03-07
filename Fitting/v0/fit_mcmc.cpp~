@@ -15,10 +15,11 @@ using namespace std;
 gsl_rng * r;  /* global generator */
 bool metrop(double de,double t);
 
+//note here we have arguments that are being passed to this (as in by the idl widget), but never seem to do anything with them
 int main(int argc,char** argv){
   
   if(argc < 4){
-    cerr << "ERROR: Invalid number of arguments." << endl << "Calling sequence should be 'fit obsfile modfile sedfile [output]'" << endl;
+    cout << "ERROR: Invalid number of arguments." << endl << "Calling sequence should be 'fit obsfile modfile sedfile [output]'" << endl;
     return 1;}
   
   //File names passed in by Widget
@@ -95,17 +96,6 @@ int main(int argc,char** argv){
     The chain results (including all accepted guesses) will provide us with the posterior probability distributions for the fitted parameters.
   */
 
-  lumfunct lf();
-  lf.set_phi0(lpars[0]);
-  lf.set_L0(lpars[1]);
-  lf.set_alpha(lpars[2]);
-  lf.set_beta(lpars[3]);
-  lf.set_p(lpars[4]);
-  lf.set_q(lpars[5]);
-
-  simulator survey(bs,errs,flims,obsfile,sedfile); //initialize simulator
-  survey.set_lumfunct(&lf);
-
   double chi_min=1000.0; //the initial chi2_min value, this is iterated each time a better value is found
   double previous=chi_min;
   double trial;
@@ -120,14 +110,12 @@ int main(int argc,char** argv){
   T=gsl_rng_default;
   r=gsl_rng_alloc(T);
   
-  double area, nz, dz;
+  double area;
   //note need to be able to pass the survey area down from the widget!!!
   //this is necessary for correct cosmological volume determinations
   //hence correct number count predictions
   //this value of area here is just a placeholder
   area=pow((1.4*M_PI/180.0),2);
-  nz = 10;
-  dz = 0.5;
 
   double t=100; // the temperature, keep fixed for now, but can also try annealing in the future, this has similar effect as the width of the proposal distribution, as determines how likely a far flung guess is of being accepted (see metrop function on top)
   double temp;
@@ -140,12 +128,11 @@ int main(int argc,char** argv){
     temp=p_o[1]+q0_rng[i];
     if((temp >= p_min[1]) && (temp <= p_max[1])) lpars[5]=temp;
     // this should be commented out when the runs number gets longer as it will slow things down alot to have to display each guess
-    //check to see if sensible guesses, need to also do some test the randomness at some point
-    printf("%i %d %d\n",(i+1),lpars[4],lpars[5]);
-    
-    lf.set_p(lpars[4]);
-    lf.set_q(lpars[5]);
-    trial=survey.simulate(area,nz,dz);
+    cout<<i+1<<" "<<lpars[4]<<" "<<lpars[5]<<endl; //check to see if sensible guesses, need to also do some test the randomness at some point
+
+    simulator tester(bs,errs,area,flims,lpars,modfile,obsfile,sedfile);
+    trial=tester.model_chi2();
+
     cout<<"Model chi2 :"<<trial<<endl;
 
     double de=trial-chi_min;

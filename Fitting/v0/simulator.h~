@@ -36,7 +36,7 @@ class simulator{
   simulator() {chisq=0;}
   simulator(double b[],double b_err[],double f_lims[],string obsfile,string sedfile);
   void set_bands(double b[],double b_err[],double f_lims[]);
-  void set_lumfunct(lumfunct *lf);
+  void set_lumfunct(lumfunct *lf, double area, int nz,double dz);
   void set_sed_lib(string sedfile);
   void set_obs(string obsfile);
   void reset();
