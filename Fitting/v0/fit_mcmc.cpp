@@ -112,7 +112,7 @@ int main(int argc,char** argv){
     probability distributions for the fitted parameters.
   */
 
-  lumfunct lf();
+  lumfunct lf;
   lf.set_phi0(lpars[0]);
   lf.set_L0(lpars[1]);
   lf.set_alpha(lpars[2]);

@@ -70,9 +70,6 @@ simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,st
     flux_limits[i]= f_lims[i];
   }
   
-  redshift_range[0] = 0.0;
-  redshift_range[1] = 10.0;
-
   observations = new obs_lib(obsfile);
   seds = new sed_lib(sedfile);
 
@@ -95,7 +92,7 @@ void simulator::set_bands(double b[],double b_err[],double f_lims[]){
 
 void simulator::set_lumfunct(lumfunct *lf){
   if(lf != NULL){
-    luminosity_function = lf;
+    this->lf = lf;
   }
   else
     cout << "ERROR: NULL Pointer Passed to Simulator" << endl;
@@ -120,12 +117,12 @@ void simulator::set_obs(string obsfile){
 double simulator::simulate(double area, int nz, double dz){
   reset();
 
-  if(models != NULL){
+  if(seds != NULL){
     //needs to be double checked, should be about done
     static int is,js;
     static double tmpz,vol;
-    double nsrcs[nz][seds->nlum()];
-    double lums[seds->lnum()];
+    double nsrcs[nz][seds->get_lnum()];
+    double lums[seds->get_lnum()];
     seds->get_lums(lums);
 
     //setup redshift array    
@@ -138,7 +135,7 @@ double simulator::simulate(double area, int nz, double dz){
     for (is=0;is<nz;is++) {
       tmpz=(zarray[is+1]+zarray[is])/2.0;
       vol=(dvdz(tmpz,area)*dz)/(1.e+05);
-      for (js=0;js<seds->nlum();js++)
+      for (js=0;js<seds->get_lnum();js++)
 	nsrcs[is][js]=vol*lf->get_nsrcs(zarray[is],lums[js]);
     }
     
@@ -166,7 +163,7 @@ double simulator::simulate(double area, int nz, double dz){
       b_rest[0]=bands[0]/(1.+zarray[is]);
       b_rest[1]=bands[1]/(1.+zarray[is]);
       b_rest[2]=bands[2]/(1.+zarray[is]);
-      for (js=0;js<seds->lnum();js++){
+      for (js=0;js<seds->get_lnum();js++){
 	//printf("L-z bin: %lf %lf \n",zarray[is],lumarray[js]);
 	//cout<<"Number of sources"<<endl;
 	//cout<<nsrcs[is][js]<<endl;
@@ -196,7 +193,7 @@ double simulator::simulate(double area, int nz, double dz){
     // generate diagnostic color-color plots
     //*************************************************************************
     
-    double *mc1,*mc2;
+    double *c1,*c2;
     
     int snum(sources.size());
     c1 = new double[snum];
@@ -206,7 +203,7 @@ double simulator::simulate(double area, int nz, double dz){
       c2[i] = sources[i].c2;
     }
     
-    int msize = nz*seds->nlum();
+    int msize = nz*seds->get_lnum();
     //cout<<" The n_z x n_lum size: "<<endl;
     //cout<<msize<<endl;
     
@@ -233,7 +230,7 @@ simulator::~simulator(){
   if(observations != NULL)
     delete observations;
   if(seds != NULL)
-    delete models;  
+    delete seds;  
   if(diagnostic != NULL)
     delete diagnostic;
 }
