@@ -12,7 +12,7 @@ sed::sed(double * f,double *bands, int bnum){
 
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline,bnum);
-  gsl_spline_init(spline,bands,f,bnum);
+  gsl_spline_init(spline,bands,fluxes,bnum);
   interp_init = true;
 }
 
@@ -49,14 +49,15 @@ sed_lib::sed_lib(string fitsfile){
   lnum = image.axis(1)-1; //since the first row here is the lambda array
   lums = new double[lnum];
   double inds[lnum];
-  seds.resize(image.axis(1)-1);
+  seds.reserve(lnum);
   bands = new double[bandnum];
 
  //read in the total IR luminosities associated with the different z=0 SED templates
   double temp;
   HDU& header = pInfile->pHDU();
   
-  for (int i=0;i<lnum;i++) {
+  cout << "Initialize Luminosities" << endl;
+  for (unsigned int i=0;i<lnum;i++) {
     std::string a = "ROW";
     //convert integer to string...may not be best way
     a+= static_cast<ostringstream*>( &(ostringstream() << i+1) )->str();
@@ -64,7 +65,7 @@ sed_lib::sed_lib(string fitsfile){
     lums[i] = temp;
     inds[i] = i;
   }
-
+  
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline,lnum);
   gsl_spline_init(spline,lums,inds,lnum);
@@ -72,17 +73,20 @@ sed_lib::sed_lib(string fitsfile){
   double fluxes[bandnum];
   sed *new_sed;
   
-  for (int fi=0;fi<bandnum;fi++){
+  for (unsigned int fi=0;fi<bandnum;fi++){
     bands[fi]=contents[fi];
   }
   
-  for (int fj=1;fj<(lnum+1);fj++){
-    for (int fi=0;fi<bandnum;fi++)
+  brange[0] = bands[0];
+  brange[1] = bands[bandnum-1];
+  
+  for (unsigned int fj=1;fj<(lnum+1);fj++){
+    for (unsigned int fi=0;fi<bandnum;fi++)
       fluxes[fi]=contents[fi+bandnum*fj];
     new_sed = new sed(fluxes,bands,bandnum);
-    seds[fj] = new_sed;
+    seds.push_back(new_sed);
   }
-  
+
   delete[] bands;
   delete pInfile;
 }
@@ -91,16 +95,28 @@ sed_lib::sed_lib(string fitsfile){
 //rounds to nearest template, in future may average/interp
 //make sure lums sorted in order!!! currently an assumption
 double sed_lib::get_flux(double lum,double band){
-  int i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
+  static unsigned int i = 0;
+  i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
   if (i < 0)
     i = 0;
   if (i >= lnum)
     i = lnum-1;
-  return seds[i]->get_flux(band);
+  if (seds[i] != NULL){
+    if((band >= brange[0]) and (band <= brange[1]))
+      return seds[i]->get_flux(band);
+    else{
+      printf("%s\n%s\n","ERROR: Band out of model range.","Check that the obs bands are within range and unit consistent");
+      return -1;
+    }
+  }
+  else{
+    printf("%s %i \n","ERROR: Unitialized Model Called!!!",i);
+    return -1;
+  }
 }
 
 void sed_lib::get_lums(double luminosities[]){
-  for (int i=0;i < lnum; i++)
+  for (unsigned int i=0;i < lnum; i++)
     luminosities[i] = lums[i];
 }
 

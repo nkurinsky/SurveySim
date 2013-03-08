@@ -1,11 +1,12 @@
 #!/bin/bash
 
 clear
+
 printf "\nSurvey Simulator Compilation Code\n"
 printf "Last Updated 4/7/13 by Noah Kurinsky\n\n"
 
 printf "Building Simulator.cpp..."
-g++ -c simulator.cpp -Wall -Werror
+g++ -g -c simulator.cpp -Wall -Werror
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -14,7 +15,7 @@ else
 fi
 
 printf "Building Lumfunct.cpp..." 
-g++ -c lumfunct.cpp -Wall -Werror
+g++ -g -c lumfunct.cpp -Wall -Werror
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -23,7 +24,7 @@ else
 fi
 
 printf "Building Functions.cpp..." 
-g++ -c functions.cpp -Wall -Werror
+g++ -g -c functions.cpp -Wall -Werror
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -32,7 +33,7 @@ else
 fi
 
 printf "Building hist_lib.cpp..." 
-g++ -c hist_lib.cpp -Wall -Werror
+g++ -g -c hist_lib.cpp -Wall -Werror
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -41,7 +42,7 @@ else
 fi
 
 printf "Building sed_lib.cpp..." 
-g++ -c sed_lib.cpp -Wall -Werror
+g++ -g -c sed_lib.cpp -Wall -Werror
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -50,7 +51,7 @@ else
 fi
 
 printf "Building obs_lib.cpp..."
-g++ -c obs_lib.cpp -Wall -Werror
+g++ -g -c obs_lib.cpp -Wall -Werror
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -67,3 +68,5 @@ else
     printf "\nMain build failed...exiting\n\n" 1>&2
     exit 1
 fi
+
+printf "\nProgram successfully compiled as \"fitter\"\n\n""

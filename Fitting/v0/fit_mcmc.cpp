@@ -23,22 +23,22 @@ bool metrop(double de,double t);
 int main(int argc,char** argv){
   
   if(argc < 4){
-    cerr << "ERROR: Invalid number of arguments." << endl;
-    cerr << "Calling sequence should be 'fit obsfile modfile sedfile [output]'" << endl;
+    printf("%s","ERROR: Invalid number of arguments.\n");
+    printf("%s","Calling sequence should be \"fit obsfile modfile sedfile [output]\"\n");
     return 1;}
   
   //File names passed in by Widget
-  string outfile("/Users/annie/students/noah_kurinsky/Fitting/output.fits");
-  string obsfile(argv[2]);
-  string modfile(argv[3]);
-  string sedfile(argv[4]);
+  string outfile("output.fits");
+  string obsfile(argv[1]);
+  string modfile(argv[2]);
+  string sedfile(argv[3]);
   //If outfile specified as argument, change from default
   if(argc > 4)
-    outfile = argv[5];
+    outfile = argv[4];
 
   //temporary, of course in the end this will be much longer 
   //perhaps 100,000-500,000 
-  long int runs=30;   
+  long int runs=1;   
   const gsl_rng_type * T;
 
   // the initial guesses of the parameters, the width of the proposal distribution 
@@ -64,8 +64,10 @@ int main(int argc,char** argv){
     obs_table.readKey("WAVE_"+pi[i+1],bs[i]); //should already be in microns
     obs_table.readKey("W"+pi[i+1]+"_FMIN",flims[i]); //should be in mJy
     obs_table.readKey("W"+pi[i+1]+"_FERR",errs[i]);
+    printf("%fl\t",bs[i]);
   }
-  
+  printf("\n");
+
 //=================================================================  
 //Read-in Luminosity Function Parameters
 //-----------------------------------------------------------------
@@ -165,10 +167,11 @@ int main(int argc,char** argv){
     if((temp >= p_min[1]) && (temp <= p_max[1])) lpars[5]=temp;
     //check to see if sensible guesses, need to also do some test 
     //the randomness at some point
-    printf("%i %lf %lf\n",(i+1),lpars[4],lpars[5]);
+    printf("%i %lf %lf...",(i+1),lpars[4],lpars[5]);
     
     lf.set_p(lpars[4]);
     lf.set_q(lpars[5]);
+    printf("Running...");
     trial=survey.simulate(area,nz,dz);
     printf("Model chi2: %lf\n",trial);
 

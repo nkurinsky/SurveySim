@@ -121,7 +121,7 @@ double simulator::simulate(double area, int nz, double dz){
     //needs to be double checked, should be about done
     static int is,js;
     static double tmpz,vol;
-    double nsrcs[nz][seds->get_lnum()];
+    long nsrcs[nz][seds->get_lnum()];
     double lums[seds->get_lnum()];
     seds->get_lums(lums);
 
@@ -131,12 +131,15 @@ double simulator::simulate(double area, int nz, double dz){
       zarray[i]=0.1+i*dz;
 
     //get the number of sources per L-z bin
-    //scale the volume elements by 10^5 to avoid too large a number
+    //scale the volume elements by 10^10 to avoid too large a number
+    //THIS SCALING DOES NOT WORK, STILL get 10^6!!!
+    //making a weights array associated with redshift (use volume), aim for 1000 per bin
+    //luminosity function dependent scaling (use highest bin, 10 per bin)
     for (is=0;is<nz;is++) {
       tmpz=(zarray[is+1]+zarray[is])/2.0;
-      vol=(dvdz(tmpz,area)*dz)/(1.e+05);
+      vol=(dvdz(tmpz,area)*dz)/(1.e+10);
       for (js=0;js<seds->get_lnum();js++)
-	nsrcs[is][js]=vol*lf->get_nsrcs(zarray[is],lums[js]);
+	nsrcs[is][js]= long(vol*lf->get_nsrcs(zarray[is],lums[js]));
     }
     
     //=========================================================================
@@ -147,7 +150,7 @@ double simulator::simulate(double area, int nz, double dz){
     // We interpolate here, in future will convolve filter
  
     static double b_rest[3],flux_sim[3];
-    static double nrange[2];
+    //static double nrange[2];
     static double noise[3];
     static sprop *temp_src;
     static int src_iter;
@@ -168,6 +171,7 @@ double simulator::simulate(double area, int nz, double dz){
 	//cout<<"Number of sources"<<endl;
 	//cout<<nsrcs[is][js]<<endl;
 	
+	printf("NSRCS: %ld\n",nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
