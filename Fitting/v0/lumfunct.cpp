@@ -29,11 +29,8 @@ double lumfunct::get_nsrcs(double redshift,double lum){
   double nsrcs;
   double t1=pow(10,phi0)*pow((1.+redshift),p);
   double t2=pow(10,L0)*pow((1.+redshift),q);
-  double ratio,lf;
+  double ratio;
   ratio=pow(10,lum)/t2;
-  lf=t1/(pow(ratio,alpha)+pow(ratio,beta));
-  //cout<<lf<<endl;
-  //nsrcs=static_cast<int>(lf+0.5);
-  nsrcs=lf;
+  nsrcs=t1/(pow(ratio,alpha)+pow(ratio,beta));
   return nsrcs;
 }

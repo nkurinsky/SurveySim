@@ -1,6 +1,6 @@
 //****************************************************************************
 // written by Anna Sajina 09/28/12
-// updated by Anna Sajina 02/19/13
+// updated by Noah Kurinsky 3/15/13
 // The purpose of this program is to read-in the parameters set in the idl 
 // wrapper (simulation.pro) and to use MCMC to determine the best-fit set of 
 // parameters. 
@@ -99,7 +99,8 @@ int main(int argc,char** argv){
  
   //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
   p_o[0]=6.0;
- 
+  //lpars[1] = 10.0;
+
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
 
   delete pInfile;

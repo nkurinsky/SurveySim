@@ -31,8 +31,8 @@ sprop::sprop(int m,double z,double b[],double f[],double lum){
       do_colors = false;
   }
   if(do_colors){
-    c1 = log10(f[2]/f[0]); // /log10(b[2]/b[0]);
-    c2 = log10(f[2]/f[1]); // /log10(b[2]/b[1]);
+    c1 = log10(f[2]/f[0]);
+    c2 = log10(f[2]/f[1]);
   }
   else{
     c1 = -99.0;
@@ -44,12 +44,7 @@ sprop::sprop(){
   mod_num = -1;
   redshift = -1;
   luminosity = -1;
-  /*
-  for (int i=0;i<3;i++){
-    fluxes[i] = -1;
-    bands[i] = -1;
-  }
-  */
+
   c1 = -99.0;
   c2 = -99.0;
 }
@@ -121,8 +116,11 @@ double simulator::simulate(double area, int nz, double dz){
     //needs to be double checked, should be about done
     static int is,js;
     static double tmpz,vol;
-    long nsrcs[nz][seds->get_lnum()];
-    double lums[seds->get_lnum()];
+    int lnum = seds->get_lnum();
+    double high;
+    double scale[nz];
+    long nsrcs[nz][lnum];
+    double lums[lnum];
     seds->get_lums(lums);
 
     //setup redshift array    
@@ -132,16 +130,17 @@ double simulator::simulate(double area, int nz, double dz){
 
     //get the number of sources per L-z bin
     //scale the volume elements by 10^10 to avoid too large a number
-    //THIS SCALING DOES NOT WORK, STILL get 10^6!!!
     //making a weights array associated with redshift (use volume), aim for 1000 per bin
     //luminosity function dependent scaling (use highest bin, 10 per bin)
     for (is=0;is<nz;is++) {
-      tmpz=(zarray[is+1]+zarray[is])/2.0;
+      tmpz=zarray[is]+dz/2.0;
       vol=(dvdz(tmpz,area)*dz)/(1.e+10);
-      for (js=0;js<seds->get_lnum();js++)
-	nsrcs[is][js]= long(vol*lf->get_nsrcs(zarray[is],lums[js]));
+      high = lf->get_nsrcs(zarray[is],lums[lnum-1])*vol;
+      scale[is] = 10.e+0/high;
+      for (js=0;js<lnum;js++)
+	nsrcs[is][js]= long(scale[is]*vol*lf->get_nsrcs(zarray[is],lums[js]));
     }
-    
+
     //=========================================================================
     // for each L-z depending on the number of sources, sample the SED and get the appropriate fluxes
     //*************************************************************************
@@ -150,7 +149,6 @@ double simulator::simulate(double area, int nz, double dz){
     // We interpolate here, in future will convolve filter
  
     static double b_rest[3],flux_sim[3];
-    //static double nrange[2];
     static double noise[3];
     static sprop *temp_src;
     static int src_iter;
@@ -166,12 +164,9 @@ double simulator::simulate(double area, int nz, double dz){
       b_rest[0]=bands[0]/(1.+zarray[is]);
       b_rest[1]=bands[1]/(1.+zarray[is]);
       b_rest[2]=bands[2]/(1.+zarray[is]);
-      for (js=0;js<seds->get_lnum();js++){
-	//printf("L-z bin: %lf %lf \n",zarray[is],lumarray[js]);
-	//cout<<"Number of sources"<<endl;
-	//cout<<nsrcs[is][js]<<endl;
-	
-	printf("NSRCS: %ld\n",nsrcs[is][js]);
+      printf("\n z = %f, scale = %e, NSCRS: ",zarray[is],scale[is]);
+      for (js=0;js<lnum;js++){
+	printf("{%f, %ld} ",lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
@@ -207,13 +202,11 @@ double simulator::simulate(double area, int nz, double dz){
       c2[i] = sources[i].c2;
     }
     
-    int msize = nz*seds->get_lnum();
-    //cout<<" The n_z x n_lum size: "<<endl;
-    //cout<<msize<<endl;
+    //int msize = nz*seds->get_lnum();
     
-    diagnostic->init_model(c1,c2,msize);
+    diagnostic->init_model(c1,c2,snum);
     chisq=diagnostic->get_chisq();
-    
+
     delete[] c1;
     delete[] c2;
     
@@ -245,7 +238,3 @@ void simulator::reset(){
   if(diagnostic != NULL)
     delete diagnostic;
 }
-
-
-
-
