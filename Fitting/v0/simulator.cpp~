@@ -19,11 +19,9 @@ int findMinloc(double vals[], int MAXELS)
     return hit;
 }
 
-sprop::sprop(double z,double f[],double lum, double w){
+sprop::sprop(double z,double f[],double lum){
   redshift = z;
   luminosity = lum;
-  weight = w;
-
   bool do_colors(true);
   for (int i=0;i<3;i++){
     fluxes[i] = f[i];
@@ -43,7 +41,6 @@ sprop::sprop(double z,double f[],double lum, double w){
 sprop::sprop(){
   redshift = -1;
   luminosity = -1;
-  weight = 0;
 
   c1 = -99.0;
   c2 = -99.0;
@@ -140,10 +137,6 @@ double simulator::simulate(double area, int nz, double dz){
       for (js=0;js<lnum;js++)
 	nsrcs[is][js]= long(scale[is]*vol*lf->get_nsrcs(zarray[is],lums[js]));
     }
-
-    double weights[nz];
-    for (int i=0;i<nz;i++)
-      weights[i] = 1.e0/scale[i];
 
     //=========================================================================
     // for each L-z depending on the number of sources, sample the SED and get the appropriate fluxes

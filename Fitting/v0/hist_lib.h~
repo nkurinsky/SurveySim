@@ -15,8 +15,8 @@
 class hist_lib{
  private:
   //variables for storage of dynamically created histograms
-  unsigned long ** model_hist;
-  unsigned long ** obs_hist;
+  int ** model_hist;
+  int ** obs_hist;
   double ** comparison_hist;
   //properties of the histograms, set internally
   double range[2];
@@ -29,10 +29,14 @@ class hist_lib{
   //constructors
   hist_lib(); //All set to null
   hist_lib(double obs_c1[],double obs_c2[],int obs_size); //only observation histogram created
+  hist_lib(double obs_c1[],double obs_c2[],int obs_size,double mod_c1[],double mod_c2[],int mod_size); //model and observation histograms constructed
   //Functions for passing data to class if not already done so by constructor
   void init_obs(double c1[],double c2[],int size);
-  bool init_model(double c1[],double c2[],double weights[],int size);
-  //Functions for outputting properties of histograms
+  bool init_model(double c1[],double c2[],int size);
+  //Functions for getting properties of histograms
+  //void get_range(double ret_range[]);
+  //int get_nbins();
+  //int get_xysize();
   double get_chisq();
   bool write_fits(string filename);
   //Deconstructor for dynamic histogram arrays
@@ -40,6 +44,6 @@ class hist_lib{
  private:
   //functions which produce histograms
   int ** get_hist(double c1[],double c2[],int cnum,double range[]); //compute histogram, fitting binsize
-  int ** compute_hist(double c1[],double c2[],double weights[],int cnum); //compute histogram for given inputs
+  int ** compute_hist(double c1[],double c2[],int cnum); //compute histogram for given inputs
   double fit_err();
 };

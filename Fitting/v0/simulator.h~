@@ -8,11 +8,10 @@ struct sprop{
   //source properties (as determined by distributions)
   double redshift;
   double luminosity;
-  double weight;
   double fluxes[3];
   double c1,c2;
   sprop();
-  sprop(double z,double f[],double lum, double w); //constructor initializes variables
+  sprop(double z,double f[],double lum); //constructor initializes variables
   //as well as automatically computes colors if it is a valid operation
   friend ostream &operator<<(ostream &out,sprop c);
 };

@@ -39,34 +39,34 @@ hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size){
   msize = -1;
 }
 
-// hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size,double mod_c1[],double mod_c2[],int mod_size){
-//   static double temp_range[2];
-//   static double x,y;
+hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size,double mod_c1[],double mod_c2[],int mod_size){
+  static double temp_range[2];
+  static double x,y;
   
-//   //set the range to the absolute extremes of the color arrays (of observation)
-//   x = gsl_stats_min(obs_c1,H_STRIDE,obs_size);
-//   y = gsl_stats_min(obs_c2,H_STRIDE,obs_size);
-//   if (x <= y)
-//     temp_range[0] = x;
-//   else
-//     temp_range[0] = y;
+  //set the range to the absolute extremes of the color arrays (of observation)
+  x = gsl_stats_min(obs_c1,H_STRIDE,obs_size);
+  y = gsl_stats_min(obs_c2,H_STRIDE,obs_size);
+  if (x <= y)
+    temp_range[0] = x;
+  else
+    temp_range[0] = y;
 
-//   x = gsl_stats_max(obs_c1,H_STRIDE,obs_size);
-//   y = gsl_stats_max(obs_c2,H_STRIDE,obs_size);
-//   if (x >= y)
-//     temp_range[1] = x;
-//   else
-//     temp_range[1] = y;
+  x = gsl_stats_max(obs_c1,H_STRIDE,obs_size);
+  y = gsl_stats_max(obs_c2,H_STRIDE,obs_size);
+  if (x >= y)
+    temp_range[1] = x;
+  else
+    temp_range[1] = y;
 
-//   //create both histograms
-//   obs_hist = get_hist(obs_c1,obs_c2,obs_size,temp_range);
-//   model_hist = compute_hist(mod_c1,mod_c2,mod_size);
+  //create both histograms
+  obs_hist = get_hist(obs_c1,obs_c2,obs_size,temp_range);
+  model_hist = compute_hist(mod_c1,mod_c2,mod_size);
 
-//   osize = obs_size;
-//   msize = mod_size;
-//   comparison_hist = NULL;
-//   chisq = fit_err();
-// }
+  osize = obs_size;
+  msize = mod_size;
+  comparison_hist = NULL;
+  chisq = fit_err();
+}
 
 void hist_lib::init_obs(double c1[],double c2[],int size){
   if(obs_hist != NULL){
@@ -107,7 +107,7 @@ void hist_lib::init_obs(double c1[],double c2[],int size){
   }
 }
 
-bool hist_lib::init_model(double c1[],double c2[],double weights[],int size){
+bool hist_lib::init_model(double c1[],double c2[],int size){
   if (model_hist != NULL){
     for (int i=0;i<xysize;i++){
       delete[] model_hist[i];
@@ -117,7 +117,7 @@ bool hist_lib::init_model(double c1[],double c2[],double weights[],int size){
   } 
   //create histogram with class parameters
   if(obs_hist != NULL){
-    model_hist = compute_hist(c1,c2,weights,size);
+    model_hist = compute_hist(c1,c2,size);
     msize = size;
     
     if(comparison_hist != NULL){
@@ -130,6 +130,19 @@ bool hist_lib::init_model(double c1[],double c2[],double weights[],int size){
   }
   return true;
 }
+
+// void hist_lib::get_range(double ret_range[]){
+//   ret_range[0] = range[0];
+//   ret_range[1] = range[1];
+// }
+
+// int hist_lib::get_nbins(){
+//   return int((range[1]-range[0])/binsize);
+// }
+
+// int hist_lib::get_xysize(){
+//   return xysize;
+// }
 
 double hist_lib::get_chisq(){
   if(comparison_hist != NULL)
@@ -232,22 +245,18 @@ int ** hist_lib::get_hist(double c1[],double c2[],int cnum,double inp_range[]){
   xysize = ceil(rdiff/binsize); //ensures that range is whole multiple of binsize
   range[1] = range[0]+xysize*binsize; //recompute upper bound
   
-  double weights[cnum];
-  for (int i=0;i<cnum;i++)
-    weights[i] = 1.0;
-
   //create histogram with given range and calculated binsize
-  temp = compute_hist(c1,c2,weights,cnum);
+  temp = compute_hist(c1,c2,cnum);
   return temp;
 }
 
-int ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cnum){
+int ** hist_lib::compute_hist(double c1[],double c2[],int cnum){
   static int ** retvals;
 
   //initialize two dimensional integer array (Dynamic)
-  retvals = new unsigned long*[xysize];
+  retvals = new int*[xysize];
   for (int i=0;i<xysize;i++){
-    retvals[i] = new unsigned long[xysize];
+    retvals[i] = new int[xysize];
     for (int j=0;j<xysize;j++){
       retvals[i][j] = 0;
     }
@@ -263,7 +272,7 @@ int ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cnum)
     if((c1[i] >= range[0]) and (c1[i] < range[1]) and (c2[i] >= range[0]) and (c2[i] < range[1])){
       xpt = int((c1[i]-range[0])/binsize);
       ypt = int((c2[i]-range[0])/binsize);
-      retvals[xpt][ypt]+= 1*weights[i];
+      retvals[xpt][ypt]++;
     }
     else
       exc++;
