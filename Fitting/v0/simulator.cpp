@@ -184,7 +184,7 @@ double simulator::simulate(double area, int nz, double dz){
 	  //check for detectability, if "Yes" add to list
 	  //if(flux_sim[0] >= 8.0) //include real flux limits but had errors for some reason
 	  if(flux_sim[0] >=flux_limits[0]){
-	    temp_src = new sprop(zarray[is],flux_sim,lums[js]);
+	    temp_src = new sprop(zarray[is],flux_sim,lums[js],weights[is]);
 	    sources.push_back(*temp_src);
 	    delete temp_src;
 	  }
@@ -196,24 +196,27 @@ double simulator::simulate(double area, int nz, double dz){
     // generate diagnostic color-color plots
     //*************************************************************************
     
-    double *c1,*c2;
+    double *c1,*c2,*w;
     
     int snum(sources.size());
     c1 = new double[snum];
     c2 = new double[snum];
+    w = new double[snum];
     for (int i=0;i<snum;i++){
       c1[i] = sources[i].c1;
       c2[i] = sources[i].c2;
+      w[i] = sources[i].weight;
     }
     
     //int msize = nz*seds->get_lnum();
     
-    diagnostic->init_model(c1,c2,snum);
+    diagnostic->init_model(c1,c2,w,snum);
     chisq=diagnostic->get_chisq();
 
     delete[] c1;
     delete[] c2;
-    
+    delete[] w;
+
     return chisq;
   }
   else{

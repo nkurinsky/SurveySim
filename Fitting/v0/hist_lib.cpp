@@ -213,8 +213,8 @@ hist_lib::~hist_lib(){
   }
 }
 
-int ** hist_lib::get_hist(double c1[],double c2[],int cnum,double inp_range[]){
-  static int ** temp;
+unsigned long ** hist_lib::get_hist(double c1[],double c2[],int cnum,double inp_range[]){
+  static unsigned long ** temp;
   static double sd1,sd2;
   sd1 = gsl_stats_sd(c1,H_STRIDE,cnum);
   sd2 = gsl_stats_sd(c2,H_STRIDE,cnum);
@@ -241,8 +241,8 @@ int ** hist_lib::get_hist(double c1[],double c2[],int cnum,double inp_range[]){
   return temp;
 }
 
-int ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cnum){
-  static int ** retvals;
+unsigned long ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cnum){
+  static unsigned long ** retvals;
 
   //initialize two dimensional integer array (Dynamic)
   retvals = new unsigned long*[xysize];
@@ -263,14 +263,14 @@ int ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cnum)
     if((c1[i] >= range[0]) and (c1[i] < range[1]) and (c2[i] >= range[0]) and (c2[i] < range[1])){
       xpt = int((c1[i]-range[0])/binsize);
       ypt = int((c2[i]-range[0])/binsize);
-      retvals[xpt][ypt]+= 1*weights[i];
+      retvals[xpt][ypt]+= weights[i];
     }
     else
-      exc++;
+      exc+= weights[i];
   }
   m_exc = exc;
   //number of points which lay outside of the specified range
-  // cout << "CHist Exclusions: " << exc << " (" << (exc/double(cnum))*100 << "%)" << endl;
+  printf("CHist Exclusions: %6.2E (%5.2f%%)\n",double(exc),(double(exc)/double(cnum))*100.0);
   
   return retvals;
 }

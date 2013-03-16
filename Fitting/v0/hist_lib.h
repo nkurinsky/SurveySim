@@ -39,7 +39,7 @@ class hist_lib{
   ~hist_lib();
  private:
   //functions which produce histograms
-  int ** get_hist(double c1[],double c2[],int cnum,double range[]); //compute histogram, fitting binsize
-  int ** compute_hist(double c1[],double c2[],double weights[],int cnum); //compute histogram for given inputs
+  unsigned long ** get_hist(double c1[],double c2[],int cnum,double range[]); //compute histogram, fitting binsize
+  unsigned long ** compute_hist(double c1[],double c2[],double weights[],int cnum); //compute histogram for given inputs
   double fit_err();
 };

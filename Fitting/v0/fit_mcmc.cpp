@@ -129,7 +129,7 @@ int main(int argc,char** argv){
 
   //the initial chi2_min value
   //this is iterated each time a better value is found
-  double chi_min=10000.0; 
+  double chi_min=1.0E+10; 
   double previous=chi_min;
   double trial;
   int minlink;
