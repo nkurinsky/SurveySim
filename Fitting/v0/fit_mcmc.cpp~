@@ -172,7 +172,7 @@ int main(int argc,char** argv){
     
     lf.set_p(lpars[4]);
     lf.set_q(lpars[5]);
-    printf("Running...\n");
+    printf("Running...");
     trial=survey.simulate(area,nz,dz);
     printf("Model chi2: %lf\n",trial);
 

@@ -6,12 +6,14 @@
 //Storage structure for each individual source
 struct sprop{
   //source properties (as determined by distributions)
+  int mod_num;
   double redshift;
   double luminosity;
+  double bands[3];
   double fluxes[3];
   double c1,c2;
   sprop();
-  sprop(double z,double f[],double lum); //constructor initializes variables
+  sprop(int m,double z,double b[],double f[],double lum); //constructor initializes variables
   //as well as automatically computes colors if it is a valid operation
   friend ostream &operator<<(ostream &out,sprop c);
 };

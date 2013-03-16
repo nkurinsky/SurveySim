@@ -19,13 +19,15 @@ int findMinloc(double vals[], int MAXELS)
     return hit;
 }
 
-sprop::sprop(double z,double f[],double lum){
+sprop::sprop(int m,double z,double b[],double f[],double lum){
+  mod_num = m;
   redshift = z;
   luminosity = lum;
   bool do_colors(true);
   for (int i=0;i<3;i++){
+    bands[i] = b[i];
     fluxes[i] = f[i];
-    if(f[i] < 0.00000000E0)
+    if((b[i] < 0.0000000E0) or (f[i] < 0.00000000E0))
       do_colors = false;
   }
   if(do_colors){
@@ -39,6 +41,7 @@ sprop::sprop(double z,double f[],double lum){
 }
 
 sprop::sprop(){
+  mod_num = -1;
   redshift = -1;
   luminosity = -1;
 
@@ -67,7 +70,7 @@ simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,st
 
   //initialize observation portion of histograms
   //possibility here to integrate obs_lib into hist_lib
-  diagnostic = new hist_lib();
+  diagnostic = new hist_lib;
   double *c1,*c2;
   int osize = observations->get_snum();
   observations->get_all_colors(c1,c2);

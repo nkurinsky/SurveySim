@@ -74,7 +74,6 @@ void hist_lib::init_obs(double c1[],double c2[],int size){
       delete[] obs_hist[i];
     }
     delete[] obs_hist;
-    obs_hist = NULL;
   }
   static double temp_range[2];
   static double x,y;
@@ -113,7 +112,6 @@ bool hist_lib::init_model(double c1[],double c2[],int size){
       delete[] model_hist[i];
     }
     delete[] model_hist;
-    model_hist = NULL;
   } 
   //create histogram with class parameters
   if(obs_hist != NULL){
