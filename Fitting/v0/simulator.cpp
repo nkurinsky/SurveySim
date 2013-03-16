@@ -107,7 +107,7 @@ void simulator::set_obs(string obsfile){
 }
 
 double simulator::simulate(double area, int nz, double dz){
-  reset();
+  sources.clear();
 
   if(seds != NULL){
     //needs to be double checked, should be about done
@@ -131,9 +131,9 @@ double simulator::simulate(double area, int nz, double dz){
     //luminosity function dependent scaling (use highest bin, 10 per bin)
     for (is=0;is<nz;is++) {
       tmpz=zarray[is]+dz/2.0;
-      vol=(dvdz(tmpz,area)*dz)/(1.e+10);
-      high = lf->get_nsrcs(zarray[is],lums[lnum-1])*vol;
-      scale[is] = 10.e+0/high;
+      vol=(dvdz(tmpz,area)*dz);
+      high = lf->get_nsrcs(zarray[is],10.0)*vol;
+      scale[is] = 1.0e+4/high;
       for (js=0;js<lnum;js++)
 	nsrcs[is][js]= long(scale[is]*vol*lf->get_nsrcs(zarray[is],lums[js]));
     }
@@ -161,9 +161,9 @@ double simulator::simulate(double area, int nz, double dz){
       b_rest[0]=bands[0]/(1.+zarray[is]);
       b_rest[1]=bands[1]/(1.+zarray[is]);
       b_rest[2]=bands[2]/(1.+zarray[is]);
-      printf("\n z = %f, scale = %e, NSCRS: ",zarray[is],scale[is]);
+      printf("\nz = %4.2f, s = %6.2E, n: ",zarray[is],scale[is]);
       for (js=0;js<lnum;js++){
-	printf("{%f, %ld} ",lums[js],nsrcs[is][js]);
+	printf("{%4.2f, %ld} ",lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
@@ -177,7 +177,7 @@ double simulator::simulate(double area, int nz, double dz){
 	  //check for detectability, if "Yes" add to list
 	  //if(flux_sim[0] >= 8.0) //include real flux limits but had errors for some reason
 	  if(flux_sim[0] >=flux_limits[0]){
-	    temp_src = new sprop(0.0,zarray[is],bands,flux_sim,lums[js]);
+	    temp_src = new sprop(zarray[is],flux_sim,lums[js]);
 	    sources.push_back(*temp_src);
 	    delete temp_src;
 	  }
@@ -231,7 +231,4 @@ simulator::~simulator(){
 
 void simulator::reset(){
   sources.clear();
-
-  if(diagnostic != NULL)
-    delete diagnostic;
 }

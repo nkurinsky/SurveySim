@@ -6,7 +6,7 @@ printf "\nSurvey Simulator Compilation Code\n"
 printf "Last Updated 3/15/13 by Noah Kurinsky\n\n"
 
 printf "Building Simulator.cpp..."
-g++ -g -c simulator.cpp -Wall -Werror
+g++ -g -c simulator.cpp -Wall -Wextra -Werror
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else

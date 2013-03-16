@@ -38,7 +38,7 @@ int main(int argc,char** argv){
 
   //temporary, of course in the end this will be much longer 
   //perhaps 100,000-500,000 
-  long int runs=1;   
+  long int runs=10;   
   const gsl_rng_type * T;
 
   // the initial guesses of the parameters, the width of the proposal distribution 
@@ -99,7 +99,7 @@ int main(int argc,char** argv){
  
   //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
   p_o[0]=6.0;
-  //lpars[1] = 10.0;
+  lpars[1] = 10.0;
 
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
 
@@ -168,13 +168,13 @@ int main(int argc,char** argv){
     if((temp >= p_min[1]) && (temp <= p_max[1])) lpars[5]=temp;
     //check to see if sensible guesses, need to also do some test 
     //the randomness at some point
-    printf("%i %lf %lf...",(i+1),lpars[4],lpars[5]);
+    printf("\n\n%i %lf %lf...",(i+1),lpars[4],lpars[5]);
     
     lf.set_p(lpars[4]);
     lf.set_q(lpars[5]);
     printf("Running...\n");
     trial=survey.simulate(area,nz,dz);
-    printf("Model chi2: %lf\n",trial);
+    printf("\nModel chi2: %lf\n",trial);
 
     double de=trial-chi_min;
     if(trial < chi_min){
