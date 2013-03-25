@@ -168,9 +168,9 @@ double simulator::simulate(double area, int nz, double dz){
       b_rest[0]=bands[0]/(1.+zarray[is]);
       b_rest[1]=bands[1]/(1.+zarray[is]);
       b_rest[2]=bands[2]/(1.+zarray[is]);
-      printf("\nz = %4.2f, s = %6.2E, n: ",zarray[is],scale[is]);
+      //printf("\nz = %4.2f, s = %6.2E, n: ",zarray[is],scale[is]);
       for (js=0;js<lnum;js++){
-	printf("{%4.2f, %ld} ",lums[js],nsrcs[is][js]);
+	//printf("{%4.2f, %ld} ",lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);

@@ -38,7 +38,8 @@ int main(int argc,char** argv){
 
   //temporary, of course in the end this will be much longer 
   //perhaps 100,000-500,000 
-  long int runs=10;   
+  long int runs=10;  
+ 
   const gsl_rng_type * T;
 
   // the initial guesses of the parameters, the width of the proposal distribution 
@@ -49,7 +50,7 @@ int main(int argc,char** argv){
   //note: chain is npar+1 as last column holds chi2 values for the particular "guess"
   double chain[npar+1][runs]; 
   
-  FITS *pInfile,*pInfile2;
+  FITS *pInfile,*pInfile2,*savefile;
   pInfile = new FITS(modfile,Read);
   pInfile2 = new FITS(obsfile,Read);
   
@@ -192,14 +193,80 @@ int main(int argc,char** argv){
     }
   }
 
-  // here will call on code that genrates output to be send back to the idl 
-  // wrapper, here also need new code that will analyze the results in the chain
-  // and return maximum likelihood values as well as associated 68% 
-  // probabilities (need to decide whether its better to do this here or in 
-  // the idl wrapper).
-  // perhaps the easiest thing to start off is to save the chain in a fits 
-  // format and send it back to idl like that?
 
+  //write the diagnostic 2d plot to the outfile and then add the table extension below. 
+
+    // declare auto-pointer to FITS at function scope. Ensures no resources
+    // leaked if something fails in dynamic allocation.
+  
+    std::auto_ptr<FITS> pFits(0);
+      
+    try
+      {                
+        // overwrite existing file if the file already exists.     
+	const std::string fileName("temp_chain.fits");            
+	pFits.reset( new FITS(fileName,Write) );
+      }
+    catch (FITS::CantCreate)
+      {
+	return -1;       
+      }
+
+    unsigned long rows(runs); 
+
+    string hduName("MC Chain");  
+    std::vector<string> colName(3,"");
+    std::vector<string> colForm(3,"");
+    std::vector<string> colUnit(3,"");
+    
+   
+    colName[0] = "Par1";
+    colName[1] = "Par2";
+    colName[2] = "chi2";
+
+    colForm[0] = "f4.2";
+    colForm[1] = "f4.2";
+    colForm[2] = "f8.2";
+
+    colUnit[0] = "";
+    colUnit[1] = "";
+    colUnit[2] = "";    
+
+    Table* newTable = savefile->addTable(hduName,rows,colName,colForm,colUnit,AsciiTbl);
+
+    std::vector<float> par1(rows);
+    std::vector<float> par2(rows);
+    std::vector<float> chi2(rows);
+
+    size_t j = 0;    
+    for ( ; j < rows; ++j) {
+      par1[j] = chain[0][j];
+      par2[j] = chain[1][j];
+      chi2[j] = chain[2][j];
+    }
+
+    try
+      {                
+        newTable->column(colName[0]).write(par1,1);  
+        newTable->column(colName[1]).write(par2,1);
+        newTable->column(colName[2]).write(chi2,1);
+      }
+    catch (FitsException&)
+      {
+         // ExtHDU::column could in principle throw a NoSuchColumn exception,
+         // or some other fits error may ensue.
+         std::cerr << " Error in writing to columns - check e.g. that columns of specified name "
+                        << " exist in the extension \n";
+                               
+      }
+    
+
+// write the data string.
+    newTable->writeDate();
+   
+    // and see if it all worked right.
+    std::cout << *newTable << std::endl;
+    
   gsl_rng_free (r);
 
   return 0;
