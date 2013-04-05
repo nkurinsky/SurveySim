@@ -15,8 +15,8 @@
 class hist_lib{
  private:
   //variables for storage of dynamically created histograms
-  unsigned long ** model_hist;
-  unsigned long ** obs_hist;
+  double ** model_hist;
+  double ** obs_hist;
   double ** comparison_hist;
   //properties of the histograms, set internally
   double range[2];
@@ -24,7 +24,7 @@ class hist_lib{
   double chisq;
   int xysize;
   int osize,msize;
-  int m_exc;
+  double m_exc;
  public:
   //constructors
   hist_lib(); //All set to null
@@ -39,7 +39,7 @@ class hist_lib{
   ~hist_lib();
  private:
   //functions which produce histograms
-  unsigned long ** get_hist(double c1[],double c2[],int cnum,double range[]); //compute histogram, fitting binsize
-  unsigned long ** compute_hist(double c1[],double c2[],double weights[],int cnum); //compute histogram for given inputs
+  double ** get_hist(double c1[],double c2[],int cnum,double range[]); //compute histogram, fitting binsize
+  double ** compute_hist(double c1[],double c2[],double weights[],int cnum); //compute histogram for given inputs
   double fit_err();
 };

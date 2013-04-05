@@ -39,35 +39,6 @@ hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size){
   msize = -1;
 }
 
-// hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size,double mod_c1[],double mod_c2[],int mod_size){
-//   static double temp_range[2];
-//   static double x,y;
-  
-//   //set the range to the absolute extremes of the color arrays (of observation)
-//   x = gsl_stats_min(obs_c1,H_STRIDE,obs_size);
-//   y = gsl_stats_min(obs_c2,H_STRIDE,obs_size);
-//   if (x <= y)
-//     temp_range[0] = x;
-//   else
-//     temp_range[0] = y;
-
-//   x = gsl_stats_max(obs_c1,H_STRIDE,obs_size);
-//   y = gsl_stats_max(obs_c2,H_STRIDE,obs_size);
-//   if (x >= y)
-//     temp_range[1] = x;
-//   else
-//     temp_range[1] = y;
-
-//   //create both histograms
-//   obs_hist = get_hist(obs_c1,obs_c2,obs_size,temp_range);
-//   model_hist = compute_hist(mod_c1,mod_c2,mod_size);
-
-//   osize = obs_size;
-//   msize = mod_size;
-//   comparison_hist = NULL;
-//   chisq = fit_err();
-// }
-
 void hist_lib::init_obs(double c1[],double c2[],int size){
   if(obs_hist != NULL){
     for (int i=0;i<xysize;i++){
@@ -163,8 +134,8 @@ bool hist_lib::write_fits(string filename){
   static int nelements;
   nelements = xysize*xysize;
 
-  static std::valarray<int> model_1d(nelements);
-  static std::valarray<int> obs_1d(nelements);
+  static std::valarray<double> model_1d(nelements);
+  static std::valarray<double> obs_1d(nelements);
   static std::valarray<double> comparison_1d(nelements);
 
   for (int i=0;i<xysize;i++){
@@ -213,8 +184,8 @@ hist_lib::~hist_lib(){
   }
 }
 
-unsigned long ** hist_lib::get_hist(double c1[],double c2[],int cnum,double inp_range[]){
-  static unsigned long ** temp;
+double ** hist_lib::get_hist(double c1[],double c2[],int cnum,double inp_range[]){
+  static double ** temp;
   static double sd1,sd2;
   sd1 = gsl_stats_sd(c1,H_STRIDE,cnum);
   sd2 = gsl_stats_sd(c2,H_STRIDE,cnum);
@@ -241,13 +212,13 @@ unsigned long ** hist_lib::get_hist(double c1[],double c2[],int cnum,double inp_
   return temp;
 }
 
-unsigned long ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cnum){
-  static unsigned long ** retvals;
+double ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cnum){
+  static double ** retvals;
 
   //initialize two dimensional integer array (Dynamic)
-  retvals = new unsigned long*[xysize];
+  retvals = new double*[xysize];
   for (int i=0;i<xysize;i++){
-    retvals[i] = new unsigned long[xysize];
+    retvals[i] = new double[xysize];
     for (int j=0;j<xysize;j++){
       retvals[i][j] = 0;
     }
@@ -255,7 +226,8 @@ unsigned long ** hist_lib::compute_hist(double c1[],double c2[],double weights[]
   
   //computes indices of point using integer rounding. increments integer at associated
   //index (eq used: (point-min)/binsize   round down to get index)
-  static int xpt,ypt,exc;
+  static int xpt,ypt;
+  static double exc;
   xpt = 0;
   ypt = 0;
   exc = 0;

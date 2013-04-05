@@ -12,8 +12,10 @@
 
 #include "simulator.h"
 #include "functions.h"
+#include <stdio.h>
 
 #define BANDS 3
+#define NPAR 2
 
 using namespace std;
 
@@ -36,6 +38,9 @@ int main(int argc,char** argv){
   if(argc > 4)
     outfile = argv[4];
 
+  FILE *chain;
+  chain = fopen("chain.txt","w");
+  
   //temporary, of course in the end this will be much longer 
   //perhaps 100,000-500,000 
   long int runs=10;  
@@ -44,13 +49,12 @@ int main(int argc,char** argv){
 
   // the initial guesses of the parameters, the width of the proposal distribution 
   // and the acceptable min/max range
-  int npar=2; //should eventually be set by the widget
-  double p_o[npar],dp[npar],p_min[npar],p_max[npar]; 
+  double p_o[NPAR],dp[NPAR],p_min[NPAR],p_max[NPAR]; 
 
   //note: chain is npar+1 as last column holds chi2 values for the particular "guess"
-  double chain[npar+1][runs]; 
+  //double chain[npar+1][runs]; 
   
-  FITS *pInfile,*pInfile2,*savefile;
+  FITS *pInfile,*pInfile2;
   pInfile = new FITS(modfile,Read);
   pInfile2 = new FITS(obsfile,Read);
   
@@ -101,7 +105,8 @@ int main(int argc,char** argv){
   //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
   p_o[0]=-6.0;
   lpars[1] = 10.0;
-  lpars[4]=-6.0;
+  lpars[4] = -6.0;
+  lpars[5] = 2.0;
 
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
 
@@ -134,7 +139,6 @@ int main(int argc,char** argv){
   double chi_min=1.0E+6; 
   double previous=chi_min;
   double trial;
-  int minlink;
   long acceptot=0;
   bool ans;
 
@@ -159,21 +163,23 @@ int main(int argc,char** argv){
   // distribution, as determines how likely a far flung guess is of being 
   // accepted (see metrop function)
   double t=100; 
-  double temp;
+  double temp,bestp,bestq,ptemp,qtemp;
+
+  fprintf(chain,"%s\n%s\n","Monte Carlo Parameter Chain","Iteration, P, Q, Chi-Square");
 
   for (int i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
     q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
     temp=lpars[4]+p0_rng[i];  //fix this (not just the initial guess)  
-    if((temp >= p_min[0]) && (temp <= p_max[0])) lpars[4]=temp;
+    if((temp >= p_min[0]) && (temp <= p_max[0])) ptemp=temp;
     temp=lpars[5]+q0_rng[i];
-    if((temp >= p_min[1]) && (temp <= p_max[1])) lpars[5]=temp;
+    if((temp >= p_min[1]) && (temp <= p_max[1])) qtemp=temp;
     //check to see if sensible guesses, need to also do some test 
     //the randomness at some point
     printf("\n\n%i %lf %lf...",(i+1),lpars[4],lpars[5]);
     
-    lf.set_p(lpars[4]);
-    lf.set_q(lpars[5]);
+    lf.set_p(ptemp);
+    lf.set_q(qtemp);
     printf("Running...\n");
     trial=survey.simulate(area,nz,dz);
     printf("\nModel chi2: %lf\n",trial);
@@ -181,116 +187,50 @@ int main(int argc,char** argv){
     double de=trial-chi_min;
     if(trial < chi_min){
       chi_min=trial;
-      minlink=i;
+      bestp = ptemp;
+      bestq = qtemp;
     }
     ans=metrop(de,t);
     if(ans=true){
       acceptot++;
       previous=trial;
       //update mcmc chain with accepted values
-      chain[0][i]=lpars[4];
-      chain[1][i]=lpars[5];
-      chain[2][i]=trial;
+      lpars[4] = ptemp;
+      lpars[5] = qtemp;
+      fprintf(chain,"%i %f %f %f \n",i,lpars[4],lpars[5],trial);
     }
   }
 
+  lf.set_p(bestp);
+  lf.set_q(bestq);
+  printf("Re-Running Best Fit...\n");
+  trial=survey.simulate(area,nz,dz);
+  printf("\nModel chi2: %lf\n",trial);
   survey.save(outfile);
-
-  //write the diagnostic 2d plot to the outfile and then add the table extension below. 
-
-    // declare auto-pointer to FITS at function scope. Ensures no resources
-    // leaked if something fails in dynamic allocation.
   
-    std::auto_ptr<FITS> pFits(0);
-      
-    try
-      {                
-        // overwrite existing file if the file already exists.     
-	const std::string fileName("temp_chain.fits");            
-	pFits.reset( new FITS(fileName,Write) );
-      }
-    catch (FITS::CantCreate)
-      {
-	return -1;       
-      }
-
-    unsigned long rows(runs); 
-
-    string hduName("MC Chain");  
-    std::vector<string> colName(3,"");
-    std::vector<string> colForm(3,"");
-    std::vector<string> colUnit(3,"");
-    
-   
-    colName[0] = "Par1";
-    colName[1] = "Par2";
-    colName[2] = "chi2";
-
-    colForm[0] = "f4.2";
-    colForm[1] = "f4.2";
-    colForm[2] = "f8.2";
-
-    colUnit[0] = "";
-    colUnit[1] = "";
-    colUnit[2] = "";    
-
-    Table* newTable = savefile->addTable(hduName,rows,colName,colForm,colUnit,AsciiTbl);
-
-    std::vector<float> par1(rows);
-    std::vector<float> par2(rows);
-    std::vector<float> chi2(rows);
-
-    size_t j = 0;    
-    for ( ; j < rows; ++j) {
-      par1[j] = chain[0][j];
-      par2[j] = chain[1][j];
-      chi2[j] = chain[2][j];
-    }
-
-    try
-      {                
-        newTable->column(colName[0]).write(par1,1);  
-        newTable->column(colName[1]).write(par2,1);
-        newTable->column(colName[2]).write(chi2,1);
-      }
-    catch (FitsException&)
-      {
-         // ExtHDU::column could in principle throw a NoSuchColumn exception,
-         // or some other fits error may ensue.
-         std::cerr << " Error in writing to columns - check e.g. that columns of specified name "
-                        << " exist in the extension \n";
-                               
-      }
-    
-
-// write the data string.
-    newTable->writeDate();
-   
-    // and see if it all worked right.
-    std::cout << *newTable << std::endl;
-    
+  fclose(chain);
   gsl_rng_free (r);
-
+  
   return 0;
 }
 
 
 bool metrop(double de,double t){
-//here de is effectively Delta(Energy), and t is the temperature
-//as in the boltzman factor exp(-de/t)
+  //here de is effectively Delta(Energy), and t is the temperature
+  //as in the boltzman factor exp(-de/t)
   
   static bool ans;
   static const gsl_rng_type * T;
   static double itemp;
-
+  
   gsl_rng_env_setup();   
   gsl_rng_default_seed = time(NULL);
   T = gsl_rng_default;
   r = gsl_rng_alloc(T);
   itemp=gsl_rng_uniform(r);   //want uniform random number from 0-1
-
+  
   ans = ((de < 0.0) or (itemp < exp(-de/t))) ? true : false;
-
+  
   return ans;
 }
 

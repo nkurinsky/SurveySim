@@ -31,8 +31,8 @@ sprop::sprop(double z,double f[],double lum, double w){
       do_colors = false;
   }
   if(do_colors){
-    c1 = log10(f[2]/f[0]);
-    c2 = log10(f[2]/f[1]);
+    c1 = get_color(f[2],f[0]);
+    c2 = get_color(f[2],f[1]);
   }
   else{
     c1 = -99.0;
@@ -156,6 +156,7 @@ double simulator::simulate(double area, int nz, double dz){
     static double noise[3];
     static sprop *temp_src;
     static int src_iter;
+    bool detected = true;
 
     gsl_rng * r;
     const gsl_rng_type * T;    
@@ -168,10 +169,11 @@ double simulator::simulate(double area, int nz, double dz){
       b_rest[0]=bands[0]/(1.+zarray[is]);
       b_rest[1]=bands[1]/(1.+zarray[is]);
       b_rest[2]=bands[2]/(1.+zarray[is]);
-      printf("\nz = %4.2f, s = %6.2E, n: ",zarray[is],scale[is]);
+      printf("\nz = %4.2f, s = %6.2E, s = %6.2E, n: ",zarray[is],scale[is],weights[is]);
       for (js=0;js<lnum;js++){
 	printf("{%4.2f, %ld} ",lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
+	  detected = true;
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
 	    //noise[i] = gauss_random(r,nrange,0.0,b_err[i],nsrcs[is][js]); 
@@ -179,10 +181,11 @@ double simulator::simulate(double area, int nz, double dz){
 	    flux_sim[i] = seds->get_flux(lums[js],b_rest[i]);
 	    flux_sim[i] *= (1/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2)))/Wm2Hz_TO_mJy;
 	    flux_sim[i] += noise[i];
-	  }
-	  
+	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
+	      detected = false;
+	  }	  
 	  //check for detectability, if "Yes" add to list
-	  if(flux_sim[0] >=flux_limits[0]){
+	  if(detected){
 	    temp_src = new sprop(zarray[is],flux_sim,lums[js],weights[is]);
 	    sources.push_back(*temp_src);
 	    delete temp_src;

@@ -43,4 +43,4 @@ double * random(gsl_rng * r,double range[],int size);
 double * gauss_random(gsl_rng * r,double range[],double mean,double sigma,int size);
 
 //Generates spectral color of a galaxy from fluxes and bands
-double get_color(double f1,double f2,double b1,double b2);
+double get_color(double f1,double f2);

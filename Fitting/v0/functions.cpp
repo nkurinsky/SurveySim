@@ -28,9 +28,6 @@ double * gauss_random(gsl_rng * r,double range[],double mean,double sigma,int si
 }
 
 //Computes spectral color in log space from flux and band inputs
-double get_color(double f1,double f2,double b1,double b2){
-  static double up,down;
-  up = log10(f1/f2);
-  down = log10(b1/b2);
-  return up/down;
+double get_color(double f1,double f2){
+  return log10(f1/f2);
 }
