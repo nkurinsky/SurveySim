@@ -182,6 +182,7 @@ double simulator::simulate(double area, int nz, double dz){
 	  }
 	  
 	  //check for detectability, if "Yes" add to list
+	  //if(flux_sim[0] >= 8.0) //include real flux limits but had errors for some reason
 	  if(flux_sim[0] >=flux_limits[0]){
 	    temp_src = new sprop(zarray[is],flux_sim,lums[js],weights[is]);
 	    sources.push_back(*temp_src);
@@ -206,6 +207,8 @@ double simulator::simulate(double area, int nz, double dz){
       c2[i] = sources[i].c2;
       w[i] = sources[i].weight;
     }
+    
+    //int msize = nz*seds->get_lnum();
     
     diagnostic->init_model(c1,c2,w,snum);
     chisq=diagnostic->get_chisq();
