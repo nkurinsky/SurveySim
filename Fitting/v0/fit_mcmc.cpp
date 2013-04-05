@@ -294,4 +294,3 @@ bool metrop(double de,double t){
 
 //Notes:
 //at every iteration, keep distributions of source properties but not every source
-//how do we handle redshift?
