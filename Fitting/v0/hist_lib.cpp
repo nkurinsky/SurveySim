@@ -270,7 +270,7 @@ unsigned long ** hist_lib::compute_hist(double c1[],double c2[],double weights[]
   }
   m_exc = exc;
   //number of points which lay outside of the specified range
-  printf("CHist Exclusions: %6.2E (%5.2f%%)\n",double(exc),(double(exc)/double(cnum))*100.0);
+  printf("CHist Exclusions: %6.2E %6.2E (%5.2f%%)\n",double(exc),double(cnum),(double(exc)/double(cnum))*100.0);
   
   return retvals;
 }

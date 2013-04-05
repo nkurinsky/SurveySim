@@ -90,8 +90,8 @@ int main(int argc,char** argv){
   //so requires trial and error as we actually start fitting data.
   p_o[0]=lpars[4]; 
   dp[0]=0.3;
-  p_min[0]=0.0;
-  p_max[0]=7.0;
+  p_min[0]=-10.0;
+  p_max[0]=0.0;
   
   p_o[1]=lpars[5];
   dp[1]=0.3;
@@ -99,8 +99,9 @@ int main(int argc,char** argv){
   p_max[1]=5.0;
  
   //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
-  p_o[0]=6.0;
+  p_o[0]=-6.0;
   lpars[1] = 10.0;
+  lpars[4]=-6.0;
 
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
 
@@ -130,7 +131,7 @@ int main(int argc,char** argv){
 
   //the initial chi2_min value
   //this is iterated each time a better value is found
-  double chi_min=1.0E+10; 
+  double chi_min=1.0E+6; 
   double previous=chi_min;
   double trial;
   int minlink;
@@ -163,9 +164,9 @@ int main(int argc,char** argv){
   for (int i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
     q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
-    temp=p_o[0]+p0_rng[i];  //fix this (not just the initial guess)  
+    temp=lpars[4]+p0_rng[i];  //fix this (not just the initial guess)  
     if((temp >= p_min[0]) && (temp <= p_max[0])) lpars[4]=temp;
-    temp=p_o[1]+q0_rng[i];
+    temp=lpars[5]+q0_rng[i];
     if((temp >= p_min[1]) && (temp <= p_max[1])) lpars[5]=temp;
     //check to see if sensible guesses, need to also do some test 
     //the randomness at some point
@@ -193,6 +194,7 @@ int main(int argc,char** argv){
     }
   }
 
+  survey.save(outfile);
 
   //write the diagnostic 2d plot to the outfile and then add the table extension below. 
 
