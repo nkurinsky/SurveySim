@@ -233,8 +233,8 @@ PRO simulation_event,ev
 ;===============================================================
 ;Run the actual simulation
 ;---------------------------------------------------------------
-        args = ''
-        ;spawn,cdir+'/fitter '+args
+        args = 'observation.fits model.fits sf_templates.fits'
+        spawn,'fitter '+args
 
         read_output
         graphs
