@@ -271,10 +271,10 @@ bool simulator::save(string outfile){
     return opened;
   
   using namespace CCfits;
-  std::auto_ptr<FITS> pfits(0);
+  std::auto_ptr<FITS> pFits(0);
 
   try{
-    pfits.reset(new FITS(outfile,Write));
+    pFits.reset(new FITS(outfile,Write));
   }
   catch (CCfits::FITS::CantOpen){
     cerr << "Can't open " << outfile << endl;
@@ -339,7 +339,7 @@ bool simulator::save(string outfile){
   }
   
   static string hname("Parameter Distributions");
-  Table *newTable= pfits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
+  Table *newTable= pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
   
   newTable->column(colname[0]).write(f1,1);
   newTable->column(colname[1]).write(f2,1);

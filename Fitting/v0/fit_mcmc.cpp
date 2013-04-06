@@ -192,7 +192,7 @@ int main(int argc,char** argv){
     if((temp >= p_min[1]) && (temp <= p_max[1])) qtemp=temp;
     //check to see if sensible guesses, need to also do some test 
     //the randomness at some point
-    printf("\n\n%i %lf %lf...",(i+1),lpars[4],lpars[5]);
+    printf("\n\n%lu %lf %lf...",(i+1),lpars[4],lpars[5]);
     
     lf.set_p(ptemp);
     lf.set_q(qtemp);
@@ -215,7 +215,7 @@ int main(int argc,char** argv){
       //update mcmc chain with accepted values
       lpars[4] = ptemp;
       lpars[5] = qtemp;
-      fprintf(chain,"%i %f %f %f \n",i,lpars[4],lpars[5],trial);
+      fprintf(chain,"%lu %f %f %f \n",i,lpars[4],lpars[5],trial);
       mcchain[0][i]=lpars[4];
       mcchain[1][i]=lpars[5];
       for(int iz=0;iz<nz;iz++) mcchain[iz+2][i]=output.dndz[iz];

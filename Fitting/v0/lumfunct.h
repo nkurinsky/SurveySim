@@ -26,7 +26,7 @@ class lumfunct {
   void set_beta(double val);
   void set_p(double val);
   void set_q(double val);
-  void get_params(double[] lpars);
+  void get_params(double lpars[]);
   //for getting the number of sources/Mpc^3 for a given L,z pair
   double get_nsrcs(double redshift,double lum);
   //~lumfunct();

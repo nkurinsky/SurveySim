@@ -24,7 +24,7 @@ void lumfunct::set_q(double val){
   q=val;
 }
 
-void lumfunct::get_params(double[] lpars){
+void lumfunct::get_params(double lpars[]){
   lpars[0] = phi0;
   lpars[1] = L0;
   lpars[2] = alpha;
