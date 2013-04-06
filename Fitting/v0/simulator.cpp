@@ -265,7 +265,92 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
 
 
 bool simulator::save(string outfile){
-  return diagnostic->write_fits(outfile);
+  bool opened =  diagnostic->write_fits(outfile);
+  
+  if(not opened)
+    return opened;
+  
+  using namespace CCfits;
+  std::auto_ptr<FITS> pfits(0);
+
+  try{
+    pfits.reset(new FITS(outfile,Write));
+  }
+  catch (CCfits::FITS::CantOpen){
+    cerr << "Can't open " << outfile << endl;
+    opened = false;       
+  }
+  
+  double lpars[6];
+  lf->get_params(lpars);
+  
+  pFits->pHDU().addKey("PHI0",lpars[0],"Normalization"); 
+  pFits->pHDU().addKey("L0",lpars[1],"Knee location z=0"); 
+  pFits->pHDU().addKey("ALPHA",lpars[2],"upper slope"); 
+  pFits->pHDU().addKey("BETA",lpars[3],"lower slope"); 
+  pFits->pHDU().addKey("P",lpars[4],"Norm evolution"); 
+  pFits->pHDU().addKey("Q",lpars[5],"Knee evolution"); 
+
+  int size = sources.size();
+  int pnum = 2;
+  valarray<double> f1(size),f2(size),f3(size),luminosity(size);
+  valarray<double> redshift(size);
+  valarray<double> param(size);
+  valarray<double> params[pnum];
+  for (int i=0;i<pnum;i++)
+    params[i].resize(size);
+  
+  for(int i=0;i<size;i++){
+    f1[i] = sources[i].fluxes[0];
+    f2[i] = sources[i].fluxes[1];
+    f3[i] = sources[i].fluxes[2];
+    param[i] = 1; //placeholder for now
+    redshift[i] = sources[i].redshift;
+    luminosity[i] = sources[i].luminosity;
+    for(int j=0;j<pnum;j++)
+      params[j][i] = 1; //also placeholder for now
+  }
+  
+  static std::vector<string> colname((6+pnum),"");
+  static std::vector<string> colunit((6+pnum),"");
+  static std::vector<string> colform((6+pnum),"f13.8");
+  
+  static string pnames[] = {"P0","P1","P2","P3","P4"};
+  
+  colname[0] = "F1";
+  colname[1] = "F2";
+  colname[2] = "F3";
+  colname[3] = "Z";
+  colname[4] = "M";
+  colname[5] = "Lum";
+  
+  colunit[0] = "Jy";
+  colunit[1] = "Jy";
+  colunit[2] = "Jy";
+  colunit[3] = "-";
+  colunit[4] = "-";
+  colunit[5] = "W/Hz";
+  
+  colform[5] = "e13.5";
+  
+  for(int i=6;i<6+pnum;i++){
+    colname[i] = pnames[i-6];
+    colunit[i] = "-";
+  }
+  
+  static string hname("Parameter Distributions");
+  Table *newTable= pfits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
+  
+  newTable->column(colname[0]).write(f1,1);
+  newTable->column(colname[1]).write(f2,1);
+  newTable->column(colname[2]).write(f3,1);
+  newTable->column(colname[3]).write(redshift,1);
+  newTable->column(colname[4]).write(param,1);
+  newTable->column(colname[5]).write(luminosity,1);
+  for (int i=6;i<6+pnum;i++)
+    newTable->column(colname[i]).write(params[i-6],1);
+  
+  return true;
 }
 
 simulator::~simulator(){

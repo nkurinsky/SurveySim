@@ -24,6 +24,15 @@ void lumfunct::set_q(double val){
   q=val;
 }
 
+void lumfunct::get_params(double[] lpars){
+  lpars[0] = phi0;
+  lpars[1] = L0;
+  lpars[2] = alpha;
+  lpars[3] = beta;
+  lpars[4] = p;
+  lpars[5] = q;
+}
+
 //this function returns the number of sources (per Mpc^3) for a given L-z pair
 double lumfunct::get_nsrcs(double redshift,double lum){
   double nsrcs;
