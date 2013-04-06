@@ -92,7 +92,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
      bands = [band1,band2,band3]
 
      ;luminosity function parameter initialization
-     ldat={phi0:-2.2,lo:10,alpha:0.47,beta:2.88,p:-6.7,q:3.5}
+     ldat={phi0:-2.2,lo:23.64,alpha:0.47,beta:2.88,p:6.0,q:3.5}
      ldata=replicate(ldat,2) 
      ;the fixed values: =1 if held fixed, =0 if variable
      ldata(1).phi0=1
