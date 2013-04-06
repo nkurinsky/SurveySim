@@ -182,9 +182,9 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
       scale[is] = 1.0; //1.0e+4/high;
       weights[is] = 1.e0/scale[is]; //why do we need that in addition to scale?
 
-      b_rest[0]=bands[0]/(1.+zarray[is]);
-      b_rest[1]=bands[1]/(1.+zarray[is]);
-      b_rest[2]=bands[2]/(1.+zarray[is]);
+      b_rest[0]=bands[0]/(1.0+zarray[is]);
+      b_rest[1]=bands[1]/(1.0+zarray[is]);
+      b_rest[2]=bands[2]/(1.0+zarray[is]);
       //printf("\nz = %4.2f, s = %6.2E, n: ",zarray[is],scale[is]);
 
 	//Its not necessary to generate nsrcs for ALL possible L's and try to solve for them -- the vast majority will end up being discounted. Here add an extra loop to determine the minimum detectable luminosity and only simulate sources in that regime.
@@ -291,7 +291,8 @@ bool simulator::save(string outfile){
   pFits->pHDU().addKey("P",lpars[4],"Norm evolution"); 
   pFits->pHDU().addKey("Q",lpars[5],"Knee evolution"); 
 
-  int size = sources.size();
+  unsigned long size = sources.size();
+  printf("%s %lu\n","Soures Being Saved: ",size);
   int pnum = 2;
   valarray<double> f1(size),f2(size),f3(size),luminosity(size);
   valarray<double> redshift(size);
@@ -300,7 +301,7 @@ bool simulator::save(string outfile){
   for (int i=0;i<pnum;i++)
     params[i].resize(size);
   
-  for(int i=0;i<size;i++){
+  for(unsigned long i=0;i<size;i++){
     f1[i] = sources[i].fluxes[0];
     f2[i] = sources[i].fluxes[1];
     f3[i] = sources[i].fluxes[2];

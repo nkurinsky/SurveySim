@@ -16,6 +16,7 @@
 
 #define BANDS 3
 #define NPAR 2
+#define RUNS 10
 
 using namespace std;
 
@@ -43,7 +44,7 @@ int main(int argc,char** argv){
   
   //temporary, of course in the end this will be much longer 
   //perhaps 100,000-500,000 
-  unsigned long runs=1000;  
+  unsigned long runs=RUNS;  
  
   const gsl_rng_type * T;
 
@@ -172,7 +173,9 @@ int main(int argc,char** argv){
   dlogs=0.3;
   
   //note: chain is +1 as last column holds chi2 values for the particular "guess"
-  double mcchain[NPAR+nz+ns+1][runs]; 
+  valarray<double> mcchain[NPAR+nz+ns+1];
+  for(int i=0;i<(NPAR+nz+ns+1);i++)
+    mcchain[i].resize(runs);
 
   // the temperature, keep fixed for now, but can also try annealing 
   // in the future, this has similar effect as the width of the proposal
@@ -229,6 +232,44 @@ int main(int argc,char** argv){
   output=survey.simulate(area,nz,dz,ns,logsmin,dlogs);
   printf("\nModel chi2: %lf\n",output.chisqr);
   survey.save(outfile);
+  
+  bool save = true;
+  using namespace CCfits;
+  std::auto_ptr<FITS> pFits(0);
+
+  try{
+    pFits.reset(new FITS(outfile,Write));
+  }
+  catch (CCfits::FITS::CantOpen){
+    std::cerr << "Unknown Error Occurred, Can't save chain" << endl;
+    save = false;
+  }
+
+  if(save){
+    std::vector<string> colnames((NPAR+nz+ns+1),"dnds");
+    std::vector<string> colunits((NPAR+nz+ns+1),"");
+    std::vector<string> colform((NPAR+nz+ns+1),"f13.8");
+    string hname("Chain");
+    
+    char temp[2];
+    
+    colnames[0] = "P";
+    colnames[1] = "Q";
+    for(int iz=0;iz<nz;iz++){
+      sprintf(temp,"%i",iz);
+      colnames[iz+2] = "dndz"+std::string(temp);
+    }
+    for(int is=0;is<ns;is++){
+      sprintf(temp,"%i",is);
+      colnames[is+2+nz] = "dnds"+std::string(temp);
+    }
+    colnames[20] = "chisq";
+    
+    Table *newTable = pFits->addTable(hname,runs,colnames,colform,colunits,AsciiTbl);
+    for (int i=0;i<(NPAR+nz+ns+1);i++){
+      newTable->column(colnames[i]).write(mcchain[i],1);
+    }
+  }
   
   fclose(chain);
   gsl_rng_free (r);
