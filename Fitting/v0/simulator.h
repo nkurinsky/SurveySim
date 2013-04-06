@@ -17,6 +17,14 @@ struct sprop{
   friend ostream &operator<<(ostream &out,sprop c);
 };
 
+struct products{
+  double chisqr;
+  vector<double> dndz;
+  vector<double> dnds;
+  products();
+  products(int nz, int ns);
+};
+
 class simulator{
  private:
   double chisq;
@@ -39,25 +47,8 @@ class simulator{
   void set_sed_lib(string sedfile);
   void set_obs(string obsfile);
   void reset();
-  double simulate(double area, int nz, double dz);
+  products simulate(double area, int nz, double dz, int ns, double logsmin, double dlogs);
   double model_chisq() { return chisq; }
   bool save(string outfile);
   ~simulator();
 };
-
-struct mparam{
-  int p_id;
-  double mean;
-  double sigma;
-  double min;
-  double max;
-};
-
-struct fixed_params{
-  simulator * sim;
-  int npar;
-  int znum;
-  mparam *p;
-};
-
-double simulate(const gsl_vector *v,void *params);

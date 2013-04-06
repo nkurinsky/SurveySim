@@ -43,7 +43,7 @@ int main(int argc,char** argv){
   
   //temporary, of course in the end this will be much longer 
   //perhaps 100,000-500,000 
-  long int runs=10;  
+  unsigned long runs=1000;  
  
   const gsl_rng_type * T;
 
@@ -51,9 +51,6 @@ int main(int argc,char** argv){
   // and the acceptable min/max range
   double p_o[NPAR],dp[NPAR],p_min[NPAR],p_max[NPAR]; 
 
-  //note: chain is npar+1 as last column holds chi2 values for the particular "guess"
-  //double chain[npar+1][runs]; 
-  
   FITS *pInfile,*pInfile2;
   pInfile = new FITS(modfile,Read);
   pInfile2 = new FITS(obsfile,Read);
@@ -103,10 +100,11 @@ int main(int argc,char** argv){
   p_max[1]=5.0;
  
   //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
-  p_o[0]=-6.0;
+  p_o[0]=-6.7;
+  p_o[1]= 3.5;
   lpars[1] = 10.0;
-  lpars[4] = -6.0;
-  lpars[5] = 2.0;
+  lpars[4] = p_o[0];
+  lpars[5] = p_o[1];
 
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
 
@@ -136,9 +134,10 @@ int main(int argc,char** argv){
 
   //the initial chi2_min value
   //this is iterated each time a better value is found
-  double chi_min=1.0E+6; 
+  double chi_min=1.0E+4; 
   double previous=chi_min;
-  double trial;
+  double trial,de;
+  int minlink;
   long acceptot=0;
   bool ans;
 
@@ -149,25 +148,42 @@ int main(int argc,char** argv){
   T=gsl_rng_default;
   r=gsl_rng_alloc(T);
   
-  double area, nz, dz;
+  int nz,ns;
+  double area, dz, logsmin,dlogs;
+  products output;
+
   //note need to be able to pass the survey area down from the widget!!!
   //this is necessary for correct cosmological volume determinations
   //hence correct number count predictions
   //this value of area here is just a placeholder
-  area=pow((1.4*M_PI/180.0),2);
+  area=2.0*pow((M_PI/180.0),2); //in steradians from 2.0sq.deg.
+
+  //we don't want to keep information on each simulated source, but ultimately need to know the distribution with redshift, flux (i.e. number counts) and SED type for all *accepted* runs. 
+  // I think the best way to do so is to define the redshift, flux, and type arrays now, pass them on to survey.simulate from which we get not only chi2 but also these distributions. If accepted they are tagged onto the MC chain and saved with it. This increases the number of columns but not unmanageably so (currently, 21) 
+
+  //the redshift array is linear in steps of 0.5
   nz = 10;
   dz = 0.5;
+ 
+  //the flux array is logarithmic in steps of 0.3dex 
+  //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
+  ns=8;
+  logsmin=0.5;
+  dlogs=0.3;
+  
+  //note: chain is +1 as last column holds chi2 values for the particular "guess"
+  double mcchain[NPAR+nz+ns+1][runs]; 
 
   // the temperature, keep fixed for now, but can also try annealing 
   // in the future, this has similar effect as the width of the proposal
   // distribution, as determines how likely a far flung guess is of being 
   // accepted (see metrop function)
-  double t=100; 
+  double tmc=100.00; //to distinguish it from the random T
   double temp,bestp,bestq,ptemp,qtemp;
 
   fprintf(chain,"%s\n%s\n","Monte Carlo Parameter Chain","Iteration, P, Q, Chi-Square");
 
-  for (int i=0;i<runs;i++){
+  for (unsigned long i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
     q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
     temp=lpars[4]+p0_rng[i];  //fix this (not just the initial guess)  
@@ -181,16 +197,18 @@ int main(int argc,char** argv){
     lf.set_p(ptemp);
     lf.set_q(qtemp);
     printf("Running...\n");
-    trial=survey.simulate(area,nz,dz);
+    output=survey.simulate(area,nz,dz,ns,logsmin,dlogs);
+    trial=output.chisqr;
     printf("\nModel chi2: %lf\n",trial);
 
-    double de=trial-chi_min;
+    de=trial-chi_min;
     if(trial < chi_min){
       chi_min=trial;
+      minlink=i;
       bestp = ptemp;
       bestq = qtemp;
     }
-    ans=metrop(de,t);
+    ans=metrop(de,tmc);
     if(ans=true){
       acceptot++;
       previous=trial;
@@ -198,14 +216,18 @@ int main(int argc,char** argv){
       lpars[4] = ptemp;
       lpars[5] = qtemp;
       fprintf(chain,"%i %f %f %f \n",i,lpars[4],lpars[5],trial);
+      mcchain[0][i]=lpars[4];
+      mcchain[1][i]=lpars[5];
+      for(int iz=0;iz<nz;iz++) mcchain[iz+2][i]=output.dndz[iz];
+      mcchain[20][i]=trial;
     }
   }
 
   lf.set_p(bestp);
   lf.set_q(bestq);
   printf("Re-Running Best Fit...\n");
-  trial=survey.simulate(area,nz,dz);
-  printf("\nModel chi2: %lf\n",trial);
+  output=survey.simulate(area,nz,dz,ns,logsmin,dlogs);
+  printf("\nModel chi2: %lf\n",output.chisqr);
   survey.save(outfile);
   
   fclose(chain);
@@ -215,22 +237,25 @@ int main(int argc,char** argv){
 }
 
 
-bool metrop(double de,double t){
-  //here de is effectively Delta(Energy), and t is the temperature
-  //as in the boltzman factor exp(-de/t)
+bool metrop(double de,double tmc){
+//here de is effectively Delta(Energy), and t is the temperature
+//as in the boltzman factor exp(-de/t)
   
   static bool ans;
-  static const gsl_rng_type * T;
-  static double itemp;
-  
-  gsl_rng_env_setup();   
-  gsl_rng_default_seed = time(NULL);
-  T = gsl_rng_default;
-  r = gsl_rng_alloc(T);
-  itemp=gsl_rng_uniform(r);   //want uniform random number from 0-1
-  
-  ans = ((de < 0.0) or (itemp < exp(-de/t))) ? true : false;
-  
+  static double itemp,tester;
+
+  tester=de/tmc;
+  //to avoid getting segmentation fault from taking e^x where x is very large
+  if(tester <= -2) ans = (de<0.0) ? true : false;
+  if(tester > -2) {
+    static const gsl_rng_type * T;
+    gsl_rng_env_setup();   
+    gsl_rng_default_seed = time(NULL);
+    T = gsl_rng_default;
+    r = gsl_rng_alloc(T);
+    itemp=gsl_rng_uniform(r);   //want uniform random number from 0-1
+    ans = ((de < 0.0) or (itemp < exp(-de/tmc))) ? true : false;
+  }
   return ans;
 }
 

@@ -49,6 +49,16 @@ sprop::sprop(){
   c2 = -99.0;
 }
 
+products::products(){
+  dndz.resize(10);
+  dnds.resize(8);
+}
+
+products::products(int nz, int ns){
+  dndz.resize(nz);
+  dnds.resize(ns);
+}
+
 void simulator::init_rand(){
   gsl_rng * r;
   const gsl_rng_type * T;
@@ -109,12 +119,16 @@ void simulator::set_obs(string obsfile){
   diagnostic->init_obs(c1,c2,osize);
 }
 
-double simulator::simulate(double area, int nz, double dz){
+products simulator::simulate(double area, int nz, double dz, int ns, double logsmin, double dlogs){
   sources.clear();
+  products output(nz,ns);
+
+  logsmin = logsmin;
+  dlogs=dlogs;
 
   if(seds != NULL){
     //needs to be double checked, should be about done
-    static int is,js;
+    static int is,js,jsmin;
     static double tmpz,vol;
     int lnum = seds->get_lnum();
     double high;
@@ -124,26 +138,7 @@ double simulator::simulate(double area, int nz, double dz){
     seds->get_lums(lums);
 
     //setup redshift array    
-    double zarray[nz];    
-    for (int i=0;i<nz;i++)
-      zarray[i]=0.1+i*dz;
-
-    //get the number of sources per L-z bin
-    //scale the volume elements by 10^10 to avoid too large a number
-    //making a weights array associated with redshift (use volume), aim for 1000 per bin
-    //luminosity function dependent scaling (use highest bin, 10 per bin)
-    for (is=0;is<nz;is++) {
-      tmpz=zarray[is]+dz/2.0;
-      vol=(dvdz(tmpz,area)*dz);
-      high = lf->get_nsrcs(zarray[is],10.0)*vol;
-      scale[is] = 1.0e+4/high;
-      for (js=0;js<lnum;js++)
-	nsrcs[is][js]= long(scale[is]*vol*lf->get_nsrcs(zarray[is],lums[js]));
-    }
-
-    double weights[nz];
-    for (int i=0;i<nz;i++)
-      weights[i] = 1.e0/scale[i];
+    double zarray[nz],weights[nz];    
 
     //=========================================================================
     // for each L-z depending on the number of sources, sample the SED and get the appropriate fluxes
@@ -156,7 +151,12 @@ double simulator::simulate(double area, int nz, double dz){
     static double noise[3];
     static sprop *temp_src;
     static int src_iter;
-    bool detected = true;
+    static bool detected = true;
+
+    //double dndz[nz],dnds[ns]; //arrays to hold redshift distribution and number counts
+
+    //just temporary, complains if unused variables
+    output.dnds[0]=0;
 
     gsl_rng * r;
     const gsl_rng_type * T;    
@@ -164,14 +164,43 @@ double simulator::simulate(double area, int nz, double dz){
     T = gsl_rng_default;
     r = gsl_rng_alloc(T);
     
+   //For the scaling, get the number of sources per L-z bin
+    //scale the volume elements by 10^10 to avoid too large a number
+    //making a weights array associated with redshift (use volume), aim for 1000 per bin
+    //luminosity function dependent scaling (use highest bin, 10 per bin)
+
     //NOTE templates are given in W/Hz
     for (is=0;is<nz;is++){
+      zarray[is]=0.1+is*dz;
+      output.dndz[is]=0;
+
+      tmpz=zarray[is]+dz/2.0;
+      vol=(dvdz(tmpz,area)*dz);
+      high = lf->get_nsrcs(zarray[is],10.0)*vol;
+      //high ranges from ~15000 to 1.e+10
+      //cout<<high;
+      scale[is] = 1.0; //1.0e+4/high;
+      weights[is] = 1.e0/scale[is]; //why do we need that in addition to scale?
+
       b_rest[0]=bands[0]/(1.+zarray[is]);
       b_rest[1]=bands[1]/(1.+zarray[is]);
       b_rest[2]=bands[2]/(1.+zarray[is]);
-      printf("\nz = %4.2f, s = %6.2E, s = %6.2E, n: ",zarray[is],scale[is],weights[is]);
+      //printf("\nz = %4.2f, s = %6.2E, n: ",zarray[is],scale[is]);
+
+	//Its not necessary to generate nsrcs for ALL possible L's and try to solve for them -- the vast majority will end up being discounted. Here add an extra loop to determine the minimum detectable luminosity and only simulate sources in that regime.
+
       for (js=0;js<lnum;js++){
-	printf("{%4.2f, %ld} ",lums[js],nsrcs[is][js]);
+	flux_sim[0] = seds->get_flux(lums[js],b_rest[0]);
+	flux_sim[0] *= (1/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2)))/Wm2Hz_TO_mJy;
+	if(flux_sim[0]>=flux_limits[0]){
+	  jsmin=js; //maybe can try js-1 to allow for noise?
+	  js = lnum; //break out of loop
+	};
+      };
+      
+      for (js=jsmin;js<lnum;js++){
+	nsrcs[is][js]= long(scale[is]*vol*lf->get_nsrcs(zarray[is],lums[js]));
+	//printf("%4.2f %4.2f %6li \n",zarray[is],lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
 	  detected = true;
 	  for (int i=0;i<3;i++){
@@ -183,17 +212,21 @@ double simulator::simulate(double area, int nz, double dz){
 	    flux_sim[i] += noise[i];
 	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
 	      detected = false;
-	  }	  
+	  }
+	  
 	  //check for detectability, if "Yes" add to list
 	  if(detected){
 	    temp_src = new sprop(zarray[is],flux_sim,lums[js],weights[is]);
 	    sources.push_back(*temp_src);
+	    output.dndz[is]+=1; 
 	    delete temp_src;
 	  }
 	}
       }
+      //just testing, comment out when runs>1
+      //printf("%4.2f %4.2f \n",zarray[is],output.dndz[is]);
     }
-    
+     
     //=========================================================================
     // generate diagnostic color-color plots
     //*************************************************************************
@@ -210,18 +243,23 @@ double simulator::simulate(double area, int nz, double dz){
       w[i] = sources[i].weight;
     }
     
+    //int msize = nz*seds->get_lnum();
+    
     diagnostic->init_model(c1,c2,w,snum);
-    chisq=diagnostic->get_chisq();
+    output.chisqr=diagnostic->get_chisq();
 
     delete[] c1;
     delete[] c2;
     delete[] w;
-
-    return chisq;
+    
+    //  return chisq;
+    return output;
   }
   else{
     cout << "ERROR: NULL Model Library" << endl;
-    return -1;
+    //doesn't work now as the output is of type "products" and "-1" is integer
+    //return -1;
+    return output;
   }
 }
 
