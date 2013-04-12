@@ -497,13 +497,13 @@ pro graphs
 
   widget_control,lumfunct,get_value=index
   wset,index
-  h = histogram(alog10(lum),nbins=50,locations=xh)
+  h = histogram(lum,nbins=50,locations=xh)
   plot,xh,h,psym=10,xstyle=1,yrange=[0.1,1000],ystyle=1,xtitle='Log(Luminosity (W/Hz))',ytitle='dN/(dL/dHz)',/ylog,title='Luminosity Function'
 
   widget_control,redshift,get_value=index
   wset,index
-  h = histogram(z,binsize=0.1,locations=xh,min=0,max=10)
-  plot,xh,h,psym=10,xrange=[0,10],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
+  h = histogram(z,binsize=0.1,locations=xh,min=0,max=5)
+  plot,xh,h,psym=10,xrange=[0,5],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
 
   widget_control,models,get_value=index
   wset,index

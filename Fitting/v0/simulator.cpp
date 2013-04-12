@@ -140,6 +140,7 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
     //setup redshift array    
     double zarray[nz],weights[nz];    
 
+    jsmin = 0;
     //=========================================================================
     // for each L-z depending on the number of sources, sample the SED and get the appropriate fluxes
     //*************************************************************************
@@ -191,24 +192,24 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
 
       for (js=0;js<lnum;js++){
 	flux_sim[0] = seds->get_flux(lums[js],b_rest[0]);
-	flux_sim[0] *= (1/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2)))/Wm2Hz_TO_mJy;
+	flux_sim[0] *= (1.0/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0)))*Wm2Hz_TO_mJy;
 	if(flux_sim[0]>=flux_limits[0]){
 	  jsmin=js; //maybe can try js-1 to allow for noise?
 	  js = lnum; //break out of loop
 	};
       };
+      printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
       
       for (js=jsmin;js<lnum;js++){
 	nsrcs[is][js]= long(scale[is]*vol*lf->get_nsrcs(zarray[is],lums[js]));
-	//printf("%4.2f %4.2f %6li \n",zarray[is],lums[js],nsrcs[is][js]);
+	printf("%4.2f %4.2f %6li \n",zarray[is],lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
 	  detected = true;
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
 	    //noise[i] = gauss_random(r,nrange,0.0,b_err[i],nsrcs[is][js]); 
-	    //this keeps giving me compiler/linker errors
 	    flux_sim[i] = seds->get_flux(lums[js],b_rest[i]);
-	    flux_sim[i] *= (1/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2)))/Wm2Hz_TO_mJy;
+	    flux_sim[i] *= (1.0/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0)))*Wm2Hz_TO_mJy;
 	    flux_sim[i] += noise[i];
 	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
 	      detected = false;

@@ -63,13 +63,13 @@ int main(int argc,char** argv){
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5"};
 
+  printf("%s\n","Bands:");
   for(int i=0;i<BANDS;i++){
     obs_table.readKey("WAVE_"+pi[i+1],bs[i]); //should already be in microns
     obs_table.readKey("W"+pi[i+1]+"_FMIN",flims[i]); //should be in mJy
     obs_table.readKey("W"+pi[i+1]+"_FERR",errs[i]);
-    printf("%fl\t",bs[i]);
+    printf("%fl\t%fl\t%fl\n",bs[i],flims[i],errs[i]);
   }
-  printf("\n");
 
 //=================================================================  
 //Read-in Luminosity Function Parameters

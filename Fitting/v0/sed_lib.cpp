@@ -56,7 +56,7 @@ sed_lib::sed_lib(string fitsfile){
   double temp;
   HDU& header = pInfile->pHDU();
   
-  cout << "Initialize Luminosities" << endl;
+  printf("%s\n","Initialize Luminosities");
   for (unsigned int i=0;i<lnum;i++) {
     std::string a = "ROW";
     //convert integer to string...may not be best way
