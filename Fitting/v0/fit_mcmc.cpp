@@ -17,6 +17,8 @@
 #define BANDS 3
 #define NPAR 2
 #define RUNS 10
+#define DZ 0.1
+#define ZMAX 4.0
 
 using namespace std;
 
@@ -161,10 +163,9 @@ int main(int argc,char** argv){
 
   //we don't want to keep information on each simulated source, but ultimately need to know the distribution with redshift, flux (i.e. number counts) and SED type for all *accepted* runs. 
   // I think the best way to do so is to define the redshift, flux, and type arrays now, pass them on to survey.simulate from which we get not only chi2 but also these distributions. If accepted they are tagged onto the MC chain and saved with it. This increases the number of columns but not unmanageably so (currently, 21) 
-
-  //the redshift array is linear in steps of 0.5
-  nz = 10;
-  dz = 0.5;
+  dz = DZ;
+  nz = ZMAX/dz;
+  printf("\nNZ: %i, DZ: %f\n\n",nz,dz);
  
   //the flux array is logarithmic in steps of 0.3dex 
   //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
@@ -173,8 +174,9 @@ int main(int argc,char** argv){
   dlogs=0.3;
   
   //note: chain is +1 as last column holds chi2 values for the particular "guess"
-  valarray<double> mcchain[NPAR+nz+ns+1];
-  for(int i=0;i<(NPAR+nz+ns+1);i++)
+  int chainsize = NPAR+nz+ns+1;
+  valarray<double> mcchain[chainsize];
+  for(int i=0;i<chainsize;i++)
     mcchain[i].resize(runs);
 
   // the temperature, keep fixed for now, but can also try annealing 
@@ -221,8 +223,9 @@ int main(int argc,char** argv){
       fprintf(chain,"%lu %f %f %f \n",i,lpars[4],lpars[5],trial);
       mcchain[0][i]=lpars[4];
       mcchain[1][i]=lpars[5];
-      for(int iz=0;iz<nz;iz++) mcchain[iz+2][i]=output.dndz[iz];
-      mcchain[20][i]=trial;
+      for(int iz=0;iz<nz;iz++) mcchain[iz+NPAR][i]=output.dndz[iz];
+      for(int is=0;is<ns;is++) mcchain[is+nz+NPAR][i] = 0;
+      mcchain[chainsize-1][i]=trial;
     }
   }
 
@@ -245,10 +248,12 @@ int main(int argc,char** argv){
     save = false;
   }
 
+  save=false;
   if(save){
-    std::vector<string> colnames((NPAR+nz+ns+1),"dnds");
-    std::vector<string> colunits((NPAR+nz+ns+1),"");
-    std::vector<string> colform((NPAR+nz+ns+1),"f13.8");
+    int vecsize = chainsize;
+    std::vector<string> colnames(vecsize,"dnds");
+    std::vector<string> colunits(vecsize,"");
+    std::vector<string> colform(vecsize,"f");
     string hname("Chain");
     
     char temp[2];
@@ -257,18 +262,25 @@ int main(int argc,char** argv){
     colnames[1] = "Q";
     for(int iz=0;iz<nz;iz++){
       sprintf(temp,"%i",iz);
-      colnames[iz+2] = "dndz"+std::string(temp);
+      colnames[iz+NPAR] = "dndz"+std::string(temp);
     }
     for(int is=0;is<ns;is++){
       sprintf(temp,"%i",is);
-      colnames[is+2+nz] = "dnds"+std::string(temp);
+      colnames[is+NPAR+nz] = "dnds"+std::string(temp);
     }
-    colnames[20] = "chisq";
+    colnames[vecsize-1] = "chisq";
     
+    cerr << "writing" << endl;
+
     Table *newTable = pFits->addTable(hname,runs,colnames,colform,colunits,AsciiTbl);
+
+    cerr << "table initialized" << endl;
+
     for (int i=0;i<(NPAR+nz+ns+1);i++){
       newTable->column(colnames[i]).write(mcchain[i],1);
     }
+
+    cerr << "table written" << endl;
   }
   
   fclose(chain);

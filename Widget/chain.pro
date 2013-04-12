@@ -2,7 +2,7 @@ pro chain
 
 !p.charsize=1.5
 
-readcol,'chain.txt',i,p1,p2,chisq,format='i,f,f,f'
+readcol,'chain.txt',i,p1,p2,chisq,skipline=2,format='i,f,f,f',/silent
 
 n = n_elements(p1)              
 
