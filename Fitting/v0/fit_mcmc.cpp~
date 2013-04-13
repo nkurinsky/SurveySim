@@ -159,7 +159,7 @@ int main(int argc,char** argv){
   //this is necessary for correct cosmological volume determinations
   //hence correct number count predictions
   //this value of area here is just a placeholder
-  area=10.0*pow((M_PI/180.0),2.0); //in steradians from 10.0sq.deg.
+  area=2.0*pow((M_PI/180.0),2); //in steradians from 2.0sq.deg.
 
   //we don't want to keep information on each simulated source, but ultimately need to know the distribution with redshift, flux (i.e. number counts) and SED type for all *accepted* runs. 
   // I think the best way to do so is to define the redshift, flux, and type arrays now, pass them on to survey.simulate from which we get not only chi2 but also these distributions. If accepted they are tagged onto the MC chain and saved with it. This increases the number of columns but not unmanageably so (currently, 21) 

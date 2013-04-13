@@ -25,16 +25,16 @@ double lumdist(double zmax) {
 
 double dvdz (double zmax, double area)
 {
-  static double ez;
-  static double my_dvdz;
-  static double dl;
-  static double dz2;
+  double ez;
+  double my_dvdz;
+  double dl;
 
-  dz2 = pow((1+zmax),2);
   dl=lumdist(zmax);
-  ez=sqrt(OL+(OM*dz2*(1+zmax)));
-  my_dvdz=(d_hub*dl*dl*area)/(ez*dz2);
 
-  return my_dvdz;
+  ez=sqrt(OL+OM*(1+zmax)*(1+zmax)*(1+zmax));
+
+  my_dvdz=(d_hub*dl*dl*area)/(ez*(1+zmax)*(1+zmax));
+
+  return (my_dvdz);
 }
 

@@ -179,6 +179,7 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
       vol=(dvdz(tmpz,area)*dz);
       high = lf->get_nsrcs(zarray[is],10.0)*vol;
       //high ranges from ~15000 to 1.e+10
+      //cout<<high;
       scale[is] = 1.0; //1.0e+4/high;
       weights[is] = 1.e0/scale[is]; //why do we need that in addition to scale?
 
@@ -187,7 +188,7 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
       b_rest[2]=bands[2]/(1.0+zarray[is]);
       //printf("\nz = %4.2f, s = %6.2E, n: ",zarray[is],scale[is]);
 
-      //Its not necessary to generate nsrcs for ALL possible L's and try to solve for them -- the vast majority will end up being discounted. Here add an extra loop to determine the minimum detectable luminosity and only simulate sources in that regime.
+	//Its not necessary to generate nsrcs for ALL possible L's and try to solve for them -- the vast majority will end up being discounted. Here add an extra loop to determine the minimum detectable luminosity and only simulate sources in that regime.
 
       for (js=0;js<lnum;js++){
 	flux_sim[0] = seds->get_flux(lums[js],b_rest[0]);
