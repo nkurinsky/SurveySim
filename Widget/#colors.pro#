@@ -46,4 +46,8 @@ pro colors
 
   device,/close
 
+  for j=1,14 do begin
+     s = reform(res[*,j])
+  endfor
+
 end

@@ -32,7 +32,7 @@ pro colors
      end
   end
   
-  xyouts,-0.32,-0.38,textoidl('Redshift:')
+  xyouts,-0.35,-0.38,textoidl('Redshift:')
   xyouts,-0.1,-0.38,textoidl('0.0')
   xyouts,0.09,-0.38,textoidl('1.0')
   xyouts,0.28,-0.38,textoidl('2.0')
