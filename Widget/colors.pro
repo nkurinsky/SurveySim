@@ -27,7 +27,6 @@ pro colors
         fluxes = s[inds]
         c1 = alog10(fluxes[2]/fluxes[0])
         c2 = alog10(fluxes[1]/fluxes[0])
-        print,c1,c2
         oplot,[c1],[c2],psym=2,color=i*40+20,symsize=0.5
      end
   end
@@ -42,6 +41,54 @@ pro colors
   for i=0.0,5.0,0.1 do begin
      ind = (-0.1+i/5)
      oplot,[ind,ind+0.01,ind,ind+0.01,ind,ind+0.01],[-0.4,-0.4,-0.395,-0.395,-0.39,-0.39],psym=2,color=i*40+20,symsize=0.5
+  endfor
+
+  device,/close
+  device,filename="models.eps",xsize=12,ysize=9,/inches,/times,/color,/encapsulated
+  loadct,0,/silent
+
+  plot,[wave[0],wave[n_elements(wave)-1]],[1e19,1e28],/xlog,/ylog,/nodata,xstyle=1,ystyle=1,xtitle=textoidl("Wavelength [\mu m]"),ytitle=textoidl("Luminosity [W/\lambda]")
+
+  for j=1,14 do begin
+     s = reform(res[*,j])
+     oplot,wave,s,linestyle=0
+  endfor
+
+  oplot,[250,250],[1e19,1e28],linestyle=1
+  oplot,[350,350],[1e19,1e28],linestyle=1
+  oplot,[500,500],[1e19,1e28],linestyle=1
+
+  device,/close
+
+  device,filename='model_brightness.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
+  
+  plot,[wave[0],wave[n_elements(wave)-1]],[1e19,1e28],/xlog,/ylog,/nodata,xstyle=1,ystyle=1,xtitle=textoidl("Wavelength [\mu m]"),ytitle=textoidl("Luminosity [W/ \lambda ]")
+
+  loadct,39,/silent
+  for j=1,1 do begin
+     s = reform(res[*,j])
+     for i=0.0,5.0 do begin
+        b_rest = wave/(1.0+i)
+        oplot,b_rest,s,color=i*40+20
+     endfor
+  endfor
+
+  s = reform(res[*,14])
+  for i=0.0,5.0 do begin
+     b_rest = wave/(1.0+i)
+     oplot,b_rest,s,color=i*40+20
+  endfor
+
+  for i=0,2 do begin
+     oplot,[bands[i],bands[i]],[1e19,1e28],linestyle=1
+  endfor	
+
+  xyouts,1e4,10^(26.7),textoidl('Redshift:')
+  xyouts,1e4,10^(26.4),textoidl('0.0')
+  xyouts,10^(4.8),10^(26.4),textoidl('5.0')
+  for i=0.0,5.0,0.1 do begin
+     ind = (4.0+i/5)
+     oplot,[10^ind,10^(ind+0.01),10^ind,10^(ind+0.01),10^ind,10^(ind+0.01)],[10^26.0,10^26.0,10^26.1,10^26.1,20^26.2,10^26.2],psym=2,color=i*40+20,symsize=1.0
   endfor
 
   device,/close
