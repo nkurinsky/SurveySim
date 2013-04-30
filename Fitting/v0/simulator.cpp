@@ -131,8 +131,8 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
     static int is,js,jsmin;
     static double tmpz,vol;
     int lnum = seds->get_lnum();
+    double sf;
     double high;
-    double scale[nz];
     long nsrcs[nz][lnum];
     double lums[lnum];
     seds->get_lums(lums);
@@ -172,43 +172,43 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
 
     //NOTE templates are given in W/Hz
     for (is=0;is<nz;is++){
-      zarray[is]=0.01+is*dz;
+      zarray[is]=(is+1)*dz;
       output.dndz[is]=0;
 
       tmpz=zarray[is]+dz/2.0;
       vol=(dvdz(tmpz,area)*dz);
       high = lf->get_nsrcs(zarray[is],10.0)*vol;
       //high ranges from ~15000 to 1.e+10
-      scale[is] = 1.0; //1.0e+4/high;
-      weights[is] = 1.e0/scale[is]; //why do we need that in addition to scale?
+      weights[is] = 1.e0; 
 
       b_rest[0]=bands[0]/(1.0+zarray[is]);
       b_rest[1]=bands[1]/(1.0+zarray[is]);
       b_rest[2]=bands[2]/(1.0+zarray[is]);
-      //printf("\nz = %4.2f, s = %6.2E, n: ",zarray[is],scale[is]);
 
-      //Its not necessary to generate nsrcs for ALL possible L's and try to solve for them -- the vast majority will end up being discounted. Here add an extra loop to determine the minimum detectable luminosity and only simulate sources in that regime.
+      sf = 4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0); //denominator of conversion from luminosity to flux
+      
+      //Its not necessary to generate nsrcs for ALL possible L's and try to solve for them -- the vast majority will end up being discounted. 
+      //Here add an extra loop to determine the minimum detectable luminosity and only simulate sources in that regime.
 
       for (js=0;js<lnum;js++){
 	flux_sim[0] = seds->get_flux(lums[js],b_rest[0]);
-	flux_sim[0] *= (1+zarray[is])*(1.0/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0)))*Wm2Hz_TO_mJy;
+	flux_sim[0] *= (1+zarray[is])*Wm2Hz_TO_mJy/sf;
 	if(flux_sim[0]>=flux_limits[0]){
-	  jsmin = (js > 0) ? (js-1) : js; //maybe can try js-1 to allow for noise?
+	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
 	  js = lnum; //break out of loop
 	};
       };
       printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
       
       for (js=jsmin;js<lnum;js++){
-	nsrcs[is][js]= long(scale[is]*vol*lf->get_nsrcs(zarray[is],lums[js]));
+	nsrcs[is][js]= long(vol*lf->get_nsrcs(zarray[is],lums[js]));
 	printf("%4.2f %4.2f %6li \n",zarray[is],lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
 	  detected = true;
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
-	    //noise[i] = gauss_random(r,nrange,0.0,b_err[i],nsrcs[is][js]); 
 	    flux_sim[i] = seds->get_flux(lums[js],b_rest[i]);
-	    flux_sim[i] *= (1+zarray[is])*(1.0/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0)))*Wm2Hz_TO_mJy;
+	    flux_sim[i] *= (1+zarray[is])*Wm2Hz_TO_mJy/sf;
 	    flux_sim[i] += noise[i];
 	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
 	      detected = false;
