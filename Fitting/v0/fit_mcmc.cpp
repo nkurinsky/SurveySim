@@ -94,8 +94,8 @@ int main(int argc,char** argv){
   //so requires trial and error as we actually start fitting data.
   p_o[0]=lpars[4]; 
   dp[0]=0.3;
-  p_min[0]=-10.0;
-  p_max[0]=0.0;
+  p_min[0]= 0.0;
+  p_max[0]= 10.0;
   
   p_o[1]=lpars[5];
   dp[1]=0.3;
@@ -103,11 +103,11 @@ int main(int argc,char** argv){
   p_max[1]=5.0;
  
   //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
-  p_o[0]=-6.7;
-  p_o[1]= 3.5;
-  lpars[1] = 10.0;
-  lpars[4] = p_o[0];
-  lpars[5] = p_o[1];
+  //p_o[0]= 6.7;
+  //p_o[1]= 3.5;
+  //lpars[1] = 10.14;
+  //lpars[4] = p_o[0];
+  //lpars[5] = p_o[1];
 
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
 

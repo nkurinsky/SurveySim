@@ -92,7 +92,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
      bands = [band1,band2,band3]
 
      ;luminosity function parameter initialization
-     ldat={phi0:-2.2,lo:10,alpha:0.5,beta:3.0,p:-6.7,q:3.5}
+     ldat={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:6.7,q:3.5}
      ldata=replicate(ldat,2) 
      ;the fixed values: =1 if held fixed, =0 if variable
      ldata(1).phi0=1
@@ -259,13 +259,13 @@ pro bcheck,ev
   i = ev.y
 
   widget_control,ev.id,get_value=value
-  if(value[i].fixed lt 0) then begin
-     value[i].fixed=0
-     widget_control,ev.id,set_value=value
+  ;if(value[i].fixed lt 0) then begin
+  ;   value[i].fixed=0
+  ;   widget_control,ev.id,set_value=value
   ;endif else if(value[i].fixed gt 1) then begin
   ;   value[i].fixed=1
   ;   widget_control,ev.id,set_value=value
-  endif
+  ;endif
 
 end
 
@@ -457,104 +457,104 @@ pro graphs
   set_plot,'x'
   loadct,0,/silent
 
-  dists = mrdfits('output.fits',3,head,/silent)
+  ;; dists = mrdfits('output.fits',3,head,/silent)
 
-  gpts = where(dists.f3 gt 0)
-  f1 = dists[gpts].f1
-  f2 = dists[gpts].f2
-  f3 = dists[gpts].f3
-  z = dists[gpts].z
-  m = dists[gpts].m
-  lum = dists[gpts].lum
+;;   gpts = where(dists.f3 gt 0)
+;;   f1 = dists[gpts].f1
+;;   f2 = dists[gpts].f2
+;;   f3 = dists[gpts].f3
+;;   z = dists[gpts].z
+;;   m = dists[gpts].m
+;;   lum = dists[gpts].lum
 
-  pnum_out = fxpar(head,'tfields')
+;;   pnum_out = fxpar(head,'tfields')
 
-  for i=6,pnum_out-1 do begin
-     if (i eq 6) then begin
-        hists = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=10)
-        hmax = max(hists)
-        xmax = max(xh)
-     endif else begin
-        h = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0)
-        if(max(xh) gt xmax) then begin
-           xmax = max(xh)
-           for j=6,i-1 do begin
-              if(i eq 6) then begin
-                 hists = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
-              endif else begin
-                 htemp = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
-                 hists = [hists,htemp]
-              endelse
-           endfor
-        endif else begin
-           h = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
-        endelse
-        temp = max(h)
-        hmax = (temp gt hmax) ? temp : hmax
-        hists = [[hists],[h]]
-     endelse
-  endfor     
+;;   for i=6,pnum_out-1 do begin
+;;      if (i eq 6) then begin
+;;         hists = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=10)
+;;         hmax = max(hists)
+;;         xmax = max(xh)
+;;      endif else begin
+;;         h = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0)
+;;         if(max(xh) gt xmax) then begin
+;;            xmax = max(xh)
+;;            for j=6,i-1 do begin
+;;               if(i eq 6) then begin
+;;                  hists = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
+;;               endif else begin
+;;                  htemp = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
+;;                  hists = [hists,htemp]
+;;               endelse
+;;            endfor
+;;         endif else begin
+;;            h = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
+;;         endelse
+;;         temp = max(h)
+;;         hmax = (temp gt hmax) ? temp : hmax
+;;         hists = [[hists],[h]]
+;;      endelse
+;;   endfor     
 
-  widget_control,lumfunct,get_value=index
-  wset,index
-  h = histogram(lum,nbins=50,locations=xh)
-  plot,xh,h,psym=10,xstyle=1,yrange=[0.1,1000],ystyle=1,xtitle='Log(Luminosity (W/Hz))',ytitle='dN/(dL/dHz)',/ylog,title='Luminosity Function'
+;;   widget_control,lumfunct,get_value=index
+;;   wset,index
+;;   h = histogram(lum,nbins=50,locations=xh)
+;;   plot,xh,h,psym=10,xstyle=1,yrange=[0.1,1000],ystyle=1,xtitle='Log(Luminosity (W/Hz))',ytitle='dN/(dL/dHz)',/ylog,title='Luminosity Function'
 
-  widget_control,redshift,get_value=index
-  wset,index
-  h = histogram(z,binsize=0.1,locations=xh,min=0,max=5)
-  plot,xh,h,psym=10,xrange=[0,5],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
+;;   widget_control,redshift,get_value=index
+;;   wset,index
+;;   h = histogram(z,binsize=0.1,locations=xh,min=0,max=5)
+;;   plot,xh,h,psym=10,xrange=[0,5],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
 
-  widget_control,models,get_value=index
-  wset,index
+;;   widget_control,models,get_value=index
+;;   wset,index
 
-  help,hists
-  for i=6,pnum_out-1 do begin
-     if(i eq 6) then begin
-        plot,xh,hists(*,i-6),psym=10,xstyle=1,xtitle='m',ytitle='dN/dm',xrange=[0,xmax],title='Model Distribution',yrange=[0,hmax*1.2]
-     endif else begin
-        oplot,xh,hists(*,i-6),linestyle=(i-6),psym=10
-     endelse
-  endfor
+;;   help,hists
+;;   for i=6,pnum_out-1 do begin
+;;      if(i eq 6) then begin
+;;         plot,xh,hists(*,i-6),psym=10,xstyle=1,xtitle='m',ytitle='dN/dm',xrange=[0,xmax],title='Model Distribution',yrange=[0,hmax*1.2]
+;;      endif else begin
+;;         oplot,xh,hists(*,i-6),linestyle=(i-6),psym=10
+;;      endelse
+;;   endfor
 
-  widget_control,dcount1,get_value=index
-  wset,index
-;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
-  if( file_test('counts_clements10.dat')) then begin
-     readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err
-     flux=flux/1.d3
-     plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=[5.d2,1.d5],ystyle=1
-     oploterr,flux,diff_counts,diff_err
-  endif else begin
-     print,'Error: File "counts_clements10.dat" not found'
-     plot,[100,500],[5.d2,1.d5],/nodata,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',ystyle=1
-  endelse
+;;   widget_control,dcount1,get_value=index
+;;   wset,index
+;; ;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
+;;   if( file_test('counts_clements10.dat')) then begin
+;;      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err
+;;      flux=flux/1.d3
+;;      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=[5.d2,1.d5],ystyle=1
+;;      oploterr,flux,diff_counts,diff_err
+;;   endif else begin
+;;      print,'Error: File "counts_clements10.dat" not found'
+;;      plot,[100,500],[5.d2,1.d5],/nodata,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',ystyle=1
+;;   endelse
 
-  h = histogram(alog10(f1),nbins=50,locations=xh,min=-3,max=1)
-  ;I think the area covered here is not
-;quite right needs to be sorted out better, but for now just scale up
-  h=h*2.d3
-  ;dlogS=dS/S
-  df1=(shift(xh,-1)-xh)*10.^(xh)
-  dcounts=(h/df1)*f1^(2.5)
-  xh=10.^(xh)
-  oplot,xh,dcounts,psym=10
+;;   h = histogram(alog10(f1),nbins=50,locations=xh,min=-3,max=1)
+;;   ;I think the area covered here is not
+;; ;quite right needs to be sorted out better, but for now just scale up
+;;   h=h*2.d3
+;;   ;dlogS=dS/S
+;;   df1=(shift(xh,-1)-xh)*10.^(xh)
+;;   dcounts=(h/df1)*f1^(2.5)
+;;   xh=10.^(xh)
+;;   oplot,xh,dcounts,psym=10
 
-  widget_control,dcount2,get_value=index
-  wset,index
+;;   widget_control,dcount2,get_value=index
+;;   wset,index
 
-  h = histogram(alog10(f2),nbins=50,locations=xh,min=-3,max=0)
-  pts = where(h le 0)
-  h[pts] = 0.01
-  plot,xh,h,psym=10,/ylog,xrange=[-3,0],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='Flux [Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
+;;   h = histogram(alog10(f2),nbins=50,locations=xh,min=-3,max=0)
+;;   pts = where(h le 0)
+;;   h[pts] = 0.01
+;;   plot,xh,h,psym=10,/ylog,xrange=[-3,0],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='Flux [Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
 
-  widget_control,dcount3,get_value=index
-  wset,index
+;;   widget_control,dcount3,get_value=index
+;;   wset,index
 
-  h = histogram(alog10(f3),nbins=50,locations=xh,min=-3,max=0)
-  pts = where(h le 0)
-  h[pts] = 0.01
-  plot,xh,h,psym=10,/ylog,xrange=[-3,0],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='Flux [Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
+;;   h = histogram(alog10(f3),nbins=50,locations=xh,min=-3,max=0)
+;;   pts = where(h le 0)
+;;   h[pts] = 0.01
+;;   plot,xh,h,psym=10,/ylog,xrange=[-3,0],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='Flux [Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
 
   comp = mrdfits(info.oname,0,head,/silent)
   model = mrdfits(info.oname,1,/silent)

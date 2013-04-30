@@ -193,7 +193,7 @@ products simulator::simulate(double area, int nz, double dz, int ns, double logs
 	flux_sim[0] = seds->get_flux(lums[js],b_rest[0]);
 	flux_sim[0] *= (1+zarray[is])*(1.0/(4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0)))*Wm2Hz_TO_mJy;
 	if(flux_sim[0]>=flux_limits[0]){
-	  jsmin=js-1; //maybe can try js-1 to allow for noise?
+	  jsmin = (js > 0) ? (js-1) : js; //maybe can try js-1 to allow for noise?
 	  js = lnum; //break out of loop
 	};
       };
