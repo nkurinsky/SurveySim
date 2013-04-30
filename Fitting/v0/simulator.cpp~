@@ -119,23 +119,28 @@ void simulator::set_obs(string obsfile){
   diagnostic->init_obs(c1,c2,osize);
 }
 
-products simulator::simulate(double area, int nz, double dz, int ns){
+products simulator::simulate(double area, int nz, double dz, int ns, double logsmin, double dlogs){
   sources.clear();
   products output(nz,ns);
 
-  if(seds != NULL){
+  logsmin = logsmin;
+  dlogs=dlogs;
 
+  if(seds != NULL){
+    //needs to be double checked, should be about done
     static int is,js,jsmin;
     static double tmpz,vol;
-
     int lnum = seds->get_lnum();
-    double high, sf;
+    double sf;
+    double high;
     long nsrcs[nz][lnum];
     double lums[lnum];
-    double zarray[nz],weights[nz];    
-    
     seds->get_lums(lums);
-    
+
+    //setup redshift array    
+    double zarray[nz],weights[nz];    
+
+    jsmin = 0;
     //=========================================================================
     // for each L-z depending on the number of sources, sample the SED and get the appropriate fluxes
     //*************************************************************************
@@ -149,6 +154,8 @@ products simulator::simulate(double area, int nz, double dz, int ns){
     static int src_iter;
     static bool detected = true;
 
+    //double dndz[nz],dnds[ns]; //arrays to hold redshift distribution and number counts
+
     //just temporary, complains if unused variables
     output.dnds[0]=0;
 
@@ -156,7 +163,12 @@ products simulator::simulate(double area, int nz, double dz, int ns){
     const gsl_rng_type * T;    
     gsl_rng_default_seed = time(NULL);
     T = gsl_rng_default;
-    r = gsl_rng_alloc(T);    
+    r = gsl_rng_alloc(T);
+    
+   //For the scaling, get the number of sources per L-z bin
+    //scale the volume elements by 10^10 to avoid too large a number
+    //making a weights array associated with redshift (use volume), aim for 1000 per bin
+    //luminosity function dependent scaling (use highest bin, 10 per bin)
 
     //NOTE templates are given in W/Hz
     for (is=0;is<nz;is++){
@@ -165,16 +177,19 @@ products simulator::simulate(double area, int nz, double dz, int ns){
 
       tmpz=zarray[is]+dz/2.0;
       vol=(dvdz(tmpz,area)*dz);
-      weights[is] = 1.e0; //still here in case scaling must be done
+      high = lf->get_nsrcs(zarray[is],10.0)*vol;
+      //high ranges from ~15000 to 1.e+10
+      weights[is] = 1.e0; 
 
       b_rest[0]=bands[0]/(1.0+zarray[is]);
       b_rest[1]=bands[1]/(1.0+zarray[is]);
       b_rest[2]=bands[2]/(1.0+zarray[is]);
 
-      //denominator of conversion from luminosity to flux, precompute for speed
-      sf = 4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0); 
+      sf = 4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0); //denominator of conversion from luminosity to flux
       
-      jsmin = 0
+      //Its not necessary to generate nsrcs for ALL possible L's and try to solve for them -- the vast majority will end up being discounted. 
+      //Here add an extra loop to determine the minimum detectable luminosity and only simulate sources in that regime.
+
       for (js=0;js<lnum;js++){
 	flux_sim[0] = seds->get_flux(lums[js],b_rest[0]);
 	flux_sim[0] *= (1+zarray[is])*Wm2Hz_TO_mJy/sf;
@@ -187,7 +202,7 @@ products simulator::simulate(double area, int nz, double dz, int ns){
       
       for (js=jsmin;js<lnum;js++){
 	nsrcs[is][js]= long(vol*lf->get_nsrcs(zarray[is],lums[js]));
-	//printf("%4.2f %4.2f %6li \n",zarray[is],lums[js],nsrcs[is][js]);
+	printf("%4.2f %4.2f %6li \n",zarray[is],lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs[is][js];src_iter++){
 	  detected = true;
 	  for (int i=0;i<3;i++){
@@ -208,6 +223,8 @@ products simulator::simulate(double area, int nz, double dz, int ns){
 	  }
 	}
       }
+      //just testing, comment out when runs>1
+      //printf("%4.2f %4.2f \n",zarray[is],output.dndz[is]);
     }
      
     //=========================================================================

@@ -14,7 +14,6 @@
 #include "functions.h"
 #include <stdio.h>
 
-//For values to be passed in by widget
 #define BANDS 3
 #define NPAR 2
 #define RUNS 10
@@ -103,6 +102,13 @@ int main(int argc,char** argv){
   p_min[1]=0.0;
   p_max[1]=5.0;
  
+  //REMOVE THIS, TESTING PURPOSES ONLY as the value in params.save is currently wrong
+  //p_o[0]= 6.7;
+  //p_o[1]= 3.5;
+  //lpars[1] = 10.14;
+  //lpars[4] = p_o[0];
+  //lpars[5] = p_o[1];
+
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
 
   delete pInfile;
@@ -146,7 +152,7 @@ int main(int argc,char** argv){
   r=gsl_rng_alloc(T);
   
   int nz,ns;
-  double area, dz;
+  double area, dz, logsmin,dlogs;
   products output;
 
   //note need to be able to pass the survey area down from the widget!!!
@@ -164,6 +170,8 @@ int main(int argc,char** argv){
   //the flux array is logarithmic in steps of 0.3dex 
   //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
   ns=8;
+  logsmin=0.5;
+  dlogs=0.3;
   
   //note: chain is +1 as last column holds chi2 values for the particular "guess"
   int chainsize = NPAR+nz+ns+1;
@@ -194,7 +202,7 @@ int main(int argc,char** argv){
     lf.set_p(ptemp);
     lf.set_q(qtemp);
     printf("Running...\n");
-    output=survey.simulate(area,nz,dz,ns);
+    output=survey.simulate(area,nz,dz,ns,logsmin,dlogs);
     trial=output.chisqr;
     printf("\nModel chi2: %lf\n",trial);
 
@@ -224,7 +232,7 @@ int main(int argc,char** argv){
   lf.set_p(bestp);
   lf.set_q(bestq);
   printf("Re-Running Best Fit...\n");
-  output=survey.simulate(area,nz,dz,ns);
+  output=survey.simulate(area,nz,dz,ns,logsmin,dlogs);
   printf("\nModel chi2: %lf\n",output.chisqr);
   survey.save(outfile);
   
@@ -304,3 +312,5 @@ bool metrop(double de,double tmc){
   return ans;
 }
 
+//Notes:
+//at every iteration, keep distributions of source properties but not every source
