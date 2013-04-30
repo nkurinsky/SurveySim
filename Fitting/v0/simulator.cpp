@@ -129,7 +129,7 @@ products simulator::simulate(double area, int nz, double dz, int ns){
     static double tmpz,vol;
 
     int lnum = seds->get_lnum();
-    double high, sf;
+    double sf;
     long nsrcs[nz][lnum];
     double lums[lnum];
     double zarray[nz],weights[nz];    
@@ -174,7 +174,7 @@ products simulator::simulate(double area, int nz, double dz, int ns){
       //denominator of conversion from luminosity to flux, precompute for speed
       sf = 4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0); 
       
-      jsmin = 0
+      jsmin = 0;
       for (js=0;js<lnum;js++){
 	flux_sim[0] = seds->get_flux(lums[js],b_rest[0]);
 	flux_sim[0] *= (1+zarray[is])*Wm2Hz_TO_mJy/sf;
@@ -183,7 +183,7 @@ products simulator::simulate(double area, int nz, double dz, int ns){
 	  js = lnum; //break out of loop
 	};
       };
-      printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
+      //printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
       
       for (js=jsmin;js<lnum;js++){
 	nsrcs[is][js]= long(vol*lf->get_nsrcs(zarray[is],lums[js]));

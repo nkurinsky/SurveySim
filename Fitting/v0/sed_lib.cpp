@@ -95,12 +95,12 @@ sed_lib::sed_lib(string fitsfile){
 //rounds to nearest template, in future may average/interp
 //make sure lums sorted in order!!! currently an assumption
 double sed_lib::get_flux(double lum,double band){
-  static unsigned int i = 0;
+  static int i = 0;
   i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
   if (i < 0)
     i = 0;
-  if (i >= lnum)
-    i = lnum-1;
+  if (i >= int(lnum))
+    i = int(lnum)-1;
   if (seds[i] != NULL){
     if((band >= brange[0]) and (band <= brange[1]))
       return seds[i]->get_flux(band);
