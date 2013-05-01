@@ -8,7 +8,7 @@
 
 pro simulation
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,sdat,settings,bands
 
 ;==================================================================
 ;the directory where the fitting code lives
@@ -70,6 +70,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   p_main = widget_base(info.base,/column,/align_center)                   ;parameter base
   obs_table = widget_base(p_main,/column,/align_center)
   lum_table = widget_base(p_main,/column,/align_center)
+  sim_table = widget_base(p_main,/column,/align_center)
   dbase = widget_base(p_main,/column,/align_center)    ; base for file dialogs
   button_base = widget_base(p_main,/row,/align_center) ; base for buttons
   
@@ -98,6 +99,8 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
      ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:10.0,q:10.0}
      ldata=[ldat0,ldat1,ldat2,ldat3]
      ;the fixed values: =1 if held fixed, =0 if variable
+
+     sdat = {zmin:0.0,zmax:5.0,dz:0.1,runs:1e9}
   endelse
 
   bname = ["Band 1","Band 2","Band 3"]
@@ -107,7 +110,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   
 ;The Survey properties table
   lo = widget_label(obs_table,value="Survey Properties")
-  ot = widget_table(obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150,140],format=fmt)
+  ot = widget_table(obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150],format=fmt,scr_xsize=425,scr_ysize=95)
 
   f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
   f2b = ['(i)','(i)','(i)','(i)','(i)','(i)']
@@ -116,12 +119,11 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
 
 ;Luminosity Function Paramters
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
-  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck',format=fmt2)
+  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck',format=fmt2,scr_xsize=472,scr_ysize=112)
 
-  opts = ["Fit","Set"]
-  fs = widget_base(lum_table,/row,/align_center)
-  sel1 = widget_combobox(fs,value=opts,uvalue='sel1')
-  sel2 = widget_combobox(fs,value=opts,uvalue='sel2')
+;Simulation Parameters
+  l2 = widget_label(sim_table,value="Simulation Settings")
+  t2 = widget_table(sim_table,value=sdat,column_labels=tag_names(sdat),/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[70,70,70,80],scr_xsize=295,scr_ysize=55)
 
 ;============================================================================
 ;Show SED templates
@@ -157,7 +159,7 @@ END
 
 ;widget event handling routine
 PRO simulation_event,ev
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,sdat,settings,bands
 
   ; get event identifier
   widget_control,ev.id,get_uvalue=uvalue
@@ -208,6 +210,8 @@ PRO simulation_event,ev
         widget_control,t1,get_value=lparam
         pars = lparam(0)
         fixed = lparam(1)
+        min = lparam(2)
+        max = lparam(3)
 
         sxaddpar,hdr2,'PHI0',pars.phi0,'Luminosity Function Normalization'
         sxaddpar,hdr2,'L0',pars.lo,'Luminosity Function Knee'
@@ -275,8 +279,15 @@ end
 pro fit_info
   
   main = widget_base(title="Information about Fitting Methodology",/column)
-  t1 = widget_text(main,value="The ranges for the luminosity function parameters are only important for non-fixed parameters")
-  bt = widget_button(main,uvalue='close',value='Close',xsize=50,ysize=25)
+  t1 = widget_text(main,/wrap,value=['Luminosity Function Fitter Version 1.0, by Noah Kurinsky and Anna Sajina' $
+  ,'Department of Physics and Astronomy, Tufts University, Medford MA' $
+  ,'Last Updated 5/1/13' $
+  ,'' $
+  ,'Notes on using this interface:' $
+  ,'- To allow a parameter to be fitted, set the value of the "fixed" row for that parameter to "0"' $
+  ,'- The ranges for the luminosity function parameters are only important for non-fixed parameters'],xsize=80,ysize=20)
+  bthold = widget_base(main,/row,/align_center)
+  bt = widget_button(bthold,uvalue='close',value='Close',xsize=50,ysize=25)
 
   widget_control,main,/realize
   xmanager,'fit_info',main,/no_block
@@ -420,7 +431,7 @@ end
 
 pro graphs
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,sdat,settings,bands
 
   !p.thick=0
   !x.thick=0
@@ -671,7 +682,7 @@ pro graphs
 end
 
 pro graphs_event,ev
-  COMMON simulation_com,cdir,info,ot,t1,ldata,ldat0,settings,bands
+  COMMON simulation_com,cdir,info,ot,t1,ldata,ldat0,sdat,settings,bands
 
   widget_control,ev.id,get_uvalue=uvalue
 
