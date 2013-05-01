@@ -267,19 +267,7 @@ PRO simulation_event,ev
         widget_control,ev.top,/destroy
      end
      'ot': widget_control,ot,get_value=bands
-     't1': begin
-        widget_control,t1,get_value=ldata
-        
-        i = ev.y
-        if(ldata[i].fixed lt 1) then begin
-           ldata[i].fixed=0
-           widget_control,ev.id,set_value=ldata
-        endif else if(ldata[i].fixed gt 1) then begin
-           ldata[i].fixed=1
-           widget_control,ev.id,set_value=ldata
-        endif
-        
-     end
+     't1': widget_control,t1,get_value=ldata
      't2': widget_control,t2,get_value=sdat
      'size': widget_control,size,get_value=settings
      'info': fit_info

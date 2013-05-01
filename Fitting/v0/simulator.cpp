@@ -226,8 +226,6 @@ products simulator::simulate(double area, int nz, double dz, int ns){
       w[i] = sources[i].weight;
     }
     
-    //int msize = nz*seds->get_lnum();
-    
     diagnostic->init_model(c1,c2,w,snum);
     output.chisqr=diagnostic->get_chisq();
 
@@ -235,13 +233,11 @@ products simulator::simulate(double area, int nz, double dz, int ns){
     delete[] c2;
     delete[] w;
     
-    //  return chisq;
     return output;
   }
   else{
     cout << "ERROR: NULL Model Library" << endl;
     //doesn't work now as the output is of type "products" and "-1" is integer
-    //return -1;
     return output;
   }
 }
@@ -282,17 +278,17 @@ bool simulator::save(string outfile){
   valarray<double> param(size);
   valarray<double> params[pnum];
   for (int i=0;i<pnum;i++)
-    params[i].resize(size);
+    params[i].reserve(size);
   
   for(unsigned long i=0;i<size;i++){
     f1[i] = sources[i].fluxes[0];
     f2[i] = sources[i].fluxes[1];
     f3[i] = sources[i].fluxes[2];
-    param[i] = 1; //placeholder for now
+    param[i] = 1.0; //placeholder for now
     redshift[i] = sources[i].redshift;
     luminosity[i] = sources[i].luminosity;
     for(int j=0;j<pnum;j++)
-      params[j][i] = 1; //also placeholder for now
+      params[j][i] = 1.0; //also placeholder for now
   }
   
   static std::vector<string> colname((6+pnum),"");

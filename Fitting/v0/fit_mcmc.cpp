@@ -14,16 +14,14 @@
 #include "functions.h"
 #include <stdio.h>
 
-//For values to be passed in by widget
+//Array size definitions (most likely will never change)
 #define BANDS 3
+//For values to be passed in by widget
 #define NPAR 2
-#define RUNS 10
-#define DZ 0.1
-#define ZMAX 4.0
 
 using namespace std;
 
-gsl_rng * r;  /* global generator */
+gsl_rng * r;  // global generator 
 bool metrop(double de,double t);
 
 int main(int argc,char** argv){
@@ -45,15 +43,19 @@ int main(int argc,char** argv){
   FILE *chain;
   chain = fopen("chain.txt","w");
   
-  //temporary, of course in the end this will be much longer 
-  //perhaps 100,000-500,000 
-  unsigned long runs;  
- 
-  const gsl_rng_type * T;
-
+  unsigned long runs; 
+  int nz,ns;
+  double area, dz, zmax, rtemp;
+  products output;
+  double bs[BANDS],errs[BANDS],flims[BANDS];
+  string pi[] = {"0","1","2","3","4","5"};
+  //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
+  double lpars[6],lfix[6],lmax[6],lmin[6];
   // the initial guesses of the parameters, the width of the proposal distribution 
   // and the acceptable min/max range
   double p_o[NPAR],dp[NPAR],p_min[NPAR],p_max[NPAR]; 
+
+  const gsl_rng_type * T;
 
   FITS *pInfile,*pInfile2;
   pInfile = new FITS(modfile,Read);
@@ -62,12 +64,6 @@ int main(int argc,char** argv){
   //reading primary header from fits file
   HDU& params_table = pInfile->pHDU();
   HDU& obs_table = pInfile2->pHDU();
-
-  int nz,ns;
-  double area, dz, zmax, rtemp;
-  products output;
-  double bs[BANDS],errs[BANDS],flims[BANDS];
-  string pi[] = {"0","1","2","3","4","5"};
 
   params_table.readKey("RUNS",rtemp);
   runs = (unsigned long) rtemp;
@@ -94,12 +90,6 @@ int main(int argc,char** argv){
   //=================================================================  
   //Read-in Luminosity Function Parameters
   //-----------------------------------------------------------------
-  
-  //this array holds phi0,L0,alpha,beta,p, and q
-  double lpars[6];
-  double lfix[6];
-  double lmax[6];
-  double lmin[6];
 
   //read parameter values
   params_table.readKey("PHI0",lpars[0]);
@@ -133,12 +123,15 @@ int main(int argc,char** argv){
   params_table.readKey("P_MAX",lmax[4]);
   params_table.readKey("Q_MAX",lmax[5]);
   
-  //note that the dp values here are the widths of the "proposal distribution"
-  //the smaller they are the slower will converge onto the right answer
-  //the bigger they are, the less well sampled the probability distribution 
-  //will be and hence the less accurate the final answer
-  //needs to find the "goldilocks" zone here but that's very problem specific 
-  //so requires trial and error as we actually start fitting data.
+  /*
+    note that the dp values here are the widths of the "proposal distribution"
+    the smaller they are the slower will converge onto the right answer
+    the bigger they are, the less well sampled the probability distribution 
+    will be and hence the less accurate the final answer
+    needs to find the "goldilocks" zone here but that's very problem specific 
+    so requires trial and error as we actually start fitting data. 
+  */
+
   p_o[0] = lpars[4]; 
   dp[0] = 0.3;
   p_min[0]= lmin[4];
@@ -148,7 +141,15 @@ int main(int argc,char** argv){
   dp[1] = 0.3;
   p_min[1]= lmin[5];
   p_max[1]= lmax[5];
- 
+
+  lumfunct lf;
+  lf.set_phi0(lpars[0]);
+  lf.set_L0(lpars[1]);
+  lf.set_alpha(lpars[2]);
+  lf.set_beta(lpars[3]);
+  lf.set_p(lpars[4]);
+  lf.set_q(lpars[5]);
+  
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
   printf("p range: %5.3f - %5.3f\n",p_min[0],p_max[0]);
   printf("q range: %5.3f - %5.3f\n",p_min[1],p_max[1]);
@@ -165,14 +166,6 @@ int main(int argc,char** argv){
     probability distributions for the fitted parameters.
   */
 
-  lumfunct lf;
-  lf.set_phi0(lpars[0]);
-  lf.set_L0(lpars[1]);
-  lf.set_alpha(lpars[2]);
-  lf.set_beta(lpars[3]);
-  lf.set_p(lpars[4]);
-  lf.set_q(lpars[5]);
-
   //initialize simulator
   simulator survey(bs,errs,flims,obsfile,sedfile); 
   survey.set_lumfunct(&lf);
@@ -185,17 +178,20 @@ int main(int argc,char** argv){
   int minlink;
   long acceptot=0;
   bool ans;
-
   double p0_rng[runs];
   double q0_rng[runs];
+
+  // the temperature, keep fixed for now, but can also try annealing 
+  // in the future, this has similar effect as the width of the proposal
+  // distribution, as determines how likely a far flung guess is of being 
+  // accepted (see metrop function)
+  double tmc=100.00; //to distinguish it from the random T
+  double temp,bestp,bestq,ptemp,qtemp,iz,is;
 
   gsl_rng_default_seed=time(NULL);
   T=gsl_rng_default;
   r=gsl_rng_alloc(T);
 
-  //we don't want to keep information on each simulated source, but ultimately need to know the distribution with redshift, flux (i.e. number counts) and SED type for all *accepted* runs. 
-  // I think the best way to do so is to define the redshift, flux, and type arrays now, pass them on to survey.simulate from which we get not only chi2 but also these distributions. If accepted they are tagged onto the MC chain and saved with it. This increases the number of columns but not unmanageably so (currently, 21) 
- 
   //the flux array is logarithmic in steps of 0.3dex 
   //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
   ns=8;
@@ -206,12 +202,8 @@ int main(int argc,char** argv){
   for(int i=0;i<chainsize;i++)
     mcchain[i].resize(runs);
 
-  // the temperature, keep fixed for now, but can also try annealing 
-  // in the future, this has similar effect as the width of the proposal
-  // distribution, as determines how likely a far flung guess is of being 
-  // accepted (see metrop function)
-  double tmc=100.00; //to distinguish it from the random T
-  double temp,bestp,bestq,ptemp,qtemp;
+  ptemp = bestp = lpars[4];
+  qtemp = bestq = lpars[5];
 
   fprintf(chain,"%s\n%s\n","Monte Carlo Parameter Chain","Iteration, P, Q, Chi-Square");
   printf("Fitting Start; Total Run Number: %ld",runs);
@@ -232,7 +224,7 @@ int main(int argc,char** argv){
     printf("Running...\n");
     output=survey.simulate(area,nz,dz,ns);
     trial=output.chisqr;
-    printf("\nModel chi2: %lf\n",trial);
+    printf("Model chi2: %lf\n",trial);
 
     de=trial-chi_min;
     if(trial < chi_min){
@@ -251,8 +243,8 @@ int main(int argc,char** argv){
       fprintf(chain,"%lu %f %f %f \n",i,lpars[4],lpars[5],trial);
       mcchain[0][i]=lpars[4];
       mcchain[1][i]=lpars[5];
-      for(int iz=0;iz<nz;iz++) mcchain[iz+NPAR][i]=output.dndz[iz];
-      for(int is=0;is<ns;is++) mcchain[is+nz+NPAR][i] = 0;
+      for(iz=0;iz<nz;iz++) mcchain[iz+NPAR][i]=output.dndz[iz];
+      for(is=0;is<ns;is++) mcchain[is+nz+NPAR][i] = 0;
       mcchain[chainsize-1][i]=trial;
     }
   }
@@ -261,7 +253,7 @@ int main(int argc,char** argv){
   lf.set_q(bestq);
   printf("Re-Running Best Fit...\n");
   output=survey.simulate(area,nz,dz,ns);
-  printf("\nModel chi2: %lf\n",output.chisqr);
+  printf("Model chi2: %lf\n",output.chisqr);
   survey.save(outfile);
   
   bool save = true;

@@ -64,12 +64,13 @@ int main(int argc,char** argv){
   HDU& obs_table = pInfile2->pHDU();
 
   int nz,ns;
-  double area, dz, zmax;
+  double area, dz, zmax, rtemp;
   products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5"};
 
-  params_table.readKey("RUNS",runs);
+  params_table.readKey("RUNS",rtemp);
+  runs = (unsigned long) rtemp;
   params_table.readKey("ZMAX",zmax);
   params_table.readKey("DZ",dz);
   params_table.readKey("AREA",area);
@@ -80,7 +81,7 @@ int main(int argc,char** argv){
 
   //compute redshift bin number from FITS values
   nz = zmax/dz;
-  printf("\nNZ: %i, DZ: %f\n",nz,dz);
+  printf("\nNR: %lu, NZ: %i, DZ: %f\n",runs,nz,dz);
 
   printf("%s\n","Bands:");
   for(int i=0;i<BANDS;i++){

@@ -183,7 +183,7 @@ products simulator::simulate(double area, int nz, double dz, int ns){
 	  js = lnum; //break out of loop
 	};
       };
-      printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
+      //printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
       
       for (js=jsmin;js<lnum;js++){
 	nsrcs[is][js]= long(vol*lf->get_nsrcs(zarray[is],lums[js]));
