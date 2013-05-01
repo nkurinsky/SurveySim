@@ -213,7 +213,6 @@ PRO simulation_event,ev
         min = lparam(2)
         max = lparam(3)
 
-        sxaddpar,hdr2,'DATE',systime(),'Date of creation'
         sxaddpar,hdr2,'PHI0',pars.phi0,'Luminosity Function Normalization'
         sxaddpar,hdr2,'L0',pars.lo,'Luminosity Function Knee'
         sxaddpar,hdr2,'ALPHA',pars.alpha,'Luminosity Function upper slope'
@@ -226,24 +225,16 @@ PRO simulation_event,ev
         sxaddpar,hdr2,'BETA_FIX',fixed.beta,'Fix Beta (Y=1/N=0)'
         sxaddpar,hdr2,'P_FIX',fixed.p,'Fix P (Y=1/N=0)'
         sxaddpar,hdr2,'Q_FIX',fixed.q,'Fix Q (Y=1/N=0)'
-        sxaddpar,hdr2,'PHI0_MIN',min.phi0,'Minimum Phi0 value'
-        sxaddpar,hdr2,'L0_MIN',min.lo,'Minimum L0 value'
-        sxaddpar,hdr2,'ALPHA_MIN',min.alpha,'Minimum Alpha value'
-        sxaddpar,hdr2,'BETA_MIN',min.beta,'Minimum Beta value'
-        sxaddpar,hdr2,'P_MIN',min.p,'Minimum P value'
-        sxaddpar,hdr2,'Q_MIN',min.q,'Minimum Q value'
-        sxaddpar,hdr2,'PHI0_MAX',max.phi0,'Maximum Phi0 value'
-        sxaddpar,hdr2,'L0_MAX',max.lo,'Maximum L0 value'
-        sxaddpar,hdr2,'ALPHA_MAX',max.alpha,'Maximum Alpha value'
-        sxaddpar,hdr2,'BETA_MAX',max.beta,'Maximum Beta value'
-        sxaddpar,hdr2,'P_MAX',max.p,'Maximum P value'
-        sxaddpar,hdr2,'Q_MAX',max.q,'Maximum Q value'
-        sxaddpar,hdr2,'RUNS',sdat.runs,'Number of Runs'
-        sxaddpar,hdr2,'ZMIN',sdat.zmin,'Minimum Redshift Value'
-        sxaddpar,hdr2,'ZMAX',sdat.zmax,'Maximum Redshift Value'
-        sxaddpar,dsr2,'DZ',sdat.dz,'Redshit Bin Width'
+
+        print,"Luminosity function parameters: ",pars
 
         templates = [0]
+
+;why do we actually need this? isn't model.fits basically the
+;same as sf_templates.fits ?
+;why not just pass along the name of the SED templates file defined
+;here, without making a new fits file?
+;or is "model.fits" hardwired in the fitting code?
         mwrfits,templates,'model.fits',hdr2,/create
 
 ;===============================================================
@@ -273,14 +264,15 @@ END
 pro bcheck,ev
 
   i = ev.y
-  ;; widget_control,ev.id,get_value=value
-  ;; if(value[i].fixed lt 0) then begin
-  ;;    value[i].fixed=0
-  ;;    widget_control,ev.id,set_value=value
-  ;; endif else if(value[i].fixed gt 1) then begin
-  ;;    value[i].fixed=1
-  ;;    widget_control,ev.id,set_value=value
-  ;; endif
+
+  widget_control,ev.id,get_value=value
+  ;if(value[i].fixed lt 0) then begin
+  ;   value[i].fixed=0
+  ;   widget_control,ev.id,set_value=value
+  ;endif else if(value[i].fixed gt 1) then begin
+  ;   value[i].fixed=1
+  ;   widget_control,ev.id,set_value=value
+  ;endif
 
 end
 
