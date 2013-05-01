@@ -278,7 +278,7 @@ bool simulator::save(string outfile){
   valarray<double> param(size);
   valarray<double> params[pnum];
   for (int i=0;i<pnum;i++)
-    params[i].reserve(size);
+    params[i].resize(size);
   
   for(unsigned long i=0;i<size;i++){
     f1[i] = sources[i].fluxes[0];

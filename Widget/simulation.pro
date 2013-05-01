@@ -271,14 +271,18 @@ PRO simulation_event,ev
         widget_control,t1,get_value=ldata
         
         i = ev.y
-        if(ldata[i].fixed lt 1) then begin
-           ldata[i].fixed=0
-           widget_control,ev.id,set_value=ldata
-        endif else if(ldata[i].fixed gt 1) then begin
-           ldata[i].fixed=1
-           widget_control,ev.id,set_value=ldata
+        j = ev.x        
+
+        if (i eq 1) then begin
+           if(ldata[i].(j) lt 1) then begin
+              ldata[i].(j)=0
+              widget_control,ev.id,set_value=ldata
+           endif else if(ldata[i].(j) gt 1) then begin
+              ldata[i].(j)=1
+              widget_control,ev.id,set_value=ldata
+           endif
         endif
-        
+
      end
      't2': widget_control,t2,get_value=sdat
      'size': widget_control,size,get_value=settings
@@ -287,20 +291,6 @@ PRO simulation_event,ev
   ENDCASE
 
 END
-
-pro bcheck,ev
-
-  i = ev.y
-  ;; widget_control,ev.id,get_value=value
-  ;; if(value[i].fixed lt 0) then begin
-  ;;    value[i].fixed=0
-  ;;    widget_control,ev.id,set_value=value
-  ;; endif else if(value[i].fixed gt 1) then begin
-  ;;    value[i].fixed=1
-  ;;    widget_control,ev.id,set_value=value
-  ;; endif
-
-end
 
 pro fit_info
   

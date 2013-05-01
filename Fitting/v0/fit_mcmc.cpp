@@ -186,8 +186,9 @@ int main(int argc,char** argv){
   // distribution, as determines how likely a far flung guess is of being 
   // accepted (see metrop function)
   double tmc=100.00; //to distinguish it from the random T
-  double temp,bestp,bestq,ptemp,qtemp,iz,is;
-
+  double temp,bestp,bestq,ptemp,qtemp;
+  int is,iz;
+  
   gsl_rng_default_seed=time(NULL);
   T=gsl_rng_default;
   r=gsl_rng_alloc(T);
