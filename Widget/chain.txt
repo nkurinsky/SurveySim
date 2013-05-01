@@ -1,3 +1,0 @@
-Monte Carlo Parameter Chain
-Iteration, P, Q, Chi-Square
-0 -0.570338 3.252460 603.815886 

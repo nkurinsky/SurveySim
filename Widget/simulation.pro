@@ -535,12 +535,16 @@ pro graphs
 
   widget_control,redshift,get_value=index
   wset,index
-  h = histogram(z,binsize=0.1,locations=xh,min=0,max=5)
+  h = histogram(z,binsize=0.1,locations=xh,min=0.2,max=5.0)
   plot,xh,h,psym=10,xrange=[0,5],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
 
   widget_control,models,get_value=index
   wset,index
-  plot,[0,1],[0,1],/nodata
+
+  h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
+  pts = where (h le 0)
+  h[pts] = 0.01
+  plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],xstyle=1,ystyle=1
 
   ;; help,hists
   ;; for i=6,pnum_out-1 do begin
@@ -564,7 +568,7 @@ pro graphs
      plot,[100,500],[5.d2,1.d5],/nodata,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',ystyle=1
   endelse
 
-  h = histogram(alog10(f1),nbins=50,locations=xh,min=-3,max=1)
+  h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
   ;I think the area covered here is not
 ;quite right needs to be sorted out better, but for now just scale up
   h=h*2.d3
@@ -577,18 +581,18 @@ pro graphs
   widget_control,dcount2,get_value=index
   wset,index
 
-  h = histogram(alog10(f2),nbins=50,locations=xh,min=-3,max=0)
+  h = histogram(alog10(f2/1e3),nbins=50,locations=xh,min=-3,max=0)
   pts = where(h le 0)
   h[pts] = 0.01
-  plot,xh,h,psym=10,/ylog,xrange=[-3,0],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='Flux [Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
+  plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='F_{350}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
 
   widget_control,dcount3,get_value=index
   wset,index
 
-  h = histogram(alog10(f3),nbins=50,locations=xh,min=-3,max=0)
+  h = histogram(alog10(f3/1e3),nbins=50,locations=xh,min=-3,max=0)
   pts = where(h le 0)
   h[pts] = 0.01
-  plot,xh,h,psym=10,/ylog,xrange=[-3,0],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='Flux [Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
+  plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='F_{500}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
 
   comp = mrdfits(info.oname,0,head,/silent)
   model = mrdfits(info.oname,1,/silent)
