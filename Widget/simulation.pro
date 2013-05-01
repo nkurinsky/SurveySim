@@ -8,7 +8,7 @@
 
 pro simulation
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,settings,bands
 
 ;==================================================================
 ;the directory where the fitting code lives
@@ -93,10 +93,10 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
 
      ;luminosity function parameter initialization
      ldat0={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:6.7,q:3.5}
-     ldat1={phi0:1,lo:1,alpha:1,beta:1,p:0,q:0}
-     ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:0,q:0}
-     ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:10,q:10}
-     ldata=[[ldat0],[ldat1],[ldat2],[ldat3]]
+     ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0}
+     ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:0.,q:0.0}
+     ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:10.0,q:10.0}
+     ldata=[ldat0,ldat1,ldat2,ldat3]
      ;the fixed values: =1 if held fixed, =0 if variable
   endelse
 
@@ -110,13 +110,13 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   ot = widget_table(obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150,140],format=fmt)
 
   f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
-  f2b = ['(f1.0)','(f1.0)','(f1.0)','(f1.0)','(f1.0)','(f1.0)']
+  f2b = ['(f2.0)','(f2.0)','(f2.0)','(f2.0)','(f2.0)','(f2.0)']
   fmt2 = [[f2a],[f2b],[f2a],[f2a]]
   lrows=["Initial","Fixed","Min","Max"]
 
 ;Luminosity Function Paramters
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
-  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldat0),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck',format=fmt2)
+  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck',format=fmt2)
 
 ;============================================================================
 ;Show SED templates

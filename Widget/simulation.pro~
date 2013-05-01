@@ -8,7 +8,7 @@
 
 pro simulation
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,settings,bands
 
 ;==================================================================
 ;the directory where the fitting code lives
@@ -92,30 +92,31 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
      bands = [band1,band2,band3]
 
      ;luminosity function parameter initialization
-     ldat={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:6.7,q:3.5}
-     ldata=replicate(ldat,2) 
+     ldat0={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:6.7,q:3.5}
+     ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0}
+     ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:0.,q:0.0}
+     ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:10.0,q:10.0}
+     ldata=[ldat0,ldat1,ldat2,ldat3]
      ;the fixed values: =1 if held fixed, =0 if variable
-     ldata(1).phi0=1
-     ldata(1).lo=1
-     ldata(1).alpha=1
-     ldata(1).beta=1
-     ldata(1).p=0
-     ldata(1).q=0
   endelse
 
   bname = ["Band 1","Band 2","Band 3"]
   ocols = ["Wavelength (um)","Flux limit (mJy)","Standard Error (mJy)"]
   f = ['(e9.2)','(f7.4)','(f7.4)']
   fmt = [[f],[f],[f]]
-  lrows=["Initial","Fixed"]
   
 ;The Survey properties table
   lo = widget_label(obs_table,value="Survey Properties")
   ot = widget_table(obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150,140],format=fmt)
 
+  f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
+  f2b = ['(f1.0)','(f1.0)','(f1.0)','(f1.0)','(f1.0)','(f1.0)']
+  fmt2 = [[f2a],[f2b],[f2a],[f2a]]
+  lrows=["Initial","Fixed","Min","Max"]
+
 ;Luminosity Function Paramters
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
-  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldat),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck')
+  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck',format=fmt2)
 
 ;============================================================================
 ;Show SED templates
@@ -143,7 +144,7 @@ for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
 ;Buttons at bottom 
 ;---------------------------------------------------------------------------
   run_btn = widget_button(button_base,uvalue='go',value='Run Simulation',xsize=100,ysize=25)
-  ;replot_btn = widget_button(button_base,uvalue='replot',value='Plot Last Run',xsize=100,ysize=25)
+  replot_btn = widget_button(button_base,uvalue='replot',value='Plot Last Run',xsize=100,ysize=25)
   quit_btn = widget_button(button_base,uvalue='quit',value='Quit',xsize=50,ysize=25)
   info_btn = widget_button(button_base,uvalue='info',value='Info',xsize=50,ysize=25)
 
@@ -151,18 +152,15 @@ END
 
 ;widget event handling routine
 PRO simulation_event,ev
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,settings,bands
 
   ; get event identifier
   widget_control,ev.id,get_uvalue=uvalue
 
   CASE uvalue OF
      'go'  : begin ;save settings, intialize FITS file, and pass to C++ fitting routine
-        save,ldata,ldat,bands,filename='params.save' ;save parameters
+        save,ldata,ldat0,bands,filename='params.save' ;save parameters
         
-        ;widget_control,ot,get_value=value ;get observation table values, print, value
-        ;widget_control,t1,get_value=value ;get lumfunct table values
-
         ;make observation FITS file
         widget_control,ot,get_value=bvals
         wave = [bvals[0].wave,bvals[1].wave,bvals[2].wave]
@@ -221,7 +219,7 @@ PRO simulation_event,ev
 
         print,"Luminosity function parameters: ",pars
 
-        templates = [0,0]
+        templates = [0]
 
 ;why do we actually need this? isn't model.fits basically the
 ;same as sf_templates.fits ?
@@ -239,10 +237,10 @@ PRO simulation_event,ev
         read_output
         graphs
      end
-     ;'replot': begin
-     ;   read_output
-     ;   graphs
-     ;end
+     'replot': begin
+        read_output
+        graphs
+     end
      'quit': begin
         widget_control,ev.top,/destroy
      end
@@ -272,7 +270,7 @@ end
 pro fit_info
   
   main = widget_base(title="Information about Fitting Methodology",/column)
-  ;t1 = widget_text(main,value="this is text")
+  t1 = widget_text(main,value="The ranges for the luminosity function parameters are only important for non-fixed parameters")
   bt = widget_button(main,uvalue='close',value='Close',xsize=50,ysize=25)
 
   widget_control,main,/realize
@@ -417,7 +415,7 @@ end
 
 pro graphs
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,settings,bands
 
   !p.thick=0
   !x.thick=0
@@ -436,6 +434,8 @@ pro graphs
   widget_control,gmain,set_uvalue=mnum
   xdim = fix(size_screen[0]/3.0)
   ydim = fix(size_screen[1]/3.0)
+
+  loadct,0,/silent
 
   lumfunct = widget_draw(r1,xsize=xdim,ysize=ydim)
   redshift = widget_draw(r1,xsize=xdim,ysize=ydim)
@@ -666,7 +666,7 @@ pro graphs
 end
 
 pro graphs_event,ev
-  COMMON simulation_com,cdir,info,ot,t1,ldata,ldat,settings,bands
+  COMMON simulation_com,cdir,info,ot,t1,ldata,ldat0,settings,bands
 
   widget_control,ev.id,get_uvalue=uvalue
 
