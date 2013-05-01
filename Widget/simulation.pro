@@ -8,7 +8,7 @@
 
 pro simulation
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,sdat,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,t2,ldata,ldat0,sdat,settings,bands
 
 ;==================================================================
 ;the directory where the fitting code lives
@@ -119,7 +119,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
 
 ;Luminosity Function Paramters
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
-  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck',format=fmt2,scr_xsize=472,scr_ysize=112)
+  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=472,scr_ysize=112)
 
   tcols = ["Area (sdeg)","Z Min","Z Max","Z Binsize","Run Number"]
 ;Simulation Parameters
@@ -160,7 +160,7 @@ END
 
 ;widget event handling routine
 PRO simulation_event,ev
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,sdat,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,t2,ldata,ldat0,sdat,settings,bands
 
   ; get event identifier
   widget_control,ev.id,get_uvalue=uvalue
@@ -213,6 +213,8 @@ PRO simulation_event,ev
         fixed = lparam(1)
         min = lparam(2)
         max = lparam(3)
+        widget_control,t2,get_value=sparam
+        sdat = sparam
 
         sxaddpar,hdr2,'DATE',systime(),'Date of creation'
         sxaddpar,hdr2,'PHI0',pars.phi0,'Luminosity Function Normalization'
@@ -265,6 +267,8 @@ PRO simulation_event,ev
         widget_control,ev.top,/destroy
      end
      'ot': widget_control,ot,get_value=bands
+     't1': widget_control,t1,get_value=ldata
+     't2': widget_control,t2,get_value=sdat
      'size': widget_control,size,get_value=settings
      'info': fit_info
      ELSE:
@@ -441,7 +445,7 @@ end
 
 pro graphs
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,ldata,ldat0,sdat,settings,bands
+  COMMON simulation_com,cdir,info,obsname,ot,t1,t2,ldata,ldat0,sdat,settings,bands
 
   !p.thick=0
   !x.thick=0
@@ -692,7 +696,7 @@ pro graphs
 end
 
 pro graphs_event,ev
-  COMMON simulation_com,cdir,info,ot,t1,ldata,ldat0,sdat,settings,bands
+  COMMON simulation_com,cdir,info,ot,t1,t2,ldata,ldat0,sdat,settings,bands
 
   widget_control,ev.id,get_uvalue=uvalue
 

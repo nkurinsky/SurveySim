@@ -64,12 +64,13 @@ int main(int argc,char** argv){
   HDU& obs_table = pInfile2->pHDU();
 
   int nz,ns;
-  double area, dz, zmax;
+  double area, dz, zmax, rtemp;
   products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5"};
 
-  params_table.readKey("RUNS",runs);
+  params_table.readKey("RUNS",rtemp);
+  runs = (unsigned long) rtemp;
   params_table.readKey("ZMAX",zmax);
   params_table.readKey("DZ",dz);
   params_table.readKey("AREA",area);
@@ -80,7 +81,7 @@ int main(int argc,char** argv){
 
   //compute redshift bin number from FITS values
   nz = zmax/dz;
-  printf("\nNZ: %i, DZ: %f\n",nz,dz);
+  printf("\nNR: %lu, NZ: %i, DZ: %f\n",runs,nz,dz);
 
   printf("%s\n","Bands:");
   for(int i=0;i<BANDS;i++){
@@ -111,7 +112,7 @@ int main(int argc,char** argv){
   //read parameter value fitting boolean
   params_table.readKey("PHI0_FIX",lfix[0]);
   params_table.readKey("L0_FIX",lfix[1]);
-  params_table.readKey("ALPHA_FIX",lfix[2]);
+  params_table.readKey("ALPHA_FI",lfix[2]);
   params_table.readKey("BETA_FIX",lfix[3]);
   params_table.readKey("P_FIX",lfix[4]);
   params_table.readKey("Q_FIX",lfix[5]);
@@ -119,7 +120,7 @@ int main(int argc,char** argv){
   //read parameter minimum values
   params_table.readKey("PHI0_MIN",lmin[0]);
   params_table.readKey("L0_MIN",lmin[1]);
-  params_table.readKey("ALPHA_MIN",lmin[2]);
+  params_table.readKey("ALPHA_MI",lmin[2]);
   params_table.readKey("BETA_MIN",lmin[3]);
   params_table.readKey("P_MIN",lmin[4]);
   params_table.readKey("Q_MIN",lmin[5]);
@@ -127,7 +128,7 @@ int main(int argc,char** argv){
   //read parameter maximum values
   params_table.readKey("PHI0_MAX",lmax[0]);
   params_table.readKey("L0_MAX",lmax[1]);
-  params_table.readKey("ALPHA_MAX",lmax[2]);
+  params_table.readKey("ALPHA_MA",lmax[2]);
   params_table.readKey("BETA_MAX",lmax[3]);
   params_table.readKey("P_MAX",lmax[4]);
   params_table.readKey("Q_MAX",lmax[5]);
@@ -213,7 +214,7 @@ int main(int argc,char** argv){
   double temp,bestp,bestq,ptemp,qtemp;
 
   fprintf(chain,"%s\n%s\n","Monte Carlo Parameter Chain","Iteration, P, Q, Chi-Square");
-  printf("Fitting Start; Total Run Number: %l",runs);
+  printf("Fitting Start; Total Run Number: %ld",runs);
 
   for (unsigned long i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);

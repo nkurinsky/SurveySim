@@ -47,7 +47,7 @@ int main(int argc,char** argv){
   
   //temporary, of course in the end this will be much longer 
   //perhaps 100,000-500,000 
-  unsigned long runs=RUNS;  
+  unsigned long runs;  
  
   const gsl_rng_type * T;
 
@@ -63,8 +63,24 @@ int main(int argc,char** argv){
   HDU& params_table = pInfile->pHDU();
   HDU& obs_table = pInfile2->pHDU();
 
+  int nz,ns;
+  double area, dz, zmax;
+  products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5"};
+
+  params_table.readKey("RUNS",runs);
+  params_table.readKey("ZMAX",zmax);
+  params_table.readKey("DZ",dz);
+  params_table.readKey("AREA",area);
+
+  //this is necessary for correct cosmological volume determinations
+  //hence correct number count predictions
+  area*=pow((M_PI/180.0),2.0); //in steradians from sq.deg.
+
+  //compute redshift bin number from FITS values
+  nz = zmax/dz;
+  printf("\nNZ: %i, DZ: %f\n",nz,dz);
 
   printf("%s\n","Bands:");
   for(int i=0;i<BANDS;i++){
@@ -73,19 +89,48 @@ int main(int argc,char** argv){
     obs_table.readKey("W"+pi[i+1]+"_FERR",errs[i]);
     printf("%fl\t%fl\t%fl\n",bs[i],flims[i],errs[i]);
   }
-
-//=================================================================  
-//Read-in Luminosity Function Parameters
-//-----------------------------------------------------------------
-
-//this array holds phi0,L0,alpha,beta,p, and q
+  
+  //=================================================================  
+  //Read-in Luminosity Function Parameters
+  //-----------------------------------------------------------------
+  
+  //this array holds phi0,L0,alpha,beta,p, and q
   double lpars[6];
+  double lfix[6];
+  double lmax[6];
+  double lmin[6];
+
+  //read parameter values
   params_table.readKey("PHI0",lpars[0]);
   params_table.readKey("L0",lpars[1]);
   params_table.readKey("ALPHA",lpars[2]);
   params_table.readKey("BETA",lpars[3]);
   params_table.readKey("P",lpars[4]);
   params_table.readKey("Q",lpars[5]);
+
+  //read parameter value fitting boolean
+  params_table.readKey("PHI0_FIX",lfix[0]);
+  params_table.readKey("L0_FIX",lfix[1]);
+  params_table.readKey("ALPHA_FI",lfix[2]);
+  params_table.readKey("BETA_FIX",lfix[3]);
+  params_table.readKey("P_FIX",lfix[4]);
+  params_table.readKey("Q_FIX",lfix[5]);
+
+  //read parameter minimum values
+  params_table.readKey("PHI0_MIN",lmin[0]);
+  params_table.readKey("L0_MIN",lmin[1]);
+  params_table.readKey("ALPHA_MI",lmin[2]);
+  params_table.readKey("BETA_MIN",lmin[3]);
+  params_table.readKey("P_MIN",lmin[4]);
+  params_table.readKey("Q_MIN",lmin[5]);
+
+  //read parameter maximum values
+  params_table.readKey("PHI0_MAX",lmax[0]);
+  params_table.readKey("L0_MAX",lmax[1]);
+  params_table.readKey("ALPHA_MA",lmax[2]);
+  params_table.readKey("BETA_MAX",lmax[3]);
+  params_table.readKey("P_MAX",lmax[4]);
+  params_table.readKey("Q_MAX",lmax[5]);
   
   //note that the dp values here are the widths of the "proposal distribution"
   //the smaller they are the slower will converge onto the right answer
@@ -93,17 +138,19 @@ int main(int argc,char** argv){
   //will be and hence the less accurate the final answer
   //needs to find the "goldilocks" zone here but that's very problem specific 
   //so requires trial and error as we actually start fitting data.
-  p_o[0]=lpars[4]; 
-  dp[0]=0.3;
-  p_min[0]= 0.0;
-  p_max[0]= 10.0;
+  p_o[0] = lpars[4]; 
+  dp[0] = 0.3;
+  p_min[0]= lmin[4];
+  p_max[0]= lmax[4];
   
-  p_o[1]=lpars[5];
-  dp[1]=0.3;
-  p_min[1]=0.0;
-  p_max[1]=5.0;
+  p_o[1] = lpars[5];
+  dp[1] = 0.3;
+  p_min[1]= lmin[5];
+  p_max[1]= lmax[5];
  
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
+  printf("p range: %5.3f - %5.3f\n",p_min[0],p_max[0]);
+  printf("q range: %5.3f - %5.3f\n",p_min[1],p_max[1]);
 
   delete pInfile;
   delete pInfile2;
@@ -144,22 +191,9 @@ int main(int argc,char** argv){
   gsl_rng_default_seed=time(NULL);
   T=gsl_rng_default;
   r=gsl_rng_alloc(T);
-  
-  int nz,ns;
-  double area, dz;
-  products output;
-
-  //note need to be able to pass the survey area down from the widget!!!
-  //this is necessary for correct cosmological volume determinations
-  //hence correct number count predictions
-  //this value of area here is just a placeholder
-  area=10.0*pow((M_PI/180.0),2.0); //in steradians from 10.0sq.deg.
 
   //we don't want to keep information on each simulated source, but ultimately need to know the distribution with redshift, flux (i.e. number counts) and SED type for all *accepted* runs. 
   // I think the best way to do so is to define the redshift, flux, and type arrays now, pass them on to survey.simulate from which we get not only chi2 but also these distributions. If accepted they are tagged onto the MC chain and saved with it. This increases the number of columns but not unmanageably so (currently, 21) 
-  dz = DZ;
-  nz = ZMAX/dz;
-  printf("\nNZ: %i, DZ: %f\n\n",nz,dz);
  
   //the flux array is logarithmic in steps of 0.3dex 
   //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
@@ -179,6 +213,7 @@ int main(int argc,char** argv){
   double temp,bestp,bestq,ptemp,qtemp;
 
   fprintf(chain,"%s\n%s\n","Monte Carlo Parameter Chain","Iteration, P, Q, Chi-Square");
+  printf("Fitting Start; Total Run Number: %ld",runs);
 
   for (unsigned long i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
