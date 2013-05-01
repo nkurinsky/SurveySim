@@ -166,7 +166,7 @@ PRO simulation_event,ev
 
   CASE uvalue OF
      'go'  : begin ;save settings, intialize FITS file, and pass to C++ fitting routine
-        save,ldata,ldat0,bands,filename='params.save' ;save parameters
+        save,ldata,ldat0,bands,sdat,filename='params.save' ;save parameters
         
         ;make observation FITS file
         widget_control,ot,get_value=bvals
