@@ -100,7 +100,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
      ldata=[ldat0,ldat1,ldat2,ldat3]
      ;the fixed values: =1 if held fixed, =0 if variable
 
-     sdat = {zmin:0.0,zmax:5.0,dz:0.1,runs:1e9}
+     sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1e9}
   endelse
 
   bname = ["Band 1","Band 2","Band 3"]
@@ -121,9 +121,10 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
   t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck',format=fmt2,scr_xsize=472,scr_ysize=112)
 
+  tcols = ["Area (sdeg)","Z Min","Z Max","Z Binsize","Run Number"]
 ;Simulation Parameters
   l2 = widget_label(sim_table,value="Simulation Settings")
-  t2 = widget_table(sim_table,value=sdat,column_labels=tag_names(sdat),/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[70,70,70,80],scr_xsize=295,scr_ysize=55)
+  t2 = widget_table(sim_table,value=sdat,column_labels=tcols,/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[100,100,100,100,100],scr_xsize=505,scr_ysize=55)
 
 ;============================================================================
 ;Show SED templates
@@ -241,7 +242,8 @@ PRO simulation_event,ev
         sxaddpar,hdr2,'RUNS',sdat.runs,'Number of Runs'
         sxaddpar,hdr2,'ZMIN',sdat.zmin,'Minimum Redshift Value'
         sxaddpar,hdr2,'ZMAX',sdat.zmax,'Maximum Redshift Value'
-        sxaddpar,dsr2,'DZ',sdat.dz,'Redshit Bin Width'
+        sxaddpar,hdr2,'DZ',sdat.dz,'Redshit Bin Width'
+        sxaddpar,hdr2,'AREA',sdat.area,'Observed Solid Angle'
 
         templates = [0]
         mwrfits,templates,'model.fits',hdr2,/create
