@@ -110,13 +110,18 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   ot = widget_table(obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150,140],format=fmt)
 
   f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
-  f2b = ['(f1.0)','(f1.0)','(f1.0)','(f1.0)','(f1.0)','(f1.0)']
+  f2b = ['(f2.0)','(f2.0)','(f2.0)','(f2.0)','(f2.0)','(f2.0)']
   fmt2 = [[f2a],[f2b],[f2a],[f2a]]
   lrows=["Initial","Fixed","Min","Max"]
 
 ;Luminosity Function Paramters
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
   t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,event_pro='bcheck',format=fmt2)
+
+  opts = ["Fit","Set"]
+  fs = widget_base(lum_table,/row,/align_center)
+  sel1 = widget_combobox(fs,value=opts,uvalue='sel1')
+  sel2 = widget_combobox(fs,value=opts,uvalue='sel2')
 
 ;============================================================================
 ;Show SED templates
