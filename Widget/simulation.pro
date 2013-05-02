@@ -97,7 +97,8 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
      ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0}
      ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:0.,q:0.0}
      ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:10.0,q:10.0}
-     ldata=[ldat0,ldat1,ldat2,ldat3]
+     ldat4={phi0:0.0,lo:0.0,alpha:0.0,beta:0.0,p:0.1,q:0.1}
+     ldata=[ldat0,ldat1,ldat2,ldat3,ldat4]
      ;the fixed values: =1 if held fixed, =0 if variable
 
      sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1e9}
@@ -114,12 +115,12 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
 
   f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
   f2b = ['(i)','(i)','(i)','(i)','(i)','(i)']
-  fmt2 = [[f2a],[f2b],[f2a],[f2a]]
-  lrows=["Initial","Fixed","Min","Max"]
+  fmt2 = [[f2a],[f2b],[f2a],[f2a],[f2a]]
+  lrows=["Initial","Fixed","Min","Max","Sigma"]
 
-;Luminosity Function Paramters
+;Luminosity Function Parameters
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
-  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=472,scr_ysize=112)
+  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=472,scr_ysize=132)
 
   tcols = ["Area (sdeg)","Z Min","Z Max","Z Binsize","Run Number"]
 ;Simulation Parameters
@@ -301,7 +302,8 @@ pro fit_info
   ,'' $
   ,'Notes on using this interface:' $
   ,'- To allow a parameter to be fitted, set the value of the "fixed" row for that parameter to "0"' $
-  ,'- The ranges for the luminosity function parameters are only important for non-fixed parameters'],xsize=80,ysize=20)
+  ,'- The ranges for the luminosity function parameters are only important for non-fixed parameters' $
+  ,'- The "sigma" row refers to the proposed distribution width (stdev of gaussian monte carlo steps'],xsize=80,ysize=20)
   bthold = widget_base(main,/row,/align_center)
   bt = widget_button(bthold,uvalue='close',value='Close',xsize=50,ysize=25)
 
@@ -479,14 +481,14 @@ pro graphs
   sim_colors = widget_draw(r2b,xsize=xdim,ysize=ydim)
   obs_colors = widget_draw(r2b,xsize=xdim,ysize=ydim)
   comp_colors = widget_draw(r2b,xsize=xdim,ysize=ydim)
-
+  
   refresh = widget_button(r3,uvalue='refresh',value='Refresh')
   close = widget_button(r3,uvalue='close',value='Close')
   quit = widget_button(r3,uvalue='quit',value='Quit')
-
+  
   widget_control,gmain,/realize
   xmanager,'graphs',gmain,/no_block
-
+  
   set_plot,'x'
   loadct,0,/silent
 
@@ -557,7 +559,8 @@ pro graphs
 
   widget_control,dcount1,get_value=index
   wset,index
-;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
+  
+  ;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err
      flux=flux/1.d3
@@ -570,7 +573,7 @@ pro graphs
 
   h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
   ;I think the area covered here is not
-;quite right needs to be sorted out better, but for now just scale up
+  ;quite right needs to be sorted out better, but for now just scale up
   h=h*2.d3
   ;dlogS=dS/S
   df1=(shift(xh,-1)-xh)*10.^(xh)
