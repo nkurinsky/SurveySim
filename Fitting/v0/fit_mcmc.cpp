@@ -133,11 +133,12 @@ int main(int argc,char** argv){
     the bigger they are, the less well sampled the probability distribution 
     will be and hence the less accurate the final answer
     needs to find the "goldilocks" zone here but that's very problem specific 
-    so requires trial and error as we actually start fitting data. */
+    so requires trial and error as we actually start fitting data. 
+  */
   p_o[0] = lpars[4]; 
   p_o[1] = lpars[5];
   dp[0] = ldp[4];
-  dp[1] = ldp[5]
+  dp[1] = ldp[5];
   p_min[0] = lmin[4];
   p_min[1] = lmin[5];
   p_max[0] = lmax[4];
@@ -270,35 +271,35 @@ int main(int argc,char** argv){
     save = false;
   }
 
-  //save=false;
   if(save){
-    int vecsize = chainsize;
+    int vecsize = 3;
     std::vector<string> colnames(vecsize,"DNDS");
     std::vector<string> colunits(vecsize,"-");
     std::vector<string> colform(vecsize,"e13.5");
     string hname("Chain");
-    char temp[2];
+    //char temp[2];
     
     colnames[0] = "P";
     colnames[1] = "Q";
-    for(int iz=0;iz<nz;iz++){
-      sprintf(temp,"%i",iz);
-      colnames[iz+NPAR] = "DNDZ"+std::string(temp);
-    }
-    for(int is=0;is<ns;is++){
-      sprintf(temp,"%i",is);
-      colnames[is+NPAR+nz] = "DNDS"+std::string(temp);
-    }
+    //for(int iz=0;iz<nz;iz++){
+    //  sprintf(temp,"%i",iz);
+    //  colnames[iz+NPAR] = "DNDZ"+std::string(temp);
+    //}
+    //for(int is=0;is<ns;is++){
+    //  sprintf(temp,"%i",is);
+    //  colnames[is+NPAR+nz] = "DNDS"+std::string(temp);
+    //}
     colnames[vecsize-1] = "CHISQ";
     
-    cerr << "writing" << endl;
     Table *newTable = pFits->addTable(hname,runs,colnames,colform,colunits,AsciiTbl);
-    cerr << "table initialized" << endl;
 
-    for (int i=0;i<vecsize;i++){
-      newTable->column(colnames[i]).write(mcchain[i],1);
-    }
-    cerr << "table written" << endl;
+    newTable->column(colnames[0]).write(mcchain[0],1);
+    newTable->column(colnames[1]).write(mcchain[1],1);
+    newTable->column(colnames[2]).write(mcchain[chainsize-1],1);
+
+    //for (int i=0;i<vecsize;i++){
+    //  newTable->column(colnames[i]).write(mcchain[i],1);
+    //}
   }
   
   fclose(chain);
@@ -319,11 +320,11 @@ bool metrop(double de,double tmc){
   //to avoid getting segmentation fault from taking e^x where x is very large
   if(tester <= -2) ans = (de<0.0) ? true : false;
   if(tester > -2) {
-    static const gsl_rng_type * T;
-    gsl_rng_env_setup();   
-    gsl_rng_default_seed = time(NULL);
-    T = gsl_rng_default;
-    r = gsl_rng_alloc(T);
+    //static const gsl_rng_type * T;
+    //gsl_rng_env_setup();   
+    //gsl_rng_default_seed = time(NULL);
+    //T = gsl_rng_default;
+    //r = gsl_rng_alloc(T);
     itemp=gsl_rng_uniform(r);   //want uniform random number from 0-1
     ans = ((de < 0.0) or (itemp < exp(-de/tmc))) ? true : false;
   }

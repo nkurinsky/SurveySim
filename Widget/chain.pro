@@ -2,9 +2,11 @@ pro chain
 
 !p.charsize=1.5
 
-readcol,'chain.txt',i,p1,p2,chisq,skipline=2,format='i,f,f,f',/silent
+res = mrdfits('output.fits',4,/silent)
 
-n = n_elements(p1)              
+p1 = res.p
+p2 = res.q
+n = n_elements(res)              
 
 set_plot,'x'
 plot,p1,p2,psym=-2,xstyle=1,ystyle=1,xrange=[0,-7],yrange=[0,6],xtitle='P',ytitle='Q'
