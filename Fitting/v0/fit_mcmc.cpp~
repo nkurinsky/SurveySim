@@ -1,6 +1,6 @@
 //****************************************************************************
 // written by Anna Sajina 09/28/12
-// updated by Noah Kurinsky 5/1/13
+// updated by Noah Kurinsky 3/15/13
 // The purpose of this program is to read-in the parameters set in the idl 
 // wrapper (simulation.pro) and to use MCMC to determine the best-fit set of 
 // parameters. 
@@ -50,7 +50,7 @@ int main(int argc,char** argv){
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5"};
   //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
-  double lpars[6],lfix[6],lmax[6],lmin[6],ldp[6];
+  double lpars[6],lfix[6],lmax[6],lmin[6];
   // the initial guesses of the parameters, the width of the proposal distribution 
   // and the acceptable min/max range
   double p_o[NPAR],dp[NPAR],p_min[NPAR],p_max[NPAR]; 
@@ -98,6 +98,7 @@ int main(int argc,char** argv){
   params_table.readKey("BETA",lpars[3]);
   params_table.readKey("P",lpars[4]);
   params_table.readKey("Q",lpars[5]);
+
   //read parameter value fitting boolean
   params_table.readKey("PHI0_FIX",lfix[0]);
   params_table.readKey("L0_FIX",lfix[1]);
@@ -105,6 +106,7 @@ int main(int argc,char** argv){
   params_table.readKey("BETA_FIX",lfix[3]);
   params_table.readKey("P_FIX",lfix[4]);
   params_table.readKey("Q_FIX",lfix[5]);
+
   //read parameter minimum values
   params_table.readKey("PHI0_MIN",lmin[0]);
   params_table.readKey("L0_MIN",lmin[1]);
@@ -112,6 +114,7 @@ int main(int argc,char** argv){
   params_table.readKey("BETA_MIN",lmin[3]);
   params_table.readKey("P_MIN",lmin[4]);
   params_table.readKey("Q_MIN",lmin[5]);
+
   //read parameter maximum values
   params_table.readKey("PHI0_MAX",lmax[0]);
   params_table.readKey("L0_MAX",lmax[1]);
@@ -119,13 +122,6 @@ int main(int argc,char** argv){
   params_table.readKey("BETA_MAX",lmax[3]);
   params_table.readKey("P_MAX",lmax[4]);
   params_table.readKey("Q_MAX",lmax[5]);
-  //read parameter maximum values
-  params_table.readKey("PHI0_DP",ldp[0]);
-  params_table.readKey("L0_DP",ldp[1]);
-  params_table.readKey("ALPHA_DP",ldp[2]);
-  params_table.readKey("BETA_DP",ldp[3]);
-  params_table.readKey("P_DP",ldp[4]);
-  params_table.readKey("Q_DP",ldp[5]);
   
   /*
     note that the dp values here are the widths of the "proposal distribution"
@@ -133,15 +129,18 @@ int main(int argc,char** argv){
     the bigger they are, the less well sampled the probability distribution 
     will be and hence the less accurate the final answer
     needs to find the "goldilocks" zone here but that's very problem specific 
-    so requires trial and error as we actually start fitting data. */
+    so requires trial and error as we actually start fitting data. 
+  */
+
   p_o[0] = lpars[4]; 
+  dp[0] = 0.3;
+  p_min[0]= lmin[4];
+  p_max[0]= lmax[4];
+  
   p_o[1] = lpars[5];
-  dp[0] = ldp[4];
-  dp[1] = ldp[5]
-  p_min[0] = lmin[4];
-  p_min[1] = lmin[5];
-  p_max[0] = lmax[4];
-  p_max[1] = lmax[5];
+  dp[1] = 0.3;
+  p_min[1]= lmin[5];
+  p_max[1]= lmax[5];
 
   lumfunct lf;
   lf.set_phi0(lpars[0]);
@@ -152,8 +151,8 @@ int main(int argc,char** argv){
   lf.set_q(lpars[5]);
   
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
-  printf("p range: %5.3f - %5.3f, sigma: %5.3f\n",p_min[0],p_max[0],dp[0]);
-  printf("q range: %5.3f - %5.3f, sigma: %5.3f\n",p_min[1],p_max[1],dp[1]);
+  printf("p range: %5.3f - %5.3f\n",p_min[0],p_max[0]);
+  printf("q range: %5.3f - %5.3f\n",p_min[1],p_max[1]);
 
   delete pInfile;
   delete pInfile2;
@@ -213,7 +212,7 @@ int main(int argc,char** argv){
   for (unsigned long i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
     q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
-    temp=lpars[4]+p0_rng[i];
+    temp=lpars[4]+p0_rng[i];  //fix this (not just the initial guess)  
     if((temp >= p_min[0]) && (temp <= p_max[0])) ptemp=temp;
     temp=lpars[5]+q0_rng[i];
     if((temp >= p_min[1]) && (temp <= p_max[1])) qtemp=temp;
@@ -270,34 +269,38 @@ int main(int argc,char** argv){
     save = false;
   }
 
-  //save=false;
+  save=false;
   if(save){
     int vecsize = chainsize;
-    std::vector<string> colnames(vecsize,"DNDS");
-    std::vector<string> colunits(vecsize,"-");
-    std::vector<string> colform(vecsize,"e13.5");
+    std::vector<string> colnames(vecsize,"dnds");
+    std::vector<string> colunits(vecsize,"");
+    std::vector<string> colform(vecsize,"f");
     string hname("Chain");
+    
     char temp[2];
     
     colnames[0] = "P";
     colnames[1] = "Q";
     for(int iz=0;iz<nz;iz++){
       sprintf(temp,"%i",iz);
-      colnames[iz+NPAR] = "DNDZ"+std::string(temp);
+      colnames[iz+NPAR] = "dndz"+std::string(temp);
     }
     for(int is=0;is<ns;is++){
       sprintf(temp,"%i",is);
-      colnames[is+NPAR+nz] = "DNDS"+std::string(temp);
+      colnames[is+NPAR+nz] = "dnds"+std::string(temp);
     }
-    colnames[vecsize-1] = "CHISQ";
+    colnames[vecsize-1] = "chisq";
     
     cerr << "writing" << endl;
+
     Table *newTable = pFits->addTable(hname,runs,colnames,colform,colunits,AsciiTbl);
+
     cerr << "table initialized" << endl;
 
-    for (int i=0;i<vecsize;i++){
+    for (int i=0;i<(NPAR+nz+ns+1);i++){
       newTable->column(colnames[i]).write(mcchain[i],1);
     }
+
     cerr << "table written" << endl;
   }
   
