@@ -19,7 +19,7 @@ pro lumfunct
   set_plot,'ps'
   device,filename='lumfunct.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
-  plot,[8,13],[1e-3,1e5],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir}))')
+  plot,[8,13],[1e-5,1e5],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega)'),ystyle=1
   lums = indgen(21)/4.0+8.0
   print,lums
 
@@ -41,7 +41,7 @@ pro lumfunct
      ez = sqrt(omega_m*(1+z)^3+omega_l)
      dvdz = 4062*lumdist(z)^2*(!pi/180)^2/((1+z)^2*ez)
      vol = dvdz*dz
-     nsrcs*=vol*10
+     nsrcs*=vol
 
      print,vol
      oplot,lums,nsrcs,color=z*40+20
