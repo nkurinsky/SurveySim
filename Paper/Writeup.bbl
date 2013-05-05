@@ -1,46 +1,27 @@
-\begin{thebibliography}{12}
-\providecommand{\natexlab}[1]{#1}
-\providecommand{\url}[1]{\texttt{#1}}
-\expandafter\ifx\csname urlstyle\endcsname\relax
-  \providecommand{\doi}[1]{doi: #1}\else
-  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+\begin{thebibliography}{14}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
-\bibitem[{Caputi} et~al.(2007){Caputi}, {Lagache}, {Yan}, {Dole}, {Bavouzet},
-  {Le Floc'h}, {Choi}, {Helou}, and {Reddy}]{Caputi07}
-K.~I. {Caputi}, G.~{Lagache}, L.~{Yan}, H.~{Dole}, N.~{Bavouzet}, E.~{Le
-  Floc'h}, P.~I. {Choi}, G.~{Helou}, and N.~{Reddy}.
-\newblock {The Infrared Luminosity Function of Galaxies at Redshifts z = 1 and
-  z \~{} 2 in the GOODS Fields}.
-\newblock \emph{APJ}, 660:\penalty0 97--116, May 2007.
-\newblock \doi{10.1086/512667}.
+\bibitem[{{Caputi} {et~al.}(2007){Caputi}, {Lagache}, {Yan}, {Dole},
+  {Bavouzet}, {Le Floc'h}, {Choi}, {Helou}, \& {Reddy}}]{Caputi07}
+{Caputi}, K.~I., {Lagache}, G., {Yan}, L., {et~al.} 2007, APJ, 660, 97
 
-\bibitem[{Devlin} et~al.(2009){Devlin}, {Ade}, {Aretxaga}, {Bock}, {Chapin},
+\bibitem[{{Devlin} {et~al.}(2009){Devlin}, {Ade}, {Aretxaga}, {Bock}, {Chapin},
   {Griffin}, {Gundersen}, {Halpern}, {Hargrave}, {Hughes}, {Klein}, {Marsden},
   {Martin}, {Mauskopf}, {Moncelsi}, {Netterfield}, {Ngo}, {Olmi}, {Pascale},
   {Patanchon}, {Rex}, {Scott}, {Semisch}, {Thomas}, {Truch}, {Tucker},
-  {Tucker}, {Viero}, and {Wiebe}]{Devlin09}
-M.~J. {Devlin}, P.~A.~R. {Ade}, I.~{Aretxaga}, J.~J. {Bock}, E.~L. {Chapin},
-  M.~{Griffin}, J.~O. {Gundersen}, M.~{Halpern}, P.~C. {Hargrave}, D.~H.
-  {Hughes}, J.~{Klein}, G.~{Marsden}, P.~G. {Martin}, P.~{Mauskopf},
-  L.~{Moncelsi}, C.~B. {Netterfield}, H.~{Ngo}, L.~{Olmi}, E.~{Pascale},
-  G.~{Patanchon}, M.~{Rex}, D.~{Scott}, C.~{Semisch}, N.~{Thomas}, M.~D.~P.
-  {Truch}, C.~{Tucker}, G.~S. {Tucker}, M.~P. {Viero}, and D.~V. {Wiebe}.
-\newblock {Over half of the far-infrared background light comes from galaxies
-  at z>=1.2}.
-\newblock \emph{Nature}, 458:\penalty0 737--739, April 2009.
-\newblock \doi{10.1038/nature07918}.
+  {Tucker}, {Viero}, \& {Wiebe}}]{Devlin09}
+{Devlin}, M.~J., {Ade}, P.~A.~R., {Aretxaga}, I., {et~al.} 2009, Nature, 458,
+  737
 
-\bibitem[Galassi et~al.(2011)Galassi, Davies, Theiler, Gough, and Jungman]{GSL}
-M~Galassi, J~Davies, J~Theiler, B~Gough, and G~Jungman.
-\newblock \emph{The GNU Scientific Library}, April 2011.
-\newblock URL \url{http://www.gnu.org/software/gsl/}.
+\bibitem[{Galassi {et~al.}(2011)Galassi, Davies, Theiler, Gough, \&
+  Jungman}]{GSL}
+Galassi, M., Davies, J., Theiler, J., Gough, B., \& Jungman, G. 2011, The GNU
+  Scientific Library
 
-\bibitem[Gordon et~al.(2011)Gordon, Irby, Dorman, Cansal, and Kunz]{CCFITS}
-C.~Gordon, B.~Irby, B.~Dorman, S.~Cansal, and P.~Kunz.
-\newblock \emph{CCFITS}, December 2011.
-\newblock URL \url{http://heasarc.gsfc.nasa.gov/docs/software/fitsio/CCfits}.
+\bibitem[{Gordon {et~al.}(2011)Gordon, Irby, Dorman, Cansal, \& Kunz}]{CCFITS}
+Gordon, C., Irby, B., Dorman, B., Cansal, S., \& Kunz, P. 2011, CCFITS
 
-\bibitem[{Griffin} et~al.(2010){Griffin}, {Abergel}, {Abreu}, {Ade},
+\bibitem[{{Griffin} {et~al.}(2010){Griffin}, {Abergel}, {Abreu}, {Ade},
   {Andr{\'e}}, {Augueres}, {Babbedge}, {Bae}, {Baillie}, {Baluteau}, {Barlow},
   {Bendo}, {Benielli}, {Bock}, {Bonhomme}, {Brisbin}, {Brockley-Blatt},
   {Caldwell}, {Cara}, {Castro-Rodriguez}, {Cerulli}, {Chanial}, {Chen},
@@ -66,123 +47,51 @@ C.~Gordon, B.~Irby, B.~Dorman, S.~Cansal, and P.~Kunz.
   {Trichas}, {Tourette}, {Triou}, {Tseng}, {Tucker}, {Turner}, {Vaccari},
   {Valtchanov}, {Vigroux}, {Virique}, {Voellmer}, {Walker}, {Ward}, {Waskett},
   {Weilert}, {Wesson}, {White}, {Whitehouse}, {Wilson}, {Winter}, {Woodcraft},
-  {Wright}, {Xu}, {Zavagno}, {Zemcov}, {Zhang}, and {Zonca}]{SPIRE}
-M.~J. {Griffin}, A.~{Abergel}, A.~{Abreu}, P.~A.~R. {Ade}, P.~{Andr{\'e}},
-  J.-L. {Augueres}, T.~{Babbedge}, Y.~{Bae}, T.~{Baillie}, J.-P. {Baluteau},
-  M.~J. {Barlow}, G.~{Bendo}, D.~{Benielli}, J.~J. {Bock}, P.~{Bonhomme},
-  D.~{Brisbin}, C.~{Brockley-Blatt}, M.~{Caldwell}, C.~{Cara},
-  N.~{Castro-Rodriguez}, R.~{Cerulli}, P.~{Chanial}, S.~{Chen}, E.~{Clark},
-  D.~L. {Clements}, L.~{Clerc}, J.~{Coker}, D.~{Communal}, L.~{Conversi},
-  P.~{Cox}, D.~{Crumb}, C.~{Cunningham}, F.~{Daly}, G.~R. {Davis}, P.~{de
-  Antoni}, J.~{Delderfield}, N.~{Devin}, A.~{di Giorgio}, I.~{Didschuns},
-  K.~{Dohlen}, M.~{Donati}, A.~{Dowell}, C.~D. {Dowell}, L.~{Duband},
-  L.~{Dumaye}, R.~J. {Emery}, M.~{Ferlet}, D.~{Ferrand}, J.~{Fontignie},
-  M.~{Fox}, A.~{Franceschini}, M.~{Frerking}, T.~{Fulton}, J.~{Garcia},
-  R.~{Gastaud}, W.~K. {Gear}, J.~{Glenn}, A.~{Goizel}, D.~K. {Griffin},
-  T.~{Grundy}, S.~{Guest}, L.~{Guillemet}, P.~C. {Hargrave}, M.~{Harwit},
-  P.~{Hastings}, E.~{Hatziminaoglou}, M.~{Herman}, B.~{Hinde}, V.~{Hristov},
-  M.~{Huang}, P.~{Imhof}, K.~J. {Isaak}, U.~{Israelsson}, R.~J. {Ivison},
-  D.~{Jennings}, B.~{Kiernan}, K.~J. {King}, A.~E. {Lange}, W.~{Latter},
-  G.~{Laurent}, P.~{Laurent}, S.~J. {Leeks}, E.~{Lellouch}, L.~{Levenson},
-  B.~{Li}, J.~{Li}, J.~{Lilienthal}, T.~{Lim}, S.~J. {Liu}, N.~{Lu},
-  S.~{Madden}, G.~{Mainetti}, P.~{Marliani}, D.~{McKay}, K.~{Mercier},
-  S.~{Molinari}, H.~{Morris}, H.~{Moseley}, J.~{Mulder}, M.~{Mur}, D.~A.
-  {Naylor}, H.~{Nguyen}, B.~{O'Halloran}, S.~{Oliver}, G.~{Olofsson}, H.-G.
-  {Olofsson}, R.~{Orfei}, M.~J. {Page}, I.~{Pain}, P.~{Panuzzo},
-  A.~{Papageorgiou}, G.~{Parks}, P.~{Parr-Burman}, A.~{Pearce}, C.~{Pearson},
-  I.~{P{\'e}rez-Fournon}, F.~{Pinsard}, G.~{Pisano}, J.~{Podosek}, M.~{Pohlen},
-  E.~T. {Polehampton}, D.~{Pouliquen}, D.~{Rigopoulou}, D.~{Rizzo}, I.~G.
-  {Roseboom}, H.~{Roussel}, M.~{Rowan-Robinson}, B.~{Rownd}, P.~{Saraceno},
-  M.~{Sauvage}, R.~{Savage}, G.~{Savini}, E.~{Sawyer}, C.~{Scharmberg},
-  D.~{Schmitt}, N.~{Schneider}, B.~{Schulz}, A.~{Schwartz}, R.~{Shafer}, D.~L.
-  {Shupe}, B.~{Sibthorpe}, S.~{Sidher}, A.~{Smith}, A.~J. {Smith}, D.~{Smith},
-  L.~{Spencer}, B.~{Stobie}, R.~{Sudiwala}, K.~{Sukhatme}, C.~{Surace}, J.~A.
-  {Stevens}, B.~M. {Swinyard}, M.~{Trichas}, T.~{Tourette}, H.~{Triou},
-  S.~{Tseng}, C.~{Tucker}, A.~{Turner}, M.~{Vaccari}, I.~{Valtchanov},
-  L.~{Vigroux}, E.~{Virique}, G.~{Voellmer}, H.~{Walker}, R.~{Ward},
-  T.~{Waskett}, M.~{Weilert}, R.~{Wesson}, G.~J. {White}, N.~{Whitehouse},
-  C.~D. {Wilson}, B.~{Winter}, A.~L. {Woodcraft}, G.~S. {Wright}, C.~K. {Xu},
-  A.~{Zavagno}, M.~{Zemcov}, L.~{Zhang}, and E.~{Zonca}.
-\newblock {The Herschel-SPIRE instrument and its in-flight performance}.
-\newblock \emph{AAP}, 518:\penalty0 L3, July 2010.
-\newblock \doi{10.1051/0004-6361/201014519}.
+  {Wright}, {Xu}, {Zavagno}, {Zemcov}, {Zhang}, \& {Zonca}}]{SPIRE}
+{Griffin}, M.~J., {Abergel}, A., {Abreu}, A., {et~al.} 2010, AAP, 518, L3
 
-\bibitem[{Marsden} et~al.(2011){Marsden}, {Chapin}, {Halpern}, {Patanchon},
-  {Scott}, {Truch}, {Valiante}, {Viero}, and {Wiebe}]{marsden11}
-G.~{Marsden}, E.~L. {Chapin}, M.~{Halpern}, G.~{Patanchon}, D.~{Scott},
-  M.~D.~P. {Truch}, E.~{Valiante}, M.~P. {Viero}, and D.~V. {Wiebe}.
-\newblock {A Monte Carlo approach to evolution of the far-infrared luminosity
-  function with BLAST}.
-\newblock \emph{MNRAS}, 417:\penalty0 1192--1209, October 2011.
-\newblock \doi{10.1111/j.1365-2966.2011.19336.x}.
+\bibitem[{{Marsden} {et~al.}(2011){Marsden}, {Chapin}, {Halpern}, {Patanchon},
+  {Scott}, {Truch}, {Valiante}, {Viero}, \& {Wiebe}}]{marsden11}
+{Marsden}, G., {Chapin}, E.~L., {Halpern}, M., {et~al.} 2011, MNRAS, 417, 1192
 
-\bibitem[{Negrello} et~al.(2012){Negrello}, {Clemens}, {Gonzalez-Nuevo}, {De
-  Zotti}, {Cosco}, {Guarese}, {Boaretto}, and {et al}]{negrelloIP}
-M.~{Negrello}, M.~{Clemens}, J.~{Gonzalez-Nuevo}, G.~{De Zotti}, G.~{Cosco},
-  G.~{Guarese}, L.~{Boaretto}, and {et al}.
-\newblock {The Luminosity Function of Local Star-Forming Galaxies as seen by
-  Planck}.
-\newblock \emph{MNRAS}, in prep. 2012.
+\bibitem[{{Negrello} {et~al.}(2012){Negrello}, {Clemens}, {Gonzalez-Nuevo}, {De
+  Zotti}, {Cosco}, {Guarese}, {Boaretto}, \& {et al}}]{negrelloIP}
+{Negrello}, M., {Clemens}, M., {Gonzalez-Nuevo}, J., {et~al.} 2012, MNRAS
 
-\bibitem[{Pascale} et~al.(2008){Pascale}, {Ade}, {Bock}, {Chapin}, {Chung},
+\bibitem[{{Pascale} {et~al.}(2008){Pascale}, {Ade}, {Bock}, {Chapin}, {Chung},
   {Devlin}, {Dicker}, {Griffin}, {Gundersen}, {Halpern}, {Hargrave}, {Hughes},
   {Klein}, {MacTavish}, {Marsden}, {Martin}, {Martin}, {Mauskopf},
   {Netterfield}, {Olmi}, {Patanchon}, {Rex}, {Scott}, {Semisch}, {Thomas},
-  {Truch}, {Tucker}, {Tucker}, {Viero}, and {Wiebe}]{BLAST}
-E.~{Pascale}, P.~A.~R. {Ade}, J.~J. {Bock}, E.~L. {Chapin}, J.~{Chung}, M.~J.
-  {Devlin}, S.~{Dicker}, M.~{Griffin}, J.~O. {Gundersen}, M.~{Halpern}, P.~C.
-  {Hargrave}, D.~H. {Hughes}, J.~{Klein}, C.~J. {MacTavish}, G.~{Marsden},
-  P.~G. {Martin}, T.~G. {Martin}, P.~{Mauskopf}, C.~B. {Netterfield},
-  L.~{Olmi}, G.~{Patanchon}, M.~{Rex}, D.~{Scott}, C.~{Semisch}, N.~{Thomas},
-  M.~D.~P. {Truch}, C.~{Tucker}, G.~S. {Tucker}, M.~P. {Viero}, and D.~V.
-  {Wiebe}.
-\newblock {The Balloon-borne Large Aperture Submillimeter Telescope: BLAST}.
-\newblock \emph{APJ}, 681:\penalty0 400--414, July 2008.
-\newblock \doi{10.1086/588541}.
+  {Truch}, {Tucker}, {Tucker}, {Viero}, \& {Wiebe}}]{BLAST}
+{Pascale}, E., {Ade}, P.~A.~R., {Bock}, J.~J., {et~al.} 2008, APJ, 681, 400
 
-\bibitem[Pence et~al.(2003)Pence, Drakos, and Moore]{CFITSIO}
-W.~Pence, N.~Drakos, and R.~Moore.
-\newblock \emph{CFITSIO Quick Start Guide}, January 2003.
-\newblock URL
-  \url{http://heasarc.gsfc.nasa.gov/docs/software/fitsio/fitsio.html}.
+\bibitem[{Pence {et~al.}(2003)Pence, Drakos, \& Moore}]{CFITSIO}
+Pence, W., Drakos, N., \& Moore, R. 2003, CFITSIO Quick Start Guide
 
-\bibitem[{Pilbratt} et~al.(2010){Pilbratt}, {Riedinger}, {Passvogel}, {Crone},
-  {Doyle}, {Gageur}, {Heras}, {Jewell}, {Metcalfe}, {Ott}, and
-  {Schmidt}]{Herschel}
-G.~L. {Pilbratt}, J.~R. {Riedinger}, T.~{Passvogel}, G.~{Crone}, D.~{Doyle},
-  U.~{Gageur}, A.~M. {Heras}, C.~{Jewell}, L.~{Metcalfe}, S.~{Ott}, and
-  M.~{Schmidt}.
-\newblock {Herschel Space Observatory. An ESA facility for far-infrared and
-  submillimetre astronomy}.
-\newblock \emph{AAP}, 518:\penalty0 L1, July 2010.
-\newblock \doi{10.1051/0004-6361/201014759}.
+\bibitem[{{Pilbratt} {et~al.}(2010){Pilbratt}, {Riedinger}, {Passvogel},
+  {Crone}, {Doyle}, {Gageur}, {Heras}, {Jewell}, {Metcalfe}, {Ott}, \&
+  {Schmidt}}]{Herschel}
+{Pilbratt}, G.~L., {Riedinger}, J.~R., {Passvogel}, T., {et~al.} 2010, AAP,
+  518, L1
 
-\bibitem[Scott(1979)]{binsize}
-David~W. Scott.
-\newblock On optimal and data-based histograms.
-\newblock \emph{Biometrika}, 66\penalty0 (3):\penalty0 pp. 605--610, 1979.
-\newblock ISSN 00063444.
-\newblock URL \url{http://www.jstor.org/stable/2335182}.
+\bibitem[{{Rieke} {et~al.}(2009){Rieke}, {Alonso-Herrero}, {Weiner},
+  {P{\'e}rez-Gonz{\'a}lez}, {Blaylock}, {Donley}, \& {Marcillac}}]{rieke09}
+{Rieke}, G.~H., {Alonso-Herrero}, A., {Weiner}, B.~J., {et~al.} 2009, ApJ, 692,
+  556
 
-\bibitem[{Smith} et~al.(2012){Smith}, {Wang}, {Oliver}, {Auld}, {Bock},
+\bibitem[{Scott(1979)}]{binsize}
+Scott, D.~W. 1979, Biometrika, 66, pp. 605
+
+\bibitem[{{Smith} {et~al.}(2012){Smith}, {Wang}, {Oliver}, {Auld}, {Bock},
   {Brisbin}, {Burgarella}, {Chanial}, {Chapin}, {Clements}, {Conversi},
   {Cooray}, {Dowell}, {Eales}, {Farrah}, {Franceschini}, {Glenn}, {Griffin},
   {Ivison}, {Mortier}, {Page}, {Papageorgiou}, {Pearson}, {P{\'e}rez-Fournon},
   {Pohlen}, {Rawlings}, {Raymond}, {Rodighiero}, {Roseboom}, {Rowan-Robinson},
   {Savage}, {Scott}, {Seymour}, {Symeonidis}, {Tugwell}, {Vaccari},
-  {Valtchanov}, {Vigroux}, {Ward}, {Wright}, and {Zemcov}]{HerMES}
-A.~J. {Smith}, L.~{Wang}, S.~J. {Oliver}, R.~{Auld}, J.~{Bock}, D.~{Brisbin},
-  D.~{Burgarella}, P.~{Chanial}, E.~{Chapin}, D.~L. {Clements}, L.~{Conversi},
-  A.~{Cooray}, C.~D. {Dowell}, S.~{Eales}, D.~{Farrah}, A.~{Franceschini},
-  J.~{Glenn}, M.~{Griffin}, R.~J. {Ivison}, A.~M.~J. {Mortier}, M.~J. {Page},
-  A.~{Papageorgiou}, C.~P. {Pearson}, I.~{P{\'e}rez-Fournon}, M.~{Pohlen},
-  J.~I. {Rawlings}, G.~{Raymond}, G.~{Rodighiero}, I.~G. {Roseboom},
-  M.~{Rowan-Robinson}, R.~{Savage}, D.~{Scott}, N.~{Seymour}, M.~{Symeonidis},
-  K.~E. {Tugwell}, M.~{Vaccari}, I.~{Valtchanov}, L.~{Vigroux}, R.~{Ward},
-  G.~{Wright}, and M.~{Zemcov}.
-\newblock {HerMES: point source catalogues from deep Herschel-SPIRE
-  observations}.
-\newblock \emph{MNRAS}, 419:\penalty0 377--389, January 2012.
-\newblock \doi{10.1111/j.1365-2966.2011.19709.x}.
+  {Valtchanov}, {Vigroux}, {Ward}, {Wright}, \& {Zemcov}}]{HerMES}
+{Smith}, A.~J., {Wang}, L., {Oliver}, S.~J., {et~al.} 2012, MNRAS, 419, 377
+
+\bibitem[{{Wiklind}(2003)}]{wiklind03}
+{Wiklind}, T. 2003, ArXiv Astrophysics e-prints
 
 \end{thebibliography}

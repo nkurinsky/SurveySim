@@ -3,12 +3,12 @@
 \BOOKMARK [2][-]{subsection.2.1}{SED Library}{section.2}% 3
 \BOOKMARK [2][-]{subsection.2.2}{Luminosity Function}{section.2}% 4
 \BOOKMARK [2][-]{subsection.2.3}{Cosmology}{section.2}% 5
-\BOOKMARK [2][-]{subsection.2.4}{Redshift and Model Distributions}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.4}{Generating a Survey from SEDs and a Luminosity Function}{section.2}% 6
 \BOOKMARK [2][-]{subsection.2.5}{Correcting for Survey Properties}{section.2}% 7
 \BOOKMARK [1][-]{section.3}{Fitting Methodology}{}% 8
 \BOOKMARK [2][-]{subsection.3.1}{Two-Dimensional Spectral Color Histogram}{section.3}% 9
 \BOOKMARK [2][-]{subsection.3.2}{Chi-Square Testing}{section.3}% 10
-\BOOKMARK [2][-]{subsection.3.3}{Multidimensional Minimization}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.3}{Markov Chain Monte Carlo Minimization}{section.3}% 11
 \BOOKMARK [1][-]{section.4}{Implementation}{}% 12
 \BOOKMARK [2][-]{subsection.4.1}{C++ Executable}{section.4}% 13
 \BOOKMARK [3][-]{subsubsection.4.1.1}{Classes and Other Methods}{subsection.4.1}% 14

@@ -1,6 +1,6 @@
 //****************************************************************************
 // written by Anna Sajina 09/28/12
-// updated by Noah Kurinsky 5/1/13
+// updated by Noah Kurinsky 5/5/13
 // The purpose of this program is to read-in the parameters set in the idl 
 // wrapper (simulation.pro) and to use MCMC to determine the best-fit set of 
 // parameters. 
@@ -45,7 +45,7 @@ int main(int argc,char** argv){
   
   unsigned long runs; 
   int nz,ns;
-  double area, dz, zmax, rtemp;
+  double area, dz, zmax, zmin, rtemp;
   products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5"};
@@ -67,6 +67,7 @@ int main(int argc,char** argv){
 
   params_table.readKey("RUNS",rtemp);
   runs = (unsigned long) rtemp;
+  params_table.readKey("ZMIN",zmin);
   params_table.readKey("ZMAX",zmax);
   params_table.readKey("DZ",dz);
   params_table.readKey("AREA",area);
@@ -76,7 +77,7 @@ int main(int argc,char** argv){
   area*=pow((M_PI/180.0),2.0); //in steradians from sq.deg.
 
   //compute redshift bin number from FITS values
-  nz = zmax/dz;
+  nz = (zmax-zmin)/dz;
   printf("\nNR: %lu, NZ: %i, DZ: %f\n",runs,nz,dz);
 
   printf("%s\n","Bands:");

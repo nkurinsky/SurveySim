@@ -271,7 +271,6 @@ int main(int argc,char** argv){
     save = false;
   }
 
-  //save=false;
   if(save){
     int vecsize = 3;
     std::vector<string> colnames(vecsize,"DNDS");
@@ -321,11 +320,11 @@ bool metrop(double de,double tmc){
   //to avoid getting segmentation fault from taking e^x where x is very large
   if(tester <= -2) ans = (de<0.0) ? true : false;
   if(tester > -2) {
-    static const gsl_rng_type * T;
-    gsl_rng_env_setup();   
-    gsl_rng_default_seed = time(NULL);
-    T = gsl_rng_default;
-    r = gsl_rng_alloc(T);
+    //static const gsl_rng_type * T;
+    //gsl_rng_env_setup();   
+    //gsl_rng_default_seed = time(NULL);
+    //T = gsl_rng_default;
+    //r = gsl_rng_alloc(T);
     itemp=gsl_rng_uniform(r);   //want uniform random number from 0-1
     ans = ((de < 0.0) or (itemp < exp(-de/tmc))) ? true : false;
   }

@@ -14,8 +14,8 @@
 \def \um {$\mu m$}
 
 \title{Monte Carlo Constraint of Luminosity Evolution and Redshift of Far-Infrared Galaxy Surveys}
-\author{Noah Kurinsky\\*
-  \small Tufts University '14\\*
+\author{Noah Kurinsky and Anna Sajina\\*
+  \small Tufts University\\*
   \small Department of Physics and Astronomy}
 \date{\small \today}
 
@@ -24,7 +24,7 @@
   \maketitle
   \begin{onecolabstract}
     \centering
-    This work presents a new software tool for characterizing the properties of an observational survey of galactic populations by the use of the multidimensional spectral color space over which the survey extends to fit both model and redshift distributions to the dataset. We detail in this paper the creation of this tool as well as the methodology behind it, including the assumptions made for this early version. We discuss the testing of the program, for which two surveys taken by BLAST and Herschel's SPIRE instruments were used. The software is still in early stages of development, and we discuss the additional features we plan to add, as well as the goal of being able to fully fit all characteristics of a given population. Our hope for this tool is that it can be used by the greater scientific community to improve quality and efficiency of analysis of new surveys, whether it be used to produce publishable work or guide researchers in the right direction when conducting their own analyses.
+    To be written, updated form
   \end{onecolabstract}
   \vspace{1cm}
 ]
@@ -32,9 +32,9 @@
 \section{Introduction}
 In the field of observational astrophysics, a great deal of time is put into characterizing various properties of surveys of galactic populations both large and small. The vast majority of these efforts focus on an analysis specific to the survey, instrumentation, and source type being studied, and each requires new computer code and months of work to produce a publishable result. The necessity of such a time commitment makes maximizing the scientific yield of such analyses a top priority. Recent attempts have been made to characterize the properties of galaxy populations by using very general spectral features (e.g. spectral color) to fit complex evolutionary models \citep[e.g. redshift-luminosity evolution, as in ][]{marsden11}. A discussion of such methods, as well as their successes and failures, can also be found in the previous reference.
 
-We extend the ideas presented in \citet{marsden11} from one spectral color to two; whereas they attempt to fit their model using the single 60-100 $\mu$m color, we instead employ a two color model, using three spectral bands, to create a two-dimensional diagnostic spectral color density plot of an observed population. We then employ a library of multi-parameter galactic spectral energy distribution (SED) models to try to reproduce the observed trend, exploring the parameter space to constrain the redshift distribution and parameter distributions. Future versions of this program will ultimately attempt to constrain the luminosity-redshift evolution as well. 
+We extend the ideas presented in \citet{marsden11} from one spectral color to two; whereas they attempt to fit their model using the single 60-100 $\mu$m color, we instead employ a two color model, using three spectral bands, to create a two-dimensional diagnostic spectral color density plot of an observed population. We then employ a library of luminous and ultra-luminous infrared galaxy (LIRG and ULIRG) spectral energy distribution (SED) models to try to reproduce the observed trend, exploring the parameter space to constrain the redshift evolution of the far-infrared luminosity function. Using the luminosity function as a general prescription for number density and luminosity of galaxies at a given redshift, we can use the constrained parameters to simulate a high-redshift survey, given characteristics of the instrument performing the survey.
 
-Our novel approach allows us to characterize the sample under examination as well as highlight the successes and failure of the SED template and the luminosity function form used by the fitting procedure. In addition, a large emphasis has been put on ensuring that the fitting program is highly generalizable; the model and luminosity function are stored in external files, and thus the templates desired by the user can be specified at runtime. The program is not band or instrument specific, and the user can specify the exact survey characteristics (such as magnitude limits and statistical noise levels) to achieve the best fit possible. Such considerations allow us to address the need for reusable code, with the intent being that the analysis of data sets of this nature can be done much quicker, and result in a larger, richer science yield.
+Our novel approach allows us to characterize the sample under examination as well as highlight the successes and failure of the SED template and the luminosity function form used by the fitting procedure. In addition, a large emphasis has been put on ensuring that the fitting program is highly generalizable; the models are stored externally to the main program in FITS format, and the luminosity function and various other procedures are highly modularized in the C++ code. Due to these features, the templates desired by the user can be specified at runtime, and the luminosity function can be easily modified. The program is not band or instrument specific, and the user can specify the exact survey characteristics (such as magnitude limits and statistical noise levels) to achieve the best fit possible. Such considerations allow us to address the need for reusable code, with the intent being that the analysis of data sets of this nature can be done much quicker, and result in a larger, richer science yield. In addition, we see high dependence of survey outcome on instrumental properties, and thus ability to tweak such characteristics has a large impact on the success or failure of fitting attempts.
 
 The above is a very general description of the product we detail in this paper. We begin by discussing the assumptions made by the current form of the fitting procedure, such as luminosity functional form as well as the form of the redshift and model distributions. We then discuss the mathematical methods employed to randomize the simulation, perform the fitting, and generate the fitting statistic. We then present the results of testing the program with two far-infrared data samples of the GOODS-North field obtained by BLAST \citep{BLAST} and the Spitzer FLS field obtained by the HerMES survey \citep{HerMES}, using Herschel's SPIRE instrument \citep{Herschel,SPIRE}. These data sets measure identical bands, but differ in sensitivity, sample size, sky coverage, and other minor respects. We finally lay out the improvements that we plan to implement in the near future, and our eventual goals pertaining to public release and long-term usability for the project. 
 
@@ -46,18 +46,19 @@ Following the above reasoning, the first step in the simulation process is to ge
 
 To be able to test the accuracy of the model against observation, a diagnostic needs to be chosen which can capture as many aspects of the sample as possible. Single fluxes have little meaning, as they vary with luminosity and distance, however, the trend over the entire simulated regime is luminosity independent, and provides a means by which to identify different sub-groups of similar sources. We choose to use the spectral color (defined as $S_\nu\propto\nu^\alpha$) to characterize each source, and produce a two-dimensional histogram of the entire population from these colors to describe the cumulative properties of the sample. The construction of this histogram and the method of comparison are described later in this section.
 
-Even though the following sections describe specific implementations of the various aspects of the fitting program, it is important to note that many of these specific forms are only those adopted for early testing of the fitting and modeling methods. The program has been designed and implemented to work with arbitrary models, and none of the specific details discussed below are actually present in the code, but are read in from files and are fully changeable. The luminosity function may, in the future, operate in a similar way. The overall design of the program is to strive for as few specific assumptions as possible. With this consideration in mind, we move on to discuss the specific assumptions made for the early version of this program.
+Even though the following sections describe specific implementations of the various aspects of the fitting program, it is important to note that many of these specific forms are only those adopted for our far-infrared fitting and modeling methods. The program has been designed and implemented to work with arbitrary models, and none of the specific details discussed below are actually present in the compiled executable, but are read in from files and are fully changeable. The luminosity function may, in the future, operate in a similar way; currently it is hard-coded. The overall design of the program is to strive for as few specific assumptions as possible. With this consideration in mind, we move on to discuss the specific assumptions made for the early version of this program.
 
 \subsection{SED Library}\label{sec:SED}
-The SED library employed for the first version of this tool consists of a set of modified black-bodies, as described earlier, which have the functional form $S_\nu(T,\beta)=B_\nu(T)\nu^\beta$, where $B_\nu(T)$ is the Planck function, $T$ is temperature in Kelvin, and $\nu$ is frequency. This effectively adds a variable power law component to the normal blackbody, which better approximates the thermal spectra of galaxies. It also gives the model a second variable parameter aside from temperature to allow for more robust fitting. 
 
-Ideally, the program would calculate flux densities source by source, using a continuous parameters distribution to produce the eventual simulation. Since we designed the fitting program to be generalizable to any model template, this was not practical. We instead designed the program to read in a library of pre-calculated models. The library we generated has models for $\beta = 1.0,1.1,...,2.0$ and $T=10,20,...,100$, and can be seen in Figure \ref{slib}. The program generates a model space with finer resolution than the models provided by performing spline interpolations between models, so that the number of models provided has a smaller effect on the quality of the fits than would otherwise be present. This is discussed further in Section \ref{class:models}.
+In the previous version of this program, we employed a two-dimensional model comprised of modified blackbodies of various temperatures and radio strengths, without assigning them intrinsic luminosities. This served to model the very general properties of high-redshift, actively star forming galaxies, however more detailed models exist, and using such models enhances the robustness of our analysis. In this iteration of the program, we chose to adopt a library of SED templates from \citet{rieke09}, who construct a set of templates from a combination of local observations and radiative transfer arguments. These templates, seen in figure \ref{slib}, have associated intrinsic luminosities, due to their adaptation from real local galaxies, and range in far-infrared luminosity from $10^9 - 10^{13} L_{sun}$. A closer view of our specific region of interest, with the brightest and faintest SEDs at redshifts between $z\sim 0-5$, can be seen in figure \ref{mshift}.
 
-In order to assess the breadth of our models in relation to the spectral color space which will be used for fitting, we also made a diagnostic of the entire range of colors reproducible by the models for redshifts in the range $0<z<10$. This can be seen in Figure \ref{slib_color}. 
+These templates are mainly based on spectra obtained from a handful of local IRAS galaxies selected for having high star formation rates, which leads to a question of whether they remain valid models at high redshift. \citet{rieke09} discuss model validity up to redshifts around $z\sim2.5$, and conclude that their models can be considered fairly accurate for mid-infrared analyses, although they suggest that some boosting due to AGN should be added. It has also been suggested\footnote{by Professor Danilo Marchesini, Tufts University} that, due to the intrinsically larger nature of high-redshift galaxies, the intrinsic luminosities should also be evolved with redshift to a certain extent. As we will mention in the initial results (section \ref{example}), we do see a failure of models at high redshift to reproduce observation, which suggests that these models may need one of the suggested modifications. 
+
+The design of this program allows for consideration of model accuracy, and thus it might be best in future iterations to use a more robust library of models which has built in redshift evolution. We plan to re-adopt features for this program which allow for multiple models to be associated with the same intrinsic luminosity. There is a possibility that the user would specify in what proportion each model would be sampled in a given redshift regime, however it seems more likely that the program would add such considerations into its fitting efforts, and produce as output how successful various weightings are at reproducing observations. As noted in a previous version of this paper, and in \citet {wiklind03} (who employed modified blackbodies to constrain redshift far-infrared galaxies), the introduction of such considerations leads to a large amount of degeneracy, and for this iteration of the program our main concern was to implement the Monte Carlo fitting routine, thus we chose a simpler model template. Future versions will undoubtedly see a change, however as models are user specified, single luminosity models may be used and preferred depending on use cases.
 
 \subsection{Luminosity Function}
 
-As discussed earlier, adopting a luminosity is important to simulate the effects of noise on a sample, as well as determine detectability of sources at various bands by normalizing their SEDs at a specific band. For this version of the program we employ an IRAS-type luminosity function from \citet{negrelloIP}:
+By far the most important component of the program, the luminosity function determines the number and luminosity of generated sources for a given redshift, which we modify by altering the manner in which the luminosity function evolves with redshift. This approach replaces the previous approach of using the luminosity function only to assign luminosities, and randomly selecting models and redshift distributions; now, the luminosity function determines all of these factors for us. For this version of the program we employ an IRAS-type luminosity function from \citet{negrelloIP}:
 $$
 \frac{dN}{dV dlogL}(L|L^*_0,\Phi^*_0,\alpha,\beta,z) = \Phi^*(z)*\left[{\left(\frac{L}{L^*(z)}\right)}^{\alpha}+\left(\frac{L}{L^*(z)}\right)^{\beta}\right]^{-1}
 $$
@@ -67,6 +68,8 @@ $$
 L^*(z) = L^*_0(1+z)^q
 $$
 The default values for $\alpha$, $\beta$, $\Phi^*_0$, and $L^*_0$ for 350 $\mu$m were taken from \citet{negrelloIP}, and the default values for p and q were taken from \citet{Caputi07} for redshift evolution out to $z\approx2$. These values only serve as defaults, and can be altered via the interactive interface, as will be discussed below.
+
+[Number Density]
 
 \subsection{Cosmology}
 
@@ -78,13 +81,11 @@ d_L(z)=\frac{(1+z)c}{H_0}\int\limits_0^z\frac{dz'}{\sqrt{(1+z')^3\Omega_M+\Omega
 $$
 The default parameters are taken to be $H_0=73,\Omega_M=0.282,\Omega_\Lambda=0.728$, following the accepted default parameters in the IDL function {\sc{lumdist}}\footnote{http://idlastro.gsfc.nasa.gov/ftp/pro/astro/lumdist.pro} (so that the earlier IDL and C++ versions of the simulator are compatible, for testing purposes).
 
-\subsection{Redshift and Model Distributions}
+[Comoving volume]
 
-The randomized redshift and model numbers for each simulated source are produced in accordance with four different types of distributions: fixed, flat, Gaussian, and bimodal distributions, the last of which is implemented as the sum of two separate Gaussian distributions. The bimodal distribution is used only for redshift; for all other parameters, only the first three are applicable. 
+\subsection{Generating a Survey from SEDs and a Luminosity Function}
 
-For the redshift distribution, there are five free parameters, including mean and standard deviation for each Gaussian component as well as the ratio between their respective amplitudes. To implement the distribution with the chosen parameters, one Gaussian distribution is created with a fixed number of elements, while the other contains a number of elements equal to the fixed number times the variable ratio. The fixed amplitude is set to 1000 elements as a default, but can be modified via the interactive interface. The initial redshift range is set to $0<z<10$, to allow for the program to remain relevant for even the most distant surveys, however this too is modifiable by the interactive interface.
-
-In the current version of the fitting program, the model parameters are not fit to observation but are fixed for each round of fitting, and can be modified interactively by the user. The user can choose to fix a parameter at a certain value, or generate a distribution with custom parameters. The range can be specified as well, to control the width of a fixed distribution or tightly bind a Gaussian distribution to within a strict range. Future versions will allow the distributions to be fixed or fitted, as will be discussed later in Section \ref{fdirs}.
+[to be written]
 
 \subsection{Correcting for Survey Properties}
 
@@ -129,17 +130,9 @@ $$
 $$
 This approach ensures that for any given comparison, there exists a $\chi^2$ value, and gives more weight to areas of higher density, as they have lower comparable error to those bins with only a few sources.
 
-\subsection{Multidimensional Minimization}
-The fitting method used in the current version of the program is a simple minimizer, which attempts to find the parameters corresponding to the lowest chi-square statistic. This is normally achieved by employing the first and second derivatives of a given function to find local and global extrema, however due to the non-linear, somewhat discontinuous nature of the relationship between parameters and chi-square values, this is impossible for the program in its current state. Instead, an algorithm which employs small guesses in an attempt to move to a location of better fit (lower error) is employed, using a best guess as a starting point. 
+\subsection{Markov Chain Monte Carlo Minimization}
 
-Though this minimization works well in some cases, there are a few concerning caveats of this approach:
-\begin{enumerate}  \itemsep0pt \parskip0pt \parsep0pt
-\item There is no way to restrict the minimizer to a limited parameter space
-\item This approach can only find local minima and will exit when the first minimum is found, as it has no way of sampling the entire space during minimization
-\item Due in part to point two, the ability of the minimizer to find the best result is highly dependent on the initial guess for the parameter values
-\item The minimization technique requires random guesses to sample the space, and due to the fact that the space is highly irregular and may contain tens of minima, given starting parameters will often result in very different results.
-\end{enumerate}
-In order to reduce the effects of these issues, we find the best fit of ten minimization attempts. This will also allow us to estimate uncertainties for our parameter values in future versions of the program if we continue to use this method (which seems highly unlikely at the present). The minimization technique is one of the many features of this program which we intend to improve upon, as will be discussed in Section \ref{fdirs}.
+[to be written]
 
 \section{Implementation}
 
@@ -165,17 +158,10 @@ Numerical integration is performed while calculating luminosity distance, and is
 
 Interpolation is necessary for many aspects of the simulation and is used heavily by multiple classes. Both linear ({\sc{gsl\_interp\_linear}}) and cubic spline ({\sc{gsl\_interp\_cspline}}) interpolation methods are used in the program, and are described in more detail in Chapter 27 of \citet{GSL}. The library provides methods that store the values for interpolation as well as those which require them to be passed in for every evaluation. These were both used, the prior when many interpolations were to be done and memory to be conserved, the latter when speed was desired and only a few interpolations would be performed on any given data set. Similar consideration led to the choice between linear and cubic spline interpolation.
 
-\paragraph{Multidimensional Minimization}
-
-The current method for parameter fitting employs a multidimensional minimization function from the GSL library, described in Chapter 36 of \citet{GSL}. This function, like the other GSL functions, is highly parametrized, and allows for various algorithms to be employed. The default algorithm for minimization without the use of derivatives ({\sc gsl\_multimin\_fminimizer\_nmsimplex2}) is used in the current version of the program. The variable parameters are stored in a GSL vector container, while a reference to the simulator and the fixed parameters are passed to the minimizer via a custom structure. More algorithmic and structural details can be found in the above citation.
-
 \subsubsection{Classes and Other Methods}
 Each distinct part of the simulation is given its own class and dedicated methods, both in good practice and to further the modular, generalized nature of the program. The classes are arranged in a hierarchy to maximize efficiency and allow for proper object oriented programming convention. 
 
 The ``simulation'' class manages instances of ``distributions'' classes, which store and manipulate the model parameter and redshift distributions. The ``simulator'' class manages the ``simulation'' class, ``model library'' class, and the ``histogram'' and ``observation'' classes. It also communicates with the ``luminosity function" class. The simulator class returns $\chi^2$ values for the simulation obtained from the parameter values it is given. The top level ``main'' procedure manages the luminosity function and simulator classes, and performs the minimization of the model. It also calls the various functions responsible for saving output when a minimum is found. Specific implementation details for each class are discussed below.
-
-\paragraph{Distributions Class}
-The distributions class manages both the model parameter and redshift distributions, and provides an interface for specifying whether a fixed, flat, or Gaussian distribution is desired. In addition, any of these can also be added to the existing distribution, if it has already been initialized. This class makes heavy use of the random number generation methods described earlier in this section.
 
 \paragraph{Model Library Class}\label{class:models}
 The model library class reads the provided model templates from a FITS file and stores them in a one dimensional array, indexed in relation to its parameter values. The library compensates for the finite number of models by allowing for cubic spline interpolation between them for any band and redshift combination, provided that the model ids, bands, and redshifts are all within allowable ranges. The three model flux values used for interpolation are produced by finding three models that bracket the arbitrary model desired and extracting fluxes corresponding the band requested, red-shifted appropriately. Bands are extracted from individual models by spline interpolation as well, thus providing the illusion from outside the class that any arbitrary parameter/band combination is contained within. The finer the resolution provided in the model template fed to the program, however, the lower the errors due to interpolation will be. 
@@ -186,11 +172,8 @@ The luminosity distance calculator is a member function of the Luminosity Functi
 \paragraph{Luminosity Function Class}
 The Luminosity Function Class is responsible for providing the normalization factor for simulated SEDs. It first initializes luminosity functions evolved to each redshift in the allowable range in increments of $z=0.1$, and then instantiates a random number generator for each redshift, using the corresponding luminosity function as a probability distribution. The luminosity functions are set so that the lower luminosity range stops at the flux corresponding to the detection limit for the given redshift. When a flux density for a given redshift is requested, the function generates a random luminosity, and computes the k-corrected flux for that redshift.
 
-\paragraph{Observation Class}
+\paragraph{Observation Library Class}
 The observation class reads the matched fluxes and survey properties from a FITS file and instantiates "source" structures for each set of fluxes. These source structures compute the appropriate spectral colors and store them such that the observation class can return two color arrays to a higher function when requested.
-
-\paragraph{Simulation Class}
-This class contains the distribution classes and a reference to the model library class, and is responsible for extracting the models corresponding to the various parameter values and producing arrays of "source" structures representing a simulated survey. It returns arrays of colors in much the same way as the observation class, and is functionally equivalent in outside appearance to it. The simulation class also gets passed a reference to the luminosity function class, which allows it to normalize source SEDs and add observational noise during simulation. It checks that each source would be observed by a survey with the given properties and flags any source which should be excluded from later analysis on grounds of being undetectable (this only happens if multiple attempts to normalize the SED all result in undetectable sources).
 
 \paragraph{Histogram Library Class}
 The histogram library class creates the histograms for observed and simulated color arrays, and compares them, computing and returning the chi-square goodness of fit statistic. This class uses the observation arrays to calculate optimal bin size and histogram range, and then computes the model histogram based on these values. The class is designed such that the observation values only need to initialized once, regardless of the number of simulations performed, and each time the model is re-initialized, the comparison histogram and chi-square error are updated. This class also contains methods for saving the histograms to a FITS file.
@@ -198,7 +181,7 @@ The histogram library class creates the histograms for observed and simulated co
 \paragraph{Simulator Class}
 The simulator class essentially controls, instantiates, and manages all classes except for the luminosity class. It is responsible for taking the input from the minimizer and running the simulation, and then returning the chi-square statistic. It is also responsible for creating the save file and calling the various save functions for each member class when requested. The design of this class allows for the main program to consist only of a parameter fitting procedure, allowing for different fitting procedures to all rely on one class to produce fitting statistics.
 
-\paragraph{Main Program}
+\paragraph{Main Program (Monte Carlo Fitting Code)}
 
 The main program instantiates both the simulator and luminosity function classes, as well as the initial fitting parameters. It runs the minimization procedure and keeps track of the lowest chi-square error from all runs, telling the simulator to save whenever a minimum chi-square is achieved. It is also responsible for all console output and user interaction, where applicable. A sample of the output produced by the main program can be seen in Figure \ref{disp:fit}.
 
@@ -229,19 +212,33 @@ The program in its current state is only the beginning of a larger effort to pro
 
 The longterm goal for this project is to provide a tool to the astronomical community to use for many years to come. The progress made thus far is encouraging, however this is an ongoing project and one that was never intended to be completed in a few short months. We hope eventually for this work to become my senior thesis, and for the product of that thesis to be the first publicly released version of this program, however we also anticipate further work on this project beyond that point, as more complicated surveys are published and there is a need to add more detailed features to our analysis.
 
-\bibliographystyle{plainnat}
+\bibliographystyle{aa}
 \bibliography{writeup}
 
 \begin{figure*}
-  \includegraphics[width=\textwidth,trim=0.25in 0.25in 0.25in 0.25in,clip=true]{template.eps}
-  \caption{SED Library consisting of modified blackbodies, of the form $S_\nu(T,\beta)=B_\nu(T)\nu^\beta$, where $B_\nu(T)$ is the Planck function, $T$ is temperature in Kelvins, and $\nu$ is frequency.  The library has models for $\beta = 1.0,1.1,...,2.0$ and $T=10,20,...,100$}
+  \includegraphics[width=\textwidth,trim=0.25in 0.25in 0.25in 0.25in,clip=true]{models.eps}
+  \caption{SED Library consisting of LIRG and URLIRG templates [expand]}
   \label{slib}
 \end{figure*}
 
 \begin{figure*}
-  \includegraphics[width=\textwidth]{template_colors.eps}
-  \caption{The spectral color pairs produced by the entire library of models for $0<z<10$. It should be noted that the full space of coverage includes all points which lie between any two given points on the above plots, as the model space has effectively infinitely small resolution.}
+\includegraphics[width=\textwidth]{model_brightness.eps}
+\caption{models redshifted [expand]}
+\label{mshift}
+\end{figure*}
+
+\begin{figure*}
+  \includegraphics[width=\textwidth]{model_colors.eps}
+  \caption{The spectral color pairs produced by the entire library of models for $0<z<5$. [expand]}
   \label{slib_color}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=5.5in]{lumfunct.eps}
+\includegraphics[width=5.5in]{sim_lumfunct.eps}
+\caption{Luminosity function for 2 separate evolutionary models which match at z=0}
+\label{lf}
 \end{figure*}
 
 \begin{figure*}
@@ -251,20 +248,27 @@ The longterm goal for this project is to provide a tool to the astronomical comm
 \end{figure*}
 
 \begin{figure*}
-  \centering
-  \includegraphics{fitting2.png}
-  \caption{The output from a typical run of the C++ executable. For each run, the best fitting parameters and the goodness-of-fit statistic are output, and if they are at a minimum, the program saves the results to an output fits file. After all fitting passes, the program outputs the best fit parameters of all 10 passes.}
-  \label{disp:fit}
+\includegraphics[width=\textwidth]{model_color_hist.eps}
+\caption{An example of a very rough simulation}
+\label{simmed}
 \end{figure*}
 
+%\begin{figure*}
+%  \centering
+%  \includegraphics{fitting2.png}
+%  \caption{The output from a typical run of the C++ executable. For each run, the best fitting parameters and the goodness-of-fit statistic are output, and if they are at a minimum, the program saves the results to an output fits file. After all fitting passes, the program outputs the best fit parameters of all 10 passes.}
+%  \label{disp:fit}
+%\end{figure*}
+
 \begin{figure*}
-  \includegraphics[width=\textwidth]{initial.png}
+  \centering
+  \includegraphics[width=5 in]{initial.png}
   \caption{The IDL initial fitting window. At the top are the band parameters, below are the redshift and model parameters, and to the right are the luminosity function and cosmological parameters. The run simulation button creates fits files and runs the C++ executable, while the plot last run button reads the output.fits file in the current directory and produces the output seen in Figure \ref{disp:res}.}
   \label{disp:init}
 \end{figure*}
 
 \begin{figure*}
-  \includegraphics[width=\textwidth]{fitting.png}
+  \includegraphics[width=\textwidth]{goodfit2.png}
   \caption{The IDL results display. The top row of the display (left to right) shows the luminosities of the simulated sources, as well as the fitted redshift distribution and the model parameter distributions used. The second row shows differential source counts, however evolution effects have not been removed, as they will in future version. The final row shows the model, observed, and comparison histograms from the simulation.}
   \label{disp:res}
 \end{figure*}

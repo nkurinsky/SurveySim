@@ -119,7 +119,7 @@ void simulator::set_obs(string obsfile){
   diagnostic->init_obs(c1,c2,osize);
 }
 
-products simulator::simulate(double area, int nz, double dz, double zmin, int ns){
+products simulator::simulate(double area, int nz, double dz, int ns){
   sources.clear();
   products output(nz,ns);
 
@@ -160,7 +160,7 @@ products simulator::simulate(double area, int nz, double dz, double zmin, int ns
 
     //NOTE templates are given in W/Hz
     for (is=0;is<nz;is++){
-      zarray[is]=(is+1)*dz+zmin;
+      zarray[is]=(is+1)*dz;
       output.dndz[is]=0;
 
       tmpz=zarray[is]+dz/2.0;
