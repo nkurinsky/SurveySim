@@ -226,7 +226,7 @@ int main(int argc,char** argv){
     lf.set_p(ptemp);
     lf.set_q(qtemp);
     printf("Running...\n");
-    output=survey.simulate(area,nz,dz,ns);
+    output=survey.simulate(area,nz,dz,zmin,ns);
     trial=output.chisqr;
     printf("Model chi2: %lf\n",trial);
 
@@ -256,7 +256,7 @@ int main(int argc,char** argv){
   lf.set_p(bestp);
   lf.set_q(bestq);
   printf("Re-Running Best Fit...\n");
-  output=survey.simulate(area,nz,dz,ns);
+  output=survey.simulate(area,nz,dz,zmin,ns);
   printf("Model chi2: %lf\n",output.chisqr);
   survey.save(outfile);
   
