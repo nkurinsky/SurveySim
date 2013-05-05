@@ -431,11 +431,11 @@ pro read_output
      case resi of
         0:begin
            wres = resmod
-           loadct,1,/silent
+           loadct,3,/silent
         end
         1:begin
            wres = resobs
-           loadct,3,/silent
+           loadct,8,/silent
         end
      endcase
      
@@ -561,6 +561,9 @@ pro graphs
   L0 = fxpar(head,'L0')
   p = fxpar(head,'P')
   q = fxpar(head,'Q')
+
+  omega_m = 0.28
+  omega_l = 0.72
   
   dists = mrdfits('output.fits',3,head,/silent)
 
@@ -602,6 +605,7 @@ pro graphs
 
   widget_control,lumfunct,get_value=index
   wset,index
+  device,decomposed=0
   ;h = histogram(lum,nbins=50,locations=xh)
   ;plot,xh,h,psym=10,xstyle=1,yrange=[0.1,1000],ystyle=1,xtitle='Log(Luminosity (W/Hz))',ytitle='dN/(dL/dHz)',/ylog,title='Luminosity Function'
 
@@ -612,10 +616,10 @@ pro graphs
   dz = 0.5
 
   loadct,39,/silent
-  for z=dz,5.0,dz do begin
-     if z le 2.0 then begin
-        t1 = (10^phi0)*((1+z)^p)
-        t2 = (10^L0)*((1+z)^q)
+  for zi=dz,5.0,dz do begin
+     if zi le 2.0 then begin
+        t1 = (10^phi0)*((1+zi)^p)
+        t2 = (10^L0)*((1+zi)^q)
      endif else begin
         t1 = (10^phi0)*((3.0)^p)
         t2 = (10^L0)*((3.0)^q)
@@ -624,13 +628,13 @@ pro graphs
      r = 10^lums/t2
      nsrcs=t1/(r^alpha+r^beta)
 
-     ez = sqrt(omega_m*(1+z)^3+omega_l)
-     dvdz = 4062*lumdist(z)^2*(!pi/180)^2/((1+z)^2*ez)
+     ez = sqrt(omega_m*(1+zi)^3+omega_l)
+     dvdz = 4062*lumdist(zi)^2*(!pi/180)^2/((1+zi)^2*ez)
      vol = dvdz*dz
      nsrcs*=vol
 
      print,vol
-     oplot,lums,nsrcs,color=z*40+20
+     oplot,lums,nsrcs,color=zi*40+20
   endfor
 
   for i=0.0,5.0,0.1 do begin
@@ -640,6 +644,10 @@ pro graphs
   
   loadct,0,/silent
   oplot,[8,13],[1,1],linestyle=1
+
+  xyouts,9.0,10^(-2.2),'Redshift'
+  xyouts,9.0,10^(-2.6),'0'
+  xyouts,10.9,10^(-2.6),'5'
 
   widget_control,redshift,get_value=index
   wset,index
@@ -784,11 +792,11 @@ pro graphs
      case resi of
         0:begin
            wres = resmod
-           loadct,1,/silent
+           loadct,3,/silent
         end
         1:begin
            wres = resobs
-           loadct,3,/silent
+           loadct,8,/silent
         end
      endcase
      
