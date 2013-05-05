@@ -75,7 +75,7 @@ pro colors
 
   s = reform(res[*,14])
   for i=0.0,5.0 do begin
-     b_rest = wave*(1.0+i)
+     b_rest = wave/(1.0+i)
      oplot,b_rest,s,color=i*40+20
   endfor
 

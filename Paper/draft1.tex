@@ -1,0 +1,145 @@
+%\documentclass[12pt,preprint]{aastex}
+\documentclass{emulateapj}
+
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{amsmath}
+%\usepackage{lscape}
+%\usepackage{rotating}
+
+\def\gs{\mathrel{\raise0.35ex\hbox{$\scriptstyle >
+
+$}\kern-0.6em
+\lower0.40ex\hbox{{$\scriptstyle \sim$}}}}
+\def\ls{\mathrel{\raise0.35ex\hbox{$\scriptstyle <$}\kern-0.6em
+\lower0.40ex\hbox{{$\scriptstyle \sim$}}}}
+
+\newcommand{\um}{\,$\mu$m}
+
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand{\myemail}{sajina@ipac.caltech.edu}
+\newcommand{\iras}{{\sl IRAS}}
+\newcommand{\spitz}{{\sl Spitzer}}
+\newcommand{\zr}[2]{$z$\,$\sim$\,#1\,--\,#2}
+\newcommand{\lir}[1]{10$^{#1}$\,$\rm{L}_{\odot}$}
+\newcommand{\lsun}{\,$\rm{L}_{\odot}$}
+\newcommand{\msun}{\,$\rm{M}_{\odot}$}
+
+
+\slugcomment{DRAFT \today}
+
+\shorttitle{Galaxy evolution code }
+\shortauthors{Sajina et al.}
+
+\begin{document}
+
+\title{Galaxy evolution modeling with improved SED treatment}
+
+\author{Anna Sajina, Noah Kurinsky et al.} %Lin Yan, Kalliopi Dasyra, Michel Zamojski}
+
+\affil{Tufts University}
+
+\begin{abstract}
+
+blah, blah, blah....
+
+\end{abstract}
+
+\keywords{galaxies:infrared, AGN}
+
+\section{Introduction}
+
+The Spectral Energy Distribution (SED) is one of our principle tools to both analyze the energetics of a source, but also for practical matters such as $k$-corrections and deriving the bolometric power output from the observed fluxes.  It is also an essential ingredient in galaxy evolution models [ref.]. To allow for such studies many  SED template libraries have been produced based both on empirical or physically-inspired  approaches [ref eg. dale, lagache, rieke etc. in the infrared, charlot opt+infr].  These work well in the intermediate luminosity regime ($L_{\rm{IR}}$\,$\sim$\,$10^{10}$-$10^{11}$\lsun), but tend to be inadequate at the highest luminosities especially for sources, where AGN play a significant role. Historically, this has largely been due to the dearth of such sources nearby.  Templates for such are therefore often based on a small number of sources. An exception are Type~1 quasars, which are easier to select and observe even up to very high redshifts, and therefore their SEDs are  somewhat better understood \citep[e.g.][]{elvis94,richards06}. 
+
+Throughout this paper we adopt the standard flat Universe, $\Omega_{M}$\,=\,0.27, $\Omega_{\Lambda}$\,=\,0.73, and $H_0$\,=\,71\,km\,s$^{-1}$\,Mpc$^{-1}$ cosmology \citep{spergel03}.
+[CHANGE TO new planck numbers ]
+
+\section{Model}
+
+The basic approach is to use Monte Carlo to sample the distribution of SEDs for each (L,z) pair. The sources simulated through such random sampling are used to generate color-color plots that are then compared with observed ones. The best-fit model parameters (including luminosity function and SED evolution) correspond to the minimum $\chi^2$ achieved in comparing the observed and simulated color-color plots. The use of MCMC means that the posterior probability distributions for all parameters are also derived. 
+
+\subsection{Simulation setup}
+
+We adopt a double power law functional form for the total infrared luminosity function as given in Eq-n\,\ref{eq:lf}.
+
+\begin{equation}
+\label{eq:lf}
+\phi(L,z)=\phi^*(z)\frac{1}{(L/L^*(z))^\alpha+(L/L^*(z))^\beta}
+\end{equation}
+
+where $\phi^*(z)$\,=\,$10^{-2.22}(1+z)^p$, $L^*(z)$\,=\,$10^{10.76}(1.+z)^q$. The slopes are respectively $\alpha$\,=\,0.868 (on the faint end) and $\beta$\,=\,1.97 (on the bright end). The parameters are constrained at redshift zero to the local total infrared luminosity function based on AKARI data of SDSS galaxies \citep{goto11}. The LF evolution parameters $p$ and $q$ are free and are fitted by our code. The luminosity function is shown in Figure\,\ref{fig:lf}, where we adopt $p$\,=\,-6.7, and $q$\,=3.5.
+
+\begin{figure*}[h]
+\plotone{/Users/annie/students/noah_kurinsky/Fitting/plot_lf.eps}
+\caption{Total IR luminosity function for galaxies (solid curves) and quasars (dashed curves). In both cases we use the double power law parameterization, see Goto et al. 2011, Negrello 2012, Hopkins et al. 2007 (for the quasar LF).  \label{fig:lf}}
+\end{figure*}
+
+A redshift array is defined, such that $z_{min}$=0, and $z_{max}$=4, and $dz$=0.1. We adopt the $\log(L_{\nu})$ array from the SED template library, or 14 bins in total IR luminosity starting from 9.75 and up to 13.00 (bin size 0.25dex). The number of galaxies in each $(L,z)$ bin, $N_{gal}$, is given by Eq-n\,\ref{eq:ngal}:
+
+\begin{equation}
+\label{eq:ngal}
+N_{gal}(L_j,z_i)=\phi(L_j,z_i)d\log L\frac{dV}{dz_i}dz
+\end{equation}
+
+where $i$ and $j$ are the indices of the luminosity and redshift arrays. The comoving volume element is given by:
+
+\begin{equation}
+\frac{dV}{dz}=\frac{c}{H_o(1+z)^2}\frac{D_L^2}{\sqrt{\Omega_M(1+z)^3+\Omega_{\Lambda}}}d\Omega
+\end{equation}
+
+where the last $d\Omega$ stands for the solid angle of the survey in steradians.% [THIS SHOUDL BE SUPPLIED BY USER IN THE IDL WRAPPER]. To ensure adequate sampling, a scale factor is applied to all of these such that:
+
+%\begin{equation}
+%nsample[i][j]=ngal[i][j]*mcscale
+%\end{equation}
+ 
+ %and $mcscale$ is a constant multiplicative factor that allows for adequate sampling of each bin, while preserving the relative number of sources per bin. This scaling factor is kept throughout but is removed at the stage where quantities like $dN/dz$ or $dN/dS$ are displayed. 
+ 
+ \subsection{SED treatment}
+ 
+ The number of simulated galaxies per bin, $nsample$ are generated by adopting an SED template (given $L$ and $z$), using this to determine the desired flux and then applying a redshift which is a uniform random number within the redshift bin [$z_{bin}-dz/2$$<$\,$z_{src}$\,$<$\,$z_{bin}+dz/2$], as well as applying gaussian random noise to the derived flux densities. 
+  
+  The observed flux densities at a given frequency, $\nu_{obs}$ are derived from the rest-frame SED templates as in:
+%We assume that there is a distribution of SEDs that corresponds to each (L,z) pair rather than a single SED template as is usually adopted for simplicity. This means for example that some fraction of the sources will have quasar SEDs, corresponding to the ratio of the quasar to galaxy LF at the particular redshift. 
+
+
+
+\begin{eqnarray}
+S_{\nu_{obs}}=\frac{L_{\nu_{em}}}{4\pi D_L^2}\frac{d\nu_{em}}{d\nu_{obs}}, \\
+S_{\nu_{obs}}=\frac{L_{\nu_{em}}}{4\pi D_L^2}(1+z) \nonumber
+\end{eqnarray}
+
+We adopt the Rieke et al set of SED templates for dusty star-forming galaxies. These are given in units of W/Hz and divided into 14 bins in total IR luminosity starting from 9.75 and up to 13.00 (bin size is 0.25dex). These templates are based on observational data, and display the well known luminosity-temperature relation such that the most luminous galaxies tend to have warmer SEDs, and vice versa. To implement this into the above code, we save these templates in a fits file (sf\_tempates.fits), where we first resample them onto the same lambda array (with equal $dlog\lambda$ bins) as used in the code, as well as resample onto the same luminosity array as used in the code (for luminosities below the tabulated minima of $10.^{9.75}$ we adopt a constant template equal to the 9.75 template and vice versa for the luminosities greater than the tabulated $10^{13}$).  
+
+\subsection{Including color-evolution}
+
+Including color evolution is done simply by matching a higher redshift source of luminosity $L(z)$ not with a local source of the same luminosity, but with one where $L(z=0)$\,=L(z)/(1+z)^{\alpha}$. To begin with, lets set $\alpha$\,=0 and keep it fixed, but want to change that at some point. 
+
+\subsection{Including quasars}
+
+The quasar luminosity function and its evolution with redshift are taken from Hopkins, Richards, and Hernquist (2007). In this case, the redshift evolution does not have a simple formulation, but is rather given as a table of luminosity/density evolution parameters.  Therefore, we resample the quasar luminosity function onto our adopted redshift array and luminosity array and save the results in "qso\_lf.fits" where each bin holds the value of $N[Mpc^{-3}]$. The ratio of that number relative to $ngal$ above, gives the qso fraction. Therefore, we have the separation:
+
+\begin{equation}
+n_{sample}=n_{sf}(1-f_{qso})+n_{qso}*f_{qso}
+\end{equation} 
+
+From here, $nsf$ simulated sources are drawn from the SF galaxy SED temples, and $nqso$ simulated sources adopt the quasar SED from Richards et al. (2006). 
+
+\subsection{Simulated survey parameters}
+
+We already mentione that the area on the sky of the survey we are trying to simulate comes into this via the $dV/dz$ parameter (this is defined in functions.cpp). In addition, we currently determine the best-fit parameters on the basis of minimizing the chi2 between a simulated and observed color-color plot. Therefore, we need a "detection" in at least 3 bands. The limiting fluxes in each are passed on to the fitting code from the IDL wrapper. [NOTE, CURRENTLY THE CODE SEEMS TO ONLY KEEP SIMULATED SOURCES THAT MEET THIS CRITERION I..E DETECTION IN ALL 3 BANDS, HOWEVER THIS WILL HAVE TO CHANGE, SEE BELOW -- PERHAPS KEEP ALL SOURCES DETECTION IN SOME PRIMARY BAND (SAY 250 HERE) AND THEN KEEP THEIR ASSOCIATED F350, AND F500 VALUES SO THAT WHEN THE COLOR-COLOR HISTOGRAMS ARE GENERATED ONLY SOURCES DETECTED IN ALL 3 BANDS ARE INCLUDED]
+
+\subsection{Combining number counts with color-color plots}
+
+Ultimately, we would like to derive the best-fit set of model parameters based on multiple pieces of data where a single $\chi^2$ may not be feasible. We could try some intermediate step first, such as trying to fit the color-magnitude (or rather color-flux) 2d histogram first, in the same manner as the above color-color plot -- at least see if we converge on the same answer. This has the advantage that the x-axis would now be the number counts effectively. But ultimately, do need to combine multiple pieces of data. 
+
+Possible ways to do so:\\
+
+-- iteratively fit each separate piece of data (survey/wavelength regime etc) and use the results of that mcmc as priors for the next. 
+
+See for example the series of papers by DAS Fraser (university of toronto) on combining likelihood functions from different sources. 
+
+\bibliographystyle{apj}
+\bibliography{seds.bib}
+
+\end{document}
