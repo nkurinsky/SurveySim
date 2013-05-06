@@ -31,7 +31,6 @@ class sed_lib{
   double get_flux(double lum,double band);
   int get_lnum(){
     return lnum;}
-  double get_dl();
   void get_lums(double luminosities[]);
   int get_snum(){
     return seds.size();}
