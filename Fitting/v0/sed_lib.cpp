@@ -117,12 +117,14 @@ double sed_lib::get_flux(double lum,double band){
 
 double sed_lib::get_dl(){
   static double res;
-  if ((lums ne NULL) and (lnum ge 2)){
+  if ((lums != NULL) and (lnum >= 2)){
     res = lums[1]-lums[0];
-    return (res ge 0) ? res : -1*res;
-  else
-    printf("%s\n%s\n","Error: DL requested but luminosities not intialized","Check that sed library valid")
+    return (res >= 0) ? res : -1*res;
+  }
+  else{
+    printf("%s\n%s\n","Error: DL requested but luminosities not intialized","Check that sed library valid");
     return 1;
+  }
 }
 
 void sed_lib::get_lums(double luminosities[]){
