@@ -1,4 +1,4 @@
-\begin{thebibliography}{14}
+\begin{thebibliography}{16}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{{Caputi} {et~al.}(2007){Caputi}, {Lagache}, {Yan}, {Dole},
@@ -49,6 +49,17 @@ Gordon, C., Irby, B., Dorman, B., Cansal, S., \& Kunz, P. 2011, CCFITS
   {Weilert}, {Wesson}, {White}, {Whitehouse}, {Wilson}, {Winter}, {Woodcraft},
   {Wright}, {Xu}, {Zavagno}, {Zemcov}, {Zhang}, \& {Zonca}}]{SPIRE}
 {Griffin}, M.~J., {Abergel}, A., {Abreu}, A., {et~al.} 2010, AAP, 518, L3
+
+\bibitem[{{Hogg} {et~al.}(2002){Hogg}, {Baldry}, {Blanton}, \&
+  {Eisenstein}}]{Hogg02}
+{Hogg}, D.~W., {Baldry}, I.~K., {Blanton}, M.~R., \& {Eisenstein}, D.~J. 2002,
+  ArXiv Astrophysics e-prints
+
+\bibitem[{{Komatsu} {et~al.}(2011){Komatsu}, {Smith}, {Dunkley}, {Bennett},
+  {Gold}, {Hinshaw}, {Jarosik}, {Larson}, {Nolta}, {Page}, {Spergel},
+  {Halpern}, {Hill}, {Kogut}, {Limon}, {Meyer}, {Odegard}, {Tucker}, {Weiland},
+  {Wollack}, \& {Wright}}]{Komatsu11}
+{Komatsu}, E., {Smith}, K.~M., {Dunkley}, J., {et~al.} 2011, APJS, 192, 18
 
 \bibitem[{{Marsden} {et~al.}(2011){Marsden}, {Chapin}, {Halpern}, {Patanchon},
   {Scott}, {Truch}, {Valiante}, {Viero}, \& {Wiebe}}]{marsden11}

@@ -71,15 +71,34 @@ The default values for $\alpha$, $\beta$, $\Phi^*_0$, and $L^*_0$ for 350 $\mu$m
 
 \subsection{Cosmology}
 
-In order to convert luminosity and redshift into a flux, as well as determine the detectability of a source given the magnitude limit of a sample, the program needed to be able to compute luminosity distance, and thus needed to be able to adopt some sort of cosmology. We decided to assume a flat universe ($\Omega_k=0$), however all other cosmological parameters are left free, so that future users can adjust them as more accurate measurements are made. Our one assumption allows for the code to be faster and more efficient, and as it is commonly believed that our universe has no curvature, it should not affect the long-term value of this program.
+As we are simulating galactic populations spanning a large chunk of the observable universe, correct calculation of distance and volume as a function of redshift, as well as correct compensation for redshift effects, is vital to the accuracy of our effort. Specifically, we need to calculate luminosity distance, co-moving volume, and correctly apply K-corrections when calculating observed flux values. I describe the formulae we apply in this section, and discuss various approximations and special considerations. We adopt the cosmology from WMAP ($\Omega_{\Lambda}=0.728, \Omega_{M}=0.272, \Omega_k=0, H_0=70.4$) for our default values \citep{Komatsu11}.
+
+\subsubsection{Luminosity Distance}
+In order to convert luminosity and redshift into a flux, as well as determine the detectability of a source given the magnitude limit of a sample, the program needs to be able to compute luminosity distance. We decided to assume a flat universe (as evidenced above by $\Omega_k=0$), however all other cosmological parameters are left free, so that future users can adjust them as more accurate measurements are made. Our one assumption allows for the code to be faster and more efficient, and as it is commonly believed that our universe has no curvature, it should not affect the long-term value of this program.
 
 Luminosity distance is computed by the standard formula:
 $$
 d_L(z)=\frac{(1+z)c}{H_0}\int\limits_0^z\frac{dz'}{\sqrt{(1+z')^3\Omega_M+\Omega_\Lambda}}
 $$
-The default parameters are taken to be $H_0=73,\Omega_M=0.282,\Omega_\Lambda=0.728$, following the accepted default parameters in the IDL function {\sc{lumdist}}\footnote{http://idlastro.gsfc.nasa.gov/ftp/pro/astro/lumdist.pro} (so that the earlier IDL and C++ versions of the simulator are compatible, for testing purposes).
+We compute this using numerical integration in redshift steps of $z=0.001$ to maximize precision while allowing for real-time luminosity distance calculations. Future program versions will most likely see an interpolation based calculator, in order to increase performance, as every simulated flux currently requires a 1000 cycle integration operation.
 
-[Comoving volume]
+\subsubsection{Comoving Volume}
+In order to convert the luminosity function into a source number, we also need to compute the comoving volume for a given redshift bin. For the case of a flat universe, the co-moving volume per solid angle between $z_{min}$ and $z_{max}$ is:
+$$
+\frac{dV_C}{d\Omega}=\int_{z_{min}}^{z_{max}}\left(\frac{dV_c}{dz d\Omega}\right)dz\approx \left(\frac{dV_c}{dz d\Omega}\right)\Delta z
+$$
+for small $\Delta z$, where
+$$
+\frac{dV_c}{dzd\Omega}=\frac{c\,\left[d_L(z)\right]^2}{H_0 (1+z)^2 \sqrt{\Omega_M(1+z)^3+\Omega_{\Lambda}}}
+$$
+Here, all parameters are as defined for the luminosity distance calculation. Multiplication of $dV_C/d\Omega$ by the solid angle gives the total co-moving volume between the redshift bounds.
+\subsubsection{K Corrections}
+
+Due to observation in a fixed bandpass, and a red-shifting of the emission from the galaxy into the bandpass ($\nu_e=[1+z]\nu_o$), we need to correct for the varying size of the bandpass by multiplying the expected flux by an additional factor of (1+z):
+$$
+f_{\nu}(\nu_o)=\frac{(1+z)}{4\pi d_L^2}L_{\nu}(\nu_e)
+$$
+See \citet{Hogg02} for a more involved derivation and discussion.
 
 \subsection{Generating a Survey from SEDs and a Luminosity Function}\label{generate}
 

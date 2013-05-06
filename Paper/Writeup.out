@@ -3,16 +3,19 @@
 \BOOKMARK [2][-]{subsection.2.1}{SED Library}{section.2}% 3
 \BOOKMARK [2][-]{subsection.2.2}{Luminosity Function}{section.2}% 4
 \BOOKMARK [2][-]{subsection.2.3}{Cosmology}{section.2}% 5
-\BOOKMARK [2][-]{subsection.2.4}{Generating a Survey from SEDs and a Luminosity Function}{section.2}% 6
-\BOOKMARK [2][-]{subsection.2.5}{Correcting for Survey Properties}{section.2}% 7
-\BOOKMARK [1][-]{section.3}{Fitting Methodology}{}% 8
-\BOOKMARK [2][-]{subsection.3.1}{Two-Dimensional Spectral Color Histogram}{section.3}% 9
-\BOOKMARK [2][-]{subsection.3.2}{Chi-Square Testing}{section.3}% 10
-\BOOKMARK [2][-]{subsection.3.3}{Markov Chain Monte Carlo Minimization}{section.3}% 11
-\BOOKMARK [1][-]{section.4}{Implementation}{}% 12
-\BOOKMARK [2][-]{subsection.4.1}{C++ Executable}{section.4}% 13
-\BOOKMARK [3][-]{subsubsection.4.1.1}{Classes and Other Methods}{subsection.4.1}% 14
-\BOOKMARK [3][-]{subsubsection.4.1.2}{Optimization and Efficiency Considerations}{subsection.4.1}% 15
-\BOOKMARK [2][-]{subsection.4.2}{IDL Interactive Widget and Plotting}{section.4}% 16
-\BOOKMARK [1][-]{section.5}{Testing and Initial Results}{}% 17
-\BOOKMARK [1][-]{section.6}{Future Directions}{}% 18
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Luminosity Distance}{subsection.2.3}% 6
+\BOOKMARK [3][-]{subsubsection.2.3.2}{Comoving Volume}{subsection.2.3}% 7
+\BOOKMARK [3][-]{subsubsection.2.3.3}{K Corrections}{subsection.2.3}% 8
+\BOOKMARK [2][-]{subsection.2.4}{Generating a Survey from SEDs and a Luminosity Function}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.5}{Correcting for Survey Properties}{section.2}% 10
+\BOOKMARK [1][-]{section.3}{Fitting Methodology}{}% 11
+\BOOKMARK [2][-]{subsection.3.1}{Two-Dimensional Spectral Color Histogram}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.2}{Chi-Square Testing}{section.3}% 13
+\BOOKMARK [2][-]{subsection.3.3}{Markov Chain Monte Carlo Minimization}{section.3}% 14
+\BOOKMARK [1][-]{section.4}{Implementation}{}% 15
+\BOOKMARK [2][-]{subsection.4.1}{C++ Executable}{section.4}% 16
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Classes and Other Methods}{subsection.4.1}% 17
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Optimization and Efficiency Considerations}{subsection.4.1}% 18
+\BOOKMARK [2][-]{subsection.4.2}{IDL Interactive Widget and Plotting}{section.4}% 19
+\BOOKMARK [1][-]{section.5}{Testing and Initial Results}{}% 20
+\BOOKMARK [1][-]{section.6}{Future Directions}{}% 21
