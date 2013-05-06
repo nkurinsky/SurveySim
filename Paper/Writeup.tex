@@ -58,7 +58,7 @@ The design of this program allows for consideration of model accuracy, and thus 
 
 \subsection{Luminosity Function}
 
-By far the most important component of the program, the luminosity function determines the number and luminosity of generated sources for a given redshift, which we modify by altering the manner in which the luminosity function evolves with redshift. This approach replaces the previous approach of using the luminosity function only to assign luminosities, and randomly selecting models and redshift distributions; now, the luminosity function determines all of these factors for us. For this version of the program we employ an IRAS-type luminosity function from \citet{negrelloIP}:
+By far the most important component of the program, the luminosity function determines the number and luminosity of generated sources for a given redshift, which we modify by altering the manner in which the luminosity function evolves with redshift. This approach replaces the previous approach of using the luminosity function only to assign luminosities, and randomly selecting models and redshift distributions; now, the luminosity function determines all of these factors for us. For this version of the program we employ an IRAS-type double power-law luminosity function from \citet{negrelloIP}:
 $$
 \frac{dN}{dV dlogL}(L|L^*_0,\Phi^*_0,\alpha,\beta,z) = \Phi^*(z)*\left[{\left(\frac{L}{L^*(z)}\right)}^{\alpha}+\left(\frac{L}{L^*(z)}\right)^{\beta}\right]^{-1}
 $$
@@ -67,9 +67,7 @@ $$
 \Phi^*(z) = \Phi^*_0(1+z)^p \quad
 L^*(z) = L^*_0(1+z)^q
 $$
-The default values for $\alpha$, $\beta$, $\Phi^*_0$, and $L^*_0$ for 350 $\mu$m were taken from \citet{negrelloIP}, and the default values for p and q were taken from \citet{Caputi07} for redshift evolution out to $z\approx2$. These values only serve as defaults, and can be altered via the interactive interface, as will be discussed below.
-
-[Number Density]
+The default values for $\alpha$, $\beta$, $\Phi^*_0$, and $L^*_0$ for 350 $\mu$m were taken from \citet{negrelloIP}, and for this iteration are considered fixed values, as the luminosity function is well constrained at low redshift. The default values for p and q were taken from \citet{Caputi07} for redshift evolution out to $z\approx2$; the values we choose are those consistent with the low-redshift evolution from that paper. These values only serve as defaults, and can be altered via the interactive interface, as will be discussed below. For the current form of the program, we assume no evolution after redshift of $\sim2$, as is generally accepted due to analyses such as that presented in \citet{marsden11}. I will discuss how this translates to simulated source numbers in section \ref{generate}.
 
 \subsection{Cosmology}
 
@@ -83,7 +81,7 @@ The default parameters are taken to be $H_0=73,\Omega_M=0.282,\Omega_\Lambda=0.7
 
 [Comoving volume]
 
-\subsection{Generating a Survey from SEDs and a Luminosity Function}
+\subsection{Generating a Survey from SEDs and a Luminosity Function}\label{generate}
 
 [to be written]
 
@@ -268,7 +266,7 @@ The longterm goal for this project is to provide a tool to the astronomical comm
 \end{figure*}
 
 \begin{figure*}
-  \includegraphics[width=\textwidth]{goodfit2.png}
+  \includegraphics[width=\textwidth]{bestfit.png}
   \caption{The IDL results display. The top row of the display (left to right) shows the luminosities of the simulated sources, as well as the fitted redshift distribution and the model parameter distributions used. The second row shows differential source counts, however evolution effects have not been removed, as they will in future version. The final row shows the model, observed, and comparison histograms from the simulation.}
   \label{disp:res}
 \end{figure*}
