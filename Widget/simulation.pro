@@ -421,8 +421,8 @@ pro read_output
   neg = where(comp lt 0)
   resmod = comp
   resobs = abs(comp)
-  resmod[neg] = 0
-  resobs[pos] = 0
+  if(neg[0] gt -1) then resmod[neg] = 0
+  if(pos[0] gt -1) then resobs[pos] = 0
 
   plot,[hist_min,hist_max],[hist_min,hist_max],/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}')
   hb = 0.5
