@@ -102,7 +102,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
      ldata=[ldat0,ldat1,ldat2,ldat3,ldat4]
      ;the fixed values: =1 if held fixed, =0 if variable
 
-     sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1e9}
+     sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1.e2}
   endelse
 
   bname = ["Band 1","Band 2","Band 3"]

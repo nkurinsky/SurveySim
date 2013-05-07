@@ -6,7 +6,7 @@ printf "\nSurvey Simulator Compilation Code (For Asajina)\n"
 printf "Last Updated 4/9/13 by Noah Kurinsky\n\n"
 
 printf "Building Simulator.cpp..."
-g++ -g -c simulator.cpp -Wall -Werror
+g++ -g -c simulator.cpp -Wall -Werror -Wextra
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -15,7 +15,7 @@ else
 fi
 
 printf "Building Lumfunct.cpp..." 
-g++ -g -c lumfunct.cpp -Wall -Werror
+g++ -g -c lumfunct.cpp -Wall -Werror -Wextra
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -24,7 +24,7 @@ else
 fi
 
 printf "Building Functions.cpp..." 
-g++ -g -c functions.cpp -Wall -Werror
+g++ -g -c functions.cpp -Wall -Werror -Wextra
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -33,7 +33,7 @@ else
 fi
 
 printf "Building hist_lib.cpp..." 
-g++ -g -c hist_lib.cpp -Wall -Werror
+g++ -g -c hist_lib.cpp -Wall -Werror -Wextra
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -42,7 +42,7 @@ else
 fi
 
 printf "Building sed_lib.cpp..." 
-g++ -g -c sed_lib.cpp -Wall -Werror
+g++ -g -c sed_lib.cpp -Wall -Werror -Wextra
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -51,7 +51,7 @@ else
 fi
 
 printf "Building obs_lib.cpp..."
-g++ -g -c obs_lib.cpp -Wall -Werror
+g++ -g -c obs_lib.cpp -Wall -Werror -Wextra
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
@@ -60,7 +60,7 @@ else
 fi
 
 printf "\nBuilding Main..."
-g++ -g -lgsl -/scisoft/CCfits/include/CCfits -/scisoft/cfitsio/lcfitsio -lccfits fit_mcmc.cpp simulator.o lumfunct.o hist_lib.o sed_lib.o obs_lib.o functions.o -o fitter -Wall -Werror -fexceptions -lgslcblas -O3
+g++ -g -lgsl -/scisoft/CCfits/include/CCfits -/scisoft/cfitsio/lcfitsio -lccfits fit_mcmc.cpp simulator.o lumfunct.o hist_lib.o sed_lib.o obs_lib.o functions.o -o fitter -Wall -Werror -Wextra -fexceptions -lgslcblas -O3
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else
