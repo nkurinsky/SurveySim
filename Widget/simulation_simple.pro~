@@ -632,7 +632,7 @@ pro graphs
      ez = sqrt(omega_m*(1+zi)^3+omega_l)
      dvdz = 4062*lumdist(zi)^2*(!pi/180)^2/((1+zi)^2*ez)
      vol = dvdz*dz
-     ;nsrcs*=vol
+     nsrcs*=vol
 
      print,vol
      oplot,lums,nsrcs,color=zi*40+20

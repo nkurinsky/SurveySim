@@ -6,7 +6,7 @@
 ;
 ;==================================================================
 
-pro simulation
+pro simulation_simple
 
   COMMON simulation_com,cdir,info,obsname,ot,t1,t2,ldata,ldat0,sdat,settings,bands
 
@@ -88,11 +88,11 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   if(file_test('params.save')) then begin
      restore,'params.save'
   endif else begin
-     band1 = {wave:250.d0,fmin:25.0,ferr:6.2}
+     band1 = {wave:250.d0,fmin:15.0,ferr:6.2}
      band2 = {wave:350.d0,fmin:20.0,ferr:5.8}
-     band3 = {wave:500.d0,fmin:15.0,ferr:6.2}
+     band3 = {wave:500.d0,fmin:25.0,ferr:6.2}
      bands = [band1,band2,band3]
-
+     print,bands
      ;luminosity function parameter initialization
      ldat0={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:6.7,q:3.5}
      ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0}
@@ -465,7 +465,7 @@ pro read_output
   
   device,filename='sim_lumfunct.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
-  plot,[8,13],[1e-5,1e5],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega)'),ystyle=1
+  plot,[8,13],[1e-5,1e5],/ylog,/nodata,xtitle=TeXtoIDL('log(L_{IR}) [L_{sun}]'),ytitle=TeXtoIDL('log_{10}(N(L_{fir})/\Omega)'),ystyle=1
   lums = indgen(21)/4.0+8.0
   print,lums
 
@@ -524,29 +524,29 @@ pro graphs
   size_screen = size_screen*0.8
   gmain = widget_base(title='Simulation Output',/column,xsize=size_screen[0],ysize=size_screen_alt[1])
   r1 = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
-  r2 = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
+  ;r2 = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
   r2b = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
-  r3 = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
+  ;r3 = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
 
   widget_control,gmain,set_uvalue=mnum
-  xdim = fix(size_screen[0]/3.0)
-  ydim = fix(size_screen[1]/3.0)
+  xdim = fix(size_screen[0]/2.0)
+  ydim = fix(size_screen[1]/2.0)
 
   loadct,0,/silent
 
   lumfunct = widget_draw(r1,xsize=xdim,ysize=ydim)
   redshift = widget_draw(r1,xsize=xdim,ysize=ydim)
-  models = widget_draw(r1,xsize=xdim,ysize=ydim)
-  dcount1 = widget_draw(r2,xsize=xdim,ysize=ydim)
-  dcount2 = widget_draw(r2,xsize=xdim,ysize=ydim)
-  dcount3 = widget_draw(r2,xsize=xdim,ysize=ydim)
+  ;models = widget_draw(r1,xsize=xdim,ysize=ydim)
+  ;dcount1 = widget_draw(r2,xsize=xdim,ysize=ydim)
+  ;dcount2 = widget_draw(r2,xsize=xdim,ysize=ydim)
+  ;dcount3 = widget_draw(r2,xsize=xdim,ysize=ydim)
   sim_colors = widget_draw(r2b,xsize=xdim,ysize=ydim)
   obs_colors = widget_draw(r2b,xsize=xdim,ysize=ydim)
-  comp_colors = widget_draw(r2b,xsize=xdim,ysize=ydim)
+  ;comp_colors = widget_draw(r2b,xsize=xdim,ysize=ydim)
   
-  refresh = widget_button(r3,uvalue='refresh',value='Refresh')
-  close = widget_button(r3,uvalue='close',value='Close')
-  quit = widget_button(r3,uvalue='quit',value='Quit')
+  ;refresh = widget_button(r3,uvalue='refresh',value='Refresh')
+  ;close = widget_button(r3,uvalue='close',value='Close')
+  ;quit = widget_button(r3,uvalue='quit',value='Quit')
   
   widget_control,gmain,/realize
   xmanager,'graphs',gmain,/no_block
@@ -610,9 +610,9 @@ pro graphs
   ;h = histogram(lum,nbins=50,locations=xh)
   ;plot,xh,h,psym=10,xstyle=1,yrange=[0.1,1000],ystyle=1,xtitle='Log(Luminosity (W/Hz))',ytitle='dN/(dL/dHz)',/ylog,title='Luminosity Function'
 
-  plot,[8,13],[1e-5,1e5],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega)'),ystyle=1
+  plot,[8,13],[1e-5,1e5],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{IR}) [L')+sunsymbol()+TeXtoIDL(']'),ytitle=textoidl('log_{10}(\phi) [Mpc^-3dex^-1]'),ystyle=1,charsize=1.5,yrange=[1.d-6,1.]
   lums = indgen(21)/4.0+8.0
-  print,lums
+  ;print,lums
 
   dz = 0.5
 
@@ -634,34 +634,34 @@ pro graphs
      vol = dvdz*dz
      ;nsrcs*=vol
 
-     print,vol
-     oplot,lums,nsrcs,color=zi*40+20
+;     print,vol
+     oplot,lums,nsrcs,color=zi*40+20,thick=2
   endfor
 
   for i=0.0,5.0,0.1 do begin
      ind = (9+2*i/5)
-     oplot,[ind,ind+0.02,ind,ind+0.02,ind,ind+0.02],[10^(-3),10^(-3),10^(-2.9),10^(-2.9),10^(-2.8),10^(-2.8)],psym=2,color=i*40+20,symsize=0.75
+     oplot,[ind,ind+0.02,ind,ind+0.02,ind,ind+0.02],[10^(-4),10^(-4),10^(-3.9),10^(-3.9),10^(-3.8),10^(-3.8)],psym=2,color=i*40+20,symsize=0.75
   endfor
   
   loadct,0,/silent
-  oplot,[8,13],[1,1],linestyle=1
+  ;oplot,[8,13],[1,1],linestyle=1
 
-  xyouts,9.0,10^(-2.2),'Redshift'
-  xyouts,9.0,10^(-2.6),'0'
-  xyouts,10.9,10^(-2.6),'5'
+  xyouts,9.9,10^(-3.2),'z'
+  xyouts,9.0,10^(-3.6),'0'
+  xyouts,10.9,10^(-3.6),'5'
 
   widget_control,redshift,get_value=index
   wset,index
   h = histogram(z,binsize=0.1,locations=xh,min=0.2,max=5.0)
-  plot,xh,h,psym=10,xrange=[0,5],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
+  plot,xh,h,psym=10,xrange=[0,5],xstyle=1,xtitle='z',ytitle='N(z)',charsize=1.5 ;title='Redshift Distribution'
 
-  widget_control,models,get_value=index
-  wset,index
+ ; widget_control,models,get_value=index
+  ;wset,index
 
-  h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
-  pts = where (h le 0)
-  h[pts] = 0.01
-  plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],xstyle=1,ystyle=1
+  ;h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
+  ;pts = where (h le 0)
+  ;h[pts] = 0.01
+  ;plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],xstyle=1,ystyle=1
 
   ;; help,hists
   ;; for i=6,pnum_out-1 do begin
@@ -672,45 +672,45 @@ pro graphs
   ;;    endelse
   ;; endfor
 
-  widget_control,dcount1,get_value=index
-  wset,index
+  ;widget_control,dcount1,get_value=index
+  ;wset,index
   
   ;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
-  if( file_test('counts_clements10.dat')) then begin
-     readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err
-     flux=flux/1.d3
-     plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=[5.d2,1.d5],ystyle=1
-     oploterr,flux,diff_counts,diff_err
-  endif else begin
-     print,'Error: File "counts_clements10.dat" not found'
-     plot,[100,500],[5.d2,1.d5],/nodata,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',ystyle=1
-  endelse
+  ;if( file_test('counts_clements10.dat')) then begin
+  ;   readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err
+  ;   flux=flux/1.d3
+  ;   plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=[5.d2,1.d5],ystyle=1
+  ;   oploterr,flux,diff_counts,diff_err
+  ;endif else begin
+  ;   print,'Error: File "counts_clements10.dat" not found'
+  ;   plot,[100,500],[5.d2,1.d5],/nodata,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',ystyle=1
+  ;endelse
 
-  h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
+  ;h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
   ;I think the area covered here is not
   ;quite right needs to be sorted out better, but for now just scale up
-  h=h*2.d3
+  ;h=h*2.d3
   ;dlogS=dS/S
-  df1=(shift(xh,-1)-xh)*10.^(xh)
-  dcounts=(h/df1)*f1^(2.5)
-  xh=10.^(xh)
-  oplot,xh,dcounts,psym=10
+  ;df1=(shift(xh,-1)-xh)*10.^(xh)
+  ;dcounts=(h/df1)*f1^(2.5)
+  ;xh=10.^(xh)
+  ;oplot,xh,dcounts,psym=10
 
-  widget_control,dcount2,get_value=index
-  wset,index
+  ;widget_control,dcount2,get_value=index
+  ;wset,index
 
-  h = histogram(alog10(f2/1e3),nbins=50,locations=xh,min=-3,max=0)
-  pts = where(h le 0)
-  h[pts] = 0.01
-  plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='F_{350}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
+  ;h = histogram(alog10(f2/1e3),nbins=50,locations=xh,min=-3,max=0)
+  ;pts = where(h le 0)
+  ;h[pts] = 0.01
+  ;plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='F_{350}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
 
-  widget_control,dcount3,get_value=index
-  wset,index
+  ;widget_control,dcount3,get_value=index
+  ;wset,index
 
-  h = histogram(alog10(f3/1e3),nbins=50,locations=xh,min=-3,max=0)
-  pts = where(h le 0)
-  h[pts] = 0.01
-  plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='F_{500}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
+  ;h = histogram(alog10(f3/1e3),nbins=50,locations=xh,min=-3,max=0)
+  ;pts = where(h le 0)
+  ;h[pts] = 0.01
+  ;plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='F_{500}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
 
   comp = mrdfits(info.oname,0,head,/silent)
   model = mrdfits(info.oname,1,/silent)
@@ -730,7 +730,7 @@ pro graphs
   widget_control,sim_colors,get_value=index
   wset,index
   
-  plot,[hist_min,hist_max],[hist_min,hist_max],/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Model Color Distribution'
+  plot,[hist_min,hist_max],[hist_min,hist_max],/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Model',charsize=1.5
   hb = 0.5
 
   color = 256*model/(max(model)*1.2)+30
@@ -746,15 +746,15 @@ pro graphs
            polyfill,xfill,yfill,color=color(i,j)
         endif
 
-        if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
+        ;if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
      endfor
-     oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
+     ;oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
   endfor
 
   widget_control,obs_colors,get_value=index
   wset,index
   
-  plot,[hist_min,hist_max],[hist_min,hist_max],/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Observed Color Distribution'
+  plot,[hist_min,hist_max],[hist_min,hist_max],/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Observed',charsize=1.5
   hb = 0.5
 
   color = 256*obs/(max(obs)*1.2)+30
@@ -770,9 +770,9 @@ pro graphs
            polyfill,xfill,yfill,color=color(i,j)
         endif
 
-        if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
+        ;if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
      endfor
-     oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
+     ;oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
   endfor
 
   widget_control,comp_colors,get_value=index
@@ -785,7 +785,7 @@ pro graphs
   resmod[neg] = 0
   resobs[pos] = 0
 
-  plot,[hist_min,hist_max],[hist_min,hist_max],/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Color Distribution Comparison'
+  plot,[hist_min,hist_max],[hist_min,hist_max],/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Color Distribution Compared'
   hb = 0.5
 
   for resi=0,1 do begin
