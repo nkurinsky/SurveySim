@@ -265,13 +265,13 @@ The longterm goal for this project is to provide a tool to the astronomical comm
 
 \begin{figure*}
   \includegraphics[width=\textwidth,trim=0.25in 0.25in 0.25in 0.25in,clip=true]{models.eps}
-  \caption{SED Library consisting of LIRG and URLIRG templates [expand]}
+  \caption{SED Library consisting of LIRG and URLIRG templates ranging in far-infrared luminosity from $10^9$ to $10^13$ $L_{sun}$, taken from \citet{rieke09}. These templates are based on a mix of data from local galaxies and models of galaxies as modified blackbodies in the far-infrared regime, mixed with radio-loud tails seen on the far right of the models in the above plot. The transition between LIRG and ULIRG can be seen where the models seem to group through the FIR region. Currently, these models are used with their associated luminosities over the entire redshift range, however with color evolution we would see intrinsic luminosities increase with redshift without a corresponding temperature rise (these models will rise along the Luminosity axis with redshift).}
   \label{slib}
 \end{figure*}
 
 \begin{figure*}
 \includegraphics[width=\textwidth]{model_brightness.eps}
-\caption{models redshifted [expand]}
+\caption{A visual of how the intensity and slope of the SED varies as a function of redshift. Here we see the brightest and faintest SED models from the \citet{rieke09} template library, redshifted between $z=0$ and $z=5$ in steps of $z=1$. We can see that intrinsic luminosity increases from low redshift, and slope rises from negative to positive with redshift. This helps to explain the overall trend we see when projecting the models into our color-color space.}
 \label{mshift}
 \end{figure*}
 
@@ -283,30 +283,22 @@ The longterm goal for this project is to provide a tool to the astronomical comm
 
 \begin{figure*}
 \centering
-\includegraphics[width=5.5in]{lumfunct.eps}
-\includegraphics[width=5.5in]{sim_lumfunct.eps}
+\includegraphics[width=\textwidth]{sim_lumfunct.eps}
 \caption{Luminosity function for 2 separate evolutionary models which match at z=0}
 \label{lf}
 \end{figure*}
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{obs_color_hist.eps}
-  \caption{An example of 2-D Color Histogram, created with the HerMES survey data}
+  \caption{An example of 2-D Color Histogram, created with the HerMES survey data \citep{HerMES}. This survey contains $\sim 10^3$ sources.}
   \label{fig:hist1}
 \end{figure*}
 
 \begin{figure*}
 \includegraphics[width=\textwidth]{model_color_hist.eps}
-\caption{An example of a very rough simulation}
+\caption{An example of a simulated survey. This was created from a simulation with a very small number of iterations, and is meant to serve as an illustration as opposed to a realistic simulation. We do see a nice spread off of the zero noise model slope, and see that the simulation is at least heading in the right direction as compared to the observations.}
 \label{simmed}
 \end{figure*}
-
-%\begin{figure*}
-%  \centering
-%  \includegraphics{fitting2.png}
-%  \caption{The output from a typical run of the C++ executable. For each run, the best fitting parameters and the goodness-of-fit statistic are output, and if they are at a minimum, the program saves the results to an output fits file. After all fitting passes, the program outputs the best fit parameters of all 10 passes.}
-%  \label{disp:fit}
-%\end{figure*}
 
 \begin{figure*}
   \centering
@@ -316,7 +308,7 @@ The longterm goal for this project is to provide a tool to the astronomical comm
 \end{figure*}
 
 \begin{figure*}
-  \includegraphics[width=\textwidth]{bestfit.png}
+  \includegraphics[width=\textwidth]{bestfit2.png}
   \caption{The IDL results display. The top row of the display (left to right) shows the luminosities of the simulated sources, as well as the fitted redshift distribution and the model parameter distributions used. The second row shows differential source counts, however evolution effects have not been removed, as they will in future version. The final row shows the model, observed, and comparison histograms from the simulation.}
   \label{disp:res}
 \end{figure*}

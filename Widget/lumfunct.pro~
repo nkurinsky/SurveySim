@@ -19,7 +19,7 @@ pro lumfunct
   set_plot,'ps'
   device,filename='lumfunct.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
-  plot,[8,13],[1e-10,1e0],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/(\Omega dLog(L_{fir})dV_c)'),ystyle=1
+  plot,[8,13],[1e-5,1e5],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/(\Omega dLog(L_{fir})dV_c)'),ystyle=1
   lums = indgen(21)/4.0+8.0
   print,lums
 

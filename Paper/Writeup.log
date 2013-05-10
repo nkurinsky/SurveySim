@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2011.9.4)  6 MAY 2013 17:17
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2011.9.4)  10 MAY 2013 11:42
 entering extended mode
 **C:/Users/Noah*Kurinsky/Documents/GitHub/SurveySim/Paper/Writeup.tex
 ("C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/Writeup.tex"
@@ -599,7 +599,7 @@ ted-to.pdf model_brightness.eps>
 (epstopdf)             \includegraphics on input line 273.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_brightness-eps-converted-to.pdf, id=251, 867.24pt x 650.43pt>
+<model_brightness-eps-converted-to.pdf, id=255, 867.24pt x 650.43pt>
 File: model_brightness-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_brightness-eps-converted-to.pdf>
@@ -617,48 +617,31 @@ to.pdf model_colors.eps>
 (epstopdf)             \includegraphics on input line 279.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_colors-eps-converted-to.pdf, id=252, 867.24pt x 650.43pt>
+<model_colors-eps-converted-to.pdf, id=260, 867.24pt x 650.43pt>
 File: model_colors-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_colors-eps-converted-to.pdf>
 Package pdftex.def Info: model_colors-eps-converted-to.pdf used on input line 2
 79.
 (pdftex.def)             Requested size: 505.89pt x 379.42317pt.
-Package epstopdf Info: Source file: <lumfunct.eps>
-(epstopdf)                    date: 2013-05-04 21:02:52
-(epstopdf)                    size: 40683 bytes
-(epstopdf)             Output file: <lumfunct-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-05-04 23:13:49
-(epstopdf)                    size: 17459 bytes
-(epstopdf)             Command: <epstopdf --outfile=lumfunct-eps-converted-to.p
-df lumfunct.eps>
+Package epstopdf Info: Source file: <sim_lumfunct.eps>
+(epstopdf)                    date: 2013-05-10 00:35:44
+(epstopdf)                    size: 41877 bytes
+(epstopdf)             Output file: <sim_lumfunct-eps-converted-to.pdf>
+(epstopdf)                    date: 2013-05-10 00:47:46
+(epstopdf)                    size: 16744 bytes
+(epstopdf)             Command: <epstopdf --outfile=sim_lumfunct-eps-converted-
+to.pdf sim_lumfunct.eps>
 (epstopdf)             \includegraphics on input line 286.
 Package epstopdf Info: Output file is already uptodate.
 
-<lumfunct-eps-converted-to.pdf, id=253, 867.24pt x 650.43pt>
-File: lumfunct-eps-converted-to.pdf Graphic file (type pdf)
-
-<use lumfunct-eps-converted-to.pdf>
-Package pdftex.def Info: lumfunct-eps-converted-to.pdf used on input line 286.
-(pdftex.def)             Requested size: 397.48499pt x 298.11963pt.
-Package epstopdf Info: Source file: <sim_lumfunct.eps>
-(epstopdf)                    date: 2013-05-04 23:10:52
-(epstopdf)                    size: 40196 bytes
-(epstopdf)             Output file: <sim_lumfunct-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-05-04 23:13:49
-(epstopdf)                    size: 17389 bytes
-(epstopdf)             Command: <epstopdf --outfile=sim_lumfunct-eps-converted-
-to.pdf sim_lumfunct.eps>
-(epstopdf)             \includegraphics on input line 287.
-Package epstopdf Info: Output file is already uptodate.
-
-<sim_lumfunct-eps-converted-to.pdf, id=254, 867.24pt x 650.43pt>
+<sim_lumfunct-eps-converted-to.pdf, id=261, 867.24pt x 650.43pt>
 File: sim_lumfunct-eps-converted-to.pdf Graphic file (type pdf)
 
 <use sim_lumfunct-eps-converted-to.pdf>
 Package pdftex.def Info: sim_lumfunct-eps-converted-to.pdf used on input line 2
-87.
-(pdftex.def)             Requested size: 397.48499pt x 298.11963pt.
+86.
+(pdftex.def)             Requested size: 505.89pt x 379.42317pt.
 Package epstopdf Info: Source file: <obs_color_hist.eps>
 (epstopdf)                    date: 2012-08-20 17:47:52
 (epstopdf)                    size: 16633 bytes
@@ -667,15 +650,15 @@ Package epstopdf Info: Source file: <obs_color_hist.eps>
 (epstopdf)                    size: 6149 bytes
 (epstopdf)             Command: <epstopdf --outfile=obs_color_hist-eps-converte
 d-to.pdf obs_color_hist.eps>
-(epstopdf)             \includegraphics on input line 293.
+(epstopdf)             \includegraphics on input line 292.
 Package epstopdf Info: Output file is already uptodate.
 
-<obs_color_hist-eps-converted-to.pdf, id=255, 722.7pt x 578.16pt>
+<obs_color_hist-eps-converted-to.pdf, id=262, 722.7pt x 578.16pt>
 File: obs_color_hist-eps-converted-to.pdf Graphic file (type pdf)
 
 <use obs_color_hist-eps-converted-to.pdf>
 Package pdftex.def Info: obs_color_hist-eps-converted-to.pdf used on input line
- 293.
+ 292.
 (pdftex.def)             Requested size: 505.89pt x 404.70924pt.
 Package epstopdf Info: Source file: <model_color_hist.eps>
 (epstopdf)                    date: 2013-05-05 14:01:33
@@ -685,54 +668,53 @@ Package epstopdf Info: Source file: <model_color_hist.eps>
 (epstopdf)                    size: 6629 bytes
 (epstopdf)             Command: <epstopdf --outfile=model_color_hist-eps-conver
 ted-to.pdf model_color_hist.eps>
-(epstopdf)             \includegraphics on input line 299.
+(epstopdf)             \includegraphics on input line 298.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_color_hist-eps-converted-to.pdf, id=256, 722.7pt x 578.16pt>
+<model_color_hist-eps-converted-to.pdf, id=267, 722.7pt x 578.16pt>
 File: model_color_hist-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_color_hist-eps-converted-to.pdf>
 Package pdftex.def Info: model_color_hist-eps-converted-to.pdf used on input li
-ne 299.
+ne 298.
 (pdftex.def)             Requested size: 505.89pt x 404.70924pt.
 
-<initial.png, id=257, 459.96844pt x 720.44156pt>
+<initial.png, id=268, 459.96844pt x 720.44156pt>
 File: initial.png Graphic file (type png)
  <use initial.png>
-Package pdftex.def Info: initial.png used on input line 313.
+Package pdftex.def Info: initial.png used on input line 305.
 (pdftex.def)             Requested size: 361.34999pt x 566.00957pt.
 
-<bestfit.png, id=260, 1172.88188pt x 724.20563pt>
-File: bestfit.png Graphic file (type png)
- <use bestfit.png>
-Package pdftex.def Info: bestfit.png used on input line 319.
+<bestfit2.png, id=271, 1172.88188pt x 724.20563pt>
+File: bestfit2.png Graphic file (type png)
+ <use bestfit2.png>
+Package pdftex.def Info: bestfit2.png used on input line 311.
 (pdftex.def)             Requested size: 505.89pt x 312.36374pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 324.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 316.
  [8]
 [9 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/models-eps-converte
 d-to.pdf>] [10 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/model_b
 rightness-eps-converted-to.pdf>] [11 <C:/Users/Noah Kurinsky/Documents/GitHub/S
 urveySim/Paper/model_colors-eps-converted-to.pdf>] [12 <C:/Users/Noah Kurinsky/
-Documents/GitHub/SurveySim/Paper/lumfunct-eps-converted-to.pdf> <C:/Users/Noah 
-Kurinsky/Documents/GitHub/SurveySim/Paper/sim_lumfunct-eps-converted-to.pdf>]
-[13 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/obs_color_hist-eps
--converted-to.pdf>] [14 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Pape
-r/model_color_hist-eps-converted-to.pdf>] [15 <C:/Users/Noah Kurinsky/Documents
-/GitHub/SurveySim/Paper/initial.png>] [16 <C:/Users/Noah Kurinsky/Documents/Git
-Hub/SurveySim/Paper/bestfit.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 324.
+Documents/GitHub/SurveySim/Paper/sim_lumfunct-eps-converted-to.pdf>] [13 <C:/Us
+ers/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/obs_color_hist-eps-converted
+-to.pdf>] [14 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/model_co
+lor_hist-eps-converted-to.pdf>] [15 <C:/Users/Noah Kurinsky/Documents/GitHub/Su
+rveySim/Paper/initial.png>] [16 <C:/Users/Noah Kurinsky/Documents/GitHub/Survey
+Sim/Paper/bestfit2.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 316.
 
 ("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.aux")
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 324.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 324.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 316.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 316.
 Package rerunfilecheck Info: File `Writeup.out' has not changed.
 (rerunfilecheck)             Checksum: E9A9B2015F409D548A112E8E65E536B6;1528.
  ) 
 Here is how much of TeX's memory you used:
- 7578 strings out of 494045
- 107389 string characters out of 3148364
- 211259 words of memory out of 3000000
- 10629 multiletter control sequences out of 15000+200000
+ 7573 strings out of 494045
+ 107247 string characters out of 3148364
+ 218132 words of memory out of 3000000
+ 10625 multiletter control sequences out of 15000+200000
  53144 words of font info for 123 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
  42i,9n,29p,2074b,328s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -745,9 +727,9 @@ rogram Files/MiKTeX 2.9/fonts/type1/public/txfonts/txsy.pfb><C:/Program Files/M
 iKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/t
 ype1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/ut
 mri8a.pfb>
-Output written on Writeup.pdf (16 pages, 424283 bytes).
+Output written on Writeup.pdf (16 pages, 459263 bytes).
 PDF statistics:
- 368 PDF objects out of 1000 (max. 8388607)
+ 377 PDF objects out of 1000 (max. 8388607)
  84 named destinations out of 1000 (max. 500000)
- 220 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 215 words of extra memory for PDF output out of 10000 (max. 10000000)
 
