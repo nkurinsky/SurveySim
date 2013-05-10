@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2011.9.4)  10 MAY 2013 11:42
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2011.9.4)  10 MAY 2013 12:03
 entering extended mode
 **C:/Users/Noah*Kurinsky/Documents/GitHub/SurveySim/Paper/Writeup.tex
 ("C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/Writeup.tex"
@@ -399,44 +399,44 @@ Package: geometry 2010/09/12 v5.6 Page Geometry
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\geometry\geometry.cfg"))
 ("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.aux")
-LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 22.
-LaTeX Font Info:    Try loading font information for OML+txmi on input line 22.
+LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 24.
+LaTeX Font Info:    Try loading font information for OML+txmi on input line 24.
 
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\omltxmi.fd"
 File: omltxmi.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 22.
-LaTeX Font Info:    Try loading font information for OMS+txsy on input line 22.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 24.
+LaTeX Font Info:    Try loading font information for OMS+txsy on input line 24.
 
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\omstxsy.fd"
 File: omstxsy.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 22.
-LaTeX Font Info:    Try loading font information for OMX+txex on input line 22.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 24.
+LaTeX Font Info:    Try loading font information for OMX+txex on input line 24.
 
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\omxtxex.fd"
 File: omxtxex.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 22.
-LaTeX Font Info:    Try loading font information for U+txexa on input line 22.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 24.
+LaTeX Font Info:    Try loading font information for U+txexa on input line 24.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxexa.fd"
 File: utxexa.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Try loading font information for OT1+txr on input line 22.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Try loading font information for OT1+txr on input line 24.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\ot1txr.fd"
 File: ot1txr.fd 2000/12/15 v3.1
@@ -456,7 +456,7 @@ File: ot1txr.fd 2000/12/15 v3.1
 \everyMPtoPDFconversion=\toks23
 )
 \AtBeginShipoutBox=\box30
-Package hyperref Info: Link coloring OFF on input line 22.
+Package hyperref Info: Link coloring OFF on input line 24.
  ("C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\nameref.sty"
 Package: nameref 2010/04/30 v2.40 Cross-referencing by name of section
 
@@ -465,9 +465,9 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count121
 )
-LaTeX Info: Redefining \ref on input line 22.
-LaTeX Info: Redefining \pageref on input line 22.
-LaTeX Info: Redefining \nameref on input line 22.
+LaTeX Info: Redefining \ref on input line 24.
+LaTeX Info: Redefining \pageref on input line 24.
+LaTeX Info: Redefining \nameref on input line 24.
 
 ("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.out")
 ("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.out")
@@ -507,68 +507,75 @@ LaTeX Info: Redefining \nameref on input line 22.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Try loading font information for U+txmia on input line 30.
+LaTeX Font Info:    Try loading font information for U+txmia on input line 33.
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxmia.fd"
 File: utxmia.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsya on input line 30.
+LaTeX Font Info:    Try loading font information for U+txsya on input line 33.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxsya.fd"
 File: utxsya.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyb on input line 30.
+LaTeX Font Info:    Try loading font information for U+txsyb on input line 33.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxsyb.fd"
 File: utxsyb.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyc on input line 30.
+LaTeX Font Info:    Try loading font information for U+txsyc on input line 33.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxsyc.fd"
 File: utxsyc.fd 2000/12/15 v3.1
 ) [1{C:/Users/Noah Kurinsky/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
-] [2] [3]
-Underfull \hbox (badness 1097) in paragraph at lines 129--130
+]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \vbox (badness 3019) has occurred while \output is active []
+
+ [2]
+[3]
+Underfull \hbox (badness 1097) in paragraph at lines 132--133
 \OT1/txr/m/n/10 be-gin to con-struct the sim-u-lated sur-vey. For each red-
  []
 
 [4]
-Underfull \hbox (badness 10000) in paragraph at lines 148--148
+Underfull \hbox (badness 10000) in paragraph at lines 151--151
 []\OT1/txr/bx/n/12 Two-Dimensional Spec-tral Color His-
  []
 
 [5]
-Underfull \hbox (badness 4291) in paragraph at lines 205--206
+Underfull \hbox (badness 4291) in paragraph at lines 208--209
  []\OT1/txr/bx/n/10 Interpolation[] \OT1/txr/m/n/10 In-ter-po-la-tion is nec-es
 -sary for many as-
  []
 
 
-Underfull \hbox (badness 1107) in paragraph at lines 205--206
+Underfull \hbox (badness 1107) in paragraph at lines 208--209
 \OT1/txr/m/n/10 pects of the sim-u-la-tion and is used heav-ily by mul-ti-ple
  []
 
 
-Underfull \hbox (badness 2205) in paragraph at lines 216--217
+Underfull \hbox (badness 2205) in paragraph at lines 219--220
  []\OT1/txr/bx/n/10 Cosmological Func-tions[] \OT1/txr/m/n/10 The func-tions wh
 ich com-pute
  []
 
 [6]
-Underfull \hbox (badness 4096) in paragraph at lines 221--222
+Underfull \hbox (badness 4096) in paragraph at lines 224--225
  []\OT1/txr/bx/n/10 Luminosity Func-tion Class[] \OT1/txr/m/n/10 The Lu-mi-nos-
 ity Func-tion
  []
 
 [7]
-LaTeX Font Info:    Try loading font information for OMS+txr on input line 253.
+LaTeX Font Info:    Try loading font information for OMS+txr on input line 256.
 
  ("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\omstxr.fd"
 File: omstxr.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `OMS/txr/m/n' in size <10> not available
-(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 253.
+(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 256.
 
 ("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.bbl")
 Package epstopdf Info: Source file: <models.eps>
@@ -579,14 +586,14 @@ Package epstopdf Info: Source file: <models.eps>
 (epstopdf)                    size: 57613 bytes
 (epstopdf)             Command: <epstopdf --outfile=models-eps-converted-to.pdf
  models.eps>
-(epstopdf)             \includegraphics on input line 267.
+(epstopdf)             \includegraphics on input line 270.
 Package epstopdf Info: Output file is already uptodate.
 
-<models-eps-converted-to.pdf, id=249, 867.24pt x 650.43pt>
+<models-eps-converted-to.pdf, id=253, 867.24pt x 650.43pt>
 File: models-eps-converted-to.pdf Graphic file (type pdf)
 
 <use models-eps-converted-to.pdf>
-Package pdftex.def Info: models-eps-converted-to.pdf used on input line 267.
+Package pdftex.def Info: models-eps-converted-to.pdf used on input line 270.
 (pdftex.def)             Requested size: 505.89pt x 373.92268pt.
 Package epstopdf Info: Source file: <model_brightness.eps>
 (epstopdf)                    date: 2013-05-04 20:59:05
@@ -596,15 +603,15 @@ Package epstopdf Info: Source file: <model_brightness.eps>
 (epstopdf)                    size: 35476 bytes
 (epstopdf)             Command: <epstopdf --outfile=model_brightness-eps-conver
 ted-to.pdf model_brightness.eps>
-(epstopdf)             \includegraphics on input line 273.
+(epstopdf)             \includegraphics on input line 276.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_brightness-eps-converted-to.pdf, id=255, 867.24pt x 650.43pt>
+<model_brightness-eps-converted-to.pdf, id=259, 867.24pt x 650.43pt>
 File: model_brightness-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_brightness-eps-converted-to.pdf>
 Package pdftex.def Info: model_brightness-eps-converted-to.pdf used on input li
-ne 273.
+ne 276.
 (pdftex.def)             Requested size: 505.89pt x 379.42317pt.
 Package epstopdf Info: Source file: <model_colors.eps>
 (epstopdf)                    date: 2013-05-04 20:59:05
@@ -614,15 +621,15 @@ Package epstopdf Info: Source file: <model_colors.eps>
 (epstopdf)                    size: 47178 bytes
 (epstopdf)             Command: <epstopdf --outfile=model_colors-eps-converted-
 to.pdf model_colors.eps>
-(epstopdf)             \includegraphics on input line 279.
+(epstopdf)             \includegraphics on input line 282.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_colors-eps-converted-to.pdf, id=260, 867.24pt x 650.43pt>
+<model_colors-eps-converted-to.pdf, id=264, 867.24pt x 650.43pt>
 File: model_colors-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_colors-eps-converted-to.pdf>
 Package pdftex.def Info: model_colors-eps-converted-to.pdf used on input line 2
-79.
+82.
 (pdftex.def)             Requested size: 505.89pt x 379.42317pt.
 Package epstopdf Info: Source file: <sim_lumfunct.eps>
 (epstopdf)                    date: 2013-05-10 00:35:44
@@ -632,15 +639,15 @@ Package epstopdf Info: Source file: <sim_lumfunct.eps>
 (epstopdf)                    size: 16744 bytes
 (epstopdf)             Command: <epstopdf --outfile=sim_lumfunct-eps-converted-
 to.pdf sim_lumfunct.eps>
-(epstopdf)             \includegraphics on input line 286.
+(epstopdf)             \includegraphics on input line 289.
 Package epstopdf Info: Output file is already uptodate.
 
-<sim_lumfunct-eps-converted-to.pdf, id=261, 867.24pt x 650.43pt>
+<sim_lumfunct-eps-converted-to.pdf, id=265, 867.24pt x 650.43pt>
 File: sim_lumfunct-eps-converted-to.pdf Graphic file (type pdf)
 
 <use sim_lumfunct-eps-converted-to.pdf>
 Package pdftex.def Info: sim_lumfunct-eps-converted-to.pdf used on input line 2
-86.
+89.
 (pdftex.def)             Requested size: 505.89pt x 379.42317pt.
 Package epstopdf Info: Source file: <obs_color_hist.eps>
 (epstopdf)                    date: 2012-08-20 17:47:52
@@ -650,15 +657,15 @@ Package epstopdf Info: Source file: <obs_color_hist.eps>
 (epstopdf)                    size: 6149 bytes
 (epstopdf)             Command: <epstopdf --outfile=obs_color_hist-eps-converte
 d-to.pdf obs_color_hist.eps>
-(epstopdf)             \includegraphics on input line 292.
+(epstopdf)             \includegraphics on input line 295.
 Package epstopdf Info: Output file is already uptodate.
 
-<obs_color_hist-eps-converted-to.pdf, id=262, 722.7pt x 578.16pt>
+<obs_color_hist-eps-converted-to.pdf, id=266, 722.7pt x 578.16pt>
 File: obs_color_hist-eps-converted-to.pdf Graphic file (type pdf)
 
 <use obs_color_hist-eps-converted-to.pdf>
 Package pdftex.def Info: obs_color_hist-eps-converted-to.pdf used on input line
- 292.
+ 295.
 (pdftex.def)             Requested size: 505.89pt x 404.70924pt.
 Package epstopdf Info: Source file: <model_color_hist.eps>
 (epstopdf)                    date: 2013-05-05 14:01:33
@@ -668,29 +675,29 @@ Package epstopdf Info: Source file: <model_color_hist.eps>
 (epstopdf)                    size: 6629 bytes
 (epstopdf)             Command: <epstopdf --outfile=model_color_hist-eps-conver
 ted-to.pdf model_color_hist.eps>
-(epstopdf)             \includegraphics on input line 298.
+(epstopdf)             \includegraphics on input line 301.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_color_hist-eps-converted-to.pdf, id=267, 722.7pt x 578.16pt>
+<model_color_hist-eps-converted-to.pdf, id=271, 722.7pt x 578.16pt>
 File: model_color_hist-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_color_hist-eps-converted-to.pdf>
 Package pdftex.def Info: model_color_hist-eps-converted-to.pdf used on input li
-ne 298.
+ne 301.
 (pdftex.def)             Requested size: 505.89pt x 404.70924pt.
 
-<initial.png, id=268, 459.96844pt x 720.44156pt>
+<initial.png, id=272, 459.96844pt x 720.44156pt>
 File: initial.png Graphic file (type png)
  <use initial.png>
-Package pdftex.def Info: initial.png used on input line 305.
+Package pdftex.def Info: initial.png used on input line 308.
 (pdftex.def)             Requested size: 361.34999pt x 566.00957pt.
 
-<bestfit2.png, id=271, 1172.88188pt x 724.20563pt>
+<bestfit2.png, id=275, 1172.88188pt x 724.20563pt>
 File: bestfit2.png Graphic file (type png)
  <use bestfit2.png>
-Package pdftex.def Info: bestfit2.png used on input line 311.
+Package pdftex.def Info: bestfit2.png used on input line 314.
 (pdftex.def)             Requested size: 505.89pt x 312.36374pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 316.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 319.
  [8]
 [9 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/models-eps-converte
 d-to.pdf>] [10 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/model_b
@@ -702,19 +709,19 @@ ers/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/obs_color_hist-eps-converted
 lor_hist-eps-converted-to.pdf>] [15 <C:/Users/Noah Kurinsky/Documents/GitHub/Su
 rveySim/Paper/initial.png>] [16 <C:/Users/Noah Kurinsky/Documents/GitHub/Survey
 Sim/Paper/bestfit2.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 316.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 319.
 
 ("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.aux")
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 316.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 316.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 319.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 319.
 Package rerunfilecheck Info: File `Writeup.out' has not changed.
 (rerunfilecheck)             Checksum: E9A9B2015F409D548A112E8E65E536B6;1528.
  ) 
 Here is how much of TeX's memory you used:
- 7573 strings out of 494045
- 107247 string characters out of 3148364
- 218132 words of memory out of 3000000
- 10625 multiletter control sequences out of 15000+200000
+ 7577 strings out of 494045
+ 107312 string characters out of 3148364
+ 214719 words of memory out of 3000000
+ 10628 multiletter control sequences out of 15000+200000
  53144 words of font info for 123 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
  42i,9n,29p,2074b,328s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -727,9 +734,9 @@ rogram Files/MiKTeX 2.9/fonts/type1/public/txfonts/txsy.pfb><C:/Program Files/M
 iKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/t
 ype1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/ut
 mri8a.pfb>
-Output written on Writeup.pdf (16 pages, 459263 bytes).
+Output written on Writeup.pdf (16 pages, 459902 bytes).
 PDF statistics:
- 377 PDF objects out of 1000 (max. 8388607)
- 84 named destinations out of 1000 (max. 500000)
+ 381 PDF objects out of 1000 (max. 8388607)
+ 85 named destinations out of 1000 (max. 500000)
  215 words of extra memory for PDF output out of 10000 (max. 10000000)
 
