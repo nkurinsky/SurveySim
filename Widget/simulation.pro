@@ -65,8 +65,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   info.magnification = size_screen[1]/(plotSize+info.ysize1)*0.9
   
 ;widget base initialization
-  info.base = widget_base(title='Model Setup and Initialization',y_scroll_size=600,x_scroll_size=500,scr_xsize=500,/column)
-  ;info.base = widget_base(title='Model Setup and Initialization',/column) ;main base
+  info.base = widget_base(title='Model Setup and Initialization',/column,/align_center) ;main base
   info.base2= widget_base(info.base, /column,/align_center)               ;plot base
   p_main = widget_base(info.base,/column,/align_center)                   ;parameter base
   obs_table = widget_base(p_main,/column,/align_center)
@@ -465,7 +464,7 @@ pro read_output
   
   device,filename='sim_lumfunct.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
-  plot,[8,13],[1e-5,1e5],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega)'),ystyle=1
+  plot,[8,13],[1e-10,1e0],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega dV_c)'),ystyle=1
   lums = indgen(21)/4.0+8.0
   print,lums
 
@@ -484,26 +483,26 @@ pro read_output
      r = 10^lums/t2
      nsrcs=t1/(r^alpha+r^beta)
 
-     ez = sqrt(omega_m*(1+z)^3+omega_l)
-     dvdz = 4062*lumdist(z)^2*(!pi/180)^2/((1+z)^2*ez)
-     vol = dvdz*dz
-     nsrcs*=vol
+     ;ez = sqrt(omega_m*(1+z)^3+omega_l)
+     ;dvdz = 4062*lumdist(z)^2*(!pi/180)^2/((1+z)^2*ez)
+     ;vol = dvdz*dz
+     ;nsrcs*=vol
 
-     print,vol
+     ;print,vol
      oplot,lums,nsrcs,color=z*40+20
   endfor
 
   for i=0.0,5.0,0.1 do begin
      ind = (9+2*i/5)
-     oplot,[ind,ind+0.02,ind,ind+0.02,ind,ind+0.02],[10^(-3),10^(-3),10^(-2.9),10^(-2.9),10^(-2.8),10^(-2.8)],psym=2,color=i*40+20,symsize=0.75
+     oplot,[ind,ind+0.02,ind,ind+0.02,ind,ind+0.02],[10^(-8),10^(-8),10^(-7.9),10^(-7.9),10^(-7.8),10^(-7.8)],psym=2,color=i*40+20,symsize=0.75
   endfor
 
   loadct,0,/silent
   oplot,[8,13],[1,1],linestyle=1
 
-  xyouts,9.0,10^(-2.2),textoidl('Redshift')
-  xyouts,9.0,10^(-2.6),textoidl('0')
-  xyouts,10.9,10^(-2.6),textoidl('5')
+  xyouts,9.0,10^(-7.2),textoidl('Redshift')
+  xyouts,9.0,10^(-7.6),textoidl('0')
+  xyouts,10.9,10^(-7.6),textoidl('5')
 
   device,/close
 
@@ -610,7 +609,7 @@ pro graphs
   ;h = histogram(lum,nbins=50,locations=xh)
   ;plot,xh,h,psym=10,xstyle=1,yrange=[0.1,1000],ystyle=1,xtitle='Log(Luminosity (W/Hz))',ytitle='dN/(dL/dHz)',/ylog,title='Luminosity Function'
 
-  plot,[8,13],[1e-5,1e5],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega)'),ystyle=1
+  plot,[8,13],[1e-10,1e0],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega dV_C)'),ystyle=1
   lums = indgen(21)/4.0+8.0
   print,lums
 
@@ -629,26 +628,26 @@ pro graphs
      r = 10^lums/t2
      nsrcs=t1/(r^alpha+r^beta)
 
-     ez = sqrt(omega_m*(1+zi)^3+omega_l)
-     dvdz = 4062*lumdist(zi)^2*(!pi/180)^2/((1+zi)^2*ez)
-     vol = dvdz*dz
+     ;ez = sqrt(omega_m*(1+zi)^3+omega_l)
+     ;dvdz = 4062*lumdist(zi)^2*(!pi/180)^2/((1+zi)^2*ez)
+     ;vol = dvdz*dz
      ;nsrcs*=vol
 
-     print,vol
+     ;print,vol
      oplot,lums,nsrcs,color=zi*40+20
   endfor
 
   for i=0.0,5.0,0.1 do begin
      ind = (9+2*i/5)
-     oplot,[ind,ind+0.02,ind,ind+0.02,ind,ind+0.02],[10^(-3),10^(-3),10^(-2.9),10^(-2.9),10^(-2.8),10^(-2.8)],psym=2,color=i*40+20,symsize=0.75
+     oplot,[ind,ind+0.02,ind,ind+0.02,ind,ind+0.02],[10^(-8),10^(-8),10^(-7.9),10^(-7.9),10^(-7.8),10^(-7.8)],psym=2,color=i*40+20,symsize=0.75
   endfor
   
   loadct,0,/silent
   oplot,[8,13],[1,1],linestyle=1
 
-  xyouts,9.0,10^(-2.2),'Redshift'
-  xyouts,9.0,10^(-2.6),'0'
-  xyouts,10.9,10^(-2.6),'5'
+  xyouts,9.0,10^(-7.2),'Redshift'
+  xyouts,9.0,10^(-7.6),'0'
+  xyouts,10.9,10^(-7.6),'5'
 
   widget_control,redshift,get_value=index
   wset,index
