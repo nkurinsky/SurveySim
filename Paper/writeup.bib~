@@ -400,7 +400,7 @@ archivePrefix = "arXiv",
 	{Bechtold}, J. and {Willner}, S.~P. and {Oey}, M.~S. and {Polomski}, E. and 
 	{Cutri}, R.},
     title = "{Atlas of quasar energy distributions}",
-  journal = {ApJS},
+  journal = {\apjs},
  keywords = {ASTRONOMICAL CATALOGS, INFRARED PHOTOMETRY, QUASARS, RADIO ASTRONOMY, SPECTRAL ENERGY DISTRIBUTION, STELLAR LUMINOSITY, STELLAR SPECTROPHOTOMETRY, ULTRAVIOLET ASTRONOMY, X RAY SPECTRA, GALACTIC RADIATION, HEAO 2, INFRARED ASTRONOMY SATELLITE, IUE, SIGNAL TO NOISE RATIOS},
      year = 1994,
     month = nov,

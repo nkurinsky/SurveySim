@@ -1,7 +1,7 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.8.17)  10 MAY 2013 18:02
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2011.9.4)  11 MAY 2013 00:29
 entering extended mode
-**C:/Users/Noah/Documents/GitHub/SurveySim/Paper/Writeup.tex
-(C:/Users/Noah/Documents/GitHub/SurveySim/Paper/Writeup.tex
+**C:/Users/Noah*Kurinsky/Documents/GitHub/SurveySim/Paper/Writeup.tex
+("C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/Writeup.tex"
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
@@ -52,10 +52,10 @@ Package graphics Info: Driver file: pdftex.def on input line 91.
 File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\infwarerr.sty"
-Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/message (HO)
 )
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ltxcmds.sty"
-Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+Package: ltxcmds 2011/04/18 v1.20 LaTeX kernel commands for general use (HO)
 )
 \Gread@gobject=\count87
 ))
@@ -120,7 +120,7 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
 LaTeX Info: Redefining \[ on input line 2666.
 LaTeX Info: Redefining \] on input line 2667.
 )
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\epsf\epsf.sty
+("C:\Program Files\MiKTeX 2.9\tex\latex\epsf\epsf.sty"
 This is `epsf.tex' v2.7.4 <14 February 2011>
 \epsffilein=\read1
 \epsfframemargin=\dimen114
@@ -131,14 +131,14 @@ This is `epsf.tex' v2.7.4 <14 February 2011>
 \epsfxsize=\dimen119
 \epsfysize=\dimen120
 \pspoints=\dimen121
-) (C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\natbib\natbib.sty
+) ("C:\Program Files\MiKTeX 2.9\tex\latex\natbib\natbib.sty"
 Package: natbib 2010/09/13 8.31b (PWD, AO)
 \bibhang=\skip46
 \bibsep=\skip47
 LaTeX Info: Redefining \cite on input line 694.
 \c@NAT@ctr=\count100
 )
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\txfonts.sty
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\txfonts.sty"
 Package: txfonts 2008/01/22 v3.2.1
 LaTeX Font Info:    Redeclaring symbol font `operators' on input line 21.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
@@ -214,14 +214,14 @@ LaTeX Font Info:    Overwriting symbol font `largesymbolsA' in version `bold'
 (Font)                  U/txexa/m/n --> U/txexa/bx/n on input line 129.
 LaTeX Info: Redefining \not on input line 1043.
 )
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\was\upgreek.sty
+("C:\Program Files\MiKTeX 2.9\tex\latex\was\upgreek.sty"
 Package: upgreek 2003/02/12 v2.0 (WaS)
 Package upgreek Info: Using Euler Roman for upright Greek on input line 31.
 \symugrf@m=\mathgroup10
 LaTeX Font Info:    Overwriting symbol font `ugrf@m' in version `bold'
 (Font)                  U/eur/m/n --> U/eur/b/n on input line 38.
 )
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\rotating\rotating.sty
+("C:\Program Files\MiKTeX 2.9\tex\latex\rotating\rotating.sty"
 Package: rotating 2009/03/28 v2.16a rotated objects in LaTeX
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\base\ifthen.sty"
@@ -240,19 +240,19 @@ Package: epstopdf 2010/02/09 v2.5 Conversion with epstopdf on the fly (HO)
 Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\grfext.sty"
-Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+Package: grfext 2010/08/19 v1.1 Managing graphics extensions (HO)
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\kvdefinekeys.sty"
-Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
+Package: kvdefinekeys 2011/04/07 v1.3 Defining keys (HO)
 ))
 ("C:\Program Files\MiKTeX 2.9\tex\latex\oberdiek\kvoptions.sty"
-Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
+Package: kvoptions 2010/12/23 v3.10 Keyval support for LaTeX options (HO)
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\kvsetkeys.sty"
-Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
+Package: kvsetkeys 2011/04/07 v1.13 Key value parser (HO)
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\etexcmds.sty"
-Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
+Package: etexcmds 2011/02/16 v1.5 Prefix for e-TeX command names (HO)
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ifluatex.sty"
 Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
@@ -264,8 +264,7 @@ Package etexcmds Info: Could not find \expanded.
 (etexcmds)             In the latter case, load this package earlier.
 )))
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\pdftexcmds.sty"
-Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
-)
+Package: pdftexcmds 2011/04/22 v0.16 Utilities of pdfTeX for LuaTeX (HO)
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\ifpdf.sty"
 Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
@@ -281,7 +280,7 @@ Package grfext Info: Graphics extension search list:
 G,.JBIG2,.JB2,.eps]
 (grfext)             \AppendGraphicsExtensions on input line 452.
 ))
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\abstract\abstract.sty
+("C:\Program Files\MiKTeX 2.9\tex\latex\abstract\abstract.sty"
 Package: abstract 2009/06/08 v1.2a configurable abstracts
 \abstitleskip=\skip50
 \absleftindent=\skip51
@@ -290,41 +289,38 @@ Package: abstract 2009/06/08 v1.2a configurable abstracts
 \absparsep=\skip54
 )
 ("C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\hyperref.sty"
-Package: hyperref 2012/05/13 v6.82q Hypertext links for LaTeX
+Package: hyperref 2011/08/19 v6.82h Hypertext links for LaTeX
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\hobsub-hyperref.sty"
-Package: hobsub-hyperref 2012/04/25 v1.12 Bundle oberdiek, subset hyperref (HO)
-
+Package: hobsub-hyperref 2011/04/23 v1.4 Bundle oberdiek, subset hyperref (HO)
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\hobsub-generic.sty"
-Package: hobsub-generic 2012/04/25 v1.12 Bundle oberdiek, subset generic (HO)
-Package: hobsub 2012/04/25 v1.12 Construct package bundles (HO)
+Package: hobsub-generic 2011/04/23 v1.4 Bundle oberdiek, subset generic (HO)
+Package: hobsub 2011/04/23 v1.4 Subsetting bundle oberdiek (HO)
 Package hobsub Info: Skipping package `infwarerr' (already loaded).
 Package hobsub Info: Skipping package `ltxcmds' (already loaded).
 Package hobsub Info: Skipping package `ifluatex' (already loaded).
-Package: ifvtex 2010/03/01 v1.5 Detect VTeX and its facilities (HO)
+Package: ifvtex 2010/03/01 v1.5 Switches for detecting VTeX and its modes (HO)
 Package ifvtex Info: VTeX not detected.
-Package: intcalc 2007/09/27 v1.1 Expandable calculations with integers (HO)
+Package: intcalc 2007/09/27 v1.1 Expandable integer calculations (HO)
 Package hobsub Info: Skipping package `ifpdf' (already loaded).
 Package hobsub Info: Skipping package `etexcmds' (already loaded).
 Package hobsub Info: Skipping package `kvsetkeys' (already loaded).
 Package hobsub Info: Skipping package `kvdefinekeys' (already loaded).
 Package hobsub Info: Skipping package `pdftexcmds' (already loaded).
-Package: pdfescape 2011/11/25 v1.13 Implements pdfTeX's escape features (HO)
-Package: bigintcalc 2012/04/08 v1.3 Expandable calculations on big integers (HO
-)
-Package: bitset 2011/01/30 v1.1 Handle bit-vector datatype (HO)
-Package: uniquecounter 2011/01/30 v1.2 Provide unlimited unique counter (HO)
+Package: pdfescape 2011/04/04 v1.12 Provides string conversions (HO)
+Package: bigintcalc 2011/01/30 v1.2 Expandable big integer calculations (HO)
+Package: bitset 2011/01/30 v1.1 Data type bit set (HO)
+Package: uniquecounter 2011/01/30 v1.2 Provides unlimited unique counter (HO)
 )
 Package hobsub Info: Skipping package `hobsub' (already loaded).
 Package: letltxmacro 2010/09/02 v1.4 Let assignment for LaTeX macros (HO)
-Package: hopatch 2011/06/24 v1.1 Wrapper for package hooks (HO)
+Package: hopatch 2011/01/30 v1.0 Wrapper for package hooks (HO)
 Package: xcolor-patch 2011/01/30 xcolor patch
-Package: atveryend 2011/06/30 v1.8 Hooks at the very end of document (HO)
-Package atveryend Info: \enddocument detected (standard20110627).
-Package: atbegshi 2011/10/05 v1.16 At begin shipout hook (HO)
-Package: refcount 2011/10/16 v3.4 Data extraction from label references (HO)
-Package: hycolor 2011/01/30 v1.7 Color options for hyperref/bookmark (HO)
+Package: atveryend 2011/04/23 v1.7 Hooks at very end of document (HO)
+Package: atbegshi 2011/01/30 v1.15 At begin shipout hook (HO)
+Package: refcount 2010/12/01 v3.2 Data extraction from references (HO)
+Package: hycolor 2011/01/30 v1.7 Color options of hyperref/bookmark (HO)
 )
 ("C:\Program Files\MiKTeX 2.9\tex\generic\ifxetex\ifxetex.sty"
 Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
@@ -334,39 +330,39 @@ Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 \Hy@pagecounter=\count103
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\pd1enc.def"
-File: pd1enc.def 2012/05/13 v6.82q Hyperref: PDFDocEncoding definition (HO)
+File: pd1enc.def 2011/08/19 v6.82h Hyperref: PDFDocEncoding definition (HO)
 )
 \Hy@SavedSpaceFactor=\count104
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\hyperref.cfg"
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
 )
-Package hyperref Info: Hyper figures OFF on input line 4062.
-Package hyperref Info: Link nesting OFF on input line 4067.
-Package hyperref Info: Hyper index ON on input line 4070.
-Package hyperref Info: Plain pages OFF on input line 4077.
-Package hyperref Info: Backreferencing OFF on input line 4082.
+Package hyperref Info: Hyper figures OFF on input line 4053.
+Package hyperref Info: Link nesting OFF on input line 4058.
+Package hyperref Info: Hyper index ON on input line 4061.
+Package hyperref Info: Plain pages OFF on input line 4068.
+Package hyperref Info: Backreferencing OFF on input line 4073.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
-Package hyperref Info: Bookmarks ON on input line 4300.
+Package hyperref Info: Bookmarks ON on input line 4291.
 \c@Hy@tempcnt=\count105
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\ltxmisc\url.sty"
 \Urlmuskip=\muskip11
 Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
 )
-LaTeX Info: Redefining \url on input line 4653.
+LaTeX Info: Redefining \url on input line 4644.
 \Fld@menulength=\count106
 \Field@Width=\dimen123
 \Fld@charsize=\dimen124
-Package hyperref Info: Hyper figures OFF on input line 5773.
-Package hyperref Info: Link nesting OFF on input line 5778.
-Package hyperref Info: Hyper index ON on input line 5781.
-Package hyperref Info: backreferencing OFF on input line 5788.
-Package hyperref Info: Link coloring OFF on input line 5793.
-Package hyperref Info: Link coloring with OCG OFF on input line 5798.
-Package hyperref Info: PDF/A mode OFF on input line 5803.
-LaTeX Info: Redefining \ref on input line 5843.
-LaTeX Info: Redefining \pageref on input line 5847.
+Package hyperref Info: Hyper figures OFF on input line 5730.
+Package hyperref Info: Link nesting OFF on input line 5735.
+Package hyperref Info: Hyper index ON on input line 5738.
+Package hyperref Info: backreferencing OFF on input line 5745.
+Package hyperref Info: Link coloring OFF on input line 5750.
+Package hyperref Info: Link coloring with OCG OFF on input line 5755.
+Package hyperref Info: PDF/A mode OFF on input line 5760.
+LaTeX Info: Redefining \ref on input line 5800.
+LaTeX Info: Redefining \pageref on input line 5804.
 \Hy@abspage=\count107
 \c@Item=\count108
 \c@Hfootnote=\count109
@@ -375,7 +371,7 @@ LaTeX Info: Redefining \pageref on input line 5847.
 Package hyperref Message: Driver (autodetected): hpdftex.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\hpdftex.def"
-File: hpdftex.def 2012/05/13 v6.82q Hyperref driver for pdfTeX
+File: hpdftex.def 2011/08/19 v6.82h Hyperref driver for pdfTeX
 \Fld@listcount=\count110
 \c@bookmark@seq@number=\count111
 
@@ -402,50 +398,50 @@ Package: geometry 2010/09/12 v5.6 Page Geometry
 \Gm@dimlist=\toks21
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\geometry\geometry.cfg"))
-(C:\Users\Noah\Documents\GitHub\SurveySim\Paper\Writeup.aux)
-LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 24.
-LaTeX Font Info:    Try loading font information for OML+txmi on input line 24.
+("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.aux")
+LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 23.
+LaTeX Font Info:    Try loading font information for OML+txmi on input line 23.
 
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\omltxmi.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\omltxmi.fd"
 File: omltxmi.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 24.
-LaTeX Font Info:    Try loading font information for OMS+txsy on input line 24.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 23.
+LaTeX Font Info:    Try loading font information for OMS+txsy on input line 23.
 
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\omstxsy.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\omstxsy.fd"
 File: omstxsy.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 24.
-LaTeX Font Info:    Try loading font information for OMX+txex on input line 24.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 23.
+LaTeX Font Info:    Try loading font information for OMX+txex on input line 23.
 
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\omxtxex.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\omxtxex.fd"
 File: omxtxex.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 24.
-LaTeX Font Info:    Try loading font information for U+txexa on input line 24.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 23.
+LaTeX Font Info:    Try loading font information for U+txexa on input line 23.
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\utxexa.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxexa.fd"
 File: utxexa.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Try loading font information for OT1+txr on input line 24.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Try loading font information for OT1+txr on input line 23.
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\ot1txr.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\ot1txr.fd"
 File: ot1txr.fd 2000/12/15 v3.1
 )
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\context\base\supp-pdf.mkii
+("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count115
 \scratchdimen=\dimen133
@@ -460,7 +456,7 @@ File: ot1txr.fd 2000/12/15 v3.1
 \everyMPtoPDFconversion=\toks23
 )
 \AtBeginShipoutBox=\box30
-Package hyperref Info: Link coloring OFF on input line 24.
+Package hyperref Info: Link coloring OFF on input line 23.
  ("C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\nameref.sty"
 Package: nameref 2010/04/30 v2.40 Cross-referencing by name of section
 
@@ -469,12 +465,12 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count121
 )
-LaTeX Info: Redefining \ref on input line 24.
-LaTeX Info: Redefining \pageref on input line 24.
-LaTeX Info: Redefining \nameref on input line 24.
+LaTeX Info: Redefining \ref on input line 23.
+LaTeX Info: Redefining \pageref on input line 23.
+LaTeX Info: Redefining \nameref on input line 23.
 
-(C:\Users\Noah\Documents\GitHub\SurveySim\Paper\Writeup.out)
-(C:\Users\Noah\Documents\GitHub\SurveySim\Paper\Writeup.out)
+("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.out")
+("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.out")
 \@outlinefile=\write3
 
 *geometry* driver: auto-detecting
@@ -511,231 +507,251 @@ LaTeX Info: Redefining \nameref on input line 24.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Try loading font information for U+txmia on input line 33.
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\utxmia.fd
+LaTeX Font Info:    Try loading font information for U+txmia on input line 37.
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxmia.fd"
 File: utxmia.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsya on input line 33.
+LaTeX Font Info:    Try loading font information for U+txsya on input line 37.
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\utxsya.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxsya.fd"
 File: utxsya.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyb on input line 33.
+LaTeX Font Info:    Try loading font information for U+txsyb on input line 37.
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\utxsyb.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxsyb.fd"
 File: utxsyb.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyc on input line 33.
+LaTeX Font Info:    Try loading font information for U+txsyc on input line 37.
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\utxsyc.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\utxsyc.fd"
 File: utxsyc.fd 2000/12/15 v3.1
-) [1{C:/Users/Noah/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
+)
+Underfull \vbox (badness 1082) has occurred while \output is active []
 
 
-]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 4254) has occurred while \output is active []
+
+ [1{C:/Users/Noah Kurinsky/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
-Underfull \vbox (badness 3019) has occurred while \output is active []
+] [2]
 
- [2]
-[3]
-Underfull \hbox (badness 1097) in paragraph at lines 132--133
+Package natbib Warning: Citation `Caputi07' on page 3 undefined on input line 8
+6.
+
+
+Package natbib Warning: Citation `Caputi07' on page 3 undefined on input line 9
+1.
+
+[3] [4]
+Underfull \hbox (badness 1097) in paragraph at lines 148--149
 \OT1/txr/m/n/10 be-gin to con-struct the sim-u-lated sur-vey. For each red-
  []
 
-[4]
-Underfull \hbox (badness 10000) in paragraph at lines 151--151
+
+Underfull \hbox (badness 10000) in paragraph at lines 167--167
 []\OT1/txr/bx/n/12 Two-Dimensional Spec-tral Color His-
  []
 
-[5]
-Underfull \hbox (badness 1281) in paragraph at lines 198--199
+[5] [6]
+Underfull \hbox (badness 1281) in paragraph at lines 214--215
 []\OT1/txr/m/n/10 This tem-per-a-ture has thus be-come an ad-di-tional user-
  []
 
-LaTeX Font Info:    Try loading font information for OMS+txr on input line 214.
+LaTeX Font Info:    Try loading font information for OMS+txr on input line 230.
 
-(C:\Users\Noah\AppData\Roaming\MiKTeX\2.9\tex\latex\txfonts\omstxr.fd
+("C:\Program Files\MiKTeX 2.9\tex\latex\txfonts\omstxr.fd"
 File: omstxr.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `OMS/txr/m/n' in size <10> not available
-(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 214.
- [6]
-Underfull \hbox (badness 2205) in paragraph at lines 240--241
+(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 230.
+ [7]
+Underfull \hbox (badness 2205) in paragraph at lines 256--257
  []\OT1/txr/bx/n/10 Cosmological Func-tions[] \OT1/txr/m/n/10 The func-tions wh
 ich com-pute
  []
 
-[7] [8] (C:\Users\Noah\Documents\GitHub\SurveySim\Paper\Writeup.bbl [9])
+[8] [9] ("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.bbl")
+[10]
 Package epstopdf Info: Source file: <models.eps>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2013-05-04 20:59:05
 (epstopdf)                    size: 84646 bytes
 (epstopdf)             Output file: <models-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2013-05-04 23:08:28
 (epstopdf)                    size: 57613 bytes
 (epstopdf)             Command: <epstopdf --outfile=models-eps-converted-to.pdf
  models.eps>
-(epstopdf)             \includegraphics on input line 294.
+(epstopdf)             \includegraphics on input line 316.
 Package epstopdf Info: Output file is already uptodate.
-
-<models-eps-converted-to.pdf, id=274, 867.24pt x 650.43pt>
+ <models-eps-converted-to.pdf, id=311, 867.24pt x 650.43pt>
 File: models-eps-converted-to.pdf Graphic file (type pdf)
 
 <use models-eps-converted-to.pdf>
-Package pdftex.def Info: models-eps-converted-to.pdf used on input line 294.
+Package pdftex.def Info: models-eps-converted-to.pdf used on input line 316.
 (pdftex.def)             Requested size: 505.89pt x 373.92268pt.
 Package epstopdf Info: Source file: <model_brightness.eps>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2013-05-04 20:59:05
 (epstopdf)                    size: 66650 bytes
 (epstopdf)             Output file: <model_brightness-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2013-05-04 23:17:07
 (epstopdf)                    size: 35476 bytes
 (epstopdf)             Command: <epstopdf --outfile=model_brightness-eps-conver
 ted-to.pdf model_brightness.eps>
-(epstopdf)             \includegraphics on input line 300.
+(epstopdf)             \includegraphics on input line 322.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_brightness-eps-converted-to.pdf, id=280, 867.24pt x 650.43pt>
+<model_brightness-eps-converted-to.pdf, id=317, 867.24pt x 650.43pt>
 File: model_brightness-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_brightness-eps-converted-to.pdf>
 Package pdftex.def Info: model_brightness-eps-converted-to.pdf used on input li
-ne 300.
+ne 322.
 (pdftex.def)             Requested size: 505.89pt x 379.42317pt.
 Package epstopdf Info: Source file: <model_colors.eps>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2013-05-04 20:59:05
 (epstopdf)                    size: 142512 bytes
 (epstopdf)             Output file: <model_colors-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2013-05-04 23:08:28
 (epstopdf)                    size: 47178 bytes
 (epstopdf)             Command: <epstopdf --outfile=model_colors-eps-converted-
 to.pdf model_colors.eps>
-(epstopdf)             \includegraphics on input line 306.
+(epstopdf)             \includegraphics on input line 328.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_colors-eps-converted-to.pdf, id=285, 867.24pt x 650.43pt>
+<model_colors-eps-converted-to.pdf, id=322, 867.24pt x 650.43pt>
 File: model_colors-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_colors-eps-converted-to.pdf>
 Package pdftex.def Info: model_colors-eps-converted-to.pdf used on input line 3
-06.
+28.
 (pdftex.def)             Requested size: 505.89pt x 379.42317pt.
 Package epstopdf Info: Source file: <sim_lumfunct.eps>
-(epstopdf)                    date: 2013-05-10 12:43:00
+(epstopdf)                    date: 2013-05-10 00:35:44
 (epstopdf)                    size: 41877 bytes
 (epstopdf)             Output file: <sim_lumfunct-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-05-10 12:43:00
+(epstopdf)                    date: 2013-05-10 00:47:46
 (epstopdf)                    size: 16744 bytes
 (epstopdf)             Command: <epstopdf --outfile=sim_lumfunct-eps-converted-
 to.pdf sim_lumfunct.eps>
-(epstopdf)             \includegraphics on input line 313.
+(epstopdf)             \includegraphics on input line 335.
 Package epstopdf Info: Output file is already uptodate.
 
-<sim_lumfunct-eps-converted-to.pdf, id=286, 867.24pt x 650.43pt>
+<sim_lumfunct-eps-converted-to.pdf, id=323, 867.24pt x 650.43pt>
 File: sim_lumfunct-eps-converted-to.pdf Graphic file (type pdf)
 
 <use sim_lumfunct-eps-converted-to.pdf>
 Package pdftex.def Info: sim_lumfunct-eps-converted-to.pdf used on input line 3
-13.
+35.
 (pdftex.def)             Requested size: 505.89pt x 379.42317pt.
+
+
+Package natbib Warning: Citation `Caputi07' on page 11 undefined on input line 
+336.
+
+
+Package natbib Warning: Citation `Caputi07' on page 11 undefined on input line 
+336.
+
 Package epstopdf Info: Source file: <obs_color_hist.eps>
-(epstopdf)                    date: 2013-05-10 12:42:59
-(epstopdf)                    size: 16903 bytes
+(epstopdf)                    date: 2012-08-20 17:47:52
+(epstopdf)                    size: 16633 bytes
 (epstopdf)             Output file: <obs_color_hist-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2012-08-30 11:40:48
 (epstopdf)                    size: 6149 bytes
 (epstopdf)             Command: <epstopdf --outfile=obs_color_hist-eps-converte
 d-to.pdf obs_color_hist.eps>
-(epstopdf)             \includegraphics on input line 319.
+(epstopdf)             \includegraphics on input line 341.
 Package epstopdf Info: Output file is already uptodate.
-
-<obs_color_hist-eps-converted-to.pdf, id=297, 722.7pt x 578.16pt>
+<obs_color_hist-eps-converted-to.pdf, id=330, 722.7pt x 578.16pt>
 File: obs_color_hist-eps-converted-to.pdf Graphic file (type pdf)
 
 <use obs_color_hist-eps-converted-to.pdf>
 Package pdftex.def Info: obs_color_hist-eps-converted-to.pdf used on input line
- 319.
+ 341.
 (pdftex.def)             Requested size: 505.89pt x 404.70924pt.
 Package epstopdf Info: Source file: <model_color_hist.eps>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2013-05-05 14:01:33
 (epstopdf)                    size: 14984 bytes
 (epstopdf)             Output file: <model_color_hist-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-05-10 12:42:59
+(epstopdf)                    date: 2013-05-05 14:12:05
 (epstopdf)                    size: 6629 bytes
 (epstopdf)             Command: <epstopdf --outfile=model_color_hist-eps-conver
 ted-to.pdf model_color_hist.eps>
-(epstopdf)             \includegraphics on input line 325.
+(epstopdf)             \includegraphics on input line 347.
 Package epstopdf Info: Output file is already uptodate.
 
-<model_color_hist-eps-converted-to.pdf, id=302, 722.7pt x 578.16pt>
+<model_color_hist-eps-converted-to.pdf, id=335, 722.7pt x 578.16pt>
 File: model_color_hist-eps-converted-to.pdf Graphic file (type pdf)
 
 <use model_color_hist-eps-converted-to.pdf>
 Package pdftex.def Info: model_color_hist-eps-converted-to.pdf used on input li
-ne 325.
+ne 347.
 (pdftex.def)             Requested size: 505.89pt x 404.70924pt.
 
-<MCTest.png, id=303, 679.03688pt x 491.58656pt>
+<MCTest.png, id=336, 679.03688pt x 491.58656pt>
 File: MCTest.png Graphic file (type png)
  <use MCTest.png>
-Package pdftex.def Info: MCTest.png used on input line 331.
+Package pdftex.def Info: MCTest.png used on input line 353.
 (pdftex.def)             Requested size: 505.89pt x 366.23619pt.
 
-<initial.png, id=304, 459.96844pt x 720.44156pt>
+<initial.png, id=337, 459.96844pt x 720.44156pt>
 File: initial.png Graphic file (type png)
  <use initial.png>
-Package pdftex.def Info: initial.png used on input line 338.
+Package pdftex.def Info: initial.png used on input line 360.
 (pdftex.def)             Requested size: 361.34999pt x 566.00957pt.
 
-<bestfit2.png, id=307, 1172.88188pt x 724.20563pt>
+<bestfit2.png, id=340, 1172.88188pt x 724.20563pt>
 File: bestfit2.png Graphic file (type png)
  <use bestfit2.png>
-Package pdftex.def Info: bestfit2.png used on input line 344.
+Package pdftex.def Info: bestfit2.png used on input line 366.
 (pdftex.def)             Requested size: 505.89pt x 312.36374pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 349.
- [10
 
-]
-[11 <C:/Users/Noah/Documents/GitHub/SurveySim/Paper/models-eps-converted-to.pdf
->] [12 <C:/Users/Noah/Documents/GitHub/SurveySim/Paper/model_brightness-eps-con
-verted-to.pdf>] [13 <C:/Users/Noah/Documents/GitHub/SurveySim/Paper/model_color
-s-eps-converted-to.pdf>] [14 <C:/Users/Noah/Documents/GitHub/SurveySim/Paper/si
-m_lumfunct-eps-converted-to.pdf>] [15 <C:/Users/Noah/Documents/GitHub/SurveySim
-/Paper/obs_color_hist-eps-converted-to.pdf>] [16 <C:/Users/Noah/Documents/GitHu
-b/SurveySim/Paper/model_color_hist-eps-converted-to.pdf>] [17 <C:/Users/Noah/Do
-cuments/GitHub/SurveySim/Paper/MCTest.png>] [18 <C:/Users/Noah/Documents/GitHub
-/SurveySim/Paper/initial.png>] [19 <C:/Users/Noah/Documents/GitHub/SurveySim/Pa
-per/bestfit2.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 349.
- (C:\Users\Noah\Documents\GitHub\SurveySim\Paper\Writeup.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 349.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 349.
+
+Package natbib Warning: There were undefined citations.
+
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 372.
+[11
+
+
+ <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/models-eps-converted-
+to.pdf>] [12 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/model_bri
+ghtness-eps-converted-to.pdf>] [13 <C:/Users/Noah Kurinsky/Documents/GitHub/Sur
+veySim/Paper/model_colors-eps-converted-to.pdf>] [14 <C:/Users/Noah Kurinsky/Do
+cuments/GitHub/SurveySim/Paper/sim_lumfunct-eps-converted-to.pdf>] [15 <C:/User
+s/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/obs_color_hist-eps-converted-t
+o.pdf>] [16 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Paper/model_colo
+r_hist-eps-converted-to.pdf>] [17 <C:/Users/Noah Kurinsky/Documents/GitHub/Surv
+eySim/Paper/MCTest.png>] [18 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim
+/Paper/initial.png>] [19 <C:/Users/Noah Kurinsky/Documents/GitHub/SurveySim/Pap
+er/bestfit2.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 372.
+
+("C:\Users\Noah Kurinsky\Documents\GitHub\SurveySim\Paper\Writeup.aux")
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 372.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 372.
 Package rerunfilecheck Info: File `Writeup.out' has not changed.
-(rerunfilecheck)             Checksum: 718F801E7D02206822256D4754D31B9B;1526.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 349.
+(rerunfilecheck)             Checksum: 0F7EBE277F9D2E56F99CE2A044B41E4F;1571.
  ) 
 Here is how much of TeX's memory you used:
- 7617 strings out of 494045
- 108211 string characters out of 3148390
- 216158 words of memory out of 3000000
- 10665 multiletter control sequences out of 15000+200000
- 53144 words of font info for 123 fonts, out of 3000000 for 9000
+ 7612 strings out of 494045
+ 107735 string characters out of 3148364
+ 215378 words of memory out of 3000000
+ 10653 multiletter control sequences out of 15000+200000
+ 55163 words of font info for 126 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 42i,9n,29p,2065b,441s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Users/Noah/A
-ppData/Roaming/MiKTeX/2.9/fonts/type1/public/txfonts/rtxb.pfb><C:/Users/Noah/Ap
-pData/Roaming/MiKTeX/2.9/fonts/type1/public/txfonts/rtxmi.pfb><C:/Users/Noah/Ap
-pData/Roaming/MiKTeX/2.9/fonts/type1/public/txfonts/rtxr.pfb><C:/Users/Noah/App
-Data/Roaming/MiKTeX/2.9/fonts/type1/public/txfonts/rtxsc.pfb><C:/Users/Noah/App
-Data/Roaming/MiKTeX/2.9/fonts/type1/public/txfonts/txex.pfb><C:/Users/Noah/AppD
-ata/Roaming/MiKTeX/2.9/fonts/type1/public/txfonts/txsy.pfb><C:/Program Files/Mi
-KTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/ty
-pe1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utm
-ri8a.pfb>
-Output written on Writeup.pdf (19 pages, 495327 bytes).
+ 42i,9n,29p,2074b,390s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program File
+s/MiKTeX 2.9/fonts/type1/public/txfonts/rtxb.pfb><C:/Program Files/MiKTeX 2.9/f
+onts/type1/public/txfonts/rtxmi.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/pu
+blic/txfonts/rtxr.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/txfonts/r
+txsc.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/txfonts/txex.pfb><C:/P
+rogram Files/MiKTeX 2.9/fonts/type1/public/txfonts/txsy.pfb><C:/Program Files/M
+iKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/t
+ype1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/ut
+mr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Writeup.pdf (19 pages, 517997 bytes).
 PDF statistics:
- 417 PDF objects out of 1000 (max. 8388607)
- 87 named destinations out of 1000 (max. 500000)
- 220 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 450 PDF objects out of 1000 (max. 8388607)
+ 91 named destinations out of 1000 (max. 500000)
+ 228 words of extra memory for PDF output out of 10000 (max. 10000000)
 

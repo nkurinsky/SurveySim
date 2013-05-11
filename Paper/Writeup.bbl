@@ -1,8 +1,8 @@
-\begin{thebibliography}{18}
+\begin{thebibliography}{21}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{{Caputi} {et~al.}(2007){Caputi}, {Lagache}, {Yan}, {Dole},
-  {Bavouzet}, {Le Floc'h}, {Choi}, {Helou}, \& {Reddy}}]{Caputi07}
+  {Bavouzet}, {Le Floc'h}, {Choi}, {Helou}, \& {Reddy}}]{caputi07}
 {Caputi}, K.~I., {Lagache}, G., {Yan}, L., {et~al.} 2007, APJ, 660, 97
 
 \bibitem[{{Devlin} {et~al.}(2009){Devlin}, {Ade}, {Aretxaga}, {Bock}, {Chapin},
@@ -17,6 +17,10 @@
   \& {Skordis}}]{dunkley05}
 {Dunkley}, J., {Bucher}, M., {Ferreira}, P.~G., {Moodley}, K., \& {Skordis}, C.
   2005, MNRAS, 356, 925
+
+\bibitem[{{Elvis} {et~al.}(1994){Elvis}, {Wilkes}, {McDowell}, {Green},
+  {Bechtold}, {Willner}, {Oey}, {Polomski}, \& {Cutri}}]{elvis94}
+{Elvis}, M., {Wilkes}, B.~J., {McDowell}, J.~C., {et~al.} 1994, ApJS, 95, 1
 
 \bibitem[{Galassi {et~al.}(2011)Galassi, Davies, Theiler, Gough, \&
   Jungman}]{GSL}
@@ -60,6 +64,12 @@ Gordon, C., Irby, B., Dorman, B., Cansal, S., \& Kunz, P. 2011, CCFITS
 {Hogg}, D.~W., {Baldry}, I.~K., {Blanton}, M.~R., \& {Eisenstein}, D.~J. 2002,
   ArXiv Astrophysics e-prints
 
+\bibitem[{{Kirkpatrick} {et~al.}(2013){Kirkpatrick}, {Pope}, {Charmandaris},
+  {Daddi}, {Elbaz}, {Hwang}, {Pannella}, {Scott}, {Altieri}, {Aussel}, {Coia},
+  {Dannerbauer}, {Dasyra}, {Dickinson}, {Kartaltepe}, {Leiton}, {Magdis},
+  {Magnelli}, {Popesso}, \& {Valtchanov}}]{kirk13}
+{Kirkpatrick}, A., {Pope}, A., {Charmandaris}, V., {et~al.} 2013, APJ, 763, 123
+
 \bibitem[{{Komatsu} {et~al.}(2011){Komatsu}, {Smith}, {Dunkley}, {Bennett},
   {Gold}, {Hinshaw}, {Jarosik}, {Larson}, {Nolta}, {Page}, {Spergel},
   {Halpern}, {Hill}, {Kogut}, {Limon}, {Meyer}, {Odegard}, {Tucker}, {Weiland},
@@ -101,6 +111,11 @@ Pence, W., Drakos, N., \& Moore, R. 2003, CFITSIO Quick Start Guide
   {P{\'e}rez-Gonz{\'a}lez}, {Blaylock}, {Donley}, \& {Marcillac}}]{rieke09}
 {Rieke}, G.~H., {Alonso-Herrero}, A., {Weiner}, B.~J., {et~al.} 2009, ApJ, 692,
   556
+
+\bibitem[{{Saunders} {et~al.}(1990){Saunders}, {Rowan-Robinson}, {Lawrence},
+  {Efstathiou}, {Kaiser}, {Ellis}, \& {Frenk}}]{Saunders90}
+{Saunders}, W., {Rowan-Robinson}, M., {Lawrence}, A., {et~al.} 1990, MNRAS,
+  242, 318
 
 \bibitem[{Scott(1979)}]{binsize}
 Scott, D.~W. 1979, Biometrika, 66, pp. 605
