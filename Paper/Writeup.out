@@ -14,7 +14,7 @@
 \BOOKMARK [2][-]{subsection.3.3}{Markov Chain Monte Carlo Minimization}{section.3}% 14
 \BOOKMARK [1][-]{section.4}{Implementation}{}% 15
 \BOOKMARK [2][-]{subsection.4.1}{C++ Executable}{section.4}% 16
-\BOOKMARK [3][-]{subsubsection.4.1.1}{Classes and Other Methods}{subsection.4.1}% 17
+\BOOKMARK [3][-]{subsubsection.4.1.1}{C++ Classes and Methods}{subsection.4.1}% 17
 \BOOKMARK [3][-]{subsubsection.4.1.2}{Optimization and Efficiency Considerations}{subsection.4.1}% 18
 \BOOKMARK [2][-]{subsection.4.2}{IDL Interactive Widget and Plotting}{section.4}% 19
 \BOOKMARK [1][-]{section.5}{Testing and Initial Results}{}% 20

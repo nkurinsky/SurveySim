@@ -34,6 +34,7 @@
 \citation{Komatsu11}
 \citation{Hogg02}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Luminosity Function}{3}{subsection.2.2}}
+\newlabel{sec:lf}{{2.2}{3}{Luminosity Function\relax }{subsection.2.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Cosmology}{3}{subsection.2.3}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.1}Luminosity Distance}{3}{subsubsection.2.3.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.2}Comoving Volume}{3}{subsubsection.2.3.2}}
@@ -46,39 +47,40 @@
 \citation{binsize}
 \citation{binsize}
 \citation{dunkley05}
-\citation{CCFITS}
-\citation{CFITSIO}
+\citation{dunkley05}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Two-Dimensional Spectral Color Histogram}{5}{subsection.3.1}}
 \newlabel{color_hist}{{3.1}{5}{Two-Dimensional Spectral Color Histogram\relax }{subsection.3.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Chi-Square Testing}{5}{subsection.3.2}}
 \newlabel{chisq}{{3.2}{5}{Chi-Square Testing\relax }{subsection.3.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Markov Chain Monte Carlo Minimization}{5}{subsection.3.3}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Implementation}{5}{section.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}C++ Executable}{5}{subsection.4.1}}
+\citation{dunkley05}
+\citation{marsden11}
+\citation{CosmoMC}
+\citation{CCFITS}
+\citation{CFITSIO}
 \citation{GSL}
 \citation{GSL}
 \citation{GSL}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Implementation}{6}{section.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}C++ Executable}{6}{subsection.4.1}}
 \citation{GSL}
 \citation{GSL}
-\@writefile{toc}{\contentsline {paragraph}{Random Number Generation}{6}{section*.1}}
-\@writefile{toc}{\contentsline {paragraph}{Numerical Integration}{6}{section*.2}}
-\@writefile{toc}{\contentsline {paragraph}{Interpolation}{6}{section*.3}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}Classes and Other Methods}{6}{subsubsection.4.1.1}}
-\newlabel{class:models}{{4.1.1}{6}{Model Library Class\relax }{section*.4}{}}
-\@writefile{toc}{\contentsline {paragraph}{Model Library Class}{6}{section*.4}}
-\@writefile{toc}{\contentsline {paragraph}{Cosmological Functions}{6}{section*.5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}C++ Classes and Methods}{7}{subsubsection.4.1.1}}
+\newlabel{class:models}{{4.1.1}{7}{SED Library Class\relax }{section*.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{SED Library Class}{7}{section*.1}}
+\@writefile{toc}{\contentsline {paragraph}{Cosmological Functions}{7}{section*.2}}
+\@writefile{toc}{\contentsline {paragraph}{Luminosity Function Class}{7}{section*.3}}
 \citation{Devlin09}
 \citation{HerMES}
 \citation{Herschel,SPIRE}
-\@writefile{toc}{\contentsline {paragraph}{Luminosity Function Class}{7}{section*.6}}
-\@writefile{toc}{\contentsline {paragraph}{Observation Library Class}{7}{section*.7}}
-\@writefile{toc}{\contentsline {paragraph}{Histogram Library Class}{7}{section*.8}}
-\@writefile{toc}{\contentsline {paragraph}{Simulator Class}{7}{section*.9}}
-\@writefile{toc}{\contentsline {paragraph}{Main Program (Monte Carlo Fitting Code)}{7}{section*.10}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Optimization and Efficiency Considerations}{7}{subsubsection.4.1.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}IDL Interactive Widget and Plotting}{7}{subsection.4.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Testing and Initial Results}{7}{section.5}}
-\newlabel{example}{{5}{7}{Testing and Initial Results\relax }{section.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{Observation Library Class}{8}{section*.4}}
+\@writefile{toc}{\contentsline {paragraph}{Histogram Library Class}{8}{section*.5}}
+\@writefile{toc}{\contentsline {paragraph}{Simulator Class}{8}{section*.6}}
+\@writefile{toc}{\contentsline {paragraph}{Main Program (Monte Carlo Fitting Code)}{8}{section*.7}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Optimization and Efficiency Considerations}{8}{subsubsection.4.1.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}IDL Interactive Widget and Plotting}{8}{subsection.4.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Testing and Initial Results}{8}{section.5}}
+\newlabel{example}{{5}{8}{Testing and Initial Results\relax }{section.5}{}}
 \bibstyle{aa}
 \bibdata{writeup}
 \bibcite{Caputi07}{{1}{2007}{{{Caputi} {et~al.}}}{{{Caputi}, {Lagache}, {Yan}, {Dole}, {Bavouzet}, {Le Floc'h}, {Choi}, {Helou}, \& {Reddy}}}}
@@ -89,36 +91,43 @@
 \bibcite{SPIRE}{{6}{2010}{{{Griffin} {et~al.}}}{{{Griffin}, {Abergel}, {Abreu}, {Ade}, {Andr{\'e}}, {Augueres}, {Babbedge}, {Bae}, {Baillie}, {Baluteau}, {Barlow}, {Bendo}, {Benielli}, {Bock}, {Bonhomme}, {Brisbin}, {Brockley-Blatt}, {Caldwell}, {Cara}, {Castro-Rodriguez}, {Cerulli}, {Chanial}, {Chen}, {Clark}, {Clements}, {Clerc}, {Coker}, {Communal}, {Conversi}, {Cox}, {Crumb}, {Cunningham}, {Daly}, {Davis}, {de Antoni}, {Delderfield}, {Devin}, {di Giorgio}, {Didschuns}, {Dohlen}, {Donati}, {Dowell}, {Dowell}, {Duband}, {Dumaye}, {Emery}, {Ferlet}, {Ferrand}, {Fontignie}, {Fox}, {Franceschini}, {Frerking}, {Fulton}, {Garcia}, {Gastaud}, {Gear}, {Glenn}, {Goizel}, {Griffin}, {Grundy}, {Guest}, {Guillemet}, {Hargrave}, {Harwit}, {Hastings}, {Hatziminaoglou}, {Herman}, {Hinde}, {Hristov}, {Huang}, {Imhof}, {Isaak}, {Israelsson}, {Ivison}, {Jennings}, {Kiernan}, {King}, {Lange}, {Latter}, {Laurent}, {Laurent}, {Leeks}, {Lellouch}, {Levenson}, {Li}, {Li}, {Lilienthal}, {Lim}, {Liu}, {Lu}, {Madden}, {Mainetti}, {Marliani}, {McKay}, {Mercier}, {Molinari}, {Morris}, {Moseley}, {Mulder}, {Mur}, {Naylor}, {Nguyen}, {O'Halloran}, {Oliver}, {Olofsson}, {Olofsson}, {Orfei}, {Page}, {Pain}, {Panuzzo}, {Papageorgiou}, {Parks}, {Parr-Burman}, {Pearce}, {Pearson}, {P{\'e}rez-Fournon}, {Pinsard}, {Pisano}, {Podosek}, {Pohlen}, {Polehampton}, {Pouliquen}, {Rigopoulou}, {Rizzo}, {Roseboom}, {Roussel}, {Rowan-Robinson}, {Rownd}, {Saraceno}, {Sauvage}, {Savage}, {Savini}, {Sawyer}, {Scharmberg}, {Schmitt}, {Schneider}, {Schulz}, {Schwartz}, {Shafer}, {Shupe}, {Sibthorpe}, {Sidher}, {Smith}, {Smith}, {Smith}, {Spencer}, {Stobie}, {Sudiwala}, {Sukhatme}, {Surace}, {Stevens}, {Swinyard}, {Trichas}, {Tourette}, {Triou}, {Tseng}, {Tucker}, {Turner}, {Vaccari}, {Valtchanov}, {Vigroux}, {Virique}, {Voellmer}, {Walker}, {Ward}, {Waskett}, {Weilert}, {Wesson}, {White}, {Whitehouse}, {Wilson}, {Winter}, {Woodcraft}, {Wright}, {Xu}, {Zavagno}, {Zemcov}, {Zhang}, \& {Zonca}}}}
 \bibcite{Hogg02}{{7}{2002}{{{Hogg} {et~al.}}}{{{Hogg}, {Baldry}, {Blanton}, \& {Eisenstein}}}}
 \bibcite{Komatsu11}{{8}{2011}{{{Komatsu} {et~al.}}}{{{Komatsu}, {Smith}, {Dunkley}, {Bennett}, {Gold}, {Hinshaw}, {Jarosik}, {Larson}, {Nolta}, {Page}, {Spergel}, {Halpern}, {Hill}, {Kogut}, {Limon}, {Meyer}, {Odegard}, {Tucker}, {Weiland}, {Wollack}, \& {Wright}}}}
-\bibcite{marsden11}{{9}{2011}{{{Marsden} {et~al.}}}{{{Marsden}, {Chapin}, {Halpern}, {Patanchon}, {Scott}, {Truch}, {Valiante}, {Viero}, \& {Wiebe}}}}
-\bibcite{negrello13}{{10}{2013}{{{Negrello} {et~al.}}}{{{Negrello}, {Clemens}, {Gonzalez-Nuevo}, {De Zotti}, {Bonavera}, {Cosco}, {Guarese}, {Boaretto}, {Serjeant}, {Toffolatti}, {Lapi}, {Bethermin}, {Castex}, {Clements}, {Delabrouille}, {Dole}, {Franceschini}, {Mandolesi}, {Marchetti}, {Partridge}, \& {Sajina}}}}
-\bibcite{BLAST}{{11}{2008}{{{Pascale} {et~al.}}}{{{Pascale}, {Ade}, {Bock}, {Chapin}, {Chung}, {Devlin}, {Dicker}, {Griffin}, {Gundersen}, {Halpern}, {Hargrave}, {Hughes}, {Klein}, {MacTavish}, {Marsden}, {Martin}, {Martin}, {Mauskopf}, {Netterfield}, {Olmi}, {Patanchon}, {Rex}, {Scott}, {Semisch}, {Thomas}, {Truch}, {Tucker}, {Tucker}, {Viero}, \& {Wiebe}}}}
-\bibcite{CFITSIO}{{12}{2003}{{Pence {et~al.}}}{{Pence, Drakos, \& Moore}}}
-\bibcite{Herschel}{{13}{2010}{{{Pilbratt} {et~al.}}}{{{Pilbratt}, {Riedinger}, {Passvogel}, {Crone}, {Doyle}, {Gageur}, {Heras}, {Jewell}, {Metcalfe}, {Ott}, \& {Schmidt}}}}
-\bibcite{rieke09}{{14}{2009}{{{Rieke} {et~al.}}}{{{Rieke}, {Alonso-Herrero}, {Weiner}, {P{\'e}rez-Gonz{\'a}lez}, {Blaylock}, {Donley}, \& {Marcillac}}}}
-\bibcite{binsize}{{15}{1979}{{Scott}}{{}}}
-\bibcite{HerMES}{{16}{2012}{{{Smith} {et~al.}}}{{{Smith}, {Wang}, {Oliver}, {Auld}, {Bock}, {Brisbin}, {Burgarella}, {Chanial}, {Chapin}, {Clements}, {Conversi}, {Cooray}, {Dowell}, {Eales}, {Farrah}, {Franceschini}, {Glenn}, {Griffin}, {Ivison}, {Mortier}, {Page}, {Papageorgiou}, {Pearson}, {P{\'e}rez-Fournon}, {Pohlen}, {Rawlings}, {Raymond}, {Rodighiero}, {Roseboom}, {Rowan-Robinson}, {Savage}, {Scott}, {Seymour}, {Symeonidis}, {Tugwell}, {Vaccari}, {Valtchanov}, {Vigroux}, {Ward}, {Wright}, \& {Zemcov}}}}
-\bibcite{wiklind03}{{17}{2003}{{Wiklind}}{{}}}
+\bibcite{CosmoMC}{{9}{2002}{{{Lewis} \& {Bridle}}}{{}}}
+\bibcite{marsden11}{{10}{2011}{{{Marsden} {et~al.}}}{{{Marsden}, {Chapin}, {Halpern}, {Patanchon}, {Scott}, {Truch}, {Valiante}, {Viero}, \& {Wiebe}}}}
+\bibcite{negrello13}{{11}{2013}{{{Negrello} {et~al.}}}{{{Negrello}, {Clemens}, {Gonzalez-Nuevo}, {De Zotti}, {Bonavera}, {Cosco}, {Guarese}, {Boaretto}, {Serjeant}, {Toffolatti}, {Lapi}, {Bethermin}, {Castex}, {Clements}, {Delabrouille}, {Dole}, {Franceschini}, {Mandolesi}, {Marchetti}, {Partridge}, \& {Sajina}}}}
+\bibcite{BLAST}{{12}{2008}{{{Pascale} {et~al.}}}{{{Pascale}, {Ade}, {Bock}, {Chapin}, {Chung}, {Devlin}, {Dicker}, {Griffin}, {Gundersen}, {Halpern}, {Hargrave}, {Hughes}, {Klein}, {MacTavish}, {Marsden}, {Martin}, {Martin}, {Mauskopf}, {Netterfield}, {Olmi}, {Patanchon}, {Rex}, {Scott}, {Semisch}, {Thomas}, {Truch}, {Tucker}, {Tucker}, {Viero}, \& {Wiebe}}}}
+\bibcite{CFITSIO}{{13}{2003}{{Pence {et~al.}}}{{Pence, Drakos, \& Moore}}}
+\bibcite{Herschel}{{14}{2010}{{{Pilbratt} {et~al.}}}{{{Pilbratt}, {Riedinger}, {Passvogel}, {Crone}, {Doyle}, {Gageur}, {Heras}, {Jewell}, {Metcalfe}, {Ott}, \& {Schmidt}}}}
+\bibcite{rieke09}{{15}{2009}{{{Rieke} {et~al.}}}{{{Rieke}, {Alonso-Herrero}, {Weiner}, {P{\'e}rez-Gonz{\'a}lez}, {Blaylock}, {Donley}, \& {Marcillac}}}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Future Directions}{9}{section.6}}
+\newlabel{fdirs}{{6}{9}{Future Directions\relax }{section.6}{}}
+\bibcite{binsize}{{16}{1979}{{Scott}}{{}}}
+\bibcite{HerMES}{{17}{2012}{{{Smith} {et~al.}}}{{{Smith}, {Wang}, {Oliver}, {Auld}, {Bock}, {Brisbin}, {Burgarella}, {Chanial}, {Chapin}, {Clements}, {Conversi}, {Cooray}, {Dowell}, {Eales}, {Farrah}, {Franceschini}, {Glenn}, {Griffin}, {Ivison}, {Mortier}, {Page}, {Papageorgiou}, {Pearson}, {P{\'e}rez-Fournon}, {Pohlen}, {Rawlings}, {Raymond}, {Rodighiero}, {Roseboom}, {Rowan-Robinson}, {Savage}, {Scott}, {Seymour}, {Symeonidis}, {Tugwell}, {Vaccari}, {Valtchanov}, {Vigroux}, {Ward}, {Wright}, \& {Zemcov}}}}
+\bibcite{wiklind03}{{18}{2003}{{Wiklind}}{{}}}
 \citation{rieke09}
 \citation{rieke09}
 \citation{rieke09}
 \citation{rieke09}
+\citation{negrello13}
+\citation{Caputi07}
+\citation{negrello13}
+\citation{Caputi07}
 \citation{HerMES}
 \citation{HerMES}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Future Directions}{8}{section.6}}
-\newlabel{fdirs}{{6}{8}{Future Directions\relax }{section.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces SED Library consisting of LIRG and URLIRG templates ranging in far-infrared luminosity from $10^9$ to $10^13$ $L_{sun}$, taken from \citet  {rieke09}. These templates are based on a mix of data from local galaxies and models of galaxies as modified blackbodies in the far-infrared regime, mixed with radio-loud tails seen on the far right of the models in the above plot. The transition between LIRG and ULIRG can be seen where the models seem to group through the FIR region. Currently, these models are used with their associated luminosities over the entire redshift range, however with color evolution we would see intrinsic luminosities increase with redshift without a corresponding temperature rise (these models will rise along the Luminosity axis with redshift).}}{9}{figure.1}}
-\newlabel{slib}{{1}{9}{SED Library consisting of LIRG and URLIRG templates ranging in far-infrared luminosity from $10^9$ to $10^13$ $L_{sun}$, taken from \citet {rieke09}. These templates are based on a mix of data from local galaxies and models of galaxies as modified blackbodies in the far-infrared regime, mixed with radio-loud tails seen on the far right of the models in the above plot. The transition between LIRG and ULIRG can be seen where the models seem to group through the FIR region. Currently, these models are used with their associated luminosities over the entire redshift range, however with color evolution we would see intrinsic luminosities increase with redshift without a corresponding temperature rise (these models will rise along the Luminosity axis with redshift)}{figure.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces A visual of how the intensity and slope of the SED varies as a function of redshift. Here we see the brightest and faintest SED models from the \citet  {rieke09} template library, redshifted between $z=0$ and $z=5$ in steps of $z=1$. We can see that intrinsic luminosity increases from low redshift, and slope rises from negative to positive with redshift. This helps to explain the overall trend we see when projecting the models into our color-color space.}}{10}{figure.2}}
-\newlabel{mshift}{{2}{10}{A visual of how the intensity and slope of the SED varies as a function of redshift. Here we see the brightest and faintest SED models from the \citet {rieke09} template library, redshifted between $z=0$ and $z=5$ in steps of $z=1$. We can see that intrinsic luminosity increases from low redshift, and slope rises from negative to positive with redshift. This helps to explain the overall trend we see when projecting the models into our color-color space}{figure.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The spectral color pairs produced by the entire library of models for $0<z<5$. [expand]}}{11}{figure.3}}
-\newlabel{slib_color}{{3}{11}{The spectral color pairs produced by the entire library of models for $0<z<5$. [expand]\relax }{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Luminosity function for 2 separate evolutionary models which match at z=0}}{12}{figure.4}}
-\newlabel{lf}{{4}{12}{Luminosity function for 2 separate evolutionary models which match at z=0\relax }{figure.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces An example of 2-D Color Histogram, created with the HerMES survey data \citep  {HerMES}. This survey contains $\sim 10^3$ sources.}}{13}{figure.5}}
-\newlabel{fig:hist1}{{5}{13}{An example of 2-D Color Histogram, created with the HerMES survey data \citep {HerMES}. This survey contains $\sim 10^3$ sources}{figure.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces An example of a simulated survey. This was created from a simulation with a very small number of iterations, and is meant to serve as an illustration as opposed to a realistic simulation. We do see a nice spread off of the zero noise model slope, and see that the simulation is at least heading in the right direction as compared to the observations.}}{14}{figure.6}}
-\newlabel{simmed}{{6}{14}{An example of a simulated survey. This was created from a simulation with a very small number of iterations, and is meant to serve as an illustration as opposed to a realistic simulation. We do see a nice spread off of the zero noise model slope, and see that the simulation is at least heading in the right direction as compared to the observations}{figure.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces The IDL initial fitting window. At the top are the band parameters, below are the redshift and model parameters, and to the right are the luminosity function and cosmological parameters. The run simulation button creates fits files and runs the C++ executable, while the plot last run button reads the output.fits file in the current directory and produces the output seen in Figure \ref  {disp:res}.}}{15}{figure.7}}
-\newlabel{disp:init}{{7}{15}{The IDL initial fitting window. At the top are the band parameters, below are the redshift and model parameters, and to the right are the luminosity function and cosmological parameters. The run simulation button creates fits files and runs the C++ executable, while the plot last run button reads the output.fits file in the current directory and produces the output seen in Figure \ref {disp:res}}{figure.7}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces The IDL results display. The top row of the display (left to right) shows the luminosities of the simulated sources, as well as the fitted redshift distribution and the model parameter distributions used. The second row shows differential source counts, however evolution effects have not been removed, as they will in future version. The final row shows the model, observed, and comparison histograms from the simulation.}}{16}{figure.8}}
-\newlabel{disp:res}{{8}{16}{The IDL results display. The top row of the display (left to right) shows the luminosities of the simulated sources, as well as the fitted redshift distribution and the model parameter distributions used. The second row shows differential source counts, however evolution effects have not been removed, as they will in future version. The final row shows the model, observed, and comparison histograms from the simulation}{figure.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces SED Library consisting of LIRG and URLIRG templates ranging in far-infrared luminosity from $10^9$ to $10^13$ $L_{sun}$, taken from \citet  {rieke09}. These templates are based on a mix of data from local galaxies and models of galaxies as modified blackbodies in the far-infrared regime, mixed with radio-loud tails seen on the far right of the models in the above plot. The transition between LIRG and ULIRG can be seen where the models seem to group through the FIR region. Currently, these models are used with their associated luminosities over the entire redshift range, however with color evolution we would see intrinsic luminosities increase with redshift without a corresponding temperature rise (these models will rise along the Luminosity axis with redshift).}}{11}{figure.1}}
+\newlabel{slib}{{1}{11}{SED Library consisting of LIRG and URLIRG templates ranging in far-infrared luminosity from $10^9$ to $10^13$ $L_{sun}$, taken from \citet {rieke09}. These templates are based on a mix of data from local galaxies and models of galaxies as modified blackbodies in the far-infrared regime, mixed with radio-loud tails seen on the far right of the models in the above plot. The transition between LIRG and ULIRG can be seen where the models seem to group through the FIR region. Currently, these models are used with their associated luminosities over the entire redshift range, however with color evolution we would see intrinsic luminosities increase with redshift without a corresponding temperature rise (these models will rise along the Luminosity axis with redshift)}{figure.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces A visual of how the intensity and slope of the SED varies as a function of redshift. Here we see the brightest and faintest SED models from the \citet  {rieke09} template library, redshifted between $z=0$ and $z=5$ in steps of $z=1$. We can see that intrinsic luminosity increases from low redshift, and slope rises from negative to positive with redshift. This helps to explain the overall trend we see when projecting the models into our color-color space.}}{12}{figure.2}}
+\newlabel{mshift}{{2}{12}{A visual of how the intensity and slope of the SED varies as a function of redshift. Here we see the brightest and faintest SED models from the \citet {rieke09} template library, redshifted between $z=0$ and $z=5$ in steps of $z=1$. We can see that intrinsic luminosity increases from low redshift, and slope rises from negative to positive with redshift. This helps to explain the overall trend we see when projecting the models into our color-color space}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The spectral color pairs produced by the entire library of models for $0<z<5$, without added noise. Here we can see the general trend associated with redshift, however also a degeneracy between intrinsic luminosity and redshift along the trend line, as well as some natural dispersion due to natural variation in template form through the far-infrared region.}}{13}{figure.3}}
+\newlabel{slib_color}{{3}{13}{The spectral color pairs produced by the entire library of models for $0<z<5$, without added noise. Here we can see the general trend associated with redshift, however also a degeneracy between intrinsic luminosity and redshift along the trend line, as well as some natural dispersion due to natural variation in template form through the far-infrared region}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Luminosity function from \citet  {negrello13}, evolved with the parameter values fitted during a short sample simulation starting from the low-redshift \citet  {Caputi07} values. Here we see evolution out to redshift of 2, and before that point positive evolution in characteristic luminosity and negative evolution in number density at this luminosity. The net product is to increase relative density of high luminosity galaxies such that they are more dominant in the sample at higher redshift; this combined with the relatively high magnitude limits of the samples we consider results in most of our sources being very bright and high redshift (see figure \ref  {disp:res})}}{14}{figure.4}}
+\newlabel{lf}{{4}{14}{Luminosity function from \citet {negrello13}, evolved with the parameter values fitted during a short sample simulation starting from the low-redshift \citet {Caputi07} values. Here we see evolution out to redshift of 2, and before that point positive evolution in characteristic luminosity and negative evolution in number density at this luminosity. The net product is to increase relative density of high luminosity galaxies such that they are more dominant in the sample at higher redshift; this combined with the relatively high magnitude limits of the samples we consider results in most of our sources being very bright and high redshift (see figure \ref {disp:res})\relax }{figure.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces An example of 2-D Color Histogram, created with the HerMES survey data \citep  {HerMES}. This survey contains $\sim 10^3$ sources.}}{15}{figure.5}}
+\newlabel{fig:hist1}{{5}{15}{An example of 2-D Color Histogram, created with the HerMES survey data \citep {HerMES}. This survey contains $\sim 10^3$ sources}{figure.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces An example of a simulated survey. This was created from a simulation with a very small number of iterations, and is meant to serve as an illustration as opposed to a realistic simulation. We do see a nice spread off of the zero noise model slope, and see that the simulation is at least heading in the right direction as compared to the observations.}}{16}{figure.6}}
+\newlabel{simmed}{{6}{16}{An example of a simulated survey. This was created from a simulation with a very small number of iterations, and is meant to serve as an illustration as opposed to a realistic simulation. We do see a nice spread off of the zero noise model slope, and see that the simulation is at least heading in the right direction as compared to the observations}{figure.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Example of parameter space exploration by the Monte Carlo algorithm, with p on the x axis and q on the y axis. What is most evident from this early demonstration is that there is definite clumping (indicative of a found minimum) but the Monte Carlo may be too hot, accepting guesses too often and moving too far from the minimum to proceed back quickly. Alternatively, the models could be partially inadequate, with different parts satisfying different aspects of observation and allowing multiple ``most likely'' peaks in our Monte Carlo. The above is only about 700 runs, so the space is inadequately sampled, however shows that the Monte Carlo is operating on the correct principles and finding minima.}}{17}{figure.7}}
+\newlabel{fig:mc}{{7}{17}{Example of parameter space exploration by the Monte Carlo algorithm, with p on the x axis and q on the y axis. What is most evident from this early demonstration is that there is definite clumping (indicative of a found minimum) but the Monte Carlo may be too hot, accepting guesses too often and moving too far from the minimum to proceed back quickly. Alternatively, the models could be partially inadequate, with different parts satisfying different aspects of observation and allowing multiple ``most likely'' peaks in our Monte Carlo. The above is only about 700 runs, so the space is inadequately sampled, however shows that the Monte Carlo is operating on the correct principles and finding minima}{figure.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces The IDL initial fitting window. At the top are the band parameters, below are the redshift and model parameters, and to the right are the luminosity function and cosmological parameters. The run simulation button creates fits files and runs the C++ executable, while the plot last run button reads the output.fits file in the current directory and produces the output seen in Figure \ref  {disp:res}.}}{18}{figure.8}}
+\newlabel{disp:init}{{8}{18}{The IDL initial fitting window. At the top are the band parameters, below are the redshift and model parameters, and to the right are the luminosity function and cosmological parameters. The run simulation button creates fits files and runs the C++ executable, while the plot last run button reads the output.fits file in the current directory and produces the output seen in Figure \ref {disp:res}}{figure.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces The IDL results display. The top row of the display (left to right) shows the luminosity function for the fitted parameters, as well as the resulting redshift distribution of simulated sources and a histogram of fluxes for the 250 $\mu m$ band. The second row shows more differential source counts, however evolution effects have not been removed in the second two panels, as they will in future version. The final row shows the model, observed, and comparison histograms from the simulation.}}{19}{figure.9}}
+\newlabel{disp:res}{{9}{19}{The IDL results display. The top row of the display (left to right) shows the luminosity function for the fitted parameters, as well as the resulting redshift distribution of simulated sources and a histogram of fluxes for the 250 $\mu m$ band. The second row shows more differential source counts, however evolution effects have not been removed in the second two panels, as they will in future version. The final row shows the model, observed, and comparison histograms from the simulation}{figure.9}{}}

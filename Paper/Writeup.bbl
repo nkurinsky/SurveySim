@@ -1,4 +1,4 @@
-\begin{thebibliography}{17}
+\begin{thebibliography}{18}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{{Caputi} {et~al.}(2007){Caputi}, {Lagache}, {Yan}, {Dole},
@@ -65,6 +65,9 @@ Gordon, C., Irby, B., Dorman, B., Cansal, S., \& Kunz, P. 2011, CCFITS
   {Halpern}, {Hill}, {Kogut}, {Limon}, {Meyer}, {Odegard}, {Tucker}, {Weiland},
   {Wollack}, \& {Wright}}]{Komatsu11}
 {Komatsu}, E., {Smith}, K.~M., {Dunkley}, J., {et~al.} 2011, APJS, 192, 18
+
+\bibitem[{{Lewis} \& {Bridle}(2002)}]{CosmoMC}
+{Lewis}, A. \& {Bridle}, S. 2002, PRD, 66, 103511
 
 \bibitem[{{Marsden} {et~al.}(2011){Marsden}, {Chapin}, {Halpern}, {Patanchon},
   {Scott}, {Truch}, {Valiante}, {Viero}, \& {Wiebe}}]{marsden11}
