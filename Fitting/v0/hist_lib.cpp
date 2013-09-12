@@ -247,6 +247,7 @@ double ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cn
   return retvals;
 }
 
+//here replace sqrt with tabulated vals and new formula
 double hist_lib::fit_err(){
   //Chi-square
   static double chisq,obs_temp,mod_temp,obs_temp_err,mod_temp_err,err_temp,chisq_temp;
@@ -270,23 +271,24 @@ double hist_lib::fit_err(){
       chisq_temp = 0;
       if(obs_valid or mod_valid){
 	if(mod_valid){
-	  mod_temp_err = sqrt(mod_temp);
+	  //mod_temp_err = sqrt(mod_temp);
+	  mod_temp_err = poiss_err(mod_temp);
 	  mod_temp /= double(msize);
 	  mod_temp_err /= double(msize);
 	}
 	else{
 	  mod_temp = 0;
-	  mod_temp_err = 0;
+	  mod_temp_err = 1.841;
 	}
 
 	if(obs_valid){
-	  obs_temp_err = sqrt(obs_temp);
+	  obs_temp_err = poiss_err(obs_temp);
 	  obs_temp /= double(osize);
 	  obs_temp_err /= double(osize);
 	}
 	else{
 	  obs_temp = 0;
-	  obs_temp_err = 0;
+	  obs_temp_err = 1.841;
 	}
        
 	err_temp = sqrt(pow(mod_temp_err,2)+pow(obs_temp_err,2));
@@ -300,3 +302,11 @@ double hist_lib::fit_err(){
   return chisq;
 }
 
+double hist_lib::poiss_err(int x){
+  if (x le 0)
+    return poiss[0];
+  else if (x le 100)
+    return poiss[x];
+  else
+    return sqrt(x)+1.0;
+}
