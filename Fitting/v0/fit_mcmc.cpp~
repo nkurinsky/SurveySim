@@ -1,6 +1,6 @@
 //****************************************************************************
 // written by Anna Sajina 09/28/12
-// updated by Noah Kurinsky 9/18/13
+// updated by Noah Kurinsky 5/5/13
 // The purpose of this program is to read-in the parameters set in the idl 
 // wrapper (simulation.pro) and to use MCMC to determine the best-fit set of 
 // parameters. 
@@ -228,7 +228,7 @@ int main(int argc,char** argv){
     printf("Running...\n");
     output=survey.simulate(area,nz,dz,zmin,ns);
     trial=output.chisqr;
-    printf("Model chi2: %lf",trial);
+    printf("Model chi2: %lf\n",trial);
 
     de=trial-chi_min;
     if(trial < chi_min){
@@ -240,7 +240,6 @@ int main(int argc,char** argv){
     ans=metrop(de,tmc);
     if(ans=true){
       acceptot++;
-      printf(" -- Accepted\n");
       previous=trial;
       //update mcmc chain with accepted values
       lpars[4] = ptemp;
@@ -252,8 +251,6 @@ int main(int argc,char** argv){
       for(is=0;is<ns;is++) mcchain[is+nz+NPAR][i] = 0;
       mcchain[chainsize-1][i]=trial;
     }
-    else
-      printf(" -- Rejected");
   }
 
   lf.set_p(bestp);
@@ -261,7 +258,6 @@ int main(int argc,char** argv){
   printf("Re-Running Best Fit...\n");
   output=survey.simulate(area,nz,dz,zmin,ns);
   printf("Model chi2: %lf\n",output.chisqr);
-  printf("Acceptance Rate: %lf\n",acceptot/runs);
   survey.save(outfile);
   
   bool save = true;
