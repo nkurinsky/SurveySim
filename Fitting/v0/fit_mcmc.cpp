@@ -261,7 +261,7 @@ int main(int argc,char** argv){
   printf("Re-Running Best Fit...\n");
   output=survey.simulate(area,nz,dz,zmin,ns);
   printf("Model chi2: %lf\n",output.chisqr);
-  printf("Acceptance Rate: %lf\n",acceptot/runs);
+  printf("Acceptance Rate: %lu\n",acceptot/runs);
   survey.save(outfile);
   
   bool save = true;
