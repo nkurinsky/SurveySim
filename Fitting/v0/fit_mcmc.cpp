@@ -238,7 +238,7 @@ int main(int argc,char** argv){
       bestq = qtemp;
     }
     ans=metrop(de,tmc);
-    if(ans=true){
+    if(ans == true){
       acceptot++;
       printf(" -- Accepted\n");
       previous=trial;
@@ -261,7 +261,7 @@ int main(int argc,char** argv){
   printf("Re-Running Best Fit...\n");
   output=survey.simulate(area,nz,dz,zmin,ns);
   printf("Model chi2: %lf\n",output.chisqr);
-  printf("Acceptance Rate: %lu\n",acceptot/runs);
+  printf("Acceptance Rate: %lf%%\n",(100.0*double(acceptot)/double(runs)));
   survey.save(outfile);
   
   bool save = true;
@@ -325,11 +325,6 @@ bool metrop(double de,double tmc){
   //to avoid getting segmentation fault from taking e^x where x is very large
   if(tester <= -2) ans = (de<0.0) ? true : false;
   if(tester > -2) {
-    //static const gsl_rng_type * T;
-    //gsl_rng_env_setup();   
-    //gsl_rng_default_seed = time(NULL);
-    //T = gsl_rng_default;
-    //r = gsl_rng_alloc(T);
     itemp=gsl_rng_uniform(r);   //want uniform random number from 0-1
     ans = ((de < 0.0) or (itemp < exp(-de/tmc))) ? true : false;
   }
