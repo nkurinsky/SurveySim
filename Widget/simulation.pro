@@ -70,6 +70,7 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   p_main = widget_base(info.base,/column,/align_center)                   ;parameter base
   obs_table = widget_base(p_main,/column,/align_center)
   lum_table = widget_base(p_main,/column,/align_center)
+  sed_table = widget_base(p_main,/column,/align_center)
   sim_table = widget_base(p_main,/column,/align_center)
   dbase = widget_base(p_main,/column,/align_center)    ; base for file dialogs
   button_base = widget_base(p_main,/row,/align_center) ; base for buttons
@@ -124,8 +125,8 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
   t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=472,scr_ysize=132)
 
-  l3 = widget_label(lum_table,value="SED Evolution Parameters")
-  t3 = widget_table(lum_table,value=cdat,column_labels=lrows,row_labels=["CEXP"],uvalue='t3',/editable,alignment=1,format=fmt3,scr_xsize=472,scr_ysize=55)
+  l3 = widget_label(sed_table,value="SED Evolution Parameters")
+  t3 = widget_table(sed_table,value=cdat,column_labels=lrows,row_labels=["Color Exp"],uvalue='t3',/editable,alignment=1,format=fmt3,scr_xsize=404,scr_ysize=55)
 
   tcols = ["Area (sdeg)","Z Min","Z Max","Z Binsize","Run Number"]
 ;Simulation Parameters
