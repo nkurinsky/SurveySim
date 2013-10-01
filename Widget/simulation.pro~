@@ -101,7 +101,6 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
      ldata=[ldat0,ldat1,ldat2,ldat3,ldat4]
      ;the fixed values: =1 if held fixed, =0 if variable
 
-     cdat = {a0:0.0,fixed:0.0,amin:0.0,amax:1.0,sigma:0.1}
      sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1.e3}
   endelse
 
@@ -117,21 +116,16 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
   f2b = ['(i)','(i)','(i)','(i)','(i)','(i)']
   fmt2 = [[f2a],[f2b],[f2a],[f2a],[f2a]]
-  fmt3 = ['(f5.2)','(i)','(f5.2)','(f5.2)','(f5.2)']
   lrows=["Initial","Fixed","Min","Max","Sigma"]
 
 ;Luminosity Function Parameters
   l1 = widget_label(lum_table,value="Luminosity Function Parameters")
   t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=472,scr_ysize=132)
 
-  l3 = widget_label(lum_table,value="SED Evolution Parameters")
-  t3 = widget_table(lum_table,value=cdat,column_labels=lrows,row_labels=["CEXP"],uvalue='t3',/editable,alignment=1,format=fmt3,scr_xsize=472,scr_ysize=55)
-
   tcols = ["Area (sdeg)","Z Min","Z Max","Z Binsize","Run Number"]
 ;Simulation Parameters
   l2 = widget_label(sim_table,value="Simulation Settings")
-  t2 = widget_table(sim_table,value=sdat,column_labels=tcols,/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[100,100,100,100,100],scr_xsize=505,scr_ysize=55)
-  
+  t2 = widget_table(sim_table,value=sdat,column_labels=tcols,/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[100,100,100,100,100],scr_xsize=505,scr_ysize=55)
 
 ;============================================================================
 ;Show SED templates
@@ -174,7 +168,7 @@ PRO simulation_event,ev
 
   CASE uvalue OF
      'go'  : begin ;save settings, intialize FITS file, and pass to C++ fitting routine
-        save,ldata,ldat0,bands,sdat,cdat,filename='params.save' ;save parameters
+        save,ldata,ldat0,bands,sdat,filename='params.save' ;save parameters
         
         ;make observation FITS file
         widget_control,ot,get_value=bvals

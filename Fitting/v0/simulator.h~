@@ -37,16 +37,12 @@ class simulator{
   double bands[3];
   double band_errs[3];
   double flux_limits[3];
-  double color_exp;
   double distribution_size;
   void init_rand(); //Initializes GNU random number generator (see functions.h)
  public:
-  simulator(){
-    chisq=0;
-    color_exp=0;}
+  simulator() {chisq=0;}
   simulator(double b[],double b_err[],double f_lims[],string obsfile,string sedfile);
   void set_bands(double b[],double b_err[],double f_lims[]);
-  void set_color_exp(double val);
   void set_lumfunct(lumfunct *lf);
   void set_sed_lib(string sedfile);
   void set_obs(string obsfile);

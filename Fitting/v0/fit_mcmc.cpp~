@@ -171,7 +171,6 @@ int main(int argc,char** argv){
 
   //initialize simulator
   simulator survey(bs,errs,flims,obsfile,sedfile); 
-  survey.set_color_exp(1.0); //color evolution
   survey.set_lumfunct(&lf);
 
   //the initial chi2_min value

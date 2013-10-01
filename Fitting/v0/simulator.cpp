@@ -74,7 +74,7 @@ simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,st
     band_errs[i] = b_err[i];
     flux_limits[i]= f_lims[i];
   }
-  
+  color_exp = 0.0;
   observations = new obs_lib(obsfile);
   seds = new sed_lib(sedfile);
 
@@ -93,6 +93,10 @@ void simulator::set_bands(double b[],double b_err[],double f_lims[]){
     band_errs[i] = b_err[i];
     flux_limits[i]= f_lims[i];
   }
+}
+
+void simulator::set_color_exp(double val){
+  color_exp = val;
 }
 
 void simulator::set_lumfunct(lumfunct *lf){
@@ -149,6 +153,7 @@ products simulator::simulate(double area, int nz, double dz, double zmin, int ns
     static sprop *temp_src;
     static int src_iter;
     static bool detected = true;
+    static double lum_ratio;
 
     //just temporary, complains if unused variables
     output.dnds[0]=0;
@@ -164,6 +169,9 @@ products simulator::simulate(double area, int nz, double dz, double zmin, int ns
       zarray[is]=(is+1)*dz+zmin;
       output.dndz[is]=0;
 
+      //for color evolution:
+      lum_ratio = pow((1.0+zarray[is]),color_exp);
+      
       tmpz=zarray[is]+dz/2.0;
       vol=(dvdz(tmpz,area)*dz);
       weights[is] = 1.e0; //still here in case scaling must be done
@@ -177,7 +185,7 @@ products simulator::simulate(double area, int nz, double dz, double zmin, int ns
       
       jsmin = 0;
       for (js=0;js<lnum;js++){
-	flux_sim[0] = seds->get_flux(lums[js],b_rest[0]);
+	flux_sim[0] = seds->get_flux(lums[js],b_rest[0])*lum_ratio;
 	flux_sim[0] *= (1+zarray[is])*Wm2Hz_TO_mJy/sf;
 	if(flux_sim[0]>=flux_limits[0]){
 	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
@@ -188,12 +196,12 @@ products simulator::simulate(double area, int nz, double dz, double zmin, int ns
       
       for (js=jsmin;js<lnum;js++){
 	//source number is dn/(dldv)*Dv*Dl
-	nsrcs = long(dl*vol*lf->get_nsrcs(zarray[is],lums[js]));
+	nsrcs = long(dl*vol*lf->get_nsrcs(zarray[is],(lums[js]*lum_ratio)));
 	for (src_iter=0;src_iter<nsrcs;src_iter++){
 	  detected = true;
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
-	    flux_sim[i] = seds->get_flux(lums[js],b_rest[i]);
+	    flux_sim[i] = seds->get_flux(lums[js],b_rest[i])*lum_ratio;
 	    flux_sim[i] *= (1+zarray[is])*Wm2Hz_TO_mJy/sf;
 	    flux_sim[i] += noise[i];
 	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
@@ -270,6 +278,7 @@ bool simulator::save(string outfile){
   pFits->pHDU().addKey("BETA",lpars[3],"lower slope"); 
   pFits->pHDU().addKey("P",lpars[4],"Norm evolution"); 
   pFits->pHDU().addKey("Q",lpars[5],"Knee evolution"); 
+  pFits->pHDU().addKey("CEXP",color_exp,"Color Evolution Param");
 
   unsigned long size = sources.size();
   printf("%s %lu\n","Soures Being Saved: ",size);
