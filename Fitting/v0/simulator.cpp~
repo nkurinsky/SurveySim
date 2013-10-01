@@ -187,8 +187,8 @@ products simulator::simulate(double area, int nz, double dz, double zmin, int ns
       //printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
       
       for (js=jsmin;js<lnum;js++){
-	//source number is dn/(dldv)*Dv*Dl
 	nsrcs = long(dl*vol*lf->get_nsrcs(zarray[is],lums[js]));
+	//printf("%4.2f %4.2f %6li \n",zarray[is],lums[js],nsrcs[is][js]);
 	for (src_iter=0;src_iter<nsrcs;src_iter++){
 	  detected = true;
 	  for (int i=0;i<3;i++){
