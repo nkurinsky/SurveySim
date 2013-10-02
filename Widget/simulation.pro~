@@ -224,8 +224,6 @@ PRO simulation_event,ev
         sigma = lparam(4)
         widget_control,t2,get_value=sparam
         sdat = sparam
-        widget_control,t3,get_value=cparam
-        cdat = cparam
 
         sxaddpar,hdr2,'DATE',systime(),'Date of creation'
         sxaddpar,hdr2,'PHI0',pars.phi0,'Luminosity Function Normalization'
@@ -258,11 +256,6 @@ PRO simulation_event,ev
         sxaddpar,hdr2,'Q_MIN',min.q,'Minimum Q value'
         sxaddpar,hdr2,'Q_MAX',max.q,'Maximum Q value'
         sxaddpar,hdr2,'Q_DP',sigma.q,'Sigma Q value'
-        sxaddpar,hdr2,'CEXP',cdat.a0,'Intrinsic luminosity evolution term'
-        sxaddpar,hdr2,'CEXP_FIX',cdat.fixed,'Fix CEXP (Y=1/N=0)'
-        sxaddpar,hdr2,'CEXP_MIN',cdat.amin,'Minimum CEXP value'
-        sxaddpar,hdr2,'CEXP_MAX',cdat.amax,'Maximum CEXP value'
-        sxaddpar,hdr2,'CEXP_DP',cdat.sigma,'Sigma CEXP value'
         sxaddpar,hdr2,'RUNS',sdat.runs,'Number of Runs'
         sxaddpar,hdr2,'ZMIN',sdat.zmin,'Minimum Redshift Value'
         sxaddpar,hdr2,'ZMAX',sdat.zmax,'Maximum Redshift Value'

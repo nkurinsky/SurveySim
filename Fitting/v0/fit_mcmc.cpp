@@ -40,9 +40,6 @@ int main(int argc,char** argv){
   if(argc > 4)
     outfile = argv[4];
 
-  FILE *chain;
-  chain = fopen("chain.txt","w");
-  
   unsigned long runs; 
   int nz,ns;
   double area, dz, zmax, zmin, rtemp;
@@ -50,7 +47,7 @@ int main(int argc,char** argv){
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5"};
   //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
-  double lpars[6],lfix[6],lmax[6],lmin[6],ldp[6];
+  double lpars[6],lfix[6],lmax[6],lmin[6],ldp[6], cexp[5];
   // the initial guesses of the parameters, the width of the proposal distribution 
   // and the acceptable min/max range
   double p_o[NPAR],dp[NPAR],p_min[NPAR],p_max[NPAR]; 
@@ -120,13 +117,20 @@ int main(int argc,char** argv){
   params_table.readKey("BETA_MAX",lmax[3]);
   params_table.readKey("P_MAX",lmax[4]);
   params_table.readKey("Q_MAX",lmax[5]);
-  //read parameter maximum values
+  //read parameter sigma values
   params_table.readKey("PHI0_DP",ldp[0]);
   params_table.readKey("L0_DP",ldp[1]);
   params_table.readKey("ALPHA_DP",ldp[2]);
   params_table.readKey("BETA_DP",ldp[3]);
   params_table.readKey("P_DP",ldp[4]);
   params_table.readKey("Q_DP",ldp[5]);
+
+  //read color_exp values
+  params_table.readKey("CEXP",cexp[0]);
+  params_table.readKey("CEXP_FIX",cexp[1]);
+  params_table.readKey("CEXP_MIN",cexp[2]);
+  params_table.readKey("CEXP_MAX",cexp[3]);
+  params_table.readKey("CEXP_DP",cexp[4]);
   
   /*
     note that the dp values here are the widths of the "proposal distribution"
@@ -171,7 +175,7 @@ int main(int argc,char** argv){
 
   //initialize simulator
   simulator survey(bs,errs,flims,obsfile,sedfile); 
-  survey.set_color_exp(1.0); //color evolution
+  survey.set_color_exp(cexp[0]); //color evolution
   survey.set_lumfunct(&lf);
 
   //the initial chi2_min value
@@ -210,7 +214,6 @@ int main(int argc,char** argv){
   ptemp = bestp = lpars[4];
   qtemp = bestq = lpars[5];
 
-  fprintf(chain,"%s\n%s\n","Monte Carlo Parameter Chain","Iteration, P, Q, Chi-Square");
   printf("Fitting Start; Total Run Number: %ld",runs);
 
   for (unsigned long i=0;i<runs;i++){
@@ -246,7 +249,6 @@ int main(int argc,char** argv){
       //update mcmc chain with accepted values
       lpars[4] = ptemp;
       lpars[5] = qtemp;
-      fprintf(chain,"%lu %f %f %f \n",i,lpars[4],lpars[5],trial);
       mcchain[0][i]=lpars[4];
       mcchain[1][i]=lpars[5];
       for(iz=0;iz<nz;iz++) mcchain[iz+NPAR][i]=output.dndz[iz];
@@ -307,8 +309,6 @@ int main(int argc,char** argv){
     //  newTable->column(colnames[i]).write(mcchain[i],1);
     //}
   }
-  
-  fclose(chain);
   gsl_rng_free (r);
   
   return 0;
