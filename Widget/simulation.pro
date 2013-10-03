@@ -8,12 +8,7 @@
 
 pro simulation
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,t2,ldata,ldat0,sdat,cdat,settings,bands
-
-;==================================================================
-;the directory where the fitting code lives
-;------------------------------------------------------------------
-cdir='/Users/noahkurinsky/SurveySim/v0'  
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
 ;==================================================================
 ;the INFO structure holds the key widget control parameters as well as 
@@ -37,7 +32,22 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
        win_id1:0L, $
        win_id2:0L, $
        win_id3:0L, $
-       ncolors: 0L, $
+       ncolors:0L, $
+;widget bases
+       p_main:0L, $
+       obs_table:0L, $
+       lum_table:0L, $
+       sed_table:0L, $
+       sim_table:0L, $
+       dbase:0L, $
+       button_base:0L, $
+;input tables and files
+       obsname:0L, $
+       sfile:0L, $
+       ot:0L, $
+       t1:0L, $
+       t2:0L, $
+       t3:0L, $
 ;basic simulation settings
        ofile:'observation.save', $
        mfile:'model.save', $
@@ -67,18 +77,18 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
 ;widget base initialization
   info.base = widget_base(title='Model Setup and Initialization',/column,/align_center) ;main base
   info.base2= widget_base(info.base, /column,/align_center)               ;plot base
-  p_main = widget_base(info.base,/column,/align_center)                   ;parameter base
-  obs_table = widget_base(p_main,/column,/align_center)
-  lum_table = widget_base(p_main,/column,/align_center)
-  sed_table = widget_base(p_main,/column,/align_center)
-  sim_table = widget_base(p_main,/column,/align_center)
-  dbase = widget_base(p_main,/column,/align_center)    ; base for file dialogs
-  button_base = widget_base(p_main,/row,/align_center) ; base for buttons
+  info.p_main = widget_base(info.base,/column,/align_center)                   ;parameter base
+  info.obs_table = widget_base(info.p_main,/column,/align_center)
+  info.lum_table = widget_base(info.p_main,/column,/align_center)
+  info.sed_table = widget_base(info.p_main,/column,/align_center)
+  info.sim_table = widget_base(info.p_main,/column,/align_center)
+  info.dbase = widget_base(info.p_main,/column,/align_center)    ; base for file dialogs
+  info.button_base = widget_base(info.p_main,/row,/align_center) ; base for buttons
   
 ;output file select
   CD, Current=thisDir
-  obsname = fsc_fileselect(dbase,Directory=thisDir,filename=info.ofile,/NoMaxSize,LabelName='Observation Save File') ;,ObjectRef=obsObject) 
-  sedfile = fsc_fileselect(dbase,Directory=thisDir,filename=info.sedfile,ObjectRef=sedObject,/NoMaxSize,LabelName='SED Templates file')
+  info.obsname = fsc_fileselect(info.dbase,Directory=thisDir,filename=info.ofile,/NoMaxSize,LabelName='Observation Save File') ;,ObjectRef=obsObject) 
+  info.sfile = fsc_fileselect(info.dbase,Directory=thisDir,filename=info.sedfile,ObjectRef=sedObject,/NoMaxSize,LabelName='SED Templates file')
   
 ;=============================================================
 ;survey parameter initialization
@@ -112,8 +122,8 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   fmt = [[f],[f],[f]]
   
 ;The Survey properties table
-  lo = widget_label(obs_table,value="Survey Properties")
-  ot = widget_table(obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150],format=fmt,scr_xsize=425,scr_ysize=95)
+  lo = widget_label(info.obs_table,value="Survey Properties")
+  info.ot = widget_table(info.obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150],format=fmt,scr_xsize=425,scr_ysize=95)
 
   f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
   f2b = ['(i)','(i)','(i)','(i)','(i)','(i)']
@@ -122,16 +132,16 @@ cdir='/Users/noahkurinsky/SurveySim/v0'
   lrows=["Initial","Fixed","Min","Max","Sigma"]
 
 ;Luminosity Function Parameters
-  l1 = widget_label(lum_table,value="Luminosity Function Parameters")
-  t1 = widget_table(lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=472,scr_ysize=132)
+  l1 = widget_label(info.lum_table,value="Luminosity Function Parameters")
+  info.t1 = widget_table(info.lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=472,scr_ysize=132)
 
-  l3 = widget_label(sed_table,value="SED Evolution Parameters")
-  t3 = widget_table(sed_table,value=cdat,column_labels=lrows,row_labels=["Color Exp"],uvalue='t3',/editable,alignment=1,format=fmt3,scr_xsize=404,scr_ysize=55)
+  l3 = widget_label(info.sed_table,value="SED Evolution Parameters")
+  info.t3 = widget_table(info.sed_table,value=cdat,column_labels=lrows,row_labels=["Color Exp"],uvalue='t3',/editable,alignment=1,format=fmt3,scr_xsize=404,scr_ysize=55)
 
   tcols = ["Area (sdeg)","Z Min","Z Max","Z Binsize","Run Number"]
 ;Simulation Parameters
-  l2 = widget_label(sim_table,value="Simulation Settings")
-  t2 = widget_table(sim_table,value=sdat,column_labels=tcols,/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[100,100,100,100,100],scr_xsize=505,scr_ysize=55)
+  l2 = widget_label(info.sim_table,value="Simulation Settings")
+  info.t2 = widget_table(info.sim_table,value=sdat,column_labels=tcols,/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[100,100,100,100,100],scr_xsize=505,scr_ysize=55)
   
 
 ;============================================================================
@@ -149,8 +159,8 @@ xmanager,'simulation',info.base,/NO_BLOCK
 wset,info.win_id3
 
 ;plot SEDs (generalize to any SED template file)
-widget_control,sedfile,get_value=value
-templ=mrdfits(info.sedfile) 
+widget_control,info.sfile,get_value=value
+templ=mrdfits(info.sedfile,/silent) 
 
 loadct,1,/silent
 plot,templ[*,0],templ[*,1],/xlog,/ylog,yrange=[1.d20,1.d28],ystyle=1,xtitle=TeXtoIDL('\lambda [\mum]'),ytitle=TeXtoIDL('L_{\nu} [W/Hz]')
@@ -159,16 +169,16 @@ for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
 ;===========================================================================
 ;Buttons at bottom 
 ;---------------------------------------------------------------------------
-  run_btn = widget_button(button_base,uvalue='go',value='Run Simulation',xsize=100,ysize=25)
-  replot_btn = widget_button(button_base,uvalue='replot',value='Plot Last Run',xsize=100,ysize=25)
-  quit_btn = widget_button(button_base,uvalue='quit',value='Quit',xsize=50,ysize=25)
-  info_btn = widget_button(button_base,uvalue='info',value='Info',xsize=50,ysize=25)
+  run_btn = widget_button(info.button_base,uvalue='go',value='Run Simulation',xsize=100,ysize=25)
+  replot_btn = widget_button(info.button_base,uvalue='replot',value='Plot Last Run',xsize=100,ysize=25)
+  quit_btn = widget_button(info.button_base,uvalue='quit',value='Quit',xsize=50,ysize=25)
+  info_btn = widget_button(info.button_base,uvalue='info',value='Info',xsize=50,ysize=25)
 
 END
 
 ;widget event handling routine
 PRO simulation_event,ev
-  COMMON simulation_com,cdir,info,obsname,ot,t1,t2,ldata,ldat0,sdat,cdat,settings,bands
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
   ; get event identifier
   widget_control,ev.id,get_uvalue=uvalue
@@ -178,12 +188,12 @@ PRO simulation_event,ev
         save,ldata,ldat0,bands,sdat,cdat,filename='params.save' ;save parameters
         
         ;make observation FITS file
-        widget_control,ot,get_value=bvals
+        widget_control,info.ot,get_value=bvals
         wave = [bvals[0].wave,bvals[1].wave,bvals[2].wave]
         flux_min = [bvals[0].fmin,bvals[1].fmin,bvals[2].fmin]
         flux_err = [bvals[0].ferr,bvals[1].ferr,bvals[2].ferr]
 
-        widget_control,obsname,get_value=value
+        widget_control,info.obsname,get_value=value
         if (file_test(info.ofile)) then begin
            print,info.ofile
            restore,info.ofile
@@ -216,15 +226,15 @@ PRO simulation_event,ev
 
         ;make model fits file
 
-        widget_control,t1,get_value=lparam
+        widget_control,info.t1,get_value=lparam
         pars = lparam(0)
         fixed = lparam(1)
         min = lparam(2)
         max = lparam(3)
         sigma = lparam(4)
-        widget_control,t2,get_value=sparam
+        widget_control,info.t2,get_value=sparam
         sdat = sparam
-        widget_control,t3,get_value=cparam
+        widget_control,info.t3,get_value=cparam
         cdat = cparam
 
         sxaddpar,hdr2,'DATE',systime(),'Date of creation'
@@ -288,9 +298,9 @@ PRO simulation_event,ev
      'quit': begin
         widget_control,ev.top,/destroy
      end
-     'ot': widget_control,ot,get_value=bands
+     'ot': widget_control,info.ot,get_value=bands
      't1': begin
-        widget_control,t1,get_value=ldata
+        widget_control,info.t1,get_value=ldata
         
         i = ev.y
         j = ev.x        
@@ -306,9 +316,8 @@ PRO simulation_event,ev
         endif
 
      end
-     't2': widget_control,t2,get_value=sdat
-     't3': widget_control,t2,get_value=cdat
-     'size': widget_control,size,get_value=settings
+     't2': widget_control,info.t2,get_value=sdat
+     't3': widget_control,info.t3,get_value=cdat
      'info': fit_info
      ELSE:
   ENDCASE
@@ -526,7 +535,7 @@ end
 
 pro graphs
 
-  COMMON simulation_com,cdir,info,obsname,ot,t1,t2,ldata,ldat0,sdat,cdat,settings,bands
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
   !p.thick=0
   !x.thick=0
@@ -692,7 +701,7 @@ pro graphs
   
   ;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
   if( file_test('counts_clements10.dat')) then begin
-     readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err
+     readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux=flux/1.d3
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=[5.d2,1.d5],ystyle=1
      oploterr,flux,diff_counts,diff_err
@@ -837,7 +846,7 @@ pro graphs
 end
 
 pro graphs_event,ev
-  COMMON simulation_com,cdir,info,ot,t1,t2,ldata,ldat0,sdat,cdat,settings,bands
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
   widget_control,ev.id,get_uvalue=uvalue
 

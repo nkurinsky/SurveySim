@@ -160,6 +160,7 @@ int main(int argc,char** argv){
   printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
   printf("p range: %5.3f - %5.3f, sigma: %5.3f\n",p_min[0],p_max[0],dp[0]);
   printf("q range: %5.3f - %5.3f, sigma: %5.3f\n",p_min[1],p_max[1],dp[1]);
+  printf("Color Evolution: %5.3f",cexp[0]);
 
   delete pInfile;
   delete pInfile2;
@@ -193,7 +194,7 @@ int main(int argc,char** argv){
   // in the future, this has similar effect as the width of the proposal
   // distribution, as determines how likely a far flung guess is of being 
   // accepted (see metrop function)
-  double tmc=100.00; //to distinguish it from the random T
+  double tmc=10.00; //to distinguish it from the random T
   double temp,bestp,bestq,ptemp,qtemp;
   int is,iz;
   
@@ -234,7 +235,7 @@ int main(int argc,char** argv){
     trial=output.chisqr;
     printf("Model chi2: %lf",trial);
 
-    de=trial-chi_min;
+    de=trial-previous;
     if(trial < chi_min){
       chi_min=trial;
       minlink=i;
