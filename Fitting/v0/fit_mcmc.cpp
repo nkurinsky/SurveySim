@@ -47,7 +47,7 @@ int main(int argc,char** argv){
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5"};
   //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
-  double lpars[6],lfix[6],lmax[6],lmin[6],ldp[6], cexp[5];
+  double lpars[6],lfix[6],lmax[6],lmin[6],ldp[6],cexp[5];
   // the initial guesses of the parameters, the width of the proposal distribution 
   // and the acceptable min/max range
   double p_o[NPAR],dp[NPAR],p_min[NPAR],p_max[NPAR]; 
@@ -205,7 +205,8 @@ int main(int argc,char** argv){
   //the flux array is logarithmic in steps of 0.3dex 
   //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
   ns=8;
-  
+  survey.set_size(area,dz,zmin,nz,ns);
+
   //note: chain is +1 as last column holds chi2 values for the particular "guess"
   int chainsize = NPAR+nz+ns+1;
   valarray<double> mcchain[chainsize];
@@ -226,12 +227,12 @@ int main(int argc,char** argv){
     if((temp >= p_min[1]) && (temp <= p_max[1])) qtemp=temp;
     //check to see if sensible guesses, need to also do some test 
     //the randomness at some point
-    printf("\n\n%lu %lf %lf...",(i+1),lpars[4],lpars[5]);
+    printf("\n\n%lu %lf %lf...",(i+1),ptemp,qtemp);
     
     lf.set_p(ptemp);
     lf.set_q(qtemp);
     printf("Running...\n");
-    output=survey.simulate(area,nz,dz,zmin,ns);
+    output=survey.simulate();
     trial=output.chisqr;
     printf("Model chi2: %lf",trial);
 
@@ -257,12 +258,12 @@ int main(int argc,char** argv){
       mcchain[chainsize-1][i]=trial;
     }
     else
-      printf(" -- Rejected");
+      printf(" -- Rejected\n");
   }
 
   lf.set_p(bestp);
   lf.set_q(bestq);
-  printf("Re-Running Best Fit...\n");
+  printf("\nRe-Running Best Fit...\n");
   output=survey.simulate(area,nz,dz,zmin,ns);
   printf("Model chi2: %lf\n",output.chisqr);
   printf("Acceptance Rate: %lf%%\n",(100.0*double(acceptot)/double(runs)));

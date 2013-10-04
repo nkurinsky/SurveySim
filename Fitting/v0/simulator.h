@@ -27,7 +27,7 @@ struct products{
 
 class simulator{
  private:
-  double chisq;
+  products last_output;
   vector<sprop> sources;
   bool simulated;
   lumfunct *lf;
@@ -38,21 +38,31 @@ class simulator{
   double band_errs[3];
   double flux_limits[3];
   double color_exp;
+  double area;
+  double dz;
+  double zmin;
+  int nz;
+  int ns;
   double distribution_size;
-  void init_rand(); //Initializes GNU random number generator (see functions.h)
  public:
   simulator(){
     chisq=0;
-    color_exp=0;}
+    color_exp=0; //default to no color evolution
+    area = pow((M_PI/180.0),2.0); //default to 1sq degree
+    zmin = 0.1; //default to 0.1-6.0, 0.1 steps
+    nz = 59;
+    dz = 0.1;
+    ns=8;}
   simulator(double b[],double b_err[],double f_lims[],string obsfile,string sedfile);
   void set_bands(double b[],double b_err[],double f_lims[]);
+  void set_size(double area,double dz,double zmin,int nz,int ns);
   void set_color_exp(double val);
   void set_lumfunct(lumfunct *lf);
   void set_sed_lib(string sedfile);
   void set_obs(string obsfile);
   void reset();
-  products simulate(double area, int nz, double dz, double zmin, int ns);
-  double model_chisq() { return chisq; }
+  products simulate();
+  double model_chisq() { return last_output.chisq; }
   bool save(string outfile);
   ~simulator();
 };

@@ -3,22 +3,6 @@
 #include "constants.h"
 #include "cosmo.h"
 
-// find the location of the minimum value
-int findMinloc(double vals[], int MAXELS)
-{
-  int i;
-  double min = vals[0];
-  int hit=0;
-
-    for (i = 0; i<MAXELS; i++)
-    if (min >= vals[i])
-      {
-	hit=i;
-	min = vals[i];
-      }
-    return hit;
-}
-
 sprop::sprop(double z,double f[],double lum, double w){
   redshift = z;
   luminosity = lum;
@@ -59,14 +43,6 @@ products::products(int nz, int ns){
   dnds.resize(ns);
 }
 
-void simulator::init_rand(){
-  gsl_rng * r;
-  const gsl_rng_type * T;
-  gsl_rng_default_seed = time(NULL);
-  T = gsl_rng_default;
-  r = gsl_rng_alloc(T);
-}
-
 simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,string sedfile){
 
   for (int i=0;i<3;i++){
@@ -93,6 +69,14 @@ void simulator::set_bands(double b[],double b_err[],double f_lims[]){
     band_errs[i] = b_err[i];
     flux_limits[i]= f_lims[i];
   }
+}
+
+void simulator::set_size(double area,double dz,double zmin,int nz,int ns){
+  this->area = (area > 0) ? ((area < 41254.0) ? area : 41253.0) : 1;
+  this->dz = (dz > 0) ? dz : 0.1;
+  this->zmin = (zmin > 0.001) ? zmin : 0.001;
+  this->nz = (nz > 1) ? nz : 50;
+  this->ns = (ns > 1) ? ns : 8;
 }
 
 void simulator::set_color_exp(double val){
@@ -123,7 +107,7 @@ void simulator::set_obs(string obsfile){
   diagnostic->init_obs(c1,c2,osize);
 }
 
-products simulator::simulate(double area, int nz, double dz, double zmin, int ns){
+products simulator::simulate(){
   sources.clear();
   products output(nz,ns);
 
@@ -237,18 +221,16 @@ products simulator::simulate(double area, int nz, double dz, double zmin, int ns
     
     diagnostic->init_model(c1,c2,w,snum);
     output.chisqr=diagnostic->get_chisq();
+    last_output = output;
 
     delete[] c1;
     delete[] c2;
     delete[] w;
-    
-    return output;
   }
   else{
     cout << "ERROR: NULL Model Library" << endl;
-    //doesn't work now as the output is of type "products" and "-1" is integer
-    return output;
   }
+  return output;
 }
 
 
