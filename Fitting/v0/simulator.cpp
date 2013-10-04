@@ -268,7 +268,7 @@ bool simulator::save(string outfile){
   valarray<double> f1(size),f2(size),f3(size),luminosity(size);
   valarray<double> redshift(size);
   valarray<double> param(size);
-  valarray<double> params[pnum];
+  valarray< valarray<double> > params(pnum);
   for (int i=0;i<pnum;i++)
     params[i].resize(size);
   

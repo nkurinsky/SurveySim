@@ -10,7 +10,7 @@ using namespace std;
 //******************************************************************************
 class lumfunct {
  private:
-  bool init; //is lumfunc initialized?
+  //bool init; //is lumfunc initialized?
   double phi0; //Scale at z=0
   double L0;  //Location of the knee at z=0
   //Function Slope Parameters

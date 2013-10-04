@@ -30,6 +30,8 @@ int main(int argc,char** argv){
     printf("%s","ERROR: Invalid number of arguments.\n");
     printf("%s","Calling sequence should be \"fit obsfile modfile sedfile [output]\"\n");
     return 1;}
+
+  printf("\nMCMC Fitting Code Compiled: %s\n",__DATE__);
   
   //File names passed in by Widget
   string outfile("output.fits");
@@ -209,7 +211,7 @@ int main(int argc,char** argv){
 
   //note: chain is +1 as last column holds chi2 values for the particular "guess"
   int chainsize = NPAR+nz+ns+1;
-  valarray<double> mcchain[chainsize];
+  valarray< valarray<double> > mcchain(chainsize);
   for(int i=0;i<chainsize;i++)
     mcchain[i].resize(runs);
 
@@ -264,7 +266,7 @@ int main(int argc,char** argv){
   lf.set_p(bestp);
   lf.set_q(bestq);
   printf("\nRe-Running Best Fit...\n");
-  output=survey.simulate(area,nz,dz,zmin,ns);
+  output=survey.simulate();
   printf("Model chi2: %lf\n",output.chisqr);
   printf("Acceptance Rate: %lf%%\n",(100.0*double(acceptot)/double(runs)));
   survey.save(outfile);
