@@ -1,6 +1,6 @@
 //****************************************************************************
-// written by Anna Sajina and Noah Kurinsky, 2012
-// updated by Noah Kurinsky 10/13
+// written by Anna Sajina 09/28/12
+// updated by Noah Kurinsky 9/18/13
 // The purpose of this program is to read-in the parameters set in the idl 
 // wrapper (simulation.pro) and to use MCMC to determine the best-fit set of 
 // parameters. 
@@ -18,7 +18,6 @@
 #define BANDS 3
 //For values to be passed in by widget
 #define NPAR 2
-#define TMAX 100.00
 
 using namespace std;
 
@@ -197,12 +196,10 @@ int main(int argc,char** argv){
   // in the future, this has similar effect as the width of the proposal
   // distribution, as determines how likely a far flung guess is of being 
   // accepted (see metrop function)
-  //double tmc=10.00; //to distinguish it from the random T
-  double tmax=100.0;
+  double tmc=10.00; //to distinguish it from the random T
   double temp,bestp,bestq,ptemp,qtemp;
   int is,iz;
-  int burn_runs = 100;
-
+  
   gsl_rng_default_seed=time(NULL);
   T=gsl_rng_default;
   r=gsl_rng_alloc(T);
@@ -221,44 +218,8 @@ int main(int argc,char** argv){
   ptemp = bestp = lpars[4];
   qtemp = bestq = lpars[5];
 
-  printf("--- Beginning MC Burn-in Phase ---\n");
-  printf("(Burn-In Run Number: %i)\n",burn_runs);
-  double time_limit = double(burn_runs)*2;
-  for (unsigned long i=0;i<burn_runs;i++){
-    p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
-    q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
-    temp=lpars[4]+p0_rng[i];
-    if((temp >= p_min[0]) && (temp <= p_max[0])) ptemp=temp;
-    temp=lpars[5]+q0_rng[i];
-    if((temp >= p_min[1]) && (temp <= p_max[1])) qtemp=temp;
-    //check to see if sensible guesses, need to also do some test 
-    //the randomness at some point
-    printf("\n\n%lu %lf %lf...",(i+1),ptemp,qtemp);
-    
-    lf.set_p(ptemp);
-    lf.set_q(qtemp);
-    printf("Running...\n");
-    output=survey.simulate();
-    trial=output.chisqr;
-    printf("Iteration Chi-Square: %lf",trial);
+  printf("Fitting Start; Total Run Number: %ld",runs);
 
-    de=trial-previous;
-    if(trial < chi_min){
-      chi_min=trial;
-      minlink=i;
-      bestp = ptemp;
-      bestq = qtemp;
-    }
-    ans=metrop(de,(double(i)/time_limit),tmax);
-    if(ans == true){
-      //update mcmc chain with accepted values
-      lpars[4] = ptemp;
-      lpars[5] = qtemp;
-    }
-  }
-
-  printf("--- Fitting Start ---\n Total Run Number: %ld\n\n",runs);
-  time_limit = double(runs);
   for (unsigned long i=0;i<runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
     q0_rng[i]=gsl_ran_gaussian(r,dp[1]);
@@ -284,7 +245,7 @@ int main(int argc,char** argv){
       bestp = ptemp;
       bestq = qtemp;
     }
-    ans=metrop(de,double(i)/time_limit,tmax);
+    ans=metrop(de,tmc);
     if(ans == true){
       acceptot++;
       printf(" -- Accepted\n");
@@ -358,14 +319,13 @@ int main(int argc,char** argv){
 }
 
 
-bool metrop(double de, double normtime, double tmax){
-  //here de is effectively Delta(Energy), and t is the temperature
-  //as in the boltzman factor exp(-de/t)
+bool metrop(double de,double tmc){
+//here de is effectively Delta(Energy), and t is the temperature
+//as in the boltzman factor exp(-de/t)
   
   static bool ans;
-  static double itemp,tester,tmc;
-  tmc = normtime*tmax;
-  
+  static double itemp,tester;
+
   tester=de/tmc;
   //to avoid getting segmentation fault from taking e^x where x is very large
   if(tester <= -2) ans = (de<0.0) ? true : false;
