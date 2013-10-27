@@ -1,5 +1,5 @@
 ;==================================================================
-; Writen by Noah Kurinsky, version recent as of 2/15/13
+; Writen by Noah Kurinsky, version recent as of 10/17/13
 ; Edited by Anna Sajina, December 2012
 ; certain files in the same directory are required for proper
 ; function of this widget:

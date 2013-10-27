@@ -23,7 +23,7 @@
 using namespace std;
 
 gsl_rng * r;  // global generator 
-bool metrop(double de,double t);
+bool metrop(double de,double normtime,double t);
 
 int main(int argc,char** argv){
   
@@ -201,7 +201,7 @@ int main(int argc,char** argv){
   double tmax=100.0;
   double temp,bestp,bestq,ptemp,qtemp;
   int is,iz;
-  int burn_runs = 100;
+  unsigned long burn_runs = 100;
 
   gsl_rng_default_seed=time(NULL);
   T=gsl_rng_default;
@@ -222,7 +222,7 @@ int main(int argc,char** argv){
   qtemp = bestq = lpars[5];
 
   printf("--- Beginning MC Burn-in Phase ---\n");
-  printf("(Burn-In Run Number: %i)\n",burn_runs);
+  printf("(Burn-In Run Number: %lu)\n",burn_runs);
   double time_limit = double(burn_runs)*2;
   for (unsigned long i=0;i<burn_runs;i++){
     p0_rng[i]=gsl_ran_gaussian(r,dp[0]);
