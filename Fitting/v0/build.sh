@@ -97,4 +97,6 @@ fi
 
 printf "\nBuild Successful...Exiting\n\n"
 
+rm *.o
+
 exit 0
