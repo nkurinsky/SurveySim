@@ -24,16 +24,12 @@ class MetropSampler {
 }
 
 class MCChains {
- private:
   int nchains;
   int npars;
   int nruns;
-  double chi_min;  
-  doudle *bestpars;
-  valarray<valarray<double>> chain;
+  double chi_min;
+  
+ private:
+  
  public:
-  MCChains(int nchains, int npars, int nruns);
-  add_link(int chain, double pars, double chisqr);
-  bool converged();
-  bool save(string filename);
 }
