@@ -12,7 +12,7 @@
 
 #include "simulator.h"
 #include "functions.h"
-#include "mc_util.h"
+#include "mcutil.h"
 #include <stdio.h>
 
 //Array size definitions (most likely will never change)
@@ -20,9 +20,9 @@
 //For values to be passed in by widget
 #define NPAR 2
 #define NCHAIN 5
-#define TMAX 50.00
+#define TMAX 100.00
 #define IDEALPCT 0.25
-#define BURN_STEP 5
+#define BURN_STEP 20
 #define CONV_STEP 50
 
 using namespace std; 
@@ -190,6 +190,7 @@ int main(int argc,char** argv){
   //this is iterated each time a better value is found
   double chi_min=1.0E+4; 
   double trial;
+  bool ans;
   double prng[NPAR][runs];
   unsigned long i,m,p;
 
@@ -212,7 +213,7 @@ int main(int argc,char** argv){
   ns=8;
   survey.set_size(area,dz,zmin,nz,ns);
   MCChains mcchain(NCHAIN,NPAR,runs);
-  MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,r);
+  MetropSampler metrop(NCHAIN,TMAX,IDEALPCT);
 
   for(m=0;m<NCHAIN;m++){
     ptemp[m][0] = pcurrent[m][0] = lpars[4];
@@ -228,12 +229,12 @@ int main(int argc,char** argv){
 	if((temp >= p_min[p]) && (temp <= p_max[p])) ptemp[m][p]=temp;
       }
       
-      printf("\n%lu %lu : %lf %lf...",(i+1),(m+1),ptemp[m][0],ptemp[m][1]);
+      printf("\n%lu %lf %lf...",(i+1),ptemp[m][0],ptemp[m][1]);
       
       //this not yet generalized
       lf.set_p(ptemp[m][0]);
       lf.set_q(ptemp[m][1]);
-      printf("\nRunning...\n");
+      printf("Running...\n");
       output=survey.simulate();
       trial=output.chisqr;
       printf("Iteration Chi-Square: %lf",trial);
@@ -243,12 +244,12 @@ int main(int argc,char** argv){
 	  pcurrent[m][p]=ptemp[m][p];
       }      
     }
-    if(((i+1) % BURN_STEP) == 0)
+    if(((i mod BURN_STEP) == 0) and (i > 0))
       if(not metrop.anneal())
 	i = runs;
   }
   
-  printf("\n\n--- Fitting Start ---\n Total Run Number: %ld\n\n",runs);
+  printf("--- Fitting Start ---\n Total Run Number: %ld\n\n",runs);
   for (i=0;i<runs;i++){
     for (m=0;m<NCHAIN;m++){
       for(p=0;p<NPAR;p++){
@@ -257,10 +258,10 @@ int main(int argc,char** argv){
 	if((temp >= p_min[p]) && (temp <= p_max[p])) ptemp[m][p]=temp;
       }
       
-      printf("\n%lu %lu : %lf %lf...",(i+1),(m+1),ptemp[m][0],ptemp[m][1]);
+      printf("\n%lu %lf %lf...",(i+1),ptemp[m][0],ptemp[m][1]);
       lf.set_p(ptemp[m][0]);
       lf.set_q(ptemp[m][1]);
-      printf("\nRunning...\n");
+      printf("Running...\n");
       output=survey.simulate();
       trial=output.chisqr;
       printf("Model chi2: %lf",trial);
@@ -282,7 +283,7 @@ int main(int argc,char** argv){
 	printf(" -- Rejected\n");
     }
 
-    if(((i+1) % CONV_STEP) == 0){
+    if(((i mod CONV_STEP) == 0) and (i > 0)){
       printf("Checking Convergence\n");
       metrop.anneal();
       if(mcchain.converged()){
@@ -300,7 +301,7 @@ int main(int argc,char** argv){
   printf("Model chi2: %lf\n",output.chisqr);
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
   
-  string parnames[] = {"p0","q0"};
+  string parnames[] = {"p0","q0"}
   survey.save(outfile);
   mcchain.save(outfile,parnames);
 

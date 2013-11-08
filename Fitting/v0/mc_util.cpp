@@ -12,61 +12,67 @@ int dcomp(const void * a, const void * b){
   return ( *(double*)a - *(double*)b);
 }
 
-MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct){
+MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct, gsl_rng *rgen){
   this->nchains = nchains;
   accept_total = new long[nchains];
   iteration_total = new long[nchains];
+  previous = new double[nchains];
   for (int i=0;i<nchains;i++){
     accept_total[i] = 0;
     iteration_total[i] = 0;
+    previous[i] = 1.0E+4;
   }
-  tmax = maxTemp;
+  temp = maxTemp;
   ideal_acceptance = idealpct;
+  this->rgen = rgen;
 }
 
-bool MetropSampler::accept(int chainnum, double de, double normtime){
-  static double itemp,tester,tmc;
-  tmc = normtime*tmax;
-  tester=de/tmc;
+bool MetropSampler::accept(int chainnum, double trial){
+  static double itemp,tester;
+  tester=(trial-previous[chainnum])/temp;
   
   //to avoid errors from taking e^x where x is very large
   if(tester <= -2){
-    accepted = (de<0.0) ? true : false;
+    accepted = (tester<0.0) ? true : false;
   }
   else{
-    itemp=gsl_rng_uniform(r);   //want uniform random number from 0-1
-    accepted = ((de < 0.0) or (itemp < exp(-de/tmc))) ? true : false;
+    itemp=gsl_rng_uniform(rgen);   //want uniform random number from 0-1
+    accepted = ((tester < 0.0) or (itemp < exp(-tester))) ? true : false;
   }
   
   iteration_total[chainnum]++;
-  if (accepted)
+  if (accepted){
     accept_total[chainnum]++;
+    previous[chainnum] = trial;
+  }
+  
   return accepted;
 }
 
-double MetropSample::acceptance(int chainnum){
+double MetropSampler::acceptance(int chainnum){
   return (double(accept_total[chainnum])/(double(iteration_total[chainnum])));
 }
 
-double MetropSample::mean_acceptance(){
-  double acc_temp;
+double MetropSampler::mean_acceptance(){
+  double acc_temp = 0;
   for (int i=0;i<nchains;i++){
     acc_temp += acceptance(i);
   }
   return acc_temp/double(nchains);
 }
 
-bool MetropSample::anneal(){
+bool MetropSampler::anneal(){
   if(mean_acceptance() > ideal_acceptance){
     temp--;
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 MetropSampler::~MetropSampler(){
   delete[] accept_total;
   delete[] iteration_total;
+  delete[] previous;
 }
 
 
@@ -175,7 +181,7 @@ bool MCChains::converged(){
     CIt = (totarray[upper]-totarray[lower]);
     //r math
     R = CIt/CIm;
-    printf("Param: %i, R: %d\n",i,R);
+    printf("Param: %i, R: %f\n",i,R);
     converged = (converged and (R < Rmax));
   }
   delete[] totarray;
@@ -200,22 +206,24 @@ bool MCChains::save(string filename, string parnames[]){
   std::vector<string> colunits(allwidth,"-");
   std::vector<string> colform(allwidth,"e13.5");
   string hname("Chain");
+  char ctemp[2];
   string cnum;
   
   printf("Output Columns\n");
   for(int j=0;j<nchains;j++){
-    sprintf(cnum,"%d",j);
-    for (i=0;i<npar;i++){
+    sprintf(ctemp,"%i",j);
+    cnum = string(ctemp);
+    for (i=0;i<npars;i++){
       colnames[j*chainwidth+i] = parnames[i]+cnum;
     }
-    colnames[j*chainwidth+npar] += cnum;
+    colnames[j*chainwidth+npars] += cnum;
   }
   
   Table *newTable = pFits->addTable(hname,nruns,colnames,colform,colunits,AsciiTbl);
   
   for(i=0;i<allwidth;i++)
-    printf("\t%s\n",colnames[i]);
-  newTable->column(colnames[i]).write(chain[i],1);
+    printf("\t%s\n",colnames[i].c_str());
+  newTable->column(colnames[i]).write(chains[i],1);
   return true;
 }
 

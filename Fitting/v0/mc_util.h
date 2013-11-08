@@ -6,22 +6,26 @@
   and tracking accepted moves for m chains
 */
 
+#include "functions.h"
+
 class MetropSampler {
  private:
   int nchains;
   long *accept_total;
   long *iteration_total;
-  double tmax;
+  double *previous;
+  double temp;
   bool accepted;
   double ideal_acceptance;
+  gsl_rng *rgen;
  public:
-  MetropSampler(int nchains,double maxTemp, double idealpct);
-  bool accept(int chainnum, double de, double normtime);
+  MetropSampler(int nchains,double maxTemp, double idealpct, gsl_rng *rgen);
+  bool accept(int chainnum, double trial);
   double acceptance(int chainnum);
   double mean_acceptance();
   bool anneal();
   ~MetropSampler();
-}
+};
 
 class MCChains {
  private:
@@ -36,12 +40,12 @@ class MCChains {
   double chi_min;  
   double *bestpars;
   int *chainlength;
-  valarray<valarray<double>> chains;
+  valarray<valarray<double> > chains;
  public:
   MCChains(int nchains, int npars, int nruns);
-  bool add_link(int chain, double pars, double chisqr);
+  bool add_link(int chain, double pars[], double chisqr);
   bool set_constraints(double Rmax, double alpha);
   bool converged();
-  bool save(string filename);
+  bool save(string filename, string parnames[]);
   ~MCChains();
-}
+};
