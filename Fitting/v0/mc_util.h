@@ -31,6 +31,8 @@ class MCChains {
   int chainwidth;
   int nruns;
   int i;
+  double Rmax;
+  double alpha;
   double chi_min;  
   double *bestpars;
   int *chainlength;
@@ -38,6 +40,7 @@ class MCChains {
  public:
   MCChains(int nchains, int npars, int nruns);
   bool add_link(int chain, double pars, double chisqr);
+  bool set_constraints(double Rmax, double alpha);
   bool converged();
   bool save(string filename);
   ~MCChains();

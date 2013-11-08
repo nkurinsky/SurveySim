@@ -8,6 +8,10 @@
 
 #include "mc_util.h"
 
+int dcomp(const void * a, const void * b){
+  return ( *(double*)a - *(double*)b);
+}
+
 MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct){
   this->nchains = nchains;
   accept_total = new long[nchains];
@@ -61,8 +65,8 @@ bool MetropSample::anneal(){
 }
 
 MetropSampler::~MetropSampler(){
-  delete accept_total;
-  delete iteration_total;
+  delete[] accept_total;
+  delete[] iteration_total;
 }
 
 
@@ -81,6 +85,9 @@ MCChains::MCChains(int nchains, int npars, int nruns){
   for (i=0;i<nchains;i++)
     chainlength[i]=0;
   chi_min = 1000.0;
+  //defaults to 95% CI
+  Rmax = 1.05;
+  alpha = 0.05;
 }
 
 bool MCChains::add_link(int chain, double pars[], double chisqr){
@@ -111,8 +118,69 @@ bool MCChains::add_link(int chain, double pars[], double chisqr){
   return true;
 }
 
+bool MCChains::set_constraints(double Rmax, double alpha){
+
+  if (Rmax <= 1.0 or Rmax > 2.0){
+    printf("MCChains::ERROR: Rmax constraint invalid\n");
+    return false;
+  }
+  this->Rmax = Rmax;
+
+  if (alpha <= 0.001 or alpha > 0.5){
+    printf("MCChains::ERROR: alpha constraint invalid\n");
+    return false;
+  }
+  this->alpha = alpha;
+  
+  return true;
+}
+
 bool MCChains::converged(){
-  return false;
+  static double R, CIt;
+  static double* pararray;
+  static double* totarray;
+  static int j,k,n,itot,cbase,upper,lower;
+  int totlength=0;
+  double CIm=0;
+  bool converged=false;
+
+  for (i=0;i<nchains;i++)
+    totlength+=(chainlength[i]/2);
+  totarray = new double[totlength];
+
+  for (i=0;i<npars;i++){
+    itot = 0;
+    for (j=0;j<nchains;j++){
+      n = chainlength[j]/2;
+      pararray = new double[n];
+      cbase = j*chainwidth+i;
+      for (k=n;k<chainlength[j];k++){
+	totarray[itot] = chains[cbase][k];
+	pararray[k] = chains[cbase][k];
+	itot++;
+      }
+      //m chain math
+      qsort(pararray,n,sizeof(double),dcomp);
+      lower = (int)n*(alpha/2.0);
+      upper = (int)n*(1.0-alpha/2.0);
+      CIm+= (pararray[upper]-pararray[lower]);
+      delete[] pararray;
+    }
+    //m mean
+    CIm /= nchains;
+    //t chain math
+    qsort(totarray,totlength,sizeof(double),dcomp);
+    lower = (int)totlength*(alpha/2.0);
+    upper = (int)totlength*(1.0-alpha/2.0);
+    CIt = (totarray[upper]-totarray[lower]);
+    //r math
+    R = CIt/CIm;
+    printf("Param: %i, R: %d\n",i,R);
+    converged = (converged and (R < Rmax));
+  }
+  delete[] totarray;
+  
+  return converged;
 }
 
 bool MCChains::save(string filename, string parnames[]){
@@ -152,5 +220,6 @@ bool MCChains::save(string filename, string parnames[]){
 }
 
 MCChains::~MCChains(){
-  
+  delete[] bestpars;
+  delete[] chainlength;
 }
