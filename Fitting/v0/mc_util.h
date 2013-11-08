@@ -25,15 +25,20 @@ class MetropSampler {
 
 class MCChains {
  private:
+  int allwidth;
   int nchains;
   int npars;
+  int chainwidth;
   int nruns;
+  int i;
   double chi_min;  
-  doudle *bestpars;
-  valarray<valarray<double>> chain;
+  double *bestpars;
+  int *chainlength;
+  valarray<valarray<double>> chains;
  public:
   MCChains(int nchains, int npars, int nruns);
-  add_link(int chain, double pars, double chisqr);
+  bool add_link(int chain, double pars, double chisqr);
   bool converged();
   bool save(string filename);
+  ~MCChains();
 }

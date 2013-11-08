@@ -64,3 +64,93 @@ MetropSampler::~MetropSampler(){
   delete accept_total;
   delete iteration_total;
 }
+
+
+//chains implementation
+MCChains::MCChains(int nchains, int npars, int nruns){
+  chainwidth = npars+1;
+  allwidth = chainwidth*nchains;
+  this->npars = npars;
+  this->nruns = nruns;
+  this->nchains = nchains;
+  chains.resize(allwidth);
+  for(i=0;i<allwidth;i++)
+    chains[i].resize(nruns);
+  bestpars = new double[npars];
+  chainlength = new int[nchains];
+  for (i=0;i<nchains;i++)
+    chainlength[i]=0;
+  chi_min = 1000.0;
+}
+
+bool MCChains::add_link(int chain, double pars[], double chisqr){
+  static int cbase;
+  
+  if (chain >= nchains){
+    printf("MCChains::ERROR: Invalid chain number in add_link");
+    return false;
+  }
+
+  if (chisqr < chi_min){
+    for (i=0;i<npars;i++)
+      bestpars[i]=pars[i];
+    chi_min = chisqr;
+  }
+  
+  if (chainlength[chain] >= nruns){
+    printf("MCChains::ERROR: Invalid chain length in add_link");
+    return false;
+  }
+  
+  cbase=chain*chainwidth;
+  for (i=0;i<npars;i++)
+    chains[cbase+i][chainlength[chain]] = pars[i];
+  chains[cbase+npars][chainlength[chain]] = chisqr;
+  
+  chainlength[chain]++;
+  return true;
+}
+
+bool MCChains::converged(){
+  return false;
+}
+
+bool MCChains::save(string filename, string parnames[]){
+
+  using namespace CCfits;
+  std::auto_ptr<FITS> pFits(0);
+  
+  try{
+    pFits.reset(new FITS(filename,Write));
+  }
+  catch (CCfits::FITS::CantOpen){
+    std::cerr << "Unknown Error Occurred, Can't save chain" << endl;
+    return false;
+  }
+  
+  std::vector<string> colnames(allwidth,"CHISQ");
+  std::vector<string> colunits(allwidth,"-");
+  std::vector<string> colform(allwidth,"e13.5");
+  string hname("Chain");
+  string cnum;
+  
+  printf("Output Columns\n");
+  for(int j=0;j<nchains;j++){
+    sprintf(cnum,"%d",j);
+    for (i=0;i<npar;i++){
+      colnames[j*chainwidth+i] = parnames[i]+cnum;
+    }
+    colnames[j*chainwidth+npar] += cnum;
+  }
+  
+  Table *newTable = pFits->addTable(hname,nruns,colnames,colform,colunits,AsciiTbl);
+  
+  for(i=0;i<allwidth;i++)
+    printf("\t%s\n",colnames[i]);
+  newTable->column(colnames[i]).write(chain[i],1);
+  return true;
+}
+
+MCChains::~MCChains(){
+  
+}

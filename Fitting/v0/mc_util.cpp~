@@ -52,7 +52,7 @@ double MetropSample::mean_acceptance(){
   return acc_temp/double(nchains);
 }
 
-bool MetropSample::anneal(double idealpct){
+bool MetropSample::anneal(){
   if(mean_acceptance() > ideal_acceptance){
     temp--;
     return false;
