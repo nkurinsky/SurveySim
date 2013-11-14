@@ -9,7 +9,9 @@
 #include "mc_util.h"
 
 int dcomp(const void * a, const void * b){
-  return ( *(double*)a - *(double*)b);
+  if(*(double*)a > *(double*)b) return 1;
+  if(*(double*)a < *(double*)b) return -1;
+  else return 0;
 }
 
 MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct, gsl_rng *rgen){
@@ -63,7 +65,7 @@ double MetropSampler::mean_acceptance(){
 
 bool MetropSampler::anneal(){
   if(mean_acceptance() > ideal_acceptance){
-    temp--;
+    temp -= 5;
     return true;
   }
   return false;
@@ -142,46 +144,50 @@ bool MCChains::set_constraints(double Rmax, double alpha){
 }
 
 bool MCChains::converged(){
-  static double R, CIt;
-  static double* pararray;
-  static double* totarray;
-  static int j,k,n,itot,cbase,upper,lower;
+  double R, CIt;
+  double* pararray;
+  double* totarray;
+  int j,k,n,itot,cbase,upper,lower;
+  size_t sortsize;
   int totlength=0;
   double CIm=0;
   bool converged=false;
 
-  for (i=0;i<nchains;i++)
+  for (i=0;i<nchains;i++)	
     totlength+=(chainlength[i]/2);
   totarray = new double[totlength];
 
   for (i=0;i<npars;i++){
     itot = 0;
+    printf("Start parameter %i\n",i);
     for (j=0;j<nchains;j++){
-      n = chainlength[j]/2;
+      n = int(chainlength[j]/2);
       pararray = new double[n];
       cbase = j*chainwidth+i;
       for (k=n;k<chainlength[j];k++){
 	totarray[itot] = chains[cbase][k];
-	pararray[k] = chains[cbase][k];
+	pararray[k-n] = chains[cbase][k];
 	itot++;
       }
       //m chain math
-      qsort(pararray,n,sizeof(double),dcomp);
+      sortsize = size_t(n);
+      qsort(pararray,sortsize,sizeof(double),dcomp);
       lower = (int)n*(alpha/2.0);
       upper = (int)n*(1.0-alpha/2.0);
       CIm+= (pararray[upper]-pararray[lower]);
-      printf("CI Chain %i: %f\n",j,CIm)
+      printf("CI Chain %i: %f, L=%i, u=%i, b=%i\n",j,CIm,n,upper,lower);
       delete[] pararray;
     }
     //m mean
     CIm /= nchains;
     //t chain math
-    printf("Lengths: %i %i",itot,totlength);
-    qsort(totarray,totlength,sizeof(double),dcomp);
+    sortsize = size_t(totlength);
+    qsort(totarray,sortsize,sizeof(double),dcomp);
     lower = (int)totlength*(alpha/2.0);
     upper = (int)totlength*(1.0-alpha/2.0);
     CIt = (totarray[upper]-totarray[lower]);
-    printf("CI Tot Chain: %f\n",CIt)
+    printf("CI mean: %f:\n",CIm);
+    printf("CI Tot Chain: %f, L=%i, u=%i, b=%i\n",CIt,totlength,upper,lower);
     //r math
     R = CIt/CIm;
     printf("Param: %i, R: %f\n\n",i,R);

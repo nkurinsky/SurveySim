@@ -23,7 +23,7 @@
 #define TMAX 50.00
 #define IDEALPCT 0.25
 #define BURN_STEP 5
-#define CONV_STEP 50
+#define CONV_STEP 20
 
 using namespace std; 
 
