@@ -170,18 +170,21 @@ bool MCChains::converged(){
       lower = (int)n*(alpha/2.0);
       upper = (int)n*(1.0-alpha/2.0);
       CIm+= (pararray[upper]-pararray[lower]);
+      printf("CI Chain %i: %f\n",j,CIm)
       delete[] pararray;
     }
     //m mean
     CIm /= nchains;
     //t chain math
+    printf("Lengths: %i %i",itot,totlength);
     qsort(totarray,totlength,sizeof(double),dcomp);
     lower = (int)totlength*(alpha/2.0);
     upper = (int)totlength*(1.0-alpha/2.0);
     CIt = (totarray[upper]-totarray[lower]);
+    printf("CI Tot Chain: %f\n",CIt)
     //r math
     R = CIt/CIm;
-    printf("Param: %i, R: %f\n",i,R);
+    printf("Param: %i, R: %f\n\n",i,R);
     converged = (converged and (R < Rmax));
   }
   delete[] totarray;
