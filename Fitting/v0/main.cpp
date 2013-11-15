@@ -20,9 +20,9 @@
 //For values to be passed in by widget
 #define NPAR 2
 #define NCHAIN 5
-#define TMAX 50.00
+#define TMAX 20.00
 #define IDEALPCT 0.25
-#define BURN_STEP 5
+#define BURN_STEP 10
 #define CONV_STEP 20
 
 using namespace std; 
@@ -214,12 +214,32 @@ int main(int argc,char** argv){
   MCChains mcchain(NCHAIN,NPAR,runs);
   MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,r);
 
-  for(m=0;m<NCHAIN;m++){
+  for(m=0;m<NCHAIN;m++){    
     ptemp[m][0] = pcurrent[m][0] = lpars[4];
     ptemp[m][1] = pcurrent[m][1] = lpars[5];
+    switch(m){
+    case 1:
+      ptemp[1][0] += (p_max[0]-ptemp[1][0])/2.0;
+      pcurrent[1][0] = ptemp[1][0];
+      break;
+    case 2:
+      ptemp[2][0] += (p_min[0]-ptemp[2][0])/2.0;
+      pcurrent[2][0] = ptemp[2][0];
+      break;
+    case 3:
+      ptemp[3][1] += (p_max[1]-ptemp[3][1])/2.0;
+      pcurrent[3][1] = ptemp[3][1];
+      break;
+    case 4:
+      ptemp[4][1] += (p_min[1]-ptemp[4][1])/2.0;
+      pcurrent[4][1] = ptemp[4][1];
+      break;
+    default:
+      break;
+    }
   }
   
-  printf("--- Beginning MC Burn-in Phase ---\n");
+  printf("\n ---------- Beginning MC Burn-in Phase ---------- \n");
   for (i=0;i<(runs/10);i++){
     for (m=0;m<NCHAIN;m++){
       for(p=0;p<NPAR;p++){
@@ -228,16 +248,22 @@ int main(int argc,char** argv){
 	if((temp >= p_min[p]) && (temp <= p_max[p])) ptemp[m][p]=temp;
       }
       
-      printf("\n%lu %lu : %lf %lf...",(i+1),(m+1),ptemp[m][0],ptemp[m][1]);
+      printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][0],ptemp[m][1]);
       
       //this not yet generalized
       lf.set_p(ptemp[m][0]);
       lf.set_q(ptemp[m][1]);
-      printf("\nRunning...\n");
       output=survey.simulate();
       trial=output.chisqr;
-      printf("Iteration Chi-Square: %lf",trial);
+      printf("Iteration Chi-Square: %lf\n",trial);
       
+      if(trial < chi_min){
+	printf(" -- Current Best Trial --");
+	chi_min=trial;
+	for(p=0;p<NPAR;p++)
+	  pbest[p]=ptemp[m][p];
+      }
+
       if(metrop.accept(m,trial)){
 	for(p=0;p<NPAR;p++)
 	  pcurrent[m][p]=ptemp[m][p];
@@ -248,7 +274,13 @@ int main(int argc,char** argv){
 	i = runs;
   }
   
-  printf("\n\n--- Fitting Start ---\n Total Run Number: %ld\n\n",runs);
+  for(m=0;m<NCHAIN;m++)
+    for(p=0;p<NPAR;p++)
+      ptemp[m][p] = pcurrent[m][p] = pbest[p];
+  
+  metrop.reset();
+  
+  printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",runs);
   for (i=0;i<runs;i++){
     for (m=0;m<NCHAIN;m++){
       for(p=0;p<NPAR;p++){
@@ -257,22 +289,15 @@ int main(int argc,char** argv){
 	if((temp >= p_min[p]) && (temp <= p_max[p])) ptemp[m][p]=temp;
       }
       
-      printf("\n%lu %lu : %lf %lf...",(i+1),(m+1),ptemp[m][0],ptemp[m][1]);
+      printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][0],ptemp[m][1]);
       lf.set_p(ptemp[m][0]);
       lf.set_q(ptemp[m][1]);
-      printf("\nRunning...\n");
       output=survey.simulate();
       trial=output.chisqr;
       printf("Model chi2: %lf",trial);
-
+      
       mcchain.add_link(m,ptemp[m],trial);
-      if(trial < chi_min){
-	printf("Current Best Trial!\n");
-	chi_min=trial;
-	for(p=0;p<NPAR;p++)
-	  pbest[p]=ptemp[m][p];
-      }
-
+      
       if(metrop.accept(m,trial)){
 	printf(" -- Accepted\n");
 	for(p=0;p<NPAR;p++)
@@ -281,7 +306,7 @@ int main(int argc,char** argv){
       else
 	printf(" -- Rejected\n");
     }
-
+    
     if(((i+1) % CONV_STEP) == 0){
       printf("Checking Convergence\n");
       metrop.anneal();
@@ -293,6 +318,7 @@ int main(int argc,char** argv){
     } 
   }
   
+  mcchain.get_best_link(pbest,chi_min);
   lf.set_p(pbest[0]);
   lf.set_q(pbest[1]);
   printf("\nRe-Running Best Fit...\n");
@@ -301,10 +327,17 @@ int main(int argc,char** argv){
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
   
   string parnames[] = {"p0","q0"};
-  survey.save(outfile);
-  mcchain.save(outfile,parnames);
-
+  bool saved;
+  saved = survey.save(outfile);
+  saved &= mcchain.save(outfile,parnames);
+  if(saved)
+    printf("Save Successful\n");
+  else
+    printf("Save Failed\n");
+  
   gsl_rng_free (r);
+  
+  printf("\nReturning from fitting routine\n\n");
   
   return 0;
 }

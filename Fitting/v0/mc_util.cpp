@@ -49,6 +49,11 @@ bool MetropSampler::accept(int chainnum, double trial){
     previous[chainnum] = trial;
   }
   
+  recent.push_back(accepted);
+  if(recent.size() >= RECENT_NUM){
+    recent.pop_front();
+  }  
+  
   return accepted;
 }
 
@@ -64,12 +69,32 @@ double MetropSampler::mean_acceptance(){
   return acc_temp/double(nchains);
 }
 
+double MetropSampler::acceptance_rate(){
+  recent_num=0;
+  for(unsigned long i=0;i<recent.size();i++)
+    if(recent[i]) recent_num++; 
+  
+  return (double(recent_num)/double(recent.size()));
+}
+
 bool MetropSampler::anneal(){
-  if(mean_acceptance() > ideal_acceptance){
-    temp -= 5;
+  if(acceptance_rate() > ideal_acceptance){
+    temp--;
     return true;
   }
-  return false;
+  else {
+    temp++;
+    return false;
+  }
+}
+
+void MetropSampler::reset(){
+  for (int i=0;i<nchains;i++){
+    accept_total[i] = 0;
+    iteration_total[i] = 0;
+    previous[i] = 1.0E+4;
+  }
+  recent.clear();
 }
 
 MetropSampler::~MetropSampler(){
@@ -127,6 +152,12 @@ bool MCChains::add_link(int chain, double pars[], double chisqr){
   return true;
 }
 
+void MCChains::get_best_link(double pars[], double chisqr){
+  for(int i=0;i<npars;i++)
+    pars[i] = bestpars[i];
+  chisqr = chi_min;
+}
+
 bool MCChains::set_constraints(double Rmax, double alpha){
 
   if (Rmax <= 1.0 or Rmax > 2.0){
@@ -152,7 +183,7 @@ bool MCChains::converged(){
   size_t sortsize;
   int totlength=0;
   double CI,CIm=0;
-  bool converged=false;
+  bool converged=true;
 
   for (i=0;i<nchains;i++)	
     totlength+=(chainlength[i]/2);
@@ -177,7 +208,7 @@ bool MCChains::converged(){
       upper = (int)n*(1.0-alpha/2.0);
       CI = abs((pararray[upper]-pararray[lower]));
       CIm += CI;
-      printf("\nCI Chain %i: %f, L=%i, u=%i, b=%i\n",j,CI,n,upper,lower);
+      printf("CI Chain %i: %f, L=%i, u=%i, b=%i\n",j,CI,n,upper,lower);
       delete[] pararray;
     }
     //m mean
@@ -192,7 +223,7 @@ bool MCChains::converged(){
     printf("CI Tot Chain: %f, L=%i, u=%i, b=%i\n",CIt,totlength,upper,lower);
     //r math
     R = CIt/CIm;
-    printf("Param: %i, R: %f\n\n",i,R);
+    printf("Param: %i, R: %f (%f)\n\n",i,R,Rmax);
     converged = (converged and (R < Rmax));
   }
   delete[] totarray;
@@ -235,8 +266,8 @@ bool MCChains::save(string filename, string parnames[]){
   for(i=0;i<allwidth;i++){
     printf("%s,\t",colnames[i].c_str());
     newTable->column(colnames[i]).write(chains[i],1);
-    printf("\n");
   }
+  printf("\n");
   return true;
 }
 
