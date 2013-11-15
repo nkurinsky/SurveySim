@@ -8,9 +8,10 @@
 
 #include "mc_util.h"
 
-int dcomp(const void * a, const void * b){
-  if(*(double*)a > *(double*)b) return 1;
-  if(*(double*)a < *(double*)b) return -1;
+int dcomp(const void * a,const void * b){
+  
+  if((*(double*)a) > (*(double*)b)) return 1;
+  if((*(double*)a) < (*(double*)b)) return -1;
   else return 0;
 }
 
@@ -150,7 +151,7 @@ bool MCChains::converged(){
   int j,k,n,itot,cbase,upper,lower;
   size_t sortsize;
   int totlength=0;
-  double CIm=0;
+  double CI,CIm=0;
   bool converged=false;
 
   for (i=0;i<nchains;i++)	
@@ -159,7 +160,7 @@ bool MCChains::converged(){
 
   for (i=0;i<npars;i++){
     itot = 0;
-    printf("Start parameter %i\n",i);
+    CIm = 0;
     for (j=0;j<nchains;j++){
       n = int(chainlength[j]/2);
       pararray = new double[n];
@@ -174,18 +175,19 @@ bool MCChains::converged(){
       qsort(pararray,sortsize,sizeof(double),dcomp);
       lower = (int)n*(alpha/2.0);
       upper = (int)n*(1.0-alpha/2.0);
-      CIm+= (pararray[upper]-pararray[lower]);
-      printf("CI Chain %i: %f, L=%i, u=%i, b=%i\n",j,CIm,n,upper,lower);
+      CI = abs((pararray[upper]-pararray[lower]));
+      CIm += CI;
+      printf("\nCI Chain %i: %f, L=%i, u=%i, b=%i\n",j,CI,n,upper,lower);
       delete[] pararray;
     }
     //m mean
-    CIm /= nchains;
+    CIm = CIm/double(nchains);
     //t chain math
     sortsize = size_t(totlength);
     qsort(totarray,sortsize,sizeof(double),dcomp);
     lower = (int)totlength*(alpha/2.0);
     upper = (int)totlength*(1.0-alpha/2.0);
-    CIt = (totarray[upper]-totarray[lower]);
+    CIt = abs((totarray[upper]-totarray[lower]));
     printf("CI mean: %f:\n",CIm);
     printf("CI Tot Chain: %f, L=%i, u=%i, b=%i\n",CIt,totlength,upper,lower);
     //r math
