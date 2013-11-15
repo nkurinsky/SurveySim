@@ -232,9 +232,11 @@ bool MCChains::save(string filename, string parnames[]){
   
   Table *newTable = pFits->addTable(hname,nruns,colnames,colform,colunits,AsciiTbl);
   
-  for(i=0;i<allwidth;i++)
-    printf("\t%s\n",colnames[i].c_str());
-  newTable->column(colnames[i]).write(chains[i],1);
+  for(i=0;i<allwidth;i++){
+    printf("%s,\t",colnames[i].c_str());
+    newTable->column(colnames[i]).write(chains[i],1);
+    printf("\n");
+  }
   return true;
 }
 
