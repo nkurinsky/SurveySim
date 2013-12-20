@@ -251,7 +251,7 @@ bool simulator::save(string outfile){
     opened = false;       
   }
   
-  double lpars[LUMPARS];
+  double lpars[6];
   lf->get_params(lpars);
   
   pFits->pHDU().addKey("PHI0",lpars[0],"Normalization"); 
@@ -260,9 +260,8 @@ bool simulator::save(string outfile){
   pFits->pHDU().addKey("BETA",lpars[3],"lower slope"); 
   pFits->pHDU().addKey("P",lpars[4],"Norm evolution"); 
   pFits->pHDU().addKey("Q",lpars[5],"Knee evolution"); 
-  pFits->pHDU().addKey("ZCUT",lpars[6],"Z Evolution Cutoff");
   pFits->pHDU().addKey("CEXP",color_exp,"Color Evolution Param");
-  
+
   unsigned long size = sources.size();
   printf("%s %lu\n","Soures Being Saved: ",size);
   int pnum = 2;
@@ -284,9 +283,9 @@ bool simulator::save(string outfile){
       params[j][i] = 1.0; //also placeholder for now
   }
   
-  static std::vector<string> colname((LUMPARS+pnum),"");
-  static std::vector<string> colunit((LUMPARS+pnum),"");
-  static std::vector<string> colform((LUMPARS+pnum),"f13.8");
+  static std::vector<string> colname((6+pnum),"");
+  static std::vector<string> colunit((6+pnum),"");
+  static std::vector<string> colform((6+pnum),"f13.8");
   
   static string pnames[] = {"P0","P1","P2","P3","P4"};
   
@@ -306,8 +305,8 @@ bool simulator::save(string outfile){
   
   colform[5] = "e13.5";
   
-  for(int i=LUMPARS;i<LUMPARS+pnum;i++){
-    colname[i] = pnames[i-LUMPARS];
+  for(int i=6;i<6+pnum;i++){
+    colname[i] = pnames[i-6];
     colunit[i] = "-";
   }
   
@@ -320,8 +319,9 @@ bool simulator::save(string outfile){
   newTable->column(colname[3]).write(redshift,1);
   newTable->column(colname[4]).write(param,1);
   newTable->column(colname[5]).write(luminosity,1);
-  for (int i=LUMPARS;i<LUMPARS+pnum;i++)
-    newTable->column(colname[i]).write(params[i-LUMPARS],1);
+  for (int i=6;i<6+pnum;i++)
+    newTable->column(colname[i]).write(params[i-6],1);
+  
   return true;
 }
 

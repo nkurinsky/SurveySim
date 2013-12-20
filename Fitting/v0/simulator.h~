@@ -3,8 +3,6 @@
 #include "lumfunct.h"
 #include "hist_lib.h"
 
-#define LUMPARS 7
-
 //Storage structure for each individual source
 struct sprop{
   //source properties (as determined by distributions)

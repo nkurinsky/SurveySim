@@ -104,11 +104,11 @@ pro simulation
      bands = [band1,band2,band3]
 
      ;luminosity function parameter initialization
-     ldat0={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:6.7,q:3.5,zcut:2.0}
-     ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0,zcut:1.0}
-     ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:0.0,q:0.0,zcut:0.0}
-     ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:10.0,q:10.0,zcut:0.0}
-     ldat4={phi0:0.0,lo:0.0,alpha:0.0,beta:0.0,p:0.1,q:0.1,zcut:0.0}
+     ldat0={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:6.7,q:3.5}
+     ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0}
+     ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:0.,q:0.0}
+     ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:10.0,q:10.0}
+     ldat4={phi0:0.0,lo:0.0,alpha:0.0,beta:0.0,p:0.1,q:0.1}
      ldata=[ldat0,ldat1,ldat2,ldat3,ldat4]
      ;the fixed values: =1 if held fixed, =0 if variable
 
@@ -268,11 +268,6 @@ PRO simulation_event,ev
         sxaddpar,hdr2,'Q_MIN',min.q,'Minimum Q value'
         sxaddpar,hdr2,'Q_MAX',max.q,'Maximum Q value'
         sxaddpar,hdr2,'Q_DP',sigma.q,'Sigma Q value'
-        sxaddpar,hdr2,'ZCUT',pars.zcut,'Luminosity Function z evolution limit'
-        sxaddpar,hdr2,'ZCUT_FIX',fixed.zcut,'Fix ZCUT (Y=1/N=0)'
-        sxaddpar,hdr2,'ZCUT_MIN',min.zcut,'Minimum ZCUT value'
-        sxaddpar,hdr2,'ZCUT_MAX',max.zcut,'Maximum ZCUT value'
-        sxaddpar,hdr2,'ZCUT_DP',sigma.zcut,'Sigma ZCUT value'
         sxaddpar,hdr2,'CEXP',cdat.a0,'Intrinsic luminosity evolution term'
         sxaddpar,hdr2,'CEXP_FIX',cdat.fixed,'Fix CEXP (Y=1/N=0)'
         sxaddpar,hdr2,'CEXP_MIN',cdat.amin,'Minimum CEXP value'
@@ -384,7 +379,6 @@ pro read_output
   L0 = fxpar(head,'L0')
   p = fxpar(head,'P')
   q = fxpar(head,'Q')
-  zcut = fxpar(head,'ZCUT')
 
   a = findgen(xysize+1)
   a *= binsize
@@ -501,7 +495,7 @@ pro read_output
   dz = 0.25
   loadct,39,/silent
   for z=dz,5.0,dz do begin
-     if z le zcut then begin
+     if z le 2.0 then begin
         t1 = (10^phi0)*((1+z)^p)
         t2 = (10^L0)*((1+z)^q)
      endif else begin
