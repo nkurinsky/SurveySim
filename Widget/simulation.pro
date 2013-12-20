@@ -856,7 +856,7 @@ pro graphs_event,ev
 
   case uvalue of
      'diags' : begin
-        
+        diagnostics
      end
      'refresh': begin
         widget_control,ev.top,get_uvalue=mnum
@@ -911,7 +911,7 @@ pro diagnostics
   likely = widget_draw(r2,xsize=xdim,ysize=ydim)
   phist = widget_draw(r2,xsize=xdim,ysize=ydim)
   qhist = widget_draw(r2,xsize=xdim,ysize=ydim)
-  restext = widget_text(main,/wrap,value=['Fitting Results:',head],xsize=xdim,ysize=ydim)
+  tbox = widget_base(r2b,xsize=xdim,ysize=ydim)
   pconv = widget_draw(r2b,xsize=xdim,ysize=ydim)
   qconv = widget_draw(r2b,xsize=xdim,ysize=ydim)
   
@@ -919,6 +919,8 @@ pro diagnostics
   close = widget_button(r3,uvalue='close',value='Close')
   quit = widget_button(r3,uvalue='quit',value='Quit')
   
+  restext = widget_text(tbox,/wrap,value=['Fitting Results:',head])
+
   widget_control,dmain,/realize
   xmanager,'graphs',dmain,/no_block
   
