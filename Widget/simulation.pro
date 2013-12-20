@@ -133,7 +133,7 @@ pro simulation
 
 ;Luminosity Function Parameters
   l1 = widget_label(info.lum_table,value="Luminosity Function Parameters")
-  info.t1 = widget_table(info.lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=472,scr_ysize=132)
+  info.t1 = widget_table(info.lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=572,scr_ysize=132)
 
   l3 = widget_label(info.sed_table,value="SED Evolution Parameters")
   info.t3 = widget_table(info.sed_table,value=cdat,column_labels=lrows,row_labels=["Color Exp"],uvalue='t3',/editable,alignment=1,format=fmt3,scr_xsize=404,scr_ysize=55)
@@ -911,7 +911,7 @@ pro diagnostics
   likely = widget_draw(r2,xsize=xdim,ysize=ydim)
   phist = widget_draw(r2,xsize=xdim,ysize=ydim)
   qhist = widget_draw(r2,xsize=xdim,ysize=ydim)
-  tbox = widget_base(r2b,xsize=xdim,ysize=ydim)
+  tbox = widget_base(r2b,xsize=xdim,ysize=ydim,/column)
   pconv = widget_draw(r2b,xsize=xdim,ysize=ydim)
   qconv = widget_draw(r2b,xsize=xdim,ysize=ydim)
   
@@ -1042,17 +1042,17 @@ pro diagnostics
   widget_control,likely,get_value=index
   wset,index
 
-  plot,[0,1],[0,1]
+  plot,[0,1],[0,1],/nodata
 
   widget_control,pconv,get_value=index
   wset,index
 
-  plot,[0,1],[0,1]
+  plot,[0,1],[0,1],/nodata
   
   widget_control,qconv,get_value=index
   wset,index
 
-  plot,[0,1],[0,1]
+  plot,[0,1],[0,1],/nodata
   
 end
 
