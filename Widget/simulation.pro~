@@ -883,9 +883,8 @@ pro diagnostics
   !p.charthick=0
   !p.charsize=0
 
-  size_screen=get_screen_size()
+  size_screen=0.8*get_screen_size()
   size_screen_alt = size_screen*0.85
-  size_screen = size_screen*0.8
   dmain = widget_base(title='Simulation Diagnostics',/column,xsize=size_screen[0],ysize=size_screen_alt[1])
   r1 = widget_base(dmain,/row)
   r2 = widget_base(dmain,/row)
@@ -920,7 +919,7 @@ pro diagnostics
   close = widget_button(r3,uvalue='close',value='Close')
   quit = widget_button(r3,uvalue='quit',value='Quit')
   
-  restext = widget_text(tbox,/wrap,value=['Fitting Results:',head],xsize=xdim-5,ysize=ydim-5)
+  restext = widget_text(tbox,/wrap,value=['Fitting Results:',head])
 
   widget_control,dmain,/realize
   xmanager,'graphs',dmain,/no_block
@@ -993,7 +992,7 @@ pro diagnostics
   
   for i=double(prange[0]),double(prange[1]),dp do begin
      print,i
-     gpts = where((p gt i) and (p le i+dp))
+     gpts = where((p gt i) and (p lt i+dp))
      if(gpts[0] ne -1) then begin
         mtemp = mean(chis[gpts])
         mlow = min(chis[gpts])
@@ -1017,7 +1016,7 @@ pro diagnostics
   loadct,39
   for i=double(qrange[0]),double(qrange[1]),dq do begin
      print,i
-     gpts = where((q gt i) and (q le i+dq))
+     gpts = where((q gt i) and (q lt i+dq))
      if(gpts[0] ne -1) then begin
         mtemp = mean(chis[gpts])
         mlow = min(chis[gpts])
@@ -1043,26 +1042,7 @@ pro diagnostics
   widget_control,likely,get_value=index
   wset,index
 
-  plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Model Color Distribution'
-  color_scale = 256/(alog(max(chis))*1.2)+30
-
-  for i=prange[0],prange[1],dp do begin
-     for j=qrange[0],qrange[1],dq do begin
-        
-        xfill = [i,i,i+dp,i+dp]
-        yfill = [j,j+dq,j+dq,j]
-
-        gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
-        chi_mean = mean(chis[gpts])
-
-        if(gpts[0] ne -1) then begin
-           polyfill,xfill,yfill,color=color_scale*alog(chi_mean)
-        endif
-        
-        if(i eq prange[1]) then oplot,prange,[j+dq,j+dq],linestyle=1        
-     endfor
-     oplot,[i+dp,i+dp],qrange,linestyle=1
-  endfor
+  plot,[0,1],[0,1],/nodata
 
   widget_control,pconv,get_value=index
   wset,index
