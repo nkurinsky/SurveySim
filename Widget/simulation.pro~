@@ -8,7 +8,7 @@
 
 pro simulation
 
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
 ;==================================================================
 ;the INFO structure holds the key widget control parameters as well as 
@@ -48,7 +48,11 @@ pro simulation
        t1:0L, $
        t2:0L, $
        t3:0L, $
-       tset:0L,}
+;basic simulation settings
+       ofile:'observation.save', $
+       mfile:'model.save', $
+       sedfile: 'sf_templates.fits', $
+       oname:'output.fits' }
 
 ;====================================================================
 ; Colors
@@ -81,6 +85,11 @@ pro simulation
   info.dbase = widget_base(info.p_main,/column,/align_center)    ; base for file dialogs
   info.button_base = widget_button(mbar,/menu,value="Menu") ; base for buttons
   
+;output file select
+  CD, Current=thisDir
+  info.obsname = fsc_fileselect(info.dbase,Directory=thisDir,filename=info.ofile,/NoMaxSize,LabelName='Observation Save File') ;,ObjectRef=obsObject) 
+  info.sfile = fsc_fileselect(info.dbase,Directory=thisDir,filename=info.sedfile,ObjectRef=sedObject,/NoMaxSize,LabelName='SED Templates file')
+  
 ;=============================================================
 ;survey parameter initialization
 ;-------------------------------------------------------------
@@ -93,33 +102,20 @@ pro simulation
      band2 = {wave:350.d0,fmin:20.0,ferr:5.8}
      band3 = {wave:500.d0,fmin:15.0,ferr:6.2}
      bands = [band1,band2,band3]
-     
-                                ;luminosity function parameter initialization
-     ldat0={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:-0.7,q:3.5,zcut:2.0}
+
+     ;luminosity function parameter initialization
+     ldat0={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:6.7,q:3.5,zcut:2.0}
      ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0,zcut:1.0}
-     ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:-6.0,q:2.0,zcut:0.0}
-     ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:2.0,q:8.0,zcut:0.0}
-     ldat4={phi0:0.0,lo:0.0,alpha:0.0,beta:0.0,p:0.3,q:0.1,zcut:0.0}
+     ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:0.0,q:0.0,zcut:0.0}
+     ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:10.0,q:10.0,zcut:0.0}
+     ldat4={phi0:0.0,lo:0.0,alpha:0.0,beta:0.0,p:0.1,q:0.1,zcut:0.0}
      ldata=[ldat0,ldat1,ldat2,ldat3,ldat4]
-                                ;the fixed values: =1 if held fixed, =0 if variable
-     
+     ;the fixed values: =1 if held fixed, =0 if variable
+
      cdat = {a0:0.0,fixed:0.0,amin:0.0,amax:1.0,sigma:0.1}
      sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1.e3}
-     
-     CD, Current=thisdir
-     files = {ofile:thisdir+'/observation.save', $
-              mfile:thisdir+'/model.save', $
-              sedfile:thisdir+'/sf_templates.fits', $
-              oname:thisdir+'/output.fits' }
-     
-     msettings = {$
-                 nchain:5,$
-                 tmax:20.0,$
-                 idealpct:0.25, $
-                 burn_step:10, $
-                 conv_step:20}
   endelse
-  
+
   bname = ["Band 1","Band 2","Band 3"]
   ocols = ["Wavelength (um)","Flux limit (mJy)","Standard Error (mJy)"]
   f = ['(e9.2)','(f7.4)','(f7.4)']
@@ -175,27 +171,25 @@ xmanager,'simulation',info.base,/NO_BLOCK
 wset,info.win_id3
 
 ;plot SEDs (generalize to any SED template file)
-if file_test(files.sedfile) then begin
-   templ=mrdfits(files.sedfile,/silent) 
-   loadct,1,/silent
-   plot,templ[*,0],templ[*,1],/xlog,/ylog,yrange=[1.d20,1.d28],ystyle=1,xtitle=TeXtoIDL('\lambda [\mum]'),ytitle=TeXtoIDL('L_{\nu} [W/Hz]')
-   for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
-endif else begin
-   print,'File '+files.sedfile+' does not exist, skipping plot'
-endelse
+widget_control,info.sfile,get_value=value
+templ=mrdfits(info.sedfile,/silent) 
+
+loadct,1,/silent
+plot,templ[*,0],templ[*,1],/xlog,/ylog,yrange=[1.d20,1.d28],ystyle=1,xtitle=TeXtoIDL('\lambda [\mum]'),ytitle=TeXtoIDL('L_{\nu} [W/Hz]')
+for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
 
 END
 
 ;widget event handling routine
 PRO simulation_event,ev
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
   ; get event identifier
   widget_control,ev.id,get_uvalue=uvalue
 
   CASE uvalue OF
      'go'  : begin ;save settings, intialize FITS file, and pass to C++ fitting routine
-        save,ldata,ldat0,bands,sdat,cdat,msettings,files,filename='params.save' ;save parameters
+        save,ldata,ldat0,bands,sdat,cdat,filename='params.save' ;save parameters
         
         ;make observation FITS file
         widget_control,info.ot,get_value=bvals
@@ -204,9 +198,9 @@ PRO simulation_event,ev
         flux_err = [bvals[0].ferr,bvals[1].ferr,bvals[2].ferr]
 
         widget_control,info.obsname,get_value=value
-        if (file_test(files.ofile)) then begin
-           print,files.ofile
-           restore,files.ofile
+        if (file_test(info.ofile)) then begin
+           print,info.ofile
+           restore,info.ofile
            values = dblarr(n_elements(wave),n_elements(f1))
         endif else begin
            print,'Error: file "observation.save" not found'
@@ -306,20 +300,7 @@ PRO simulation_event,ev
         read_output
         graphs
      end
-     'settings': begin
-        settings
-        
-        wset,info.win_id3
-        if file_test(files.sedfile) then begin
-           templ=mrdfits(files.sedfile,/silent) 
-           loadct,1,/silent
-           plot,templ[*,0],templ[*,1],/xlog,/ylog,yrange=[1.d20,1.d28],ystyle=1,xtitle=TeXtoIDL('\lambda [\mum]'),ytitle=TeXtoIDL('L_{\nu} [W/Hz]')
-           for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
-        endif else begin
-           print,'File '+files.sedfile+' does not exist, skipping plot'
-        endelse
-
-     end
+     'settings': settings
      'diag': diagnostics
      'replot': begin
         read_output
@@ -356,44 +337,14 @@ END
 
 pro settings
   
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
-  
-  smain = widget_base(title="Simulation Settings",/column)
-  sbase = widget_base(smain,/column,/align_center)
-
-  l1 = widget_label(sbase,value="Monte Carlo Runtime Parameters")
-  info.tset = widget_table(sbase,value=[msettings],row_labels=tag_names(msettings),column_labels=["Value"],/editable,alignment=1,/column_major)
-
-  info.obsname = fsc_fileselect(smain,/NoMaxSize,LabelName='Observation Save File')
-  widget_control,info.obsname,set_value=files.ofile
-  
-  info.sfile = fsc_fileselect(smain,ObjectRef=sedObject,/NoMaxSize,LabelName='SED Templates File')
-  widget_control,info.sfile,set_value=files.sedfile
-
-  btns = widget_base(smain,/row,/align_left)
-  save_btn = widget_button(btns,uvalue='save',Value="Save and Close")
-  cancel_btn = widget_button(btns,uvalue='cancel',Value="Cancel")
-
-  widget_control,smain,/realize
-  xmanager,'settings',smain,/no_block
-
 end
 
-pro settings_event,ev
-  
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+pro settings_event
   
   widget_control,ev.id,get_uvalue=uvalue
 
   switch uvalue of
-     'save' : begin
-        widget_control,info.tset,get_value=msettings
-        widget_control,info.sfile,get_value=files.sedfile
-        widget_control,info.ofile,get_value=files.ofile
-     end
-     'cancel' begin
-        widget_control,ev.top,/destroy
-     end
+     
   endswitch
 
 end
@@ -432,17 +383,15 @@ end
 
 pro read_output
   
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
-
   !p.thick=5
   !x.thick=5
   !y.thick=5
   !p.charthick=5
   !p.charsize=1.5
 
-  comp = mrdfits(files.oname,0,head,/silent)
-  model = mrdfits(files.oname,1,/silent)
-  obs = mrdfits(files.oname,2,/silent)
+  comp = mrdfits('output.fits',0,head,/silent)
+  model = mrdfits('output.fits',1,/silent)
+  obs = mrdfits('output.fits',2,/silent)
 
   xysize = fxpar(head,'DIM')
   hist_min = fxpar(head,'H_MIN')
@@ -610,7 +559,7 @@ end
 
 pro graphs
 
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
   !p.thick=0
   !x.thick=0
@@ -654,7 +603,7 @@ pro graphs
   set_plot,'x'
   loadct,0,/silent
 
-  res = mrdfits(files.oname,0,head,/silent)
+  res = mrdfits('output.fits',0,head,/silent)
 
   alpha = fxpar(head,'ALPHA')
   beta = fxpar(head,'BETA')
@@ -666,7 +615,7 @@ pro graphs
   omega_m = 0.28
   omega_l = 0.72
   
-  dists = mrdfits(files.oname,3,head,/silent)
+  dists = mrdfits('output.fits',3,head,/silent)
 
   gpts = where(dists.f3 gt 0)
   f1 = dists[gpts].f1
@@ -811,9 +760,9 @@ pro graphs
   h[pts] = 0.01
   plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='F_{500}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
 
-  comp = mrdfits(files.oname,0,head,/silent)
-  model = mrdfits(files.oname,1,/silent)
-  obs = mrdfits(files.oname,2,/silent)
+  comp = mrdfits(info.oname,0,head,/silent)
+  model = mrdfits(info.oname,1,/silent)
+  obs = mrdfits(info.oname,2,/silent)
 
   xysize = fxpar(head,'DIM')
   hist_min = fxpar(head,'H_MIN')
@@ -921,7 +870,7 @@ pro graphs
 end
 
 pro graphs_event,ev
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
   widget_control,ev.id,get_uvalue=uvalue
 
@@ -947,7 +896,7 @@ end
 
 pro diagnostics
 
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
   !p.thick=0
   !x.thick=0
@@ -968,7 +917,7 @@ pro diagnostics
   xdim = fix(size_screen[0]/3.0)
   ydim = fix(size_screen[1]/3.0)
 
-  res = mrdfits(files.oname,0,head,/silent)
+  res = mrdfits('output.fits',0,head,/silent)
   alpha = fxpar(head,'ALPHA')
   beta = fxpar(head,'BETA')
   phi0 = fxpar(head,'PHI0')
@@ -1003,7 +952,7 @@ pro diagnostics
   loadct,0,/silent
   
 ; chain read operations 
-  res = mrdfits(files.oname,4,/silent)
+  res = mrdfits('output.fits',4,/silent)
   p = [res.p00,res.p01,res.p02,res.p03,res.p04]
   q = [res.q00,res.q01,res.q02,res.q03,res.q04]
   chis = [res.chisq0,res.chisq1,res.chisq2,res.chisq3,res.chisq4]
@@ -1151,7 +1100,7 @@ pro diagnostics
 end
 
 pro diagnostics_event,ev
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands
 
   widget_control,ev.id,get_uvalue=uvalue
 

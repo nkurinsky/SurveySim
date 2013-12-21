@@ -25,6 +25,7 @@
 #define BURN_STEP 10
 #define CONV_STEP 20
 
+//MAKE ZCUT!!!
 
 using namespace std; 
 
