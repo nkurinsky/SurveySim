@@ -121,8 +121,7 @@ pro simulation
                  conv_conf:0.05, $
                  conv_rmax:1.05, $
                  conv_step:20, $
-                 burn_step:10, $
-                 burn_ratio:10}
+                 burn_step:10}
   endelse
   
   bname = ["Band 1","Band 2","Band 3"]
@@ -299,15 +298,6 @@ PRO simulation_event,ev
         sxaddpar,hdr2,'ZMAX',sdat.zmax,'Maximum Redshift Value'
         sxaddpar,hdr2,'DZ',sdat.dz,'Redshit Bin Width'
         sxaddpar,hdr2,'AREA',sdat.area,'Observed Solid Angle'
-
-        sxaddpar,hdr2,'NCHAIN',msettings.nchain,'Chain Number'
-        sxaddpar,hdr2,'TMAX',msettings.tmax,'Starting Anneal Temperature'
-        sxaddpar,hdr2,'ANN_PCT',msettings.acceptpct,'Ideal Acceptance Percentage'
-        sxaddpar,hdr2,'CONV_CONF',msettings.conv_conf,'Convergence CI Setting'
-        sxaddpar,hdr2,'CONV_RMAX',msettings.conv_rmax,'Convergence Rmax Criterion'
-        sxaddpar,hdr2,'CONV_STEP',msettings.conv_step,'Iterations between convergence checks'
-        sxaddpar,hdr2,'BURN_STEP',msettings.burn_step,'Iterations between anneal calls in burn-in'
-        sxaddpar,hdr2,'BURNVRUN',msettings.burn_ratio,'Ratio of normal to burn-in steps'
 
         templates = [0]
         mwrfits,templates,files.mfile,hdr2,/create

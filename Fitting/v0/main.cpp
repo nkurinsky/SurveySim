@@ -19,13 +19,14 @@
 #define BANDS 3
 //For values to be passed in by widget
 #define NPAR 2
+/*
 #define NCHAIN 5
 #define TMAX 20.00
 #define IDEALPCT 0.25
 #define BURN_STEP 10
 #define CONV_STEP 20
-
-
+#define BURN_RATIO 10
+*/
 using namespace std; 
 
 gsl_rng * r;  // global generator
@@ -50,7 +51,8 @@ int main(int argc,char** argv){
 
   unsigned long runs; 
   int nz,ns;
-  double area, dz, zmax, zmin, rtemp;
+  double area, dz, zmax, zmin, rtemp, rmax, a_ci;
+  double NCHAIN,TMAX,IDEALPCT,BURN_STEP,CONV_STEP,BURN_RATIO;
   products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5","6"};
@@ -76,6 +78,15 @@ int main(int argc,char** argv){
   params_table.readKey("ZMAX",zmax);
   params_table.readKey("DZ",dz);
   params_table.readKey("AREA",area);
+
+  params_table.readKey("NCHAIN",NCHAIN);
+  params_table.readKey("TMAX",TMAX);
+  params_table.readKey("ANN_PCT",IDEALPCT);
+  params_table.readKey("BURN_STEP",BURN_STEP);
+  params_table.readKey("CONV_STEP",CONV_STEP);
+  params_table.readKey("BURNVRUN",BURN_RATIO);
+  params_table.readKey("CONV_RMAX",rmax);
+  params_table.readKey("CONV_CONF",a_ci);
 
   //this is necessary for correct cosmological volume determinations
   //hence correct number count predictions
@@ -214,6 +225,7 @@ int main(int argc,char** argv){
   ns=8;
   survey.set_size(area,dz,zmin,nz,ns);
   MCChains mcchain(NCHAIN,NPAR,runs);
+  mcchain.set_constrains(rmax,a_ci);
   MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,r);
 
   for(m=0;m<NCHAIN;m++){    
@@ -242,7 +254,7 @@ int main(int argc,char** argv){
   }
   
   printf("\n ---------- Beginning MC Burn-in Phase ---------- \n");
-  for (i=0;i<(runs/10);i++){
+  for (i=0;i<(runs/BURN_RATIO);i++){
     for (m=0;m<NCHAIN;m++){
       for(p=0;p<NPAR;p++){
 	prng[p][i]=gsl_ran_gaussian(r,dp[p]);

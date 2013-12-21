@@ -48,8 +48,9 @@ class MCChains {
   double *bestpars;
   int *chainlength;
   valarray<valarray<double> > chains;
+  valarray<valarray<double> > rvals;
  public:
-  MCChains(int nchains, int npars, int nruns);
+  MCChains(int nchains, int npars, int nruns, int convstep);
   bool add_link(int chain, double pars[], double chisqr);
   void get_best_link(double pars[], double chisqr);
   bool set_constraints(double Rmax, double alpha);

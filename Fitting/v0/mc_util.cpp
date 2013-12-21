@@ -105,7 +105,7 @@ MetropSampler::~MetropSampler(){
 
 
 //chains implementation
-MCChains::MCChains(int nchains, int npars, int nruns){
+MCChains::MCChains(int nchains, int npars, int nruns, int convstep){
   chainwidth = npars+1;
   allwidth = chainwidth*nchains;
   this->npars = npars;
@@ -114,6 +114,9 @@ MCChains::MCChains(int nchains, int npars, int nruns){
   chains.resize(allwidth);
   for(i=0;i<allwidth;i++)
     chains[i].resize(nruns);
+  rvals.resize(npars);
+  for(i=0;i<npars;i++)
+    rvals[i].resize(nruns/convstep);
   bestpars = new double[npars];
   chainlength = new int[nchains];
   for (i=0;i<nchains;i++)
@@ -176,6 +179,7 @@ bool MCChains::set_constraints(double Rmax, double alpha){
 }
 
 bool MCChains::converged(){
+  static int call=0;
   double R, CIt;
   double* pararray;
   double* totarray;
@@ -223,11 +227,13 @@ bool MCChains::converged(){
     printf("CI Tot Chain: %f, L=%i, u=%i, b=%i\n",CIt,totlength,upper,lower);
     //r math
     R = CIt/CIm;
-    printf("Param: %i, R: %f (%f)\n\n",i,R,Rmax);
+    rvals[i][call] = R;
+    printf("(%i) -  Param: %i, R: %f (%f)\n\n",call,i,R,Rmax);
     converged = (converged and (R < Rmax));
   }
   delete[] totarray;
-  
+  call++;
+
   return converged;
 }
 
@@ -267,6 +273,26 @@ bool MCChains::save(string filename, string parnames[]){
     printf("%s,\t",colnames[i].c_str());
     newTable->column(colnames[i]).write(chains[i],1);
   }
+
+  std::vector<string> colnames2(npar,"R");
+  std::vector<string> colunits2(npar,"-");
+  std::vector<string> colform2(npar,"f5.2");
+  hname = "Convergence";
+  
+  printf("Output Convergence Columns\n");
+  for(i=0;i<npar;i++){
+    sprintf(ctemp,"%i",i);
+    cnum = string(ctemp);
+    colnames[i] += cnum;
+  }
+  
+  newTable = pFits->addTable(hname,rvals[0].size(),colnames2,colform2,colunits2,AsciiTbl);
+  
+  for(i=0;i<npar;i++){
+    printf("%s,\t",colnames[i].c_str());
+    newTable->column(colnames[i]).write(rvals[i],1);
+  }
+
   printf("\n");
   return true;
 }
