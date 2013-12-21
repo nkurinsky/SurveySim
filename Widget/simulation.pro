@@ -1167,15 +1167,17 @@ pro diagnostics
      oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
 
+  res = mrdfits(files.oname,5,/silent)
+
   widget_control,pconv,get_value=index
   wset,index
 
-  plot,[0,1],[0,1],/nodata
+  plot,res.r0
   
   widget_control,qconv,get_value=index
   wset,index
 
-  plot,[0,1],[0,1],/nodata
+  plot,res.r1
   
 end
 
