@@ -902,7 +902,7 @@ pro graphs
   widget_control,redshift,get_value=index
   wset,index
   h = histogram(z,binsize=0.1,locations=xh,min=0.2,max=5.0)
-  plot,xh,h,psym=10,xrange=[0,5],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
+  plot,xh,h,psym=10,xrange=[0,max(z)],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
 
   widget_control,models,get_value=index
   wset,index
@@ -912,7 +912,7 @@ pro graphs
   df1=(10.0^shift(xh,-1)-10.0^xh)
   dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
   xh=10.^(xh)
-  plot,xh,h,psym=10,/xlog,/ylog,yrange=[5.d1,1.d5],xstyle=1,ystyle=1,title="Luminosity Distribution",xtitle="L",ytitle="dN/dL"
+  plot,xh,h,psym=10,/xlog,/ylog,xstyle=1,ystyle=0,title="Luminosity Distribution",xtitle="L",ytitle="dN/dL"
 
   widget_control,dcount1,get_value=index
   wset,index
@@ -943,7 +943,7 @@ pro graphs
   df1=(10.0^shift(xh,-1)-10.0^xh)
   dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
   xh=10.^(xh)
-  plot,xh,h,psym=10,/ylog,yrange=[5.d1,1.d5],ystyle=1,xstyle=1,xtitle='F_{350}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
+  plot,xh,h,psym=10,/ylog,ystyle=0,xstyle=1,xtitle='F_{350}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
 
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
@@ -960,7 +960,7 @@ pro graphs
   df1=(10.0^shift(xh,-1)-10.0^xh)
   dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
   xh=10.^(xh)
-  plot,xh,h,psym=10,/ylog,yrange=[5.d1,1.d5],ystyle=1,xstyle=1,xtitle='F_{500}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
+  plot,xh,h,psym=10,/ylog,ystyle=0,xstyle=1,xtitle='F_{500}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
 
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
