@@ -44,11 +44,13 @@ pro simulation
 ;input tables and files
        obsname:0L, $
        sfile:0L, $
+       oname:0L, $
+       mname:0L, $
        ot:0L, $
        t1:0L, $
        t2:0L, $
        t3:0L, $
-       tset:0L,}
+       tset:0L}
 
 ;====================================================================
 ; Colors
@@ -108,16 +110,18 @@ pro simulation
      
      CD, Current=thisdir
      files = {ofile:thisdir+'/observation.save', $
-              mfile:thisdir+'/model.save', $
+              mfile:thisdir+'/model.fits', $
               sedfile:thisdir+'/sf_templates.fits', $
               oname:thisdir+'/output.fits' }
      
      msettings = {$
                  nchain:5,$
                  tmax:20.0,$
-                 idealpct:0.25, $
-                 burn_step:10, $
-                 conv_step:20}
+                 acceptpct:0.25, $
+                 conv_conf:0.05, $
+                 conv_rmax:1.05, $
+                 conv_step:20, $
+                 burn_step:10}
   endelse
   
   bname = ["Band 1","Band 2","Band 3"]
@@ -158,6 +162,7 @@ pro simulation
   replot_btn = widget_button(plots,uvalue='replot',value='Simulation Output')
   diag_btn = widget_button(plots,uvalue='diag',value='MCMC Diagnostics')
   info_btn = widget_button(info.button_base,uvalue='info',value='About')
+  save_btn = widget_button(info.button_base,uvalue='save',value='Save Settings')
   quit_btn = widget_button(info.button_base,uvalue='quit',value='Quit')
 
 ;============================================================================
@@ -194,16 +199,16 @@ PRO simulation_event,ev
   widget_control,ev.id,get_uvalue=uvalue
 
   CASE uvalue OF
-     'go'  : begin ;save settings, intialize FITS file, and pass to C++ fitting routine
+     'save' : save,ldata,ldat0,bands,sdat,cdat,msettings,files,filename='params.save' ;save parameters
+     'go'  : begin              ;save settings, intialize FITS file, and pass to C++ fitting routine
         save,ldata,ldat0,bands,sdat,cdat,msettings,files,filename='params.save' ;save parameters
         
-        ;make observation FITS file
+                                ;make observation FITS file
         widget_control,info.ot,get_value=bvals
         wave = [bvals[0].wave,bvals[1].wave,bvals[2].wave]
         flux_min = [bvals[0].fmin,bvals[1].fmin,bvals[2].fmin]
         flux_err = [bvals[0].ferr,bvals[1].ferr,bvals[2].ferr]
 
-        widget_control,info.obsname,get_value=value
         if (file_test(files.ofile)) then begin
            print,files.ofile
            restore,files.ofile
@@ -295,12 +300,12 @@ PRO simulation_event,ev
         sxaddpar,hdr2,'AREA',sdat.area,'Observed Solid Angle'
 
         templates = [0]
-        mwrfits,templates,'model.fits',hdr2,/create
+        mwrfits,templates,files.mfile,hdr2,/create
 
 ;===============================================================
 ;Run the actual simulation
 ;---------------------------------------------------------------
-        args = 'observation.fits model.fits sf_templates.fits'
+        args = 'observation.fits '+files.mfile+' '+files.sedfile+' '+files.oname
         spawn,'fitter '+args
 
         read_output
@@ -359,16 +364,24 @@ pro settings
   COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
   
   smain = widget_base(title="Simulation Settings",/column)
-  sbase = widget_base(smain,/column,/align_center)
+  body = widget_base(smain,/row,/align_center)
+  sbase = widget_base(body,/column,/align_center)
+  fbase = widget_base(body,/column,/align_center)
 
   l1 = widget_label(sbase,value="Monte Carlo Runtime Parameters")
-  info.tset = widget_table(sbase,value=[msettings],row_labels=tag_names(msettings),column_labels=["Value"],/editable,alignment=1,/column_major)
+  info.tset = widget_table(sbase,value=[msettings],row_labels=tag_names(msettings),column_labels=["Value"],/editable,alignment=1,/column_major,uvalue='settings')
 
-  info.obsname = fsc_fileselect(smain,/NoMaxSize,LabelName='Observation Save File')
+  info.obsname = fsc_fileselect(fbase,/NoMaxSize,LabelName='Observation Save File')
   widget_control,info.obsname,set_value=files.ofile
   
-  info.sfile = fsc_fileselect(smain,ObjectRef=sedObject,/NoMaxSize,LabelName='SED Templates File')
+  info.sfile = fsc_fileselect(fbase,ObjectRef=sedObject,/NoMaxSize,LabelName='SED Templates File')
   widget_control,info.sfile,set_value=files.sedfile
+
+  info.mname = fsc_fileselect(fbase,/NoMaxSize,LabelName='Model Fits File')
+  widget_control,info.mname,set_value=files.mfile
+
+  info.oname = fsc_fileselect(fbase,/NoMaxSize,LabelName='Output Fits File')
+  widget_control,info.oname,set_value=files.oname
 
   btns = widget_base(smain,/row,/align_left)
   save_btn = widget_button(btns,uvalue='save',Value="Save and Close")
@@ -388,10 +401,16 @@ pro settings_event,ev
   switch uvalue of
      'save' : begin
         widget_control,info.tset,get_value=msettings
-        widget_control,info.sfile,get_value=files.sedfile
-        widget_control,info.ofile,get_value=files.ofile
+        widget_control,info.sfile,get_value=temp
+        files.sedfile=temp
+        widget_control,info.obsname,get_value=temp
+        files.ofile=temp
+        widget_control,info.mname,get_value=temp
+        files.mfile=temp
+        widget_control,info.oname,get_value=temp
+        files.oname=temp
      end
-     'cancel' begin
+     'cancel': begin
         widget_control,ev.top,/destroy
      end
   endswitch
