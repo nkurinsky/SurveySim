@@ -75,7 +75,7 @@ pro simulation
   info.magnification = size_screen[1]/(plotSize+info.ysize1)*0.9
   
 ;widget base initialization
-  info.base = widget_base(title='Model Setup and Initialization',/column,/align_center) ;main base
+  info.base = widget_base(title='Model Setup and Initialization',mbar=mbar,/column,/align_center) ;main base
   info.base2= widget_base(info.base, /column,/align_center)               ;plot base
   info.p_main = widget_base(info.base,/column,/align_center)                   ;parameter base
   info.obs_table = widget_base(info.p_main,/column,/align_center)
@@ -83,7 +83,7 @@ pro simulation
   info.sed_table = widget_base(info.p_main,/column,/align_center)
   info.sim_table = widget_base(info.p_main,/column,/align_center)
   info.dbase = widget_base(info.p_main,/column,/align_center)    ; base for file dialogs
-  info.button_base = widget_base(info.p_main,/row,/align_center) ; base for buttons
+  info.button_base = widget_button(mbar,/menu,value="Menu") ; base for buttons
   
 ;output file select
   CD, Current=thisDir
@@ -125,15 +125,15 @@ pro simulation
   lo = widget_label(info.obs_table,value="Survey Properties")
   info.ot = widget_table(info.obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150],format=fmt,scr_xsize=425,scr_ysize=95)
 
-  f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
-  f2b = ['(i)','(i)','(i)','(i)','(i)','(i)']
+  f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
+  f2b = ['(i)','(i)','(i)','(i)','(i)','(i)','(i)']
   fmt2 = [[f2a],[f2b],[f2a],[f2a],[f2a]]
   fmt3 = ['(f5.2)','(i)','(f5.2)','(f5.2)','(f5.2)']
   lrows=["Initial","Fixed","Min","Max","Sigma"]
 
 ;Luminosity Function Parameters
   l1 = widget_label(info.lum_table,value="Luminosity Function Parameters")
-  info.t1 = widget_table(info.lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=572,scr_ysize=132)
+  info.t1 = widget_table(info.lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=537,scr_ysize=132)
 
   l3 = widget_label(info.sed_table,value="SED Evolution Parameters")
   info.t3 = widget_table(info.sed_table,value=cdat,column_labels=lrows,row_labels=["Color Exp"],uvalue='t3',/editable,alignment=1,format=fmt3,scr_xsize=404,scr_ysize=55)
@@ -143,6 +143,18 @@ pro simulation
   l2 = widget_label(info.sim_table,value="Simulation Settings")
   info.t2 = widget_table(info.sim_table,value=sdat,column_labels=tcols,/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[100,100,100,100,100],scr_xsize=505,scr_ysize=55)
   
+  
+;===========================================================================
+;Buttons in Menu
+;---------------------------------------------------------------------------
+  sim_opt= widget_button(mbar,/menu,value="Simulation")
+  run_btn = widget_button(sim_opt,uvalue='go',value='Run')
+  set_btn = widget_button(sim_opt,uvalue='settings',value='Settings')
+  plots = widget_button(mbar,/menu,value="Plots")
+  replot_btn = widget_button(plots,uvalue='replot',value='Simulation Output')
+  diag_btn = widget_button(plots,uvalue='diag',value='MCMC Diagnostics')
+  info_btn = widget_button(info.button_base,uvalue='info',value='About')
+  quit_btn = widget_button(info.button_base,uvalue='quit',value='Quit')
 
 ;============================================================================
 ;Show SED templates
@@ -165,14 +177,6 @@ templ=mrdfits(info.sedfile,/silent)
 loadct,1,/silent
 plot,templ[*,0],templ[*,1],/xlog,/ylog,yrange=[1.d20,1.d28],ystyle=1,xtitle=TeXtoIDL('\lambda [\mum]'),ytitle=TeXtoIDL('L_{\nu} [W/Hz]')
 for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
-
-;===========================================================================
-;Buttons at bottom 
-;---------------------------------------------------------------------------
-  run_btn = widget_button(info.button_base,uvalue='go',value='Run Simulation',xsize=100,ysize=25)
-  replot_btn = widget_button(info.button_base,uvalue='replot',value='Plot Last Run',xsize=100,ysize=25)
-  quit_btn = widget_button(info.button_base,uvalue='quit',value='Quit',xsize=50,ysize=25)
-  info_btn = widget_button(info.button_base,uvalue='info',value='Info',xsize=50,ysize=25)
 
 END
 
@@ -296,6 +300,8 @@ PRO simulation_event,ev
         read_output
         graphs
      end
+     'settings': settings
+     'diag': diagnostics
      'replot': begin
         read_output
         graphs
@@ -328,6 +334,20 @@ PRO simulation_event,ev
   ENDCASE
 
 END
+
+pro settings
+  
+end
+
+pro settings_event
+  
+  widget_control,ev.id,get_uvalue=uvalue
+
+  switch uvalue of
+     
+  endswitch
+
+end
 
 pro fit_info
   
@@ -660,7 +680,7 @@ pro graphs
      ;ez = sqrt(omega_m*(1+zi)^3+omega_l)
      ;dvdz = 4062*lumdist(zi)^2*(!pi/180)^2/((1+zi)^2*ez)
      ;vol = dvdz*dz
-     ;nsrcs*=vol
+     ;srcs*=vol
 
      ;print,vol
      oplot,lums,nsrcs,color=zi*40+20
@@ -856,6 +876,7 @@ pro graphs_event,ev
 
   case uvalue of
      'diags' : begin
+        widget_control,ev.top,/destroy
         diagnostics
      end
      'refresh': begin
@@ -912,18 +933,19 @@ pro diagnostics
   likely = widget_draw(r2,xsize=xdim,ysize=ydim)
   phist = widget_draw(r2,xsize=xdim,ysize=ydim)
   qhist = widget_draw(r2,xsize=xdim,ysize=ydim)
-  tbox = widget_base(r2b,xsize=xdim,ysize=ydim,/column)
+  tbox = widget_base(r2b,xsize=(xdim-5),ysize=(ydim-5),/column)
   pconv = widget_draw(r2b,xsize=xdim,ysize=ydim)
   qconv = widget_draw(r2b,xsize=xdim,ysize=ydim)
   
+  graphs = widget_button(r3,uvalue='graphs',value='Return to Output')
   refresh = widget_button(r3,uvalue='refresh',value='Refresh')
   close = widget_button(r3,uvalue='close',value='Close')
   quit = widget_button(r3,uvalue='quit',value='Quit')
-  
-  restext = widget_text(tbox,/wrap,value=['Fitting Results:',head],xsize=xdim-5,ysize=ydim-5)
+
+  restext = widget_text(tbox,/wrap,value=['Best Fitting Results:',head[indgen(9)+12],'','Histogram Parameters',head[indgen(3)+9]],xsize=(xdim-50),ysize=(ydim-50))
 
   widget_control,dmain,/realize
-  xmanager,'graphs',dmain,/no_block
+  xmanager,'diagnostics',dmain,/no_block
   
   set_plot,'x'
   device,decomposed=0
@@ -938,47 +960,47 @@ pro diagnostics
   qrange=[min(q),max(q)]
   crange=[min(chis)/1.2,max(chis)*1.2]
   log_crange=alog(crange)
-  dp=0.1
-  dq=0.1
+  dp=(prange[1]-prange[0])/50
+  dq=(qrange[1]-qrange[0])/50
   dc=alog(crange[1]-crange[0])/50.0
   n = n_elements(res)
 
   widget_control,space,get_value=index
   wset,index
   
-  plot,prange,qrange,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle='Q'
-  loadct,39
+  plot,prange,qrange,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle='Q',title="Chain Coverage of Parameter Space"
+  loadct,39,/silent
   p1 = res.p00
   p2 = res.q00
-  oplot,p1,p2,psym=3,color=40
+  oplot,p1,p2,psym=2,symsize=0.25,color=40
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
   p1 = res.p01
   p2 = res.q01
-  oplot,p1,p2,psym=3,color=80
+  oplot,p1,p2,psym=2,symsize=0.25,color=80
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
   p1 = res.p02
   p2 = res.q02
-  oplot,p1,p2,psym=3,color=120
+  oplot,p1,p2,psym=2,symsize=0.25,color=120
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
   p1 = res.p03
   p2 = res.q03
-  oplot,p1,p2,psym=3,color=160
+  oplot,p1,p2,psym=2,symsize=0.25,color=160
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
   p1 = res.p04
   p2 = res.q04
-  oplot,p1,p2,psym=3,color=200
+  oplot,p1,p2,psym=2,symsize=0.25,color=200
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
 
   widget_control,chisqr,get_value=index
   wset,index
-  loadct,1
-  plot,[0,n_elements(p1)],[100,100000],/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Run Number',ytitle='Chisq'
-  loadct,39
+  loadct,1,/silent
+  plot,[0,n_elements(p1)],crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Liklihood Trends"
+  loadct,39,/silent
   oplot,res.chisq0,color=40
   oplot,res.chisq1,color=80
   oplot,res.chisq2,color=120
@@ -987,67 +1009,68 @@ pro diagnostics
   
   widget_control,phist,get_value=index
   wset,index
-  loadct,1
-  plot,prange,[100,100000],/ylog,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle='Chisq'
-  loadct,39
+  loadct,1,/silent
+  plot,prange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle=textoidl("\chi^2"),title=textoidl("P \chi^2 Distribution")
+  loadct,39,/silent
   
-  for i=double(prange[0]),double(prange[1]),dp do begin
-     print,i
-     gpts = where((p gt i) and (p le i+dp))
-     if(gpts[0] ne -1) then begin
-        mtemp = mean(chis[gpts])
-        mlow = min(chis[gpts])
-        mhigh = max(chis[gpts])
-        oplot,[i+dp/2],[mtemp],psym=2
-        oploterror,[i+dp/2],[mtemp],[mtemp-mlow],/lobar
-        oploterror,[i+dp/2],[mtemp],[mhigh-mtemp],/hibar
-     endif
-  endfor  
+;  for i=double(prange[0]),double(prange[1]),dp do begin
+;     print,i
+;     gpts = where((p gt i) and (p le i+dp))
+;     if(gpts[0] ne -1) then begin
+;        mtemp = mean(chis[gpts])
+;        mlow = min(chis[gpts])
+;        mhigh = max(chis[gpts])
+;        oplot,[i+dp/2],[mtemp],psym=2
+;        oploterror,[i+dp/2],[mtemp],[mtemp-mlow],/lobar
+;        oploterror,[i+dp/2],[mtemp],[mhigh-mtemp],/hibar
+;     endif
+;  endfor  
   
-  oplot,res.p00,res.chisq0,color=40,psym=3
-  oplot,res.p01,res.chisq1,color=80,psym=3
-  oplot,res.p02,res.chisq2,color=120,psym=3
-  oplot,res.p03,res.chisq3,color=160,psym=3
-  oplot,res.p04,res.chisq4,color=200,psym=3
+  oplot,res.p00,res.chisq0,color=40,psym=2,symsize=0.25
+  oplot,res.p01,res.chisq1,color=80,psym=2,symsize=0.25
+  oplot,res.p02,res.chisq2,color=120,psym=2,symsize=0.25
+  oplot,res.p03,res.chisq3,color=160,psym=2,symsize=0.25
+  oplot,res.p04,res.chisq4,color=200,psym=2,symsize=0.25
   
   widget_control,qhist,get_value=index
   wset,index
-  loadct,1
-  plot,qrange,[100,100000],/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Q',ytitle='Chisq'
-  loadct,39
-  for i=double(qrange[0]),double(qrange[1]),dq do begin
-     print,i
-     gpts = where((q gt i) and (q le i+dq))
-     if(gpts[0] ne -1) then begin
-        mtemp = mean(chis[gpts])
-        mlow = min(chis[gpts])
-        mhigh = max(chis[gpts])
-        oplot,[i+dq/2],[mtemp],psym=2
-        oploterror,[i+dq/2],[mtemp],[mtemp-mlow],/lobar
-        oploterror,[i+dq/2],[mtemp],[mhigh-mtemp],/hibar
-     endif
-  endfor   
+  loadct,1,/silent
+  plot,qrange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Q',ytitle=textoidl("\chi^2"),title=textoidl("Q \chi^2 Distribution")
+  loadct,39,/silent
+;  for i=double(qrange[0]),double(qrange[1]),dq do begin
+;     print,i
+;     gpts = where((q gt i) and (q le i+dq))
+;     if(gpts[0] ne -1) then begin
+;        mtemp = mean(chis[gpts])
+;        mlow = min(chis[gpts])
+;        mhigh = max(chis[gpts])
+;        oplot,[i+dq/2],[mtemp],psym=2
+;        oploterror,[i+dq/2],[mtemp],[mtemp-mlow],/lobar
+;        oploterror,[i+dq/2],[mtemp],[mhigh-mtemp],/hibar
+;     endif
+;  endfor   
   
-  oplot,res.q00,res.chisq0,color=40,psym=3
-  oplot,res.q01,res.chisq1,color=80,psym=3
-  oplot,res.q02,res.chisq2,color=120,psym=3
-  oplot,res.q03,res.chisq3,color=160,psym=3
-  oplot,res.q04,res.chisq4,color=200,psym=3
+  oplot,res.q00,res.chisq0,color=40,psym=2,symsize=0.25
+  oplot,res.q01,res.chisq1,color=80,psym=2,symsize=0.25
+  oplot,res.q02,res.chisq2,color=120,psym=2,symsize=0.25
+  oplot,res.q03,res.chisq3,color=160,psym=2,symsize=0.25
+  oplot,res.q04,res.chisq4,color=200,psym=2,symsize=0.25
   
   widget_control,chidist,get_value=index
   wset,index
 
-  chist = histogram(alog(chis),nbins=50,locations=xchist,min=log_crange[0],max=log_crange[1])
-  plot,xchist,chist,psym=10
+  chist = histogram(chis,nbins=50,locations=xchist,min=crange[0],max=crange[1])
+  cmax = max(chist)
+  plot,xchist,chist,psym=10,ystyle=1,yrange=[0,cmax*1.2],xtitle=Textoidl("\chi^2"),ytitle="N"
 
   widget_control,likely,get_value=index
   wset,index
 
-  plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Model Color Distribution'
+  plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Mean Likelihood Space'
   color_scale = 256/(alog(max(chis))*1.2)+30
 
-  for i=prange[0],prange[1],dp do begin
-     for j=qrange[0],qrange[1],dq do begin
+  for i=prange[0],prange[1]-dp,dp do begin
+     for j=qrange[0],qrange[1]-dq,dq do begin
         
         xfill = [i,i,i+dp,i+dp]
         yfill = [j,j+dq,j+dq,j]
@@ -1082,6 +1105,10 @@ pro diagnostics_event,ev
   widget_control,ev.id,get_uvalue=uvalue
 
   case uvalue of
+     'graphs': begin
+        widget_control,ev.top,/destroy
+        graphs
+     end
      'refresh': begin
         widget_control,ev.top,get_uvalue=mnum
         widget_control,ev.top,/destroy
