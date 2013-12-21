@@ -1,3 +1,4 @@
+
 ;==================================================================
 ; Writen by Noah Kurinsky, version recent as of 10/17/13
 ; Edited by Anna Sajina, December 2012
@@ -654,8 +655,8 @@ pro read_output
   qrange=[min(q),max(q)]
   crange=[min(chis)/1.2,max(chis)*1.2]
   log_crange=alog(crange)
-  dp=(prange[1]-prange[0])/50
-  dq=(qrange[1]-qrange[0])/50
+  dp=(prange[1]-prange[0])/50.0
+  dq=(qrange[1]-qrange[0])/50.0
   dc=alog(crange[1]-crange[0])/50.0
   n = n_elements(res)
 
@@ -704,8 +705,6 @@ pro read_output
   device,/close
   device,filename='chisq_v_p.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
-  widget_control,phist,get_value=index
-  wset,index
   loadct,1,/silent
   plot,prange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle=textoidl("\chi^2"),title=textoidl("P \chi^2 Distribution")
   loadct,39,/silent
@@ -744,8 +743,8 @@ pro read_output
   chi_max = alog(max(chis))
   color_scale = 256/((chi_max-chi_min)*1.2)
   
-  for i=prange[0],prange[1]-dp,dp do begin
-     for j=qrange[0],qrange[1]-dq,dq do begin
+  for i=prange[0],prange[1]-dp/2,dp do begin
+     for j=qrange[0],qrange[1]-dq/2,dq do begin
         
         xfill = [i,i,i+dp,i+dp]
         yfill = [j,j+dq,j+dq,j]
@@ -757,7 +756,7 @@ pro read_output
            polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_mean))
         endif
         
-        if(i eq prange[1]) then oplot,prange,[j+dq,j+dq],linestyle=1        
+        if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1        
      endfor
      oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
@@ -767,8 +766,8 @@ pro read_output
 
   plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Max Likelihood Space'
 
-  for i=prange[0],prange[1]-dp,dp do begin
-     for j=qrange[0],qrange[1]-dq,dq do begin
+  for i=prange[0],prange[1]-dp/2,dp do begin
+     for j=qrange[0],qrange[1]-dq/2,dq do begin
 
         xfill = [i,i,i+dp,i+dp]
         yfill = [j,j+dq,j+dq,j]
@@ -780,7 +779,7 @@ pro read_output
            polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
         endif
 
-        if(i eq prange[1]) then oplot,prange,[j+dq,j+dq],linestyle=1
+        if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1
      endfor
      oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
@@ -942,7 +941,7 @@ pro graphs
   ;h=h*2.d3
   ;dlogS=dS/S
   df1=(10.0^shift(xh,-1)-10.0^xh)
-  dcounts=(h/df1)*10.0^(2.5*xh)*1.181808e7/sdat.area
+  dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
   xh=10.^(xh)
   oplot,xh,dcounts,psym=10
 
@@ -1249,8 +1248,8 @@ pro diagnostics
   chi_max = alog(max(chis))
   color_scale = 256/((chi_max-chi_min)*1.2)
   
-  for i=prange[0],prange[1]-dp,dp do begin
-     for j=qrange[0],qrange[1]-dq,dq do begin
+  for i=prange[0],prange[1]-dp/2,dp do begin
+     for j=qrange[0],qrange[1]-dq/2,dq do begin
         
         xfill = [i,i,i+dp,i+dp]
         yfill = [j,j+dq,j+dq,j]
@@ -1262,7 +1261,7 @@ pro diagnostics
            polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_mean))
         endif
         
-        if(i eq prange[1]) then oplot,prange,[j+dq,j+dq],linestyle=1        
+        if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1        
      endfor
      oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
@@ -1272,8 +1271,8 @@ pro diagnostics
 
   plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Max Likelihood Space'
 
-  for i=prange[0],prange[1]-dp,dp do begin
-     for j=qrange[0],qrange[1]-dq,dq do begin
+  for i=prange[0],prange[1]-dp/2,dp do begin
+     for j=qrange[0],qrange[1]-dq/2,dq do begin
 
         xfill = [i,i,i+dp,i+dp]
         yfill = [j,j+dq,j+dq,j]
@@ -1285,7 +1284,7 @@ pro diagnostics
            polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
         endif
 
-        if(i eq prange[1]) then oplot,prange,[j+dq,j+dq],linestyle=1
+        if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1
      endfor
      oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
