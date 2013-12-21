@@ -52,7 +52,8 @@ int main(int argc,char** argv){
   unsigned long runs; 
   int nz,ns;
   double area, dz, zmax, zmin, rtemp, rmax, a_ci;
-  double NCHAIN,TMAX,IDEALPCT,BURN_STEP,CONV_STEP,BURN_RATIO;
+  double TMAX,IDEALPCT;
+  unsigned long NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO;
   products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
   string pi[] = {"0","1","2","3","4","5","6"};
@@ -79,14 +80,29 @@ int main(int argc,char** argv){
   params_table.readKey("DZ",dz);
   params_table.readKey("AREA",area);
 
-  params_table.readKey("NCHAIN",NCHAIN);
+  printf("MC Params\n");
+  params_table.readKey("NCHAIN",rtemp);
+  NCHAIN = (unsigned long) rtemp;
   params_table.readKey("TMAX",TMAX);
   params_table.readKey("ANN_PCT",IDEALPCT);
-  params_table.readKey("BURN_STEP",BURN_STEP);
-  params_table.readKey("CONV_STEP",CONV_STEP);
-  params_table.readKey("BURNVRUN",BURN_RATIO);
-  params_table.readKey("CONV_RMAX",rmax);
-  params_table.readKey("CONV_CONF",a_ci);
+  params_table.readKey("BURN_STE",rtemp);
+  BURN_STEP = (unsigned long) rtemp;
+  params_table.readKey("CONV_STE",rtemp);
+  CONV_STEP = (unsigned long) rtemp;
+  params_table.readKey("BURNVRUN",rtemp);
+  BURN_RATIO = (unsigned long) rtemp;
+  params_table.readKey("CONV_RMA",rmax);
+  params_table.readKey("CONV_CON",a_ci);
+
+  printf("MC Settings:\n");
+  printf("Chain Number    : %lu\n",NCHAIN);
+  printf("Starting Temp   : %f\n",TMAX);
+  printf("Ideal Accept Pct: %f\n",IDEALPCT);
+  printf("Burn-in Step    : %lu\n",BURN_STEP);
+  printf("Convergence Step: %lu\n",CONV_STEP);
+  printf("Run:Burn-In     : %lu\n",BURN_RATIO);
+  printf("Convergence Criterion: %f\n",rmax);
+  printf("Confidence Interval  : %f\n",a_ci);
 
   //this is necessary for correct cosmological volume determinations
   //hence correct number count predictions
@@ -224,8 +240,8 @@ int main(int argc,char** argv){
   //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
   ns=8;
   survey.set_size(area,dz,zmin,nz,ns);
-  MCChains mcchain(NCHAIN,NPAR,runs);
-  mcchain.set_constrains(rmax,a_ci);
+  MCChains mcchain(NCHAIN,NPAR,runs,BURN_RATIO);
+  mcchain.set_constraints(rmax,a_ci);
   MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,r);
 
   for(m=0;m<NCHAIN;m++){    

@@ -41,6 +41,7 @@ class MCChains {
   int npars;
   int chainwidth;
   int nruns;
+  int convruns;
   int i;
   double Rmax;
   double alpha;

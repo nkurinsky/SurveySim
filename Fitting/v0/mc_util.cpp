@@ -115,8 +115,9 @@ MCChains::MCChains(int nchains, int npars, int nruns, int convstep){
   for(i=0;i<allwidth;i++)
     chains[i].resize(nruns);
   rvals.resize(npars);
+  convruns = nruns/convstep;
   for(i=0;i<npars;i++)
-    rvals[i].resize(nruns/convstep);
+    rvals[i].resize(convruns);
   bestpars = new double[npars];
   chainlength = new int[nchains];
   for (i=0;i<nchains;i++)
@@ -274,25 +275,26 @@ bool MCChains::save(string filename, string parnames[]){
     newTable->column(colnames[i]).write(chains[i],1);
   }
 
-  std::vector<string> colnames2(npar,"R");
-  std::vector<string> colunits2(npar,"-");
-  std::vector<string> colform2(npar,"f5.2");
+  std::vector<string> colnames2(npars,"R");
+  std::vector<string> colunits2(npars,"-");
+  std::vector<string> colform2(npars,"f5.2");
   hname = "Convergence";
   
   printf("Output Convergence Columns\n");
-  for(i=0;i<npar;i++){
+  for(i=0;i<npars;i++){
     sprintf(ctemp,"%i",i);
     cnum = string(ctemp);
-    colnames[i] += cnum;
+    colnames2[i] += cnum;
   }
   
-  newTable = pFits->addTable(hname,rvals[0].size(),colnames2,colform2,colunits2,AsciiTbl);
+  newTable = pFits->addTable(hname,convruns,colnames2,colform2,colunits2,AsciiTbl);
+  printf("Table Created\n");
   
-  for(i=0;i<npar;i++){
-    printf("%s,\t",colnames[i].c_str());
-    newTable->column(colnames[i]).write(rvals[i],1);
+  for(i=0;i<npars;i++){
+    printf("%s,\t",colnames2[i].c_str());
+    newTable->column(colnames2[i]).write(rvals[i],1);
   }
-
+  
   printf("\n");
   return true;
 }

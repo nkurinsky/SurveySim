@@ -707,37 +707,9 @@ pro graphs
 
   pnum_out = fxpar(head,'tfields')
 
-  ;; for i=6,pnum_out-1 do begin
-  ;;    if (i eq 6) then begin
-  ;;       hists = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=10)
-  ;;       hmax = max(hists)
-  ;;       xmax = max(xh)
-  ;;    endif else begin
-  ;;       h = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0)
-  ;;       if(max(xh) gt xmax) then begin
-  ;;          xmax = max(xh)
-  ;;          for j=6,i-1 do begin
-  ;;             if(i eq 6) then begin
-  ;;                hists = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
-  ;;             endif else begin
-  ;;                htemp = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
-  ;;                hists = [hists,htemp]
-  ;;             endelse
-  ;;          endfor
-  ;;       endif else begin
-  ;;          h = histogram(dists[gpts].(i),binsize=0.1,locations=xh,min=0,max=xmax)
-  ;;       endelse
-  ;;       temp = max(h)
-  ;;       hmax = (temp gt hmax) ? temp : hmax
-  ;;       hists = [[hists],[h]]
-  ;;    endelse
-  ;; endfor     
-
   widget_control,lumfunct,get_value=index
   wset,index
   device,decomposed=0
-  ;h = histogram(lum,nbins=50,locations=xh)
-  ;plot,xh,h,psym=10,xstyle=1,yrange=[0.1,1000],ystyle=1,xtitle='Log(Luminosity (W/Hz))',ytitle='dN/(dL/dHz)',/ylog,title='Luminosity Function'
 
   plot,[8,13],[1e-10,1e0],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega dV_C)'),ystyle=1
   lums = indgen(21)/4.0+8.0
@@ -757,12 +729,6 @@ pro graphs
      r = 10^lums/t2
      nsrcs=t1/(r^alpha+r^beta)
 
-     ;ez = sqrt(omega_m*(1+zi)^3+omega_l)
-     ;dvdz = 4062*lumdist(zi)^2*(!pi/180)^2/((1+zi)^2*ez)
-     ;vol = dvdz*dz
-     ;srcs*=vol
-
-     ;print,vol
      oplot,lums,nsrcs,color=zi*40+20
   endfor
 
@@ -787,18 +753,10 @@ pro graphs
   wset,index
 
   h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
+  h *= 10.0^(xh*2.5)
   pts = where (h le 0)
   h[pts] = 0.01
   plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],xstyle=1,ystyle=1
-
-  ;; help,hists
-  ;; for i=6,pnum_out-1 do begin
-  ;;    if(i eq 6) then begin
-  ;;       plot,xh,hists(*,i-6),psym=10,xstyle=1,xtitle='m',ytitle='dN/dm',xrange=[0,xmax],title='Model Distribution',yrange=[0,hmax*1.2]
-  ;;    endif else begin
-  ;;       oplot,xh,hists(*,i-6),linestyle=(i-6),psym=10
-  ;;    endelse
-  ;; endfor
 
   widget_control,dcount1,get_value=index
   wset,index
@@ -817,10 +775,10 @@ pro graphs
   h = histogram(alog10(f1/1e3),nbins=50,locations=xh,min=-3,max=1)
   ;I think the area covered here is not
   ;quite right needs to be sorted out better, but for now just scale up
-  h=h*2.d3
+  ;h=h*2.d3
   ;dlogS=dS/S
-  df1=(shift(xh,-1)-xh)*10.^(xh)
-  dcounts=(h/df1)*f1^(2.5)
+  df1=(10.0^shift(xh,-1)-10.0^xh)
+  dcounts=(h/df1)*10.0^(2.5*xh)*1.181808e7/sdat.area
   xh=10.^(xh)
   oplot,xh,dcounts,psym=10
 
@@ -828,6 +786,7 @@ pro graphs
   wset,index
 
   h = histogram(alog10(f2/1e3),nbins=50,locations=xh,min=-3,max=0)
+  h *= 10.0^(xh*2.5)
   pts = where(h le 0)
   h[pts] = 0.01
   plot,xh,h,psym=10,/ylog,xrange=[-2.2,-0.5],yrange=[1e-1,1e3],ystyle=1,xstyle=1,xtitle='F_{350}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
@@ -1013,9 +972,9 @@ pro diagnostics
   likely = widget_draw(r2,xsize=xdim,ysize=ydim)
   phist = widget_draw(r2,xsize=xdim,ysize=ydim)
   qhist = widget_draw(r2,xsize=xdim,ysize=ydim)
+  mlikely = widget_draw(r2b,xsize=xdim,ysize=ydim)
   tbox = widget_base(r2b,xsize=(xdim-5),ysize=(ydim-5),/column)
-  pconv = widget_draw(r2b,xsize=xdim,ysize=ydim)
-  qconv = widget_draw(r2b,xsize=xdim,ysize=ydim)
+  conv = widget_draw(r2b,xsize=xdim,ysize=ydim)
   
   graphs = widget_button(r3,uvalue='graphs',value='Return to Output')
   refresh = widget_button(r3,uvalue='refresh',value='Refresh')
@@ -1079,7 +1038,7 @@ pro diagnostics
   widget_control,chisqr,get_value=index
   wset,index
   loadct,1,/silent
-  plot,[0,n_elements(p1)],crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Liklihood Trends"
+  plot,[0,n_elements(p1)],crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Likelihood Trends"
   loadct,39,/silent
   oplot,res.chisq0,color=40
   oplot,res.chisq1,color=80
@@ -1093,19 +1052,6 @@ pro diagnostics
   plot,prange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle=textoidl("\chi^2"),title=textoidl("P \chi^2 Distribution")
   loadct,39,/silent
   
-;  for i=double(prange[0]),double(prange[1]),dp do begin
-;     print,i
-;     gpts = where((p gt i) and (p le i+dp))
-;     if(gpts[0] ne -1) then begin
-;        mtemp = mean(chis[gpts])
-;        mlow = min(chis[gpts])
-;        mhigh = max(chis[gpts])
-;        oplot,[i+dp/2],[mtemp],psym=2
-;        oploterror,[i+dp/2],[mtemp],[mtemp-mlow],/lobar
-;        oploterror,[i+dp/2],[mtemp],[mhigh-mtemp],/hibar
-;     endif
-;  endfor  
-  
   oplot,res.p00,res.chisq0,color=40,psym=2,symsize=0.25
   oplot,res.p01,res.chisq1,color=80,psym=2,symsize=0.25
   oplot,res.p02,res.chisq2,color=120,psym=2,symsize=0.25
@@ -1117,18 +1063,6 @@ pro diagnostics
   loadct,1,/silent
   plot,qrange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Q',ytitle=textoidl("\chi^2"),title=textoidl("Q \chi^2 Distribution")
   loadct,39,/silent
-;  for i=double(qrange[0]),double(qrange[1]),dq do begin
-;     print,i
-;     gpts = where((q gt i) and (q le i+dq))
-;     if(gpts[0] ne -1) then begin
-;        mtemp = mean(chis[gpts])
-;        mlow = min(chis[gpts])
-;        mhigh = max(chis[gpts])
-;        oplot,[i+dq/2],[mtemp],psym=2
-;        oploterror,[i+dq/2],[mtemp],[mtemp-mlow],/lobar
-;        oploterror,[i+dq/2],[mtemp],[mhigh-mtemp],/hibar
-;     endif
-;  endfor   
   
   oplot,res.q00,res.chisq0,color=40,psym=2,symsize=0.25
   oplot,res.q01,res.chisq1,color=80,psym=2,symsize=0.25
@@ -1141,14 +1075,16 @@ pro diagnostics
 
   chist = histogram(chis,nbins=50,locations=xchist,min=crange[0],max=crange[1])
   cmax = max(chist)
-  plot,xchist,chist,psym=10,ystyle=1,yrange=[0,cmax*1.2],xtitle=Textoidl("\chi^2"),ytitle="N"
+  plot,xchist,chist,psym=10,ystyle=1,yrange=[0,cmax*1.2],xtitle=Textoidl("\chi^2"),ytitle="N",title=textoidl("Total \chi^2 Distribution")
 
   widget_control,likely,get_value=index
   wset,index
 
   plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Mean Likelihood Space'
-  color_scale = 256/(alog(max(chis))*1.2)+30
-
+  chi_min = alog(min(chis))
+  chi_max = alog(max(chis))
+  color_scale = 256/((chi_max-chi_min)*1.2)
+  
   for i=prange[0],prange[1]-dp,dp do begin
      for j=qrange[0],qrange[1]-dq,dq do begin
         
@@ -1159,7 +1095,7 @@ pro diagnostics
         chi_mean = mean(chis[gpts])
 
         if(gpts[0] ne -1) then begin
-           polyfill,xfill,yfill,color=color_scale*alog(chi_mean)
+           polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_mean))
         endif
         
         if(i eq prange[1]) then oplot,prange,[j+dq,j+dq],linestyle=1        
@@ -1167,18 +1103,42 @@ pro diagnostics
      oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
 
+  widget_control,mlikely,get_value=index
+  wset,index
+
+  plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Max Likelihood Space'
+
+  for i=prange[0],prange[1]-dp,dp do begin
+     for j=qrange[0],qrange[1]-dq,dq do begin
+
+        xfill = [i,i,i+dp,i+dp]
+        yfill = [j,j+dq,j+dq,j]
+
+        gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
+        chi_plot = min(chis[gpts])
+
+        if(gpts[0] ne -1) then begin
+           polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
+        endif
+
+        if(i eq prange[1]) then oplot,prange,[j+dq,j+dq],linestyle=1
+     endfor
+     oplot,[i+dp,i+dp],qrange,linestyle=1
+  endfor
+
+
   res = mrdfits(files.oname,5,/silent)
 
-  widget_control,pconv,get_value=index
+  widget_control,conv,get_value=index
   wset,index
 
-  plot,res.r0
-  
-  widget_control,qconv,get_value=index
-  wset,index
+  gpts = where(res.r0 gt 0)
+  plot,res[gpts].r0,xrange=[0,n_elements(gpts)],xstyle=1,title="Convergence",xtitle="Test Number",ytitle="R"
+  oplot,[0,n_elements(gpts)],[msettings.conv_rmax,msettings.conv_rmax]
 
-  plot,res.r1
-  
+  gpts = where(res.r1 gt 0)
+  oplot,res[gpts].r1,linestyle=1
+
 end
 
 pro diagnostics_event,ev
