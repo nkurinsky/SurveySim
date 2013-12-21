@@ -945,13 +945,6 @@ pro graphs
   xh=10.^(xh)
   plot,xh,h,psym=10,/ylog,yrange=[5.d1,1.d5],ystyle=1,xstyle=1,xtitle='F_{350}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
 
-  if( file_test('counts_clements10.dat')) then begin
-     readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-     flux=flux/1.d3
-     oplot,flux,diff_counts,psym=1,symsize=2
-     oploterr,flux,diff_counts,diff_err
-  endif
-
   widget_control,dcount3,get_value=index
   wset,index
 
@@ -961,13 +954,6 @@ pro graphs
   dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
   xh=10.^(xh)
   plot,xh,h,psym=10,/ylog,yrange=[5.d1,1.d5],ystyle=1,xstyle=1,xtitle='F_{500}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
-
-  if( file_test('counts_clements10.dat')) then begin
-     readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-     flux=flux/1.d3
-     oplot,flux,diff_counts,psym=1,symsize=2
-     oploterr,flux,diff_counts,diff_err
-  endif
 
   comp = mrdfits(files.oname,0,head,/silent)
   model = mrdfits(files.oname,1,/silent)
