@@ -62,6 +62,7 @@ int main(int argc,char** argv){
   // the initial guesses of the parameters, the width of the proposal distribution 
   // and the acceptable min/max range
   double p_o[NPAR],dp[NPAR],p_min[NPAR],p_max[NPAR]; 
+  unsigned long nfree;
 
   const gsl_rng_type * T;
 
@@ -164,6 +165,10 @@ int main(int argc,char** argv){
   params_table.readKey("P_DP",ldp[4]);
   params_table.readKey("Q_DP",ldp[5]);
   params_table.readKey("ZCUT_DP",ldp[6]);
+  
+  for (int i=0;i<=6;i++)
+    nfree += lfix[i] == "0" ? 1 : 0;
+  printf("Number Unfixed Parameters: %ul\n",nfree);
 
   //read color_exp values
   params_table.readKey("CEXP",cexp[0]);
