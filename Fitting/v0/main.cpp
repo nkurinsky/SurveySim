@@ -59,11 +59,7 @@ int main(int argc,char** argv){
   string pi[] = {"0","1","2","3","4","5","6"};
   //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
   double lpars[LUMPARS],lfix[LUMPARS],lmax[LUMPARS],lmin[LUMPARS],ldp[LUMPARS],cexp[5];
-  // the initial guesses of the parameters, the width of the proposal distribution 
-  // and the acceptable min/max range
-  double p_o[NPAR],dp[NPAR],p_min[NPAR],p_max[NPAR]; 
-  unsigned long nfree;
-
+  vector<double> param_inds;
   const gsl_rng_type * T;
 
   FITS *pInfile,*pInfile2;
@@ -167,8 +163,10 @@ int main(int argc,char** argv){
   params_table.readKey("ZCUT_DP",ldp[6]);
   
   for (int i=0;i<=6;i++)
-    nfree += lfix[i] == "0" ? 1 : 0;
-  printf("Number Unfixed Parameters: %ul\n",nfree);
+    if(lfix[i] == 0)
+      param_inds.push_back(i);
+  
+  printf("Number Unfixed Parameters: %ul\n",param_inds.size());
 
   //read color_exp values
   params_table.readKey("CEXP",cexp[0]);
@@ -185,21 +183,13 @@ int main(int argc,char** argv){
     needs to find the "goldilocks" zone here but that's very problem specific 
     so requires trial and error as we actually start fitting data. 
   */
-  p_o[0] = lpars[4]; 
-  p_o[1] = lpars[5];
-  dp[0] = ldp[4];
-  dp[1] = ldp[5];
-  p_min[0] = lmin[4];
-  p_min[1] = lmin[5];
-  p_max[0] = lmax[4];
-  p_max[1] = lmax[5];
 
   lumfunct lf;
   lf.set_params(lpars);
 
-  printf("Initial p: %5.3f, and q: %5.3f\n",p_o[0],p_o[1]);
-  printf("p range: %5.3f - %5.3f, sigma: %5.3f\n",p_min[0],p_max[0],dp[0]);
-  printf("q range: %5.3f - %5.3f, sigma: %5.3f\n",p_min[1],p_max[1],dp[1]);
+  printf("Initial p: %5.3f, and q: %5.3f\n",lpars[4],lpars[5]);
+  printf("p range: %5.3f - %5.3f, sigma: %5.3f\n",lmin[4],lmax[4],ldp[4]);
+  printf("q range: %5.3f - %5.3f, sigma: %5.3f\n",lmin[5],lmax[5],ldp[5]);
   printf("Color Evolution: %5.3f",cexp[0]);
   printf("Redshift Cutoff: %5.3f",lpars[6]);
 
@@ -224,7 +214,7 @@ int main(int argc,char** argv){
   //this is iterated each time a better value is found
   double chi_min=1.0E+4; 
   double trial;
-  double prng[NPAR][runs];
+  double prng[param_inds.size()][runs];
   unsigned long i,m,p;
 
   // the temperature, keep fixed for now, but can also try annealing 
@@ -233,9 +223,9 @@ int main(int argc,char** argv){
   // accepted (see metrop function)
   //double tmc=10.00; //to distinguish it from the random T
   double temp;
-  double ptemp[NCHAIN][NPAR];
-  double pbest[NPAR];
-  double pcurrent[NCHAIN][NPAR];
+  double ptemp[NCHAIN][param_inds.size()];
+  double pbest[param_inds.size()];
+  double pcurrent[NCHAIN][param_inds.size()];
 
   gsl_rng_default_seed=time(NULL);
   T=gsl_rng_default;
@@ -245,32 +235,34 @@ int main(int argc,char** argv){
   //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
   ns=8;
   survey.set_size(area,dz,zmin,nz,ns);
-  MCChains mcchain(NCHAIN,NPAR,runs,BURN_RATIO);
+  MCChains mcchain(NCHAIN,param_inds.size(),runs,BURN_RATIO);
   mcchain.set_constraints(rmax,a_ci);
   MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,r);
 
-  for(m=0;m<NCHAIN;m++){    
-    ptemp[m][0] = pcurrent[m][0] = lpars[4];
-    ptemp[m][1] = pcurrent[m][1] = lpars[5];
-    switch(m){
-    case 1:
-      ptemp[1][0] += (p_max[0]-ptemp[1][0])/2.0;
-      pcurrent[1][0] = ptemp[1][0];
-      break;
-    case 2:
-      ptemp[2][0] += (p_min[0]-ptemp[2][0])/2.0;
-      pcurrent[2][0] = ptemp[2][0];
-      break;
-    case 3:
-      ptemp[3][1] += (p_max[1]-ptemp[3][1])/2.0;
-      pcurrent[3][1] = ptemp[3][1];
-      break;
-    case 4:
-      ptemp[4][1] += (p_min[1]-ptemp[4][1])/2.0;
-      pcurrent[4][1] = ptemp[4][1];
-      break;
-    default:
-      break;
+  int pqind[2];
+  int itemp;
+  pqind[0] = pqind[1] = 0;
+  for(m=0;m<param_inds.size();m++){
+    if (param_inds[m] == 4)
+      pqind[0] = m;
+    if (param_inds[m] == 5)
+      pqind[1] = m;
+  } 
+  if ((pqind[0] == pqind[1]) or (pqind[0] < 0) or (pqind[1] < 0))
+    printf("Warning: p and/or q fixed");
+  
+  for(m=0;m<NCHAIN;m++){ 
+    for(int i=0;i<param_inds.size();i++){
+      ptemp[m][i] = pcurrent[m][i] = lpars[param_inds[i]];
+    }
+    if (m > 0){
+      itemp = ((m-1)/2)%2;
+      if (m%2 == 0){
+	pcurrent[m][pqind[itemp]] = ptemp[m][pqind[itemp]] = ptemp[m][pqind[itemp]] + (lmin[param_inds[pqind[itemp]]] - ptemp[m][pqind[itemp]])/2.0;
+      }
+      else{
+	pcurrent[m][pqind[itemp]] = ptemp[m][pqind[itemp]] = ptemp[m][pqind[itemp]] + (lmax[param_inds[pqind[itemp]]] - ptemp[m][pqind[itemp]])/2.0;
+      }
     }
   }
   
