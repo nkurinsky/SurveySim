@@ -18,8 +18,8 @@
 //Array size definitions (most likely will never change)
 #define BANDS 3
 //For values to be passed in by widget
-/*
 #define NPAR 2
+/*
 #define NCHAIN 5
 #define TMAX 20.00
 #define IDEALPCT 0.25
@@ -49,7 +49,6 @@ int main(int argc,char** argv){
   if(argc > 4)
     outfile = argv[4];
 
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"}
   unsigned long runs; 
   int nz,ns;
   double area, dz, zmax, zmin, rtemp, rmax, a_ci;
@@ -57,9 +56,10 @@ int main(int argc,char** argv){
   unsigned long NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO;
   products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
+  string pi[] = {"0","1","2","3","4","5","6"};
   //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
   double lpars[LUMPARS],lfix[LUMPARS],lmax[LUMPARS],lmin[LUMPARS],ldp[LUMPARS],cexp[5];
-  vector<int> param_inds;
+  vector<double> param_inds;
   const gsl_rng_type * T;
 
   FITS *pInfile,*pInfile2;
@@ -110,14 +110,10 @@ int main(int argc,char** argv){
   printf("\nNR: %lu, NZ: %i, DZ: %f\n",runs,nz,dz);
 
   printf("%s\n","Bands:");
-  char wtemp[2];
-  string wnum;
   for(int i=0;i<BANDS;i++){
-    sprintf(wtemp,"%i",i+1);
-    wnum = string(wtemp);
-    obs_table.readKey("WAVE_"+wnum,bs[i]); //should already be in microns
-    obs_table.readKey("W"+wnum+"_FMIN",flims[i]); //should be in mJy
-    obs_table.readKey("W"+wnum+"_FERR",errs[i]);
+    obs_table.readKey("WAVE_"+pi[i+1],bs[i]); //should already be in microns
+    obs_table.readKey("W"+pi[i+1]+"_FMIN",flims[i]); //should be in mJy
+    obs_table.readKey("W"+pi[i+1]+"_FERR",errs[i]);
     printf("%fl\t%fl\t%fl\n",bs[i],flims[i],errs[i]);
   }
   
@@ -166,7 +162,7 @@ int main(int argc,char** argv){
   params_table.readKey("Q_DP",ldp[5]);
   params_table.readKey("ZCUT_DP",ldp[6]);
   
-  for (int i=0;i<LUMPARS;i++)
+  for (int i=0;i<=6;i++)
     if(lfix[i] == 0)
       param_inds.push_back(i);
   
@@ -273,17 +269,17 @@ int main(int argc,char** argv){
   printf("\n ---------- Beginning MC Burn-in Phase ---------- \n");
   for (i=0;i<(runs/BURN_RATIO);i++){
     for (m=0;m<NCHAIN;m++){
-      for(p=0;p<param_inds.size();p++){
-	prng[p][i]=gsl_ran_gaussian(r,ldp[param_inds[p]]);
+      for(p=0;p<NPAR;p++){
+	prng[p][i]=gsl_ran_gaussian(r,dp[p]);
 	temp=pcurrent[m][p]+prng[p][i];
-	if((temp >= lmin[param_inds[p]]) && (temp <= lmax[param_inds[p]])) {
-	  ptemp[m][p]=temp;
-	  lpars[param_inds[p]] = temp;
-	}
+	if((temp >= p_min[p]) && (temp <= p_max[p])) ptemp[m][p]=temp;
       }
       
-      printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][pqind[0]],ptemp[m][pqind[1]]);
-      lf.set_params(lpars);
+      printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][0],ptemp[m][1]);
+      
+      //this not yet generalized
+      lf.set_p(ptemp[m][0]);
+      lf.set_q(ptemp[m][1]);
       output=survey.simulate();
       trial=output.chisqr;
       printf("Iteration Chi-Square: %lf\n",trial);
@@ -291,12 +287,12 @@ int main(int argc,char** argv){
       if(trial < chi_min){
 	printf(" -- Current Best Trial --");
 	chi_min=trial;
-	for(p=0;p<param_inds.size();p++)
+	for(p=0;p<NPAR;p++)
 	  pbest[p]=ptemp[m][p];
       }
 
       if(metrop.accept(m,trial)){
-	for(p=0;p<param_inds.size();p++)
+	for(p=0;p<NPAR;p++)
 	  pcurrent[m][p]=ptemp[m][p];
       }      
     }
@@ -306,7 +302,7 @@ int main(int argc,char** argv){
   }
   
   for(m=0;m<NCHAIN;m++)
-    for(p=0;p<param_inds.size();p++)
+    for(p=0;p<NPAR;p++)
       ptemp[m][p] = pcurrent[m][p] = pbest[p];
   
   metrop.reset();
@@ -314,17 +310,15 @@ int main(int argc,char** argv){
   printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",runs);
   for (i=0;i<runs;i++){
     for (m=0;m<NCHAIN;m++){
-      for(p=0;p<param_inds.size();p++){
-	prng[p][i]=gsl_ran_gaussian(r,ldp[param_inds[p]]);
+      for(p=0;p<NPAR;p++){
+	prng[p][i]=gsl_ran_gaussian(r,dp[p]);
 	temp=pcurrent[m][p]+prng[p][i];
-	if((temp >= lmin[param_inds[p]]) && (temp <= lmax[param_inds[p]])){
-	  ptemp[m][p]=temp;
-	  lpars[param_inds[p]] = temp;
-	}
+	if((temp >= p_min[p]) && (temp <= p_max[p])) ptemp[m][p]=temp;
       }
       
-      printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][pqind[0]],ptemp[m][pqind[1]]);
-      lf.set_params(lpars);
+      printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][0],ptemp[m][1]);
+      lf.set_p(ptemp[m][0]);
+      lf.set_q(ptemp[m][1]);
       output=survey.simulate();
       trial=output.chisqr;
       printf("Model chi2: %lf",trial);
@@ -333,7 +327,7 @@ int main(int argc,char** argv){
       
       if(metrop.accept(m,trial)){
 	printf(" -- Accepted\n");
-	for(p=0;p<param_inds.size();p++)
+	for(p=0;p<NPAR;p++)
 	  pcurrent[m][p]=ptemp[m][p];
       }
       else
@@ -352,18 +346,14 @@ int main(int argc,char** argv){
   }
   
   mcchain.get_best_link(pbest,chi_min);
-  for(p=0;p<param_inds.size();p++)
-    lpars[param_inds[p]] = pbest[p];
-  lf.set_params(lpars);
+  lf.set_p(pbest[0]);
+  lf.set_q(pbest[1]);
   printf("\nRe-Running Best Fit...\n");
   output=survey.simulate();
   printf("Model chi2: %lf\n",output.chisqr);
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
   
-  string *parnames = new string[param_inds.size()];
-  for(p=0;p<param_inds.size();p++)
-    parnames[p] = pnames[param_inds[p]];
-  
+  string parnames[] = {"p0","q0"};
   bool saved;
   saved = survey.save(outfile);
   saved &= mcchain.save(outfile,parnames);
@@ -372,7 +362,6 @@ int main(int argc,char** argv){
   else
     printf("Save Failed\n");
   
-  delete[] parnames;
   gsl_rng_free (r);
   
   printf("\nReturning from fitting routine\n\n");
