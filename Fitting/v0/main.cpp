@@ -49,7 +49,7 @@ int main(int argc,char** argv){
   if(argc > 4)
     outfile = argv[4];
 
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"}
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
   unsigned long runs; 
   int nz,ns;
   double area, dz, zmax, zmin, rtemp, rmax, a_ci;
@@ -170,7 +170,7 @@ int main(int argc,char** argv){
     if(lfix[i] == 0)
       param_inds.push_back(i);
   
-  printf("Number Unfixed Parameters: %ul\n",param_inds.size());
+  printf("Number Unfixed Parameters: %lu\n",param_inds.size());
 
   //read color_exp values
   params_table.readKey("CEXP",cexp[0]);
@@ -256,7 +256,7 @@ int main(int argc,char** argv){
     printf("Warning: p and/or q fixed");
   
   for(m=0;m<NCHAIN;m++){ 
-    for(int i=0;i<param_inds.size();i++){
+    for(unsigned long i=0;i<param_inds.size();i++){
       ptemp[m][i] = pcurrent[m][i] = lpars[param_inds[i]];
     }
     if (m > 0){
