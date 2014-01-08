@@ -640,8 +640,8 @@ pro read_output
   
 ; chain read operations 
   res = mrdfits(files.oname,4,/silent)
-  p = [res.p00,res.p01,res.p02,res.p03,res.p04]
-  q = [res.q00,res.q01,res.q02,res.q03,res.q04]
+  p = [res.p0,res.p1,res.p2,res.p3,res.p4]
+  q = [res.q0,res.q1,res.q2,res.q3,res.q4]
   chis = [res.chisq0,res.chisq1,res.chisq2,res.chisq3,res.chisq4]
   prange=[min(p),max(p)]
   qrange=[min(q),max(q)]
@@ -656,28 +656,28 @@ pro read_output
 
   plot,prange,qrange,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle='Q',title="Chain Coverage of Parameter Space"
   loadct,39,/silent
-  p1 = res.p00
-  p2 = res.q00
+  p1 = res.p0
+  p2 = res.q0
   oplot,p1,p2,psym=2,symsize=0.25,color=40
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p01
-  p2 = res.q01
+  p1 = res.p1
+  p2 = res.q1
   oplot,p1,p2,psym=2,symsize=0.25,color=80
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p02
-  p2 = res.q02
+  p1 = res.p2
+  p2 = res.q2
   oplot,p1,p2,psym=2,symsize=0.25,color=120
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p03
-  p2 = res.q03
+  p1 = res.p3
+  p2 = res.q3
   oplot,p1,p2,psym=2,symsize=0.25,color=160
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p04
-  p2 = res.q04
+  p1 = res.p4
+  p2 = res.q4
   oplot,p1,p2,psym=2,symsize=0.25,color=200
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
@@ -701,11 +701,11 @@ pro read_output
   plot,prange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle=textoidl("\chi^2"),title=textoidl("P \chi^2 Distribution")
   loadct,39,/silent
   
-  oplot,res.p00,res.chisq0,color=40,psym=2,symsize=0.25
-  oplot,res.p01,res.chisq1,color=80,psym=2,symsize=0.25
-  oplot,res.p02,res.chisq2,color=120,psym=2,symsize=0.25
-  oplot,res.p03,res.chisq3,color=160,psym=2,symsize=0.25
-  oplot,res.p04,res.chisq4,color=200,psym=2,symsize=0.25
+  oplot,res.p0,res.chisq0,color=40,psym=2,symsize=0.25
+  oplot,res.p1,res.chisq1,color=80,psym=2,symsize=0.25
+  oplot,res.p2,res.chisq2,color=120,psym=2,symsize=0.25
+  oplot,res.p3,res.chisq3,color=160,psym=2,symsize=0.25
+  oplot,res.p4,res.chisq4,color=200,psym=2,symsize=0.25
   
   device,/close
   device,filename='chisq_v_q.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
@@ -714,11 +714,11 @@ pro read_output
   plot,qrange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Q',ytitle=textoidl("\chi^2"),title=textoidl("Q \chi^2 Distribution")
   loadct,39,/silent
   
-  oplot,res.q00,res.chisq0,color=40,psym=2,symsize=0.25
-  oplot,res.q01,res.chisq1,color=80,psym=2,symsize=0.25
-  oplot,res.q02,res.chisq2,color=120,psym=2,symsize=0.25
-  oplot,res.q03,res.chisq3,color=160,psym=2,symsize=0.25
-  oplot,res.q04,res.chisq4,color=200,psym=2,symsize=0.25
+  oplot,res.q0,res.chisq0,color=40,psym=2,symsize=0.25
+  oplot,res.q1,res.chisq1,color=80,psym=2,symsize=0.25
+  oplot,res.q2,res.chisq2,color=120,psym=2,symsize=0.25
+  oplot,res.q3,res.chisq3,color=160,psym=2,symsize=0.25
+  oplot,res.q4,res.chisq4,color=200,psym=2,symsize=0.25
   
   device,/close
   device,filename='chisq_hist.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
@@ -1162,8 +1162,8 @@ pro diagnostics
   
 ; chain read operations 
   res = mrdfits(files.oname,4,/silent)
-  p = [res.p00,res.p01,res.p02,res.p03,res.p04]
-  q = [res.q00,res.q01,res.q02,res.q03,res.q04]
+  p = [res.p0,res.p1,res.p2,res.p3,res.p4]
+  q = [res.q0,res.q1,res.q2,res.q3,res.q4]
   chis = [res.chisq0,res.chisq1,res.chisq2,res.chisq3,res.chisq4]
   prange=[min(p),max(p)]
   qrange=[min(q),max(q)]
@@ -1179,28 +1179,28 @@ pro diagnostics
   
   plot,prange,qrange,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle='Q',title="Chain Coverage of Parameter Space"
   loadct,39,/silent
-  p1 = res.p00
-  p2 = res.q00
+  p1 = res.p0
+  p2 = res.q0
   oplot,p1,p2,psym=2,symsize=0.25,color=40
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p01
-  p2 = res.q01
+  p1 = res.p1
+  p2 = res.q1
   oplot,p1,p2,psym=2,symsize=0.25,color=80
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p02
-  p2 = res.q02
+  p1 = res.p2
+  p2 = res.q2
   oplot,p1,p2,psym=2,symsize=0.25,color=120
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p03
-  p2 = res.q03
+  p1 = res.p3
+  p2 = res.q3
   oplot,p1,p2,psym=2,symsize=0.25,color=160
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p04
-  p2 = res.q04
+  p1 = res.p4
+  p2 = res.q4
   oplot,p1,p2,psym=2,symsize=0.25,color=200
   xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
   xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
@@ -1222,11 +1222,11 @@ pro diagnostics
   plot,prange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle=textoidl("\chi^2"),title=textoidl("P \chi^2 Distribution")
   loadct,39,/silent
   
-  oplot,res.p00,res.chisq0,color=40,psym=2,symsize=0.25
-  oplot,res.p01,res.chisq1,color=80,psym=2,symsize=0.25
-  oplot,res.p02,res.chisq2,color=120,psym=2,symsize=0.25
-  oplot,res.p03,res.chisq3,color=160,psym=2,symsize=0.25
-  oplot,res.p04,res.chisq4,color=200,psym=2,symsize=0.25
+  oplot,res.p0,res.chisq0,color=40,psym=2,symsize=0.25
+  oplot,res.p1,res.chisq1,color=80,psym=2,symsize=0.25
+  oplot,res.p2,res.chisq2,color=120,psym=2,symsize=0.25
+  oplot,res.p3,res.chisq3,color=160,psym=2,symsize=0.25
+  oplot,res.p4,res.chisq4,color=200,psym=2,symsize=0.25
   
   widget_control,qhist,get_value=index
   wset,index
@@ -1234,11 +1234,11 @@ pro diagnostics
   plot,qrange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Q',ytitle=textoidl("\chi^2"),title=textoidl("Q \chi^2 Distribution")
   loadct,39,/silent
   
-  oplot,res.q00,res.chisq0,color=40,psym=2,symsize=0.25
-  oplot,res.q01,res.chisq1,color=80,psym=2,symsize=0.25
-  oplot,res.q02,res.chisq2,color=120,psym=2,symsize=0.25
-  oplot,res.q03,res.chisq3,color=160,psym=2,symsize=0.25
-  oplot,res.q04,res.chisq4,color=200,psym=2,symsize=0.25
+  oplot,res.q0,res.chisq0,color=40,psym=2,symsize=0.25
+  oplot,res.q1,res.chisq1,color=80,psym=2,symsize=0.25
+  oplot,res.q2,res.chisq2,color=120,psym=2,symsize=0.25
+  oplot,res.q3,res.chisq3,color=160,psym=2,symsize=0.25
+  oplot,res.q4,res.chisq4,color=200,psym=2,symsize=0.25
   
   widget_control,chidist,get_value=index
   wset,index

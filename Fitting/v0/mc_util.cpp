@@ -163,20 +163,23 @@ void MCChains::get_best_link(double pars[], double chisqr){
 }
 
 bool MCChains::set_constraints(double Rmax, double alpha){
-
+  bool retval=true;
+  
   if (Rmax <= 1.0 or Rmax > 2.0){
     printf("MCChains::ERROR: Rmax constraint invalid\n");
-    return false;
+    retval=false;
   }
-  this->Rmax = Rmax;
-
+  else
+    this->Rmax = Rmax;
+  
   if (alpha <= 0.001 or alpha > 0.5){
     printf("MCChains::ERROR: alpha constraint invalid\n");
-    return false;
+    retval=false;
   }
-  this->alpha = alpha;
+  else
+    this->alpha = alpha;
   
-  return true;
+  return retval;
 }
 
 bool MCChains::converged(){
@@ -213,7 +216,7 @@ bool MCChains::converged(){
       upper = (int)n*(1.0-alpha/2.0);
       CI = abs((pararray[upper]-pararray[lower]));
       CIm += CI;
-      printf("CI Chain %i: %f, L=%i, u=%i, b=%i\n",j,CI,n,upper,lower);
+      //printf("CI Chain %i: %f, L=%i, u=%i, b=%i\n",j,CI,n,upper,lower);
       delete[] pararray;
     }
     //m mean
@@ -224,12 +227,12 @@ bool MCChains::converged(){
     lower = (int)totlength*(alpha/2.0);
     upper = (int)totlength*(1.0-alpha/2.0);
     CIt = abs((totarray[upper]-totarray[lower]));
-    printf("CI mean: %f:\n",CIm);
-    printf("CI Tot Chain: %f, L=%i, u=%i, b=%i\n",CIt,totlength,upper,lower);
+    //printf("CI mean: %f:\n",CIm);
+    //printf("CI Tot Chain: %f, L=%i, u=%i, b=%i\n",CIt,totlength,upper,lower);
     //r math
     R = CIt/CIm;
     rvals[i][call] = R;
-    printf("(%i) -  Param: %i, R: %f (%f)\n\n",call,i,R,Rmax);
+    printf("(%i) -  Param: %i, R: %f (%f)\n",call,i,R,Rmax);
     converged = (converged and (R < Rmax));
   }
   delete[] totarray;
@@ -271,7 +274,9 @@ bool MCChains::save(string filename, string parnames[]){
   Table *newTable = pFits->addTable(hname,nruns,colnames,colform,colunits,AsciiTbl);
   
   for(i=0;i<allwidth;i++){
-    printf("%s,\t",colnames[i].c_str());
+    if (i != 0)
+      printf(", ");
+    printf("%s",colnames[i].c_str());
     newTable->column(colnames[i]).write(chains[i],1);
   }
 
@@ -280,7 +285,7 @@ bool MCChains::save(string filename, string parnames[]){
   std::vector<string> colform2(npars,"f5.2");
   hname = "Convergence";
   
-  printf("Output Convergence Columns\n");
+  printf("\nOutput Convergence Columns\n");
   for(i=0;i<npars;i++){
     sprintf(ctemp,"%i",i);
     cnum = string(ctemp);
@@ -288,7 +293,6 @@ bool MCChains::save(string filename, string parnames[]){
   }
   
   newTable = pFits->addTable(hname,convruns,colnames2,colform2,colunits2,AsciiTbl);
-  printf("Table Created\n");
   
   for(i=0;i<npars;i++){
     printf("%s,\t",colnames2[i].c_str());

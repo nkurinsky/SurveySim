@@ -15,18 +15,9 @@
 #include "mc_util.h"
 #include <stdio.h>
 
-//Array size definitions (most likely will never change)
+//Array size definitions 
 #define BANDS 3
-//For values to be passed in by widget
-/*
-#define NPAR 2
-#define NCHAIN 5
-#define TMAX 20.00
-#define IDEALPCT 0.25
-#define BURN_STEP 10
-#define CONV_STEP 20
-#define BURN_RATIO 10
-*/
+
 using namespace std; 
 
 gsl_rng * r;  // global generator
@@ -38,7 +29,7 @@ int main(int argc,char** argv){
     printf("%s","Calling sequence should be \"fit obsfile modfile sedfile [output]\"\n");
     return 1;}
 
-  printf("\nMCMC Fitting Code Compiled: %s\n",__DATE__);
+  printf("\nMCMC Fitting Code Compiled: %s\n\n",__DATE__);
   
   //File names passed in by Widget
   string outfile("output.fits");
@@ -77,7 +68,6 @@ int main(int argc,char** argv){
   params_table.readKey("DZ",dz);
   params_table.readKey("AREA",area);
 
-  printf("MC Params\n");
   params_table.readKey("NCHAIN",rtemp);
   NCHAIN = (unsigned long) rtemp;
   params_table.readKey("TMAX",TMAX);
@@ -91,7 +81,7 @@ int main(int argc,char** argv){
   params_table.readKey("CONV_RMA",rmax);
   params_table.readKey("CONV_CON",a_ci);
 
-  printf("MC Settings:\n");
+  printf("MC Settings\n");
   printf("Chain Number    : %lu\n",NCHAIN);
   printf("Starting Temp   : %f\n",TMAX);
   printf("Ideal Accept Pct: %f\n",IDEALPCT);
@@ -107,9 +97,9 @@ int main(int argc,char** argv){
 
   //compute redshift bin number from FITS values
   nz = (zmax-zmin)/dz;
-  printf("\nNR: %lu, NZ: %i, DZ: %f\n",runs,nz,dz);
+  printf("Simulation Settings:\n");
+  printf("Run Number Max: %lu\nNumber Redshift Bins: %i\nRedshift Bin Width: %f\n\n",runs,nz,dz);
 
-  printf("%s\n","Bands:");
   char wtemp[2];
   string wnum;
   for(int i=0;i<BANDS;i++){
@@ -118,7 +108,7 @@ int main(int argc,char** argv){
     obs_table.readKey("WAVE_"+wnum,bs[i]); //should already be in microns
     obs_table.readKey("W"+wnum+"_FMIN",flims[i]); //should be in mJy
     obs_table.readKey("W"+wnum+"_FERR",errs[i]);
-    printf("%fl\t%fl\t%fl\n",bs[i],flims[i],errs[i]);
+    printf("Band %s:\t%8.3e %7.3e %7.3e\n",wnum.c_str(),bs[i],flims[i],errs[i]);
   }
   
   //=================================================================  
@@ -170,7 +160,7 @@ int main(int argc,char** argv){
     if(lfix[i] == 0)
       param_inds.push_back(i);
   
-  printf("Number Unfixed Parameters: %lu\n",param_inds.size());
+  printf("\nNumber Unfixed Parameters: %lu\n",param_inds.size());
 
   //read color_exp values
   params_table.readKey("CEXP",cexp[0]);
@@ -194,8 +184,8 @@ int main(int argc,char** argv){
   printf("Initial p: %5.3f, and q: %5.3f\n",lpars[4],lpars[5]);
   printf("p range: %5.3f - %5.3f, sigma: %5.3f\n",lmin[4],lmax[4],ldp[4]);
   printf("q range: %5.3f - %5.3f, sigma: %5.3f\n",lmin[5],lmax[5],ldp[5]);
-  printf("Color Evolution: %5.3f",cexp[0]);
-  printf("Redshift Cutoff: %5.3f",lpars[6]);
+  printf("Color Evolution: %5.3f\n",cexp[0]);
+  printf("Redshift Cutoff: %5.3f\n",lpars[6]);
 
   delete pInfile;
   delete pInfile2;
@@ -286,14 +276,15 @@ int main(int argc,char** argv){
       lf.set_params(lpars);
       output=survey.simulate();
       trial=output.chisqr;
-      printf("Iteration Chi-Square: %lf\n",trial);
+      printf("Iteration Chi-Square: %lf",trial);
       
       if(trial < chi_min){
-	printf(" -- Current Best Trial --");
+	printf(" -- Current Best Trial");
 	chi_min=trial;
 	for(p=0;p<param_inds.size();p++)
 	  pbest[p]=ptemp[m][p];
       }
+      printf("\n");
 
       if(metrop.accept(m,trial)){
 	for(p=0;p<param_inds.size();p++)
