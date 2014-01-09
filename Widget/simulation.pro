@@ -51,8 +51,10 @@ pro simulation
        t1:0L, $
        t2:0L, $
        t3:0L, $
-       tset:0L}
-
+       tset:0L, $
+       dprint:0L, $
+       print:1}
+  
 ;====================================================================
 ; Colors
 ;--------------------------------------------------------------------
@@ -309,6 +311,7 @@ PRO simulation_event,ev
         sxaddpar,hdr2,'CONV_STEP',msettings.conv_step,'Iterations between convergence checks'
         sxaddpar,hdr2,'BURN_STEP',msettings.burn_step,'Iterations between anneal calls in burn-in'
         sxaddpar,hdr2,'BURNVRUN',msettings.burn_ratio,'Ratio of normal to burn-in steps'
+        sxaddpar,hdr2,'PRINT',info.print,'Whether to Print Debug MSGs'
 
         templates = [0]
         mwrfits,templates,files.mfile,hdr2,/create
@@ -382,6 +385,9 @@ pro settings
   l1 = widget_label(sbase,value="Monte Carlo Runtime Parameters")
   info.tset = widget_table(sbase,value=[msettings],row_labels=tag_names(msettings),column_labels=["Value"],/editable,alignment=1,/column_major,uvalue='settings')
 
+  info.dprint = widget_droplist(fbase,value=["yes","no"],title="Enable Verbose Simulation Output",uvalue="print")
+  widget_control,info.dprint,set_droplist_select=info.print
+  
   info.obsname = fsc_fileselect(fbase,/NoMaxSize,LabelName='Observation Save File')
   widget_control,info.obsname,set_value=files.ofile
   
@@ -412,6 +418,7 @@ pro settings_event,ev
   switch uvalue of
      'save' : begin
         widget_control,info.tset,get_value=msettings
+        info.print = widget_info(info.dprint,/droplist_select)
         widget_control,info.sfile,get_value=temp
         files.sedfile=temp
         widget_control,info.obsname,get_value=temp
@@ -645,7 +652,7 @@ pro read_output
   chis = [res.chisq0,res.chisq1,res.chisq2,res.chisq3,res.chisq4]
   prange=[min(p),max(p)]
   qrange=[min(q),max(q)]
-  crange=[min(chis)/1.2,max(chis)*1.2]
+  crange=[min(chis)/1.2,min(chis)*10]
   log_crange=alog(crange)
   dp=(prange[1]-prange[0])/50.0
   dq=(qrange[1]-qrange[0])/50.0
@@ -723,9 +730,12 @@ pro read_output
   device,/close
   device,filename='chisq_hist.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
   
-  chist = histogram(chis,nbins=50,locations=xchist,min=crange[0],max=crange[1])
+  histrange = [0,min(chis)*10]
+  chist = histogram(chis,nbins=50,locations=xchist,min=histrange[0],max=histrange[1])
   cmax = max(chist)
-  plot,xchist,chist,psym=10,ystyle=1,yrange=[0,cmax*1.2],xtitle=Textoidl("\chi^2"),ytitle="N",title=textoidl("Total \chi^2 Distribution")
+  gpts = where(chist lt 1)
+  chist[gpts] = 0.001
+  plot,xchist,chist,psym=10,xstyle=1,ystyle=1,xrange=histrange,yrange=[0.9,cmax^1.2],xtitle=Textoidl("\chi^2"),ytitle="N",title=textoidl("Total \chi^2 Distribution"),/ylog
 
   device,/close
   device,filename='mean_likelihood.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
@@ -748,9 +758,9 @@ pro read_output
            polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_mean))
         endif
         
-        if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1        
+        ;if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1        
      endfor
-     oplot,[i+dp,i+dp],qrange,linestyle=1
+     ;oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
 
   device,/close
@@ -771,24 +781,30 @@ pro read_output
            polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
         endif
 
-        if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1
+        ;if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1
      endfor
-     oplot,[i+dp,i+dp],qrange,linestyle=1
+     ;oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
 
   res = mrdfits(files.oname,5,/silent)
 
   device,/close
   device,filename='convergence.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
-
+  
   gpts = where(res.r0 gt 0)
-  plot,res[gpts].r0,xrange=[0,n_elements(gpts)],xstyle=1,title="Convergence",xtitle="Test Number",ytitle="R"
+  plot,res[gpts].r0,xrange=[0,n_elements(gpts)],xstyle=1,yrange=[1.0,max([max(res.r0),max(res.r1)])],ystyle=1,title="Convergence",xtitle="Test Number",ytitle="R"
   oplot,[0,n_elements(gpts)],[msettings.conv_rmax,msettings.conv_rmax]
 
   gpts = where(res.r1 gt 0)
   oplot,res[gpts].r1,linestyle=1
 
   device,/close
+
+  if(file_test('plots')) then begin
+     file_delete,'plots',/recursive
+  endif
+  file_mkdir,'plots'
+  file_move,'*.eps','plots'
 
 end
 
@@ -1167,7 +1183,7 @@ pro diagnostics
   chis = [res.chisq0,res.chisq1,res.chisq2,res.chisq3,res.chisq4]
   prange=[min(p),max(p)]
   qrange=[min(q),max(q)]
-  crange=[min(chis)/1.2,max(chis)*1.2]
+  crange=[min(chis)/1.2,min(chis)*10.0]
   log_crange=alog(crange)
   dp=(prange[1]-prange[0])/50
   dq=(qrange[1]-qrange[0])/50
@@ -1243,9 +1259,12 @@ pro diagnostics
   widget_control,chidist,get_value=index
   wset,index
 
-  chist = histogram(chis,nbins=50,locations=xchist,min=crange[0],max=crange[1])
+  histrange = [0,min(chis)*10]
+  chist = histogram(chis,nbins=50,locations=xchist,min=histrange[0],max=histrange[1])
   cmax = max(chist)
-  plot,xchist,chist,psym=10,ystyle=1,yrange=[0,cmax*1.2],xtitle=Textoidl("\chi^2"),ytitle="N",title=textoidl("Total \chi^2 Distribution")
+  gpts = where(chist lt 1)
+  chist[gpts] = 0.001
+  plot,xchist,chist,psym=10,xstyle=1,ystyle=1,xrange=histrange,yrange=[0.9,cmax^1.2],xtitle=Textoidl("\chi^2"),ytitle="N",title=textoidl("Total \chi^2 Distribution"),/ylog
 
   widget_control,likely,get_value=index
   wset,index
@@ -1268,9 +1287,9 @@ pro diagnostics
            polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_mean))
         endif
         
-        if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1        
+        ;if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1        
      endfor
-     oplot,[i+dp,i+dp],qrange,linestyle=1
+     ;oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
 
   widget_control,mlikely,get_value=index
@@ -1291,9 +1310,9 @@ pro diagnostics
            polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
         endif
 
-        if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1
+        ;if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1
      endfor
-     oplot,[i+dp,i+dp],qrange,linestyle=1
+     ;oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
 
 
@@ -1303,7 +1322,7 @@ pro diagnostics
   wset,index
 
   gpts = where(res.r0 gt 0)
-  plot,res[gpts].r0,xrange=[0,n_elements(gpts)],xstyle=1,title="Convergence",xtitle="Test Number",ytitle="R"
+  plot,res[gpts].r0,xrange=[0,n_elements(gpts)],xstyle=1,yrange=[1.0,max([max(res.r0),max(res.r1)])],ystyle=1,title="Convergence",xtitle="Test Number",ytitle="R"
   oplot,[0,n_elements(gpts)],[msettings.conv_rmax,msettings.conv_rmax]
 
   gpts = where(res.r1 gt 0)

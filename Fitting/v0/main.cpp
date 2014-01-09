@@ -40,6 +40,7 @@ int main(int argc,char** argv){
   if(argc > 4)
     outfile = argv[4];
 
+  bool oprint=true;
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
   unsigned long runs; 
   int nz,ns;
@@ -80,16 +81,23 @@ int main(int argc,char** argv){
   BURN_RATIO = (unsigned long) rtemp;
   params_table.readKey("CONV_RMA",rmax);
   params_table.readKey("CONV_CON",a_ci);
+  params_table.readKey("PRINT",rtemp);
+  oprint = rtemp == 0.0 ? true : false;
+
+  if(oprint)
+    printf("Printing Verbose Output\n");
+  else
+    printf("Printing Concise Output\n");
 
   printf("MC Settings\n");
   printf("Chain Number    : %lu\n",NCHAIN);
-  printf("Starting Temp   : %f\n",TMAX);
-  printf("Ideal Accept Pct: %f\n",IDEALPCT);
+  printf("Starting Temp   : %5.2f\n",TMAX);
+  printf("Ideal Accept Pct: %4.2f\n",IDEALPCT);
   printf("Burn-in Step    : %lu\n",BURN_STEP);
   printf("Convergence Step: %lu\n",CONV_STEP);
   printf("Run:Burn-In     : %lu\n",BURN_RATIO);
-  printf("Convergence Criterion: %f\n",rmax);
-  printf("Confidence Interval  : %f\n",a_ci);
+  printf("Convergence Criterion: %4.2f\n",rmax);
+  printf("Confidence Interval  : %4.2f\n",a_ci);
 
   //this is necessary for correct cosmological volume determinations
   //hence correct number count predictions
@@ -260,7 +268,11 @@ int main(int argc,char** argv){
     }
   }
   
-  printf("\n ---------- Beginning MC Burn-in Phase ---------- \n");
+  if (oprint)
+    printf("\n ---------- Beginning MC Burn-in Phase ---------- \n");
+  else
+    printf("\nBeginning MC Burn-in Phase...\n");
+
   for (i=0;i<(runs/BURN_RATIO);i++){
     for (m=0;m<NCHAIN;m++){
       for(p=0;p<param_inds.size();p++){
@@ -272,19 +284,23 @@ int main(int argc,char** argv){
 	}
       }
       
-      printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][pqind[0]],ptemp[m][pqind[1]]);
+      if (oprint) 
+	printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][pqind[0]],ptemp[m][pqind[1]]);
       lf.set_params(lpars);
       output=survey.simulate();
       trial=output.chisqr;
-      printf("Iteration Chi-Square: %lf",trial);
+      if (oprint)
+	printf("Iteration Chi-Square: %lf",trial);
       
       if(trial < chi_min){
-	printf(" -- Current Best Trial");
+	if (oprint) 
+	  printf(" -- Current Best Trial");
 	chi_min=trial;
 	for(p=0;p<param_inds.size();p++)
 	  pbest[p]=ptemp[m][p];
       }
-      printf("\n");
+      if (oprint)
+	printf("\n");
 
       if(metrop.accept(m,trial)){
 	for(p=0;p<param_inds.size();p++)
@@ -302,7 +318,11 @@ int main(int argc,char** argv){
   
   metrop.reset();
   
-  printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",runs);
+  if (oprint)
+    printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",runs);
+  else
+    printf("\n\n Beginning Fitting, Run Maximum: %ld\n",runs);
+  
   for (i=0;i<runs;i++){
     for (m=0;m<NCHAIN;m++){
       for(p=0;p<param_inds.size();p++){
@@ -314,20 +334,23 @@ int main(int argc,char** argv){
 	}
       }
       
-      printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][pqind[0]],ptemp[m][pqind[1]]);
+      if (oprint)
+	printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][pqind[0]],ptemp[m][pqind[1]]);
       lf.set_params(lpars);
       output=survey.simulate();
       trial=output.chisqr;
-      printf("Model chi2: %lf",trial);
+      if (oprint)
+	printf("Model chi2: %lf",trial);
       
       mcchain.add_link(m,ptemp[m],trial);
       
       if(metrop.accept(m,trial)){
-	printf(" -- Accepted\n");
+	if (oprint) 
+	  printf(" -- Accepted\n");
 	for(p=0;p<param_inds.size();p++)
 	  pcurrent[m][p]=ptemp[m][p];
       }
-      else
+      else if (oprint)
 	printf(" -- Rejected\n");
     }
     
@@ -366,7 +389,10 @@ int main(int argc,char** argv){
   delete[] parnames;
   gsl_rng_free (r);
   
-  printf("\nReturning from fitting routine\n\n");
+  printf("\nFitting Complete\n\n");
   
-  return 0;
+  if(saved)
+    return 0;
+  else
+    return 1;
 }

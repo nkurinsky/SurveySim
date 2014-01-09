@@ -254,6 +254,9 @@ bool MCChains::save(string filename, string parnames[]){
     return false;
   }
   
+  std::slice domain = std::slice(0,chainlength[0],1);
+  std::valarray<double> valarray_temp(chainlength[0]);
+  
   std::vector<string> colnames(allwidth,"CHISQ");
   std::vector<string> colunits(allwidth,"-");
   std::vector<string> colform(allwidth,"e13.5");
@@ -271,13 +274,14 @@ bool MCChains::save(string filename, string parnames[]){
     colnames[j*chainwidth+npars] += cnum;
   }
   
-  Table *newTable = pFits->addTable(hname,nruns,colnames,colform,colunits,AsciiTbl);
+  Table *newTable = pFits->addTable(hname,chainlength[0],colnames,colform,colunits,AsciiTbl);
   
   for(i=0;i<allwidth;i++){
     if (i != 0)
       printf(", ");
     printf("%s",colnames[i].c_str());
-    newTable->column(colnames[i]).write(chains[i],1);
+    valarray_temp = chains[i][domain];
+    newTable->column(colnames[i]).write(valarray_temp,1);
   }
 
   std::vector<string> colnames2(npars,"R");
