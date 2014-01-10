@@ -239,7 +239,7 @@ int main(int argc,char** argv){
   survey.set_size(area,dz,zmin,nz,ns);
   MCChains mcchain(NCHAIN,param_inds.size(),runs,BURN_RATIO);
   mcchain.set_constraints(rmax,a_ci);
-  MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,r);
+  MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,0.03,r);
 
   int pqind[2];
   int itemp;

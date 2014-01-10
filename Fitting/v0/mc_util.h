@@ -20,11 +20,14 @@ class MetropSampler {
   double temp;
   bool accepted;
   double ideal_acceptance;
+  double accept_buffer;
+  double accept_ratio;
   deque<bool> recent;
+  deque<double> trials;
   unsigned long recent_num;
   gsl_rng *rgen;
  public:
-  MetropSampler(int nchains,double maxTemp, double idealpct, gsl_rng *rgen);
+  MetropSampler(int nchains,double maxTemp, double idealpct, double acpt_buf, gsl_rng *rgen);
   bool accept(int chainnum, double trial);
   double acceptance(int chainnum);
   double mean_acceptance();

@@ -15,7 +15,7 @@ int dcomp(const void * a,const void * b){
   else return 0;
 }
 
-MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct, gsl_rng *rgen){
+MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct, double acpt_buf, gsl_rng *rgen){
   this->nchains = nchains;
   accept_total = new long[nchains];
   iteration_total = new long[nchains];
@@ -27,6 +27,8 @@ MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct, gsl_r
   }
   temp = maxTemp;
   ideal_acceptance = idealpct;
+  accept_buffer = acpt_buf;
+  accept_ratio = 1.0/log(idealpct);
   this->rgen = rgen;
 }
 
@@ -50,9 +52,12 @@ bool MetropSampler::accept(int chainnum, double trial){
   }
   
   recent.push_back(accepted);
-  if(recent.size() >= RECENT_NUM){
+  if(recent.size() > RECENT_NUM)
     recent.pop_front();
-  }  
+  
+  trials.push_back(trial);
+  if(trials.size() > RECENT_NUM)
+    trials.pop_front();
   
   return accepted;
 }
@@ -78,14 +83,16 @@ double MetropSampler::acceptance_rate(){
 }
 
 bool MetropSampler::anneal(){
-  if(acceptance_rate() > ideal_acceptance){
+  double rate = acceptance_rate();
+  if(rate > (ideal_acceptance + accept_buffer)){
     temp--;
+    return true;}
+  else if (rate < (ideal_acceptance - accept_buffer)){
+    temp++;
     return true;
   }
-  else {
-    temp++;
+  else
     return false;
-  }
 }
 
 void MetropSampler::reset(){
