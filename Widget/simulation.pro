@@ -121,6 +121,7 @@ pro simulation
                  nchain:5,$
                  tmax:20.0,$
                  acceptpct:0.25, $
+                 pct_range:0.05, $
                  conv_conf:0.05, $
                  conv_rmax:1.05, $
                  conv_step:20, $
@@ -311,6 +312,7 @@ PRO simulation_event,ev
         sxaddpar,hdr2,'CONV_STEP',msettings.conv_step,'Iterations between convergence checks'
         sxaddpar,hdr2,'BURN_STEP',msettings.burn_step,'Iterations between anneal calls in burn-in'
         sxaddpar,hdr2,'BURNVRUN',msettings.burn_ratio,'Ratio of normal to burn-in steps'
+        sxaddpar,hdr2,'ANN_RNG',msettings.pct_range,'Range within which to maintain acceptance, from ideal'
         sxaddpar,hdr2,'PRINT',info.print,'Whether to Print Debug MSGs'
 
         templates = [0]

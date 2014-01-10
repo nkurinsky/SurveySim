@@ -45,7 +45,7 @@ int main(int argc,char** argv){
   unsigned long runs; 
   int nz,ns;
   double area, dz, zmax, zmin, rtemp, rmax, a_ci;
-  double TMAX,IDEALPCT;
+  double TMAX,IDEALPCT,ANNRNG;
   unsigned long NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO;
   products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
@@ -73,6 +73,7 @@ int main(int argc,char** argv){
   NCHAIN = (unsigned long) rtemp;
   params_table.readKey("TMAX",TMAX);
   params_table.readKey("ANN_PCT",IDEALPCT);
+  params_table.readKey("ANN_RNG",ANNRNG);
   params_table.readKey("BURN_STE",rtemp);
   BURN_STEP = (unsigned long) rtemp;
   params_table.readKey("CONV_STE",rtemp);
@@ -239,7 +240,7 @@ int main(int argc,char** argv){
   survey.set_size(area,dz,zmin,nz,ns);
   MCChains mcchain(NCHAIN,param_inds.size(),runs,BURN_RATIO);
   mcchain.set_constraints(rmax,a_ci);
-  MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,0.03,r);
+  MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,ANNRNG,r);
 
   int pqind[2];
   int itemp;
