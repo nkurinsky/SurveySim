@@ -242,13 +242,30 @@ int main(int argc,char** argv){
   mcchain.set_constraints(rmax,a_ci);
   MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,ANNRNG,r);
 
-  //initialize first chain to initial parameters
-  for(m=0;m<param_inds.size();m++)
-    ptemp[0][i] = pcurrent[0][i] = lpars[param_inds[i]];
+  int pqind[2];
+  int itemp;
+  pqind[0] = pqind[1] = 0;
+  for(m=0;m<param_inds.size();m++){
+    if (param_inds[m] == 4)
+      pqind[0] = m;
+    if (param_inds[m] == 5)
+      pqind[1] = m;
+  } 
+  if ((pqind[0] == pqind[1]) or (pqind[0] < 0) or (pqind[1] < 0))
+    printf("Warning: p and/or q fixed");
   
-  for(m=1;m<NCHAIN;m++){ 
+  for(m=0;m<NCHAIN;m++){ 
     for(unsigned long i=0;i<param_inds.size();i++){
-      ptemp[m][i] = pcurrent[m][i] = gsl_ran_flat(r,lmin[param_inds[i]],lmax[param_inds[i]]);
+      ptemp[m][i] = pcurrent[m][i] = lpars[param_inds[i]];
+    }
+    if (m > 0){
+      itemp = ((m-1)/2)%2;
+      if (m%2 == 0){
+	pcurrent[m][pqind[itemp]] = ptemp[m][pqind[itemp]] = ptemp[m][pqind[itemp]] + (lmin[param_inds[pqind[itemp]]] - ptemp[m][pqind[itemp]])/2.0;
+      }
+      else{
+	pcurrent[m][pqind[itemp]] = ptemp[m][pqind[itemp]] = ptemp[m][pqind[itemp]] + (lmax[param_inds[pqind[itemp]]] - ptemp[m][pqind[itemp]])/2.0;
+      }
     }
   }
   
