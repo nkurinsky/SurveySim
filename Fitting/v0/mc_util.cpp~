@@ -125,9 +125,6 @@ MCChains::MCChains(int nchains, int npars, int nruns, int convstep){
   convruns = nruns/convstep;
   for(i=0;i<npars;i++)
     rvals[i].resize(convruns);
-  accepted.resize(nchains);
-  for(i=0;i<nchains;i++)
-    accepted[i].resize(nruns);
   bestpars = new double[npars];
   chainlength = new int[nchains];
   for (i=0;i<nchains;i++)
@@ -138,7 +135,7 @@ MCChains::MCChains(int nchains, int npars, int nruns, int convstep){
   alpha = 0.05;
 }
 
-bool MCChains::add_link(int chain, double pars[], double chisqr, bool accpt){
+bool MCChains::add_link(int chain, double pars[], double chisqr){
   static int cbase;
   
   if (chain >= nchains){
@@ -161,7 +158,6 @@ bool MCChains::add_link(int chain, double pars[], double chisqr, bool accpt){
   for (i=0;i<npars;i++)
     chains[cbase+i][chainlength[chain]] = pars[i];
   chains[cbase+npars][chainlength[chain]] = chisqr;
-  accepted[chain][chainlength[chain]] = accpt;
   
   chainlength[chain]++;
   return true;
@@ -267,12 +263,10 @@ bool MCChains::save(string filename, string parnames[]){
   
   std::slice domain = std::slice(0,chainlength[0],1);
   std::valarray<double> valarray_temp(chainlength[0]);
-  std::valarray<bool> valarray_bool(chainlength[0]);
   
-  int tablewidth = allwidth+nchains;
-  std::vector<string> colnames(tablewidth,"CHISQ");
-  std::vector<string> colunits(tablewidth,"-");
-  std::vector<string> colform(tablewidth,"e13.5");
+  std::vector<string> colnames(allwidth,"CHISQ");
+  std::vector<string> colunits(allwidth,"-");
+  std::vector<string> colform(allwidth,"e13.5");
   string hname("Chain");
   char ctemp[2];
   string cnum;
@@ -286,27 +280,15 @@ bool MCChains::save(string filename, string parnames[]){
     }
     colnames[j*chainwidth+npars] += cnum;
   }
-  for (i=allwidth;i<tablewidth;i++){
-    sprintf(ctemp,"%i",i);
-    cnum = string(ctemp);
-    colnames[i] = "A"+cnum;
-    colform[i] = "b";
-  }
-
+  
   Table *newTable = pFits->addTable(hname,chainlength[0],colnames,colform,colunits,AsciiTbl);
   
-  for(i=0;i<tablewidth;i++){
+  for(i=0;i<allwidth;i++){
     if (i != 0)
       printf(", ");
     printf("%s",colnames[i].c_str());
-    if(i < allwidth){
-      valarray_temp = chains[i][domain];
-      newTable->column(colnames[i]).write(valarray_temp,1);
-    }
-    else{
-      valarray_bool = accepted[i][domain];
-      newTable->column(colnames[i]).write(valarray_bool,1);
-    }
+    valarray_temp = chains[i][domain];
+    newTable->column(colnames[i]).write(valarray_temp,1);
   }
 
   std::vector<string> colnames2(npars,"R");

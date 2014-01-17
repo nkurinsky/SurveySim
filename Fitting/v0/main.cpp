@@ -41,12 +41,16 @@ int main(int argc,char** argv){
     outfile = argv[4];
 
   bool oprint=true;
+  bool accept;
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
-  unsigned long runs; 
+  unsigned long runs;
+  unsigned long i,m,p;
   int nz,ns;
   double area, dz, zmax, zmin, rtemp, rmax, a_ci;
   double TMAX,IDEALPCT,ANNRNG;
-  unsigned long NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO;
+  char wtemp[2];
+  string wnum;
+  unsigned long NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO,burn_num;
   products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
   //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
@@ -109,9 +113,7 @@ int main(int argc,char** argv){
   printf("Simulation Settings:\n");
   printf("Run Number Max: %lu\nNumber Redshift Bins: %i\nRedshift Bin Width: %f\n\n",runs,nz,dz);
 
-  char wtemp[2];
-  string wnum;
-  for(int i=0;i<BANDS;i++){
+  for(i=0;i<BANDS;i++){
     sprintf(wtemp,"%i",i+1);
     wnum = string(wtemp);
     obs_table.readKey("WAVE_"+wnum,bs[i]); //should already be in microns
@@ -165,7 +167,7 @@ int main(int argc,char** argv){
   params_table.readKey("Q_DP",ldp[5]);
   params_table.readKey("ZCUT_DP",ldp[6]);
   
-  for (int i=0;i<LUMPARS;i++)
+  for (i=0;i<LUMPARS;i++)
     if(lfix[i] == 0)
       param_inds.push_back(i);
   
@@ -218,7 +220,6 @@ int main(int argc,char** argv){
   double chi_min=1.0E+4; 
   double trial;
   double prng[param_inds.size()][runs];
-  unsigned long i,m,p;
 
   // the temperature, keep fixed for now, but can also try annealing 
   // in the future, this has similar effect as the width of the proposal
@@ -243,12 +244,12 @@ int main(int argc,char** argv){
   MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,ANNRNG,r);
 
   //initialize first chain to initial parameters
-  for(m=0;m<param_inds.size();m++)
-    ptemp[0][i] = pcurrent[0][i] = lpars[param_inds[i]];
+  for(p=0;p<param_inds.size();p++)
+    ptemp[0][p] = pcurrent[0][p] = lpars[param_inds[p]];
   
   for(m=1;m<NCHAIN;m++){ 
-    for(unsigned long i=0;i<param_inds.size();i++){
-      ptemp[m][i] = pcurrent[m][i] = gsl_ran_flat(r,lmin[param_inds[i]],lmax[param_inds[i]]);
+    for(p=0;p<param_inds.size();p++){
+      ptemp[m][p] = pcurrent[m][p] = gsl_ran_flat(r,lmin[param_inds[p]],lmax[param_inds[p]]);
     }
   }
   
@@ -257,7 +258,9 @@ int main(int argc,char** argv){
   else
     printf("\nBeginning MC Burn-in Phase...\n");
 
-  for (i=0;i<(runs/BURN_RATIO);i++){
+  burn_num = runs/BURN_RATIO;
+
+  for (i=0;i<burn_num;i++){
     for (m=0;m<NCHAIN;m++){
       for(p=0;p<param_inds.size();p++){
 	prng[p][i]=gsl_ran_gaussian(r,ldp[param_inds[p]]);
@@ -326,9 +329,10 @@ int main(int argc,char** argv){
       if (oprint)
 	printf("Model chi2: %lf",trial);
       
-      mcchain.add_link(m,ptemp[m],trial);
-      
-      if(metrop.accept(m,trial)){
+      accept = metrop.accept(m,trial);
+      mcchain.add_link(m,ptemp[m],trial,accept);
+
+      if(accept){
 	if (oprint) 
 	  printf(" -- Accepted\n");
 	for(p=0;p<param_inds.size();p++)
