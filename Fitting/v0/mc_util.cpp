@@ -267,7 +267,6 @@ bool MCChains::save(string filename, string parnames[]){
   
   std::slice domain = std::slice(0,chainlength[0],1);
   std::valarray<double> valarray_temp(chainlength[0]);
-  std::valarray<bool> valarray_bool(chainlength[0]);
   
   int tablewidth = allwidth+nchains;
   std::vector<string> colnames(tablewidth,"CHISQ");
@@ -304,8 +303,8 @@ bool MCChains::save(string filename, string parnames[]){
       newTable->column(colnames[i]).write(valarray_temp,1);
     }
     else{
-      valarray_bool = accepted[i][domain];
-      newTable->column(colnames[i]).write(valarray_bool,1);
+      valarray_temp = (double)accepted[i][domain];
+      newTable->column(colnames[i]).write(valarray_temp,1);
     }
   }
 
