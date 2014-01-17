@@ -114,7 +114,7 @@ int main(int argc,char** argv){
   printf("Run Number Max: %lu\nNumber Redshift Bins: %i\nRedshift Bin Width: %f\n\n",runs,nz,dz);
 
   for(i=0;i<BANDS;i++){
-    sprintf(wtemp,"%i",i+1);
+    sprintf(wtemp,"%lu",i+1);
     wnum = string(wtemp);
     obs_table.readKey("WAVE_"+wnum,bs[i]); //should already be in microns
     obs_table.readKey("W"+wnum+"_FMIN",flims[i]); //should be in mJy
@@ -272,7 +272,7 @@ int main(int argc,char** argv){
       }
       
       if (oprint) 
-	printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][pqind[0]],ptemp[m][pqind[1]]);
+	printf("%lu %lu - %lf %lf : ",(i+1),(m+1),lpars[4],lpars[5]);
       lf.set_params(lpars);
       output=survey.simulate();
       trial=output.chisqr;
@@ -322,7 +322,7 @@ int main(int argc,char** argv){
       }
       
       if (oprint)
-	printf("%lu %lu - %lf %lf : ",(i+1),(m+1),ptemp[m][pqind[0]],ptemp[m][pqind[1]]);
+	printf("%lu %lu - %lf %lf : ",(i+1),(m+1),lpars[4],lpars[5]);
       lf.set_params(lpars);
       output=survey.simulate();
       trial=output.chisqr;
