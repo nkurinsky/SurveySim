@@ -161,7 +161,7 @@ bool MCChains::add_link(int chain, double pars[], double chisqr, bool accpt){
   for (i=0;i<npars;i++)
     chains[cbase+i][chainlength[chain]] = pars[i];
   chains[cbase+npars][chainlength[chain]] = chisqr;
-  accepted[chain][chainlength[chain]] = accpt;
+  accepted[chain][chainlength[chain]] = accpt ? 1.0 : 0.0;
   
   chainlength[chain]++;
   return true;
@@ -303,7 +303,7 @@ bool MCChains::save(string filename, string parnames[]){
       newTable->column(colnames[i]).write(valarray_temp,1);
     }
     else{
-      valarray_temp = (double)accepted[i][domain];
+      valarray_temp = accepted[i][domain];
       newTable->column(colnames[i]).write(valarray_temp,1);
     }
   }

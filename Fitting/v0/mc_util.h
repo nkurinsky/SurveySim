@@ -53,7 +53,7 @@ class MCChains {
   int *chainlength;
   valarray<valarray<double> > chains;
   valarray<valarray<double> > rvals;
-  valarray<valarray<bool> > accepted;
+  valarray<valarray<double> > accepted;
  public:
   MCChains(int nchains, int npars, int nruns, int convstep);
   bool add_link(int chain, double pars[], double chisqr, bool accpt);
