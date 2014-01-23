@@ -251,7 +251,6 @@ double ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cn
 double hist_lib::fit_err(){
   //Chi-square
   static double chisq,obs_temp,mod_temp,obs_temp_err,mod_temp_err,err_temp,chisq_temp;
-  //static bool obs_valid,mod_valid;
   
   comparison_hist = new double*[xysize];
   for (int i=0;i<xysize;i++){
@@ -265,37 +264,13 @@ double hist_lib::fit_err(){
       obs_temp = double(obs_hist[i][j]);
       mod_temp = double(model_hist[i][j]);
       
-      //obs_valid = (obs_temp > 0);
-      //mod_valid = (mod_temp > 0);
-      
       chisq_temp = 0;
-      //if(obs_valid or mod_valid){
-      //if(mod_valid){
-      //mod_temp_err = sqrt(mod_temp);
       mod_temp_err = poiss_err(mod_temp);
-      //mod_temp;
-      //mod_temp_err;
-      //}
-      //else{
-      //mod_temp = 0;
-      //mod_temp_err = 1.841;
-      //}
-      
-      //if(obs_valid){
       obs_temp_err = poiss_err(obs_temp);
-      //obs_temp;
-      //obs_temp_err;
-      //}
-      //else{
-      //obs_temp = 0;
-      //obs_temp_err = 1.841;
-      //}
        
-      err_temp = sqrt(pow(mod_temp_err,2)+pow(obs_temp_err,2));
-      chisq_temp = (pow((obs_temp-mod_temp),2)/pow(err_temp,2));
-      chisq += chisq_temp;
-      
-      //comparison_hist[i][j] = int((double(model_hist[i][j])*double(osize))/double(msize))-obs_hist[i][j];
+      err_temp = pow(mod_temp_err,2)+pow(obs_temp_err,2);
+      chisq_temp = pow((obs_temp-mod_temp),2)/err_temp;
+      chisq += chisq_temp;      
       comparison_hist[i][j] = chisq_temp;
     }
   }
