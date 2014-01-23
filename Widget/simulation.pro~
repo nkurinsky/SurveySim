@@ -1317,23 +1317,18 @@ pro diagnostics
      ;oplot,[i+dp,i+dp],qrange,linestyle=1
   endfor
 
+
+  res = mrdfits(files.oname,5,/silent)
+
   widget_control,conv,get_value=index
   wset,index
 
-  res= mrdfits(files.oname,5,/silent)
-  gpts = where(res.(0) gt 0)
-  res = res[gpts]
-  rmax = 0
-  for i,n_elements(tag_names(res))-1 do begin
-     tmax = max(res.(rpts[i]))
-     if (tmax gt rmax) then rmax = tmax
-  endfor
-  
-  plot,[0,n_elements(res)],[1.0,rmax],xstyle=1,ystyle=1,title="Convergence",xtitle="Test Number",ytitle="R",/nodata
+  gpts = where(res.r0 gt 0)
+  plot,res[gpts].r0,xrange=[0,n_elements(gpts)],xstyle=1,yrange=[1.0,max([max(res.r0),max(res.r1)])],ystyle=1,title="Convergence",xtitle="Test Number",ytitle="R"
   oplot,[0,n_elements(gpts)],[msettings.conv_rmax,msettings.conv_rmax]
-  for i,n_elements(rpts)-1 do begin
-     oplot,res.(i),linestyle=i
-  endfor
+
+  gpts = where(res.r1 gt 0)
+  oplot,res[gpts].r1,linestyle=1
 
 end
 
