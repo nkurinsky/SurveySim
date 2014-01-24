@@ -657,6 +657,12 @@ pro read_output
   for ci=0,n_elements(cpts)-1 do begin
      chis = [chis,res.(cpts[ci])]
   endfor
+
+  accept = []
+  apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
+  for ai=0,n_elements(apts)-1 do begin
+     accept = [accept,res.(apts[ai])]
+  endfor
   
   chi_med = median(chis)
   print,"median: ",chi_med
@@ -734,13 +740,16 @@ pro read_output
   
   device,/close
   
-  crange=[min(chis)/1.2,min(chis)*10]
+  multiplot,/reset
+
+  gpts = where(accept eq 1.0)
+  crange=[min(chis[gpts]),max(chis[gpts])]
   n = n_elements(res)
 
   device,filename='chisq_v_run.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
   loadct,1,/silent
-  plot,[0,n],crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Likelihood Trends"
+  plot,[0,n],crange,/ylog,xstyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Likelihood Trends"
   loadct,39,/silent
   
   apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
@@ -751,19 +760,22 @@ pro read_output
   for i=0,chainnum-1 do begin
      gpts = where(res.(apts[i]) eq 1.0)
      yplot = res.(cpts[i])
-     oplot,xchis[gpts],yplot[gpts],color=40+i*dcolor,psym=1
+     oplot,xchis[gpts],yplot[gpts],color=40+i*dcolor,psym=3
   endfor
   
   device,/close
 
   device,filename='chisq_hist.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
   
+  gpts = where(accept eq 1.0)
   histrange = [0,min(chis)*10]
   chist = histogram(chis,nbins=50,locations=xchist,min=histrange[0],max=histrange[1])
+  chist_acpt = histogram(chis[gpts],nbins=50,locations=xchist_acpt,min=histrange[0],max=histrange[1])
   cmax = max(chist)
   gpts = where(chist lt 1)
   chist[gpts] = 0.001
   plot,xchist,chist,psym=10,xstyle=1,ystyle=1,xrange=histrange,yrange=[0.9,cmax^1.2],xtitle=Textoidl("\chi^2"),ytitle="N",title=textoidl("Total \chi^2 Distribution"),/ylog
+  oplot,xchist_acpt,chist_acpt,psym=10,linestyle=1
 
   device,/close
 
