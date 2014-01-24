@@ -637,99 +637,125 @@ pro read_output
 
   device,/close
 
-  res = mrdfits(files.oname,0,head,/silent)
-  alpha = fxpar(head,'ALPHA')
-  beta = fxpar(head,'BETA')
-  phi0 = fxpar(head,'PHI0')
-  L0 = fxpar(head,'L0')
-  p = fxpar(head,'P')
-  q = fxpar(head,'Q')
-
-  loadct,0,/silent
-  
 ; chain read operations 
-  res = mrdfits(files.oname,4,/silent)
-  p = [res.p0,res.p1,res.p2,res.p3,res.p4]
-  q = [res.q0,res.q1,res.q2,res.q3,res.q4]
-  chis = [res.chisq0,res.chisq1,res.chisq2,res.chisq3,res.chisq4]
-  prange=[min(p),max(p)]
-  qrange=[min(q),max(q)]
+
+  res = mrdfits('output.fits',4,/silent)
+  alltags = tag_names(res)
+  tags = alltags[where(strmatch(alltags,'*0',/FOLD_CASE) eq 1)]
+
+  for i=0,n_elements(tags)-1 do begin
+     tags[i] = strmid(tags[i],0,strlen(tags[i])-1)
+  endfor
+  tags = tags[where((tags ne 'CHISQ') and (tags ne 'ACPT'))]
+  print,'Fitted Variables: ',tags
+
+  dim = n_elements(tags)
+  nbins = 50.0
+  
+  chis = []
+  cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
+  for ci=0,n_elements(cpts)-1 do begin
+     chis = [chis,res.(cpts[ci])]
+  endfor
+  
+  chi_med = median(chis)
+  print,"median: ",chi_med
+  chistpts = where(chis lt chi_med)
+
+  chi_min = alog(min(chis))
+  chi_max = alog(max(chis))
+  color_scale = 256/((chi_max-chi_min)*1.2)
+
+  set_plot,'ps'
+  device,filename='fit_results.eps',xsize=10,ysize=8,/inches,/times,set_font='Times-Roman',/color,/encapsulated
+  multiplot,[dim,dim],/init,/rowmajor,mTitle="MCMC Fitting Results",gap=0.005
+  cgText, 0.6, 0.9, Alignment=0, /Normal, 'Fitting Results:', Charsize=1.25
+
+  for x=0,dim-1 do begin
+     p = []
+     ppts = where(strmatch(alltags,tags[x]+'*',/FOLD_CASE) eq 1)
+     for pi=0,n_elements(ppts)-1 do begin
+        p = [p,res.(ppts[pi])]
+     endfor
+     prange = [min(p),max(p)]
+     for y=0,dim-1 do begin
+        multiplot
+        if (x eq y) then begin  ;make histogram
+           stats = moment(p[chistpts],maxmoment=2)
+           print,"Variable: ",tags[x],", Mean: ",stats[0]," Variance: ",stats[1]
+           cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(stats[1],format='(D0.3)')))
+           h = histogram(p[chistpts],locations=xh,max=prange[1],min=prange[0],nbins=nbins)
+           h = float(h)/float(max(h))
+           loadct,1,/silent
+           
+           xt = ''
+           yt = ''
+           if(x eq 0) then yt=tags[y]
+           if(y eq dim-1) then xt=tags[x]
+           plot,xh,h,psym=10,xrange=prange,yrange=[0,1.2],xtitle=xt,ytitle=yt,xstyle=1,ystyle=1
+
+        endif else if (x lt y) then begin ;make liklihood space
+
+           q = []
+           qpts = where(strmatch(alltags,tags[y]+'*',/FOLD_CASE) eq 1)
+           for qi=0,n_elements(qpts)-1 do begin
+              q = [q,res.(qpts[qi])]
+           endfor
+           qrange = [min(q),max(q)]
+           dp=(prange[1]-prange[0])/nbins
+           dq=(qrange[1]-qrange[0])/nbins
+
+           xt = ''
+           yt = ''
+           if(x eq 0) then yt=tags[y]
+           if(y eq dim-1) then xt=tags[x]
+           
+           loadct,1,/silent
+           plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=xt,ytitle=yt
+           loadct,39,/silent
+           for i=prange[0],prange[1]-dp/2,dp do begin
+              for j=qrange[0],qrange[1]-dq/2,dq do begin
+                 
+                 xfill = [i,i,i+dp,i+dp]
+                 yfill = [j,j+dq,j+dq,j]
+                 
+                 gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
+                 chi_plot = mean(chis[gpts])
+                 
+                 if(gpts[0] ne -1) then begin
+                    polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
+                 endif
+              endfor
+           endfor
+
+        endif 
+     endfor
+  endfor
+  
+  device,/close
+  
   crange=[min(chis)/1.2,min(chis)*10]
-  log_crange=alog(crange)
-  dp=(prange[1]-prange[0])/50.0
-  dq=(qrange[1]-qrange[0])/50.0
-  dc=alog(crange[1]-crange[0])/50.0
   n = n_elements(res)
 
-  device,filename='pspace.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
-
-  plot,prange,qrange,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle='Q',title="Chain Coverage of Parameter Space"
-  loadct,39,/silent
-  p1 = res.p0
-  p2 = res.q0
-  oplot,p1,p2,psym=2,symsize=0.25,color=40
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p1
-  p2 = res.q1
-  oplot,p1,p2,psym=2,symsize=0.25,color=80
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p2
-  p2 = res.q2
-  oplot,p1,p2,psym=2,symsize=0.25,color=120
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p3
-  p2 = res.q3
-  oplot,p1,p2,psym=2,symsize=0.25,color=160
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p4
-  p2 = res.q4
-  oplot,p1,p2,psym=2,symsize=0.25,color=200
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-
-  device,/close
   device,filename='chisq_v_run.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
   loadct,1,/silent
-  plot,[0,n_elements(p1)],crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Likelihood Trends"
+  plot,[0,n],crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Likelihood Trends"
   loadct,39,/silent
-  oplot,res.chisq0,color=40
-  oplot,res.chisq1,color=80
-  oplot,res.chisq2,color=120
-  oplot,res.chisq3,color=160
-  oplot,res.chisq4,color=200
+  
+  apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
+  cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
+  chainnum = n_elements(apts)
+  dcolor = 200/(chainnum-1)
+  xchis = indgen(n)
+  for i=0,chainnum-1 do begin
+     gpts = where(res.(apts[i]) eq 1.0)
+     yplot = res.(cpts[i])
+     oplot,xchis[gpts],yplot[gpts],color=40+i*dcolor,psym=1
+  endfor
   
   device,/close
-  device,filename='chisq_v_p.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
-  loadct,1,/silent
-  plot,prange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle=textoidl("\chi^2"),title=textoidl("P \chi^2 Distribution")
-  loadct,39,/silent
-  
-  oplot,res.p0,res.chisq0,color=40,psym=2,symsize=0.25
-  oplot,res.p1,res.chisq1,color=80,psym=2,symsize=0.25
-  oplot,res.p2,res.chisq2,color=120,psym=2,symsize=0.25
-  oplot,res.p3,res.chisq3,color=160,psym=2,symsize=0.25
-  oplot,res.p4,res.chisq4,color=200,psym=2,symsize=0.25
-  
-  device,/close
-  device,filename='chisq_v_q.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
-
-  loadct,1,/silent
-  plot,qrange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Q',ytitle=textoidl("\chi^2"),title=textoidl("Q \chi^2 Distribution")
-  loadct,39,/silent
-  
-  oplot,res.q0,res.chisq0,color=40,psym=2,symsize=0.25
-  oplot,res.q1,res.chisq1,color=80,psym=2,symsize=0.25
-  oplot,res.q2,res.chisq2,color=120,psym=2,symsize=0.25
-  oplot,res.q3,res.chisq3,color=160,psym=2,symsize=0.25
-  oplot,res.q4,res.chisq4,color=200,psym=2,symsize=0.25
-  
-  device,/close
   device,filename='chisq_hist.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
   
   histrange = [0,min(chis)*10]
@@ -740,55 +766,7 @@ pro read_output
   plot,xchist,chist,psym=10,xstyle=1,ystyle=1,xrange=histrange,yrange=[0.9,cmax^1.2],xtitle=Textoidl("\chi^2"),ytitle="N",title=textoidl("Total \chi^2 Distribution"),/ylog
 
   device,/close
-  device,filename='mean_likelihood.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
-  plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Mean Likelihood Space'
-  chi_min = alog(min(chis))
-  chi_max = alog(max(chis))
-  color_scale = 256/((chi_max-chi_min)*1.2)
-  
-  for i=prange[0],prange[1]-dp/2,dp do begin
-     for j=qrange[0],qrange[1]-dq/2,dq do begin
-        
-        xfill = [i,i,i+dp,i+dp]
-        yfill = [j,j+dq,j+dq,j]
-
-        gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
-        chi_mean = mean(chis[gpts])
-
-        if(gpts[0] ne -1) then begin
-           polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_mean))
-        endif
-        
-        ;if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1        
-     endfor
-     ;oplot,[i+dp,i+dp],qrange,linestyle=1
-  endfor
-
-  device,/close
-  device,filename='max_likelihood.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
-
-  plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Max Likelihood Space'
-
-  for i=prange[0],prange[1]-dp/2,dp do begin
-     for j=qrange[0],qrange[1]-dq/2,dq do begin
-
-        xfill = [i,i,i+dp,i+dp]
-        yfill = [j,j+dq,j+dq,j]
-
-        gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
-        chi_plot = min(chis[gpts])
-
-        if(gpts[0] ne -1) then begin
-           polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
-        endif
-
-        ;if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1
-     endfor
-     ;oplot,[i+dp,i+dp],qrange,linestyle=1
-  endfor
-
-  device,/close
   device,filename='convergence.eps',xsize=12,ysize=9,/inches,/times,/color,/encapsulated
 
   res= mrdfits(files.oname,5,/silent)
