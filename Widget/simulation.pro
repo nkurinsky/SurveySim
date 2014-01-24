@@ -1132,8 +1132,7 @@ pro diagnostics
   size_screen = size_screen*0.8
   dmain = widget_base(title='Simulation Diagnostics',/column,xsize=size_screen[0],ysize=size_screen_alt[1])
   r1 = widget_base(dmain,/row)
-  r2 = widget_base(dmain,/row)
-  r2b = widget_base(dmain,/row)
+  c1 = widget_base(r1,/column)
   r3 = widget_base(dmain,/row)
 
   widget_control,dmain,set_uvalue=mnum
@@ -1150,22 +1149,15 @@ pro diagnostics
 
   loadct,0,/silent
 
-  space = widget_draw(r1,xsize=xdim,ysize=ydim)
-  chisqr = widget_draw(r1,xsize=xdim,ysize=ydim)
-  chidist = widget_draw(r1,xsize=xdim,ysize=ydim)
-  likely = widget_draw(r2,xsize=xdim,ysize=ydim)
-  phist = widget_draw(r2,xsize=xdim,ysize=ydim)
-  qhist = widget_draw(r2,xsize=xdim,ysize=ydim)
-  mlikely = widget_draw(r2b,xsize=xdim,ysize=ydim)
-  tbox = widget_base(r2b,xsize=(xdim-5),ysize=(ydim-5),/column)
-  conv = widget_draw(r2b,xsize=xdim,ysize=ydim)
+  chisqr = widget_draw(c1,xsize=xdim,ysize=ydim)
+  chidist = widget_draw(c1,xsize=xdim,ysize=ydim)
+  conv = widget_draw(c1,xsize=xdim,ysize=ydim)
+  resplot = widget_draw(r1,xsize=2*xdim,ysize=3*ydim)
   
   graphs = widget_button(r3,uvalue='graphs',value='Return to Output')
   refresh = widget_button(r3,uvalue='refresh',value='Refresh')
   close = widget_button(r3,uvalue='close',value='Close')
   quit = widget_button(r3,uvalue='quit',value='Quit')
-
-  restext = widget_text(tbox,/wrap,value=['Best Fitting Results:',head[indgen(9)+12],'','Histogram Parameters',head[indgen(3)+9]],xsize=(xdim-50),ysize=(ydim-50))
 
   widget_control,dmain,/realize
   xmanager,'diagnostics',dmain,/no_block
@@ -1175,143 +1167,142 @@ pro diagnostics
   loadct,0,/silent
   
 ; chain read operations 
-  res = mrdfits(files.oname,4,/silent)
-  p = [res.p0,res.p1,res.p2,res.p3,res.p4]
-  q = [res.q0,res.q1,res.q2,res.q3,res.q4]
-  chis = [res.chisq0,res.chisq1,res.chisq2,res.chisq3,res.chisq4]
-  prange=[min(p),max(p)]
-  qrange=[min(q),max(q)]
-  crange=[min(chis)/1.2,min(chis)*10.0]
-  log_crange=alog(crange)
-  dp=(prange[1]-prange[0])/50
-  dq=(qrange[1]-qrange[0])/50
-  dc=alog(crange[1]-crange[0])/50.0
-  n = n_elements(res)
+  res = mrdfits('output.fits',4,/silent)
+  alltags = tag_names(res)
+  tags = alltags[where(strmatch(alltags,'*0',/FOLD_CASE) eq 1)]
 
-  widget_control,space,get_value=index
-  wset,index
+  for i=0,n_elements(tags)-1 do begin
+     tags[i] = strmid(tags[i],0,strlen(tags[i])-1)
+  endfor
+  tags = tags[where((tags ne 'CHISQ') and (tags ne 'ACPT'))]
+  print,'Fitted Variables: ',tags
+
+  dim = n_elements(tags)
+  nbins = 50.0
   
-  plot,prange,qrange,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle='Q',title="Chain Coverage of Parameter Space"
-  loadct,39,/silent
-  p1 = res.p0
-  p2 = res.q0
-  oplot,p1,p2,psym=2,symsize=0.25,color=40
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p1
-  p2 = res.q1
-  oplot,p1,p2,psym=2,symsize=0.25,color=80
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p2
-  p2 = res.q2
-  oplot,p1,p2,psym=2,symsize=0.25,color=120
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p3
-  p2 = res.q3
-  oplot,p1,p2,psym=2,symsize=0.25,color=160
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
-  p1 = res.p4
-  p2 = res.q4
-  oplot,p1,p2,psym=2,symsize=0.25,color=200
-  xyouts,p1[0]+0.1,p2[0]+0.1,"Start"
-  xyouts,p1[n-1]+0.1,p2[n-1]+0.1,"End"
+  chis = []
+  cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
+  for ci=0,n_elements(cpts)-1 do begin
+     chis = [chis,res.(cpts[ci])]
+  endfor
+
+  accept = []
+  apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
+  for ai=0,n_elements(apts)-1 do begin
+     accept = [accept,res.(apts[ai])]
+  endfor
+  
+  chi_med = median(chis)
+  print,"median: ",chi_med
+  chistpts = where(chis lt chi_med)
+
+  chi_min = alog(min(chis))
+  chi_max = alog(max(chis))
+  color_scale = 256/((chi_max-chi_min)*1.2)
+
+  widget_control,resplot,get_value=index
+  wset,index
+
+  multiplot,[dim,dim],/init,/rowmajor,mTitle="MCMC Fitting Results",gap=0.005
+  cgText, 0.6, 0.9, Alignment=0, /Normal, 'Fitting Results:', Charsize=1.25
+
+  for x=0,dim-1 do begin
+     p = []
+     ppts = where(strmatch(alltags,tags[x]+'*',/FOLD_CASE) eq 1)
+     for pi=0,n_elements(ppts)-1 do begin
+        p = [p,res.(ppts[pi])]
+     endfor
+     prange = [min(p),max(p)]
+     for y=0,dim-1 do begin
+        multiplot
+        if (x eq y) then begin  ;make histogram
+           stats = moment(p[chistpts],maxmoment=2)
+           print,"Variable: ",tags[x],", Mean: ",stats[0]," Variance: ",stats[1]
+           cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(stats[1],format='(D0.3)')))
+           h = histogram(p[chistpts],locations=xh,max=prange[1],min=prange[0],nbins=nbins)
+           h = float(h)/float(max(h))
+           loadct,1,/silent
+           
+           xt = ''
+           yt = ''
+           if(x eq 0) then yt=tags[y]
+           if(y eq dim-1) then xt=tags[x]
+           plot,xh,h,psym=10,xrange=prange,yrange=[0,1.2],xtitle=xt,ytitle=yt,xstyle=1,ystyle=1
+
+        endif else if (x lt y) then begin ;make liklihood space
+
+           q = []
+           qpts = where(strmatch(alltags,tags[y]+'*',/FOLD_CASE) eq 1)
+           for qi=0,n_elements(qpts)-1 do begin
+              q = [q,res.(qpts[qi])]
+           endfor
+           qrange = [min(q),max(q)]
+           dp=(prange[1]-prange[0])/nbins
+           dq=(qrange[1]-qrange[0])/nbins
+
+           xt = ''
+           yt = ''
+           if(x eq 0) then yt=tags[y]
+           if(y eq dim-1) then xt=tags[x]
+           
+           loadct,1,/silent
+           plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=xt,ytitle=yt
+           loadct,39,/silent
+           for i=prange[0],prange[1]-dp/2,dp do begin
+              for j=qrange[0],qrange[1]-dq/2,dq do begin
+                 
+                 xfill = [i,i,i+dp,i+dp]
+                 yfill = [j,j+dq,j+dq,j]
+                 
+                 gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
+                 chi_plot = mean(chis[gpts])
+                 
+                 if(gpts[0] ne -1) then begin
+                    polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
+                 endif
+              endfor
+           endfor
+
+        endif 
+     endfor
+  endfor
+  
+  multiplot,/reset
 
   widget_control,chisqr,get_value=index
   wset,index
+
+  gpts = where(accept eq 1.0)
+  crange=[min(chis[gpts]),max(chis[gpts])]
+  n = n_elements(res)
+
   loadct,1,/silent
-  plot,[0,n_elements(p1)],crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Likelihood Trends"
-  loadct,39,/silent
-  oplot,res.chisq0,color=40
-  oplot,res.chisq1,color=80
-  oplot,res.chisq2,color=120
-  oplot,res.chisq3,color=160
-  oplot,res.chisq4,color=200
-  
-  widget_control,phist,get_value=index
-  wset,index
-  loadct,1,/silent
-  plot,prange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='P',ytitle=textoidl("\chi^2"),title=textoidl("P \chi^2 Distribution")
+  plot,[0,n],crange,/ylog,xstyle=1,/nodata,xtitle='Run Number',ytitle=textoidl("\chi^2"),title="Temporal Likelihood Trends"
   loadct,39,/silent
   
-  oplot,res.p0,res.chisq0,color=40,psym=2,symsize=0.25
-  oplot,res.p1,res.chisq1,color=80,psym=2,symsize=0.25
-  oplot,res.p2,res.chisq2,color=120,psym=2,symsize=0.25
-  oplot,res.p3,res.chisq3,color=160,psym=2,symsize=0.25
-  oplot,res.p4,res.chisq4,color=200,psym=2,symsize=0.25
-  
-  widget_control,qhist,get_value=index
-  wset,index
-  loadct,1,/silent
-  plot,qrange,crange,/ylog,xstyle=1,ystyle=1,/nodata,xtitle='Q',ytitle=textoidl("\chi^2"),title=textoidl("Q \chi^2 Distribution")
-  loadct,39,/silent
-  
-  oplot,res.q0,res.chisq0,color=40,psym=2,symsize=0.25
-  oplot,res.q1,res.chisq1,color=80,psym=2,symsize=0.25
-  oplot,res.q2,res.chisq2,color=120,psym=2,symsize=0.25
-  oplot,res.q3,res.chisq3,color=160,psym=2,symsize=0.25
-  oplot,res.q4,res.chisq4,color=200,psym=2,symsize=0.25
+  apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
+  cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
+  chainnum = n_elements(apts)
+  dcolor = 200/(chainnum-1)
+  xchis = indgen(n)
+  for i=0,chainnum-1 do begin
+     gpts = where(res.(apts[i]) eq 1.0)
+     yplot = res.(cpts[i])
+     oplot,xchis[gpts],yplot[gpts],color=40+i*dcolor,psym=3
+  endfor
   
   widget_control,chidist,get_value=index
   wset,index
 
+  gpts = where(accept eq 1.0)
   histrange = [0,min(chis)*10]
   chist = histogram(chis,nbins=50,locations=xchist,min=histrange[0],max=histrange[1])
+  chist_acpt = histogram(chis[gpts],nbins=50,locations=xchist_acpt,min=histrange[0],max=histrange[1])
   cmax = max(chist)
   gpts = where(chist lt 1)
   chist[gpts] = 0.001
   plot,xchist,chist,psym=10,xstyle=1,ystyle=1,xrange=histrange,yrange=[0.9,cmax^1.2],xtitle=Textoidl("\chi^2"),ytitle="N",title=textoidl("Total \chi^2 Distribution"),/ylog
-
-  widget_control,likely,get_value=index
-  wset,index
-
-  plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Mean Likelihood Space'
-  chi_min = alog(min(chis))
-  chi_max = alog(max(chis))
-  color_scale = 256/((chi_max-chi_min)*1.2)
-  
-  for i=prange[0],prange[1]-dp/2,dp do begin
-     for j=qrange[0],qrange[1]-dq/2,dq do begin
-        
-        xfill = [i,i,i+dp,i+dp]
-        yfill = [j,j+dq,j+dq,j]
-
-        gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
-        chi_mean = mean(chis[gpts])
-
-        if(gpts[0] ne -1) then begin
-           polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_mean))
-        endif
-        
-        ;if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1        
-     endfor
-     ;oplot,[i+dp,i+dp],qrange,linestyle=1
-  endfor
-
-  widget_control,mlikely,get_value=index
-  wset,index
-
-  plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle="P",ytitle="Q",title='Max Likelihood Space'
-
-  for i=prange[0],prange[1]-dp/2,dp do begin
-     for j=qrange[0],qrange[1]-dq/2,dq do begin
-
-        xfill = [i,i,i+dp,i+dp]
-        yfill = [j,j+dq,j+dq,j]
-
-        gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
-        chi_plot = min(chis[gpts])
-
-        if(gpts[0] ne -1) then begin
-           polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
-        endif
-
-        ;if(i ge prange[1]-dp) then oplot,prange,[j+dq,j+dq],linestyle=1
-     endfor
-     ;oplot,[i+dp,i+dp],qrange,linestyle=1
-  endfor
+  oplot,xchist_acpt,chist_acpt,psym=10,linestyle=1
 
   widget_control,conv,get_value=index
   wset,index
