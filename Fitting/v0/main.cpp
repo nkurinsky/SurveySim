@@ -78,14 +78,14 @@ int main(int argc,char** argv){
   params_table.readKey("TMAX",TMAX);
   params_table.readKey("ANN_PCT",IDEALPCT);
   params_table.readKey("ANN_RNG",ANNRNG);
-  params_table.readKey("BURN_STE",rtemp);
+  params_table.readKey("BURNSTEP",rtemp);
   BURN_STEP = (unsigned long) rtemp;
-  params_table.readKey("CONV_STE",rtemp);
+  params_table.readKey("CONVSTEP",rtemp);
   CONV_STEP = (unsigned long) rtemp;
   params_table.readKey("BURNVRUN",rtemp);
   BURN_RATIO = (unsigned long) rtemp;
-  params_table.readKey("CONV_RMA",rmax);
-  params_table.readKey("CONV_CON",a_ci);
+  params_table.readKey("CONVRMAX",rmax);
+  params_table.readKey("CONVCONF",a_ci);
   params_table.readKey("PRINT",rtemp);
   oprint = rtemp == 0.0 ? true : false;
 
@@ -137,7 +137,7 @@ int main(int argc,char** argv){
   //read parameter value fitting boolean
   params_table.readKey("PHI0_FIX",lfix[0]);
   params_table.readKey("L0_FIX",lfix[1]);
-  params_table.readKey("ALPHA_FI",lfix[2]);
+  params_table.readKey("ALPH_FIX",lfix[2]);
   params_table.readKey("BETA_FIX",lfix[3]);
   params_table.readKey("P_FIX",lfix[4]);
   params_table.readKey("Q_FIX",lfix[5]);
@@ -145,7 +145,7 @@ int main(int argc,char** argv){
   //read parameter minimum values
   params_table.readKey("PHI0_MIN",lmin[0]);
   params_table.readKey("L0_MIN",lmin[1]);
-  params_table.readKey("ALPHA_MI",lmin[2]);
+  params_table.readKey("ALPH_MIN",lmin[2]);
   params_table.readKey("BETA_MIN",lmin[3]);
   params_table.readKey("P_MIN",lmin[4]);
   params_table.readKey("Q_MIN",lmin[5]);
@@ -153,7 +153,7 @@ int main(int argc,char** argv){
   //read parameter maximum values
   params_table.readKey("PHI0_MAX",lmax[0]);
   params_table.readKey("L0_MAX",lmax[1]);
-  params_table.readKey("ALPHA_MA",lmax[2]);
+  params_table.readKey("ALPH_MAX",lmax[2]);
   params_table.readKey("BETA_MAX",lmax[3]);
   params_table.readKey("P_MAX",lmax[4]);
   params_table.readKey("Q_MAX",lmax[5]);
