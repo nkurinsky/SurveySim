@@ -142,6 +142,7 @@ if (mdefaults == 'y'):
         return entries2
 
     def callback():
+        print("Updating parameter values...")
         ind=0
         for field in fields:
             value_initial[ind]=v_init[ind].get()
@@ -176,52 +177,49 @@ hdr.set('PHI0',value_initial[0],'Luminosity Function Normalization')
 hdr.set('PHI0_FIX',value_fix[0],'Fix Phi0 (Y=1/N=0)')
 hdr.set('PHI0_MIN',value_min[0],'Minimum Phi0 value')
 hdr.set('PHI0_MAX',value_max[0],'Maximum Phi0 value')
- hdr.set('PHI0_DP',value_dp[0],'Maximum Phi0 value')
+hdr.set('PHI0_DP',value_dp[0],'sigma phi0')
     
 hdr.set('L0',value_initial[1],'Luminosity Function knee')
 hdr.set('L0_FIX',value_fix[1],'Fix L0 (Y=1/N=0)')
 hdr.set('L0_MIN',value_min[1],'Minimum L0 value')
 hdr.set('L0_MAX',value_max[1],'Maximum L0 value')
-hdr.set('L0_DP',value_dp[0],'Maximum Phi0 value')
+hdr.set('L0_DP',value_dp[0],'sigma L0')
  
 hdr.set('ALPHA',value_initial[2],'Luminosity Function upper slope')
-hdr.set('ALPH_FIX',value_fix[2],'Fix alpha (Y=1/N=0)')
-hdr.set('ALPH_MIN',value_min[2],'Minimum alpha value')
-hdr.set('ALPH_MAX',value_max[2],'Maximum alpha value')
-hdr.set('ALPHA_DP',value_dp[2],'Maximum alpha value')
+hdr.set('ALPHA_FI',value_fix[2],'Fix alpha (Y=1/N=0)')
+hdr.set('ALPHA_MI',value_min[2],'Minimum alpha value')
+hdr.set('ALPHA_MA',value_max[2],'Maximum alpha value')
+hdr.set('ALPHA_DP',value_dp[2],'sigma alpha')
 
 hdr.set('BETA',value_initial[3],'Luminosity Function lower slope')
 hdr.set('BETA_FIX',value_fix[3],'Fix beta (Y=1/N=0)')
 hdr.set('BETA_MIN',value_min[3],'Minimum beta value')
 hdr.set('BETA_MAX',value_max[3],'Maximum beta value')
-hdr.set('BETA_DP',value_dp[3],'Maximum beta value')
+hdr.set('BETA_DP',value_dp[3],'sigma beta')
 
 hdr.set('P',value_initial[4],'Luminosity Function density evolution parameter')
-hdr['P_FIX']=value_fix[4]
-hdr.comments['P_FIX']='Fix p (Y=1/N=0)'
-hdr['P_MIN']=value_min[4]
-hdr.comments['P_MIN']='Minimum p value'
-hdr['P_MAX']=value_max[4]
-hdr.comments['P_MAX']='Maximum p value'
+hdr.set('P_FIX',value_fix[4],'Fix p (Y=1/N=0)')
+hdr.set('P_MIN',value_min[4],'Minimum p value')
+hdr.set('P_MAX',value_max[4],'Maximum p value')
+hdr.set('P_DP',value_dp[4],'sigma p')
 
-hdr['Q']=value_initial[5]
-hdr.comments['Q']='Luminosity Function luminosity evolution parameter'
-hdr['Q_FIX']=value_fix[5]
-hdr.comments['Q_FIX']='Fix q (Y=1/N=0)'
-hdr['Q_MIN']=value_min[5]
-hdr.comments['Q_MIN']='Minimum q value'
-hdr['Q_MAX']=value_max[5]
-hdr.comments['Q_MAX']='Maximum q value'
+hdr.set('Q',value_initial[5],'Luminosity Function luminosity evolution parameter')
+hdr.set('Q_FIX',value_fix[5],'Fix q (Y=1/N=0)')
+hdr.set('Q_MIN',value_min[5],'Minimum q value')
+hdr.set('Q_MAX',value_max[5],'Maximum q value')
+hdr.set('Q_DP',value_dp[5],'sigma q')
     
 hdr.set('ZCUT',value_initial[6],'Luminosity Function evolution redshift cutoff')
 hdr.set('ZCUT_FIX',value_fix[6],'Fix zcut (Y=1/N=0)')
 hdr.set('ZCUT_MIN',value_min[6],'Minimum zcut value')
 hdr.set('ZCUT_MAX',value_max[6],'Maximum zcut value')
+hdr.set('ZCUT_DP',value_max[6],'sigma zcut')
 
 hdr.set('CEXP',value_initial[6],'Color evolution term')
 hdr.set('CEXP_FIX',value_fix[6],'Fix cexp (Y=1/N=0)')
 hdr.set('CEXP_MIN',value_min[6],'Minimum cexp value')
 hdr.set('CEXP_MAX',value_max[6],'Maximum cexp value')
+hdr.set('CEXP_DP',value_dp[6],'sigma cexp')
     
 hdr.set('AREA',area[0],'Observed Solid Angle of survey')
   
@@ -235,15 +233,14 @@ hdr.set('NCHAIN',5,'Chain Number')
 hdr.set('TMAX',20.0,'Starting Anneal Temperature')
 hdr.set('ANN_PCT',0.25,'Ideal acceptance Percentage')
 hdr.set('ANN_RNG',0.05,'Range from ideal within which to maintainacceptance')
-hdr.set('CONVCONF',0.05,'Convergence CI Setting')
-hdr.set('CONVRMAX',1.05,'Convergence Rmax Criterion')
-hdr.set('CONVSTEP',20,'Iterations between convergence checks')
-hdr.set('BURNSTEP',10,'Iterations between anneal calls in burn-in')
-hdr.set('B_RATIO',10,'Ratio of normal to burn-in steps')
+hdr.set('CONV_CON',0.05,'Convergence CI Setting')
+hdr.set('CONV_RMA',1.05,'Convergence Rmax Criterion')
+hdr.set('CONV_STE',20,'Iterations between convergence checks')
+hdr.set('BURN_STE',10,'Iterations between anneal calls in burn-in')
+hdr.set('BURNVRUN',10,'Ratio of normal to burn-in steps')
 hdr.set('PRINT',1,'Whether to Print Debug MSGs (1=verbose,0=silent)')
 
 hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
-print hdr['HISTORY']
 hdu1.close
 
 if (torun == 'y'):

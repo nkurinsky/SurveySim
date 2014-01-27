@@ -295,6 +295,7 @@ bool MCChains::save(string filename, string parnames[]){
   Table *newTable = pFits->addTable(hname,chainlength[0],colnames,colform,colunits,AsciiTbl);
   printf("Made Table\n");
 
+  int i; //I had to add this here, else wouldn't compile for some reason
   for(i=0;i<tablewidth;i++){
     if (i != 0)
       printf(", ");
