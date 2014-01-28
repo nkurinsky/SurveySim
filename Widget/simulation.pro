@@ -496,7 +496,7 @@ pro read_output
   device,/close
 
   device,filename='band1_counts.eps',xsize=10,ysize=8,/inches,/encapsulated,/times,set_font='Times-Roman',/color
-  f = alog10(f1/1.d3)
+  f = alog10(f1)
   h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
   binsize=xh[1]-xh[0]
   df1=(10.0^(xh+binsize)-10.0^xh)
@@ -506,7 +506,6 @@ pro read_output
   ;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-     flux=flux/1.d3
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
      yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
@@ -519,7 +518,7 @@ pro read_output
   device,/close
   
   device,filename='band2_counts.eps',xsize=10,ysize=8,/inches,/encapsulated,/times,set_font='Times-Roman',/color
-  f = alog10(f2/1.d3)
+  f = alog10(f2)
   h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
   binsize=xh[1]-xh[0]
   df1=(10.0^(xh+binsize)-10.0^xh)
@@ -528,7 +527,6 @@ pro read_output
 
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-     flux=flux/1.d3
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
      yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
@@ -541,7 +539,7 @@ pro read_output
   device,/close
   device,filename='band3_counts.eps',xsize=10,ysize=8,/inches,/encapsulated,/times,set_font='Times-Roman',/color
 
-  f = alog10(f3/1.d3)
+  f = alog10(f3)
   h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
   binsize=xh[1]-xh[0]
   df1=(10.0^(xh+binsize)-10.0^xh)
@@ -550,7 +548,6 @@ pro read_output
 
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-     flux=flux/1.d3
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
      yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
@@ -1014,7 +1011,7 @@ pro graphs
   widget_control,dcount1,get_value=index
   wset,index
   
-  f = alog10(f1/1.d3)
+  f = alog10(f1)
   h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
   binsize=xh[1]-xh[0]
   df1=(10.0^(xh+binsize)-10.0^xh)
@@ -1024,7 +1021,6 @@ pro graphs
   ;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-     flux=flux/1.d3
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
      yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
@@ -1038,7 +1034,7 @@ pro graphs
   widget_control,dcount2,get_value=index
   wset,index
 
-  f = alog10(f2/1.d3)
+  f = alog10(f2)
   h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
   binsize=xh[1]-xh[0]
   df1=(10.0^(xh+binsize)-10.0^xh)
@@ -1047,7 +1043,6 @@ pro graphs
 
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-     flux=flux/1.d3
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
      yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
@@ -1060,7 +1055,7 @@ pro graphs
   widget_control,dcount3,get_value=index
   wset,index
 
-  f = alog10(f3/1.d3)
+  f = alog10(f3)
   h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
   binsize=xh[1]-xh[0]
   df1=(10.0^(xh+binsize)-10.0^xh)
@@ -1069,7 +1064,6 @@ pro graphs
 
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-     flux=flux/1.d3
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
      yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
