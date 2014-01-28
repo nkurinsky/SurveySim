@@ -5,8 +5,12 @@ print("a MCMC-based galaxy evolution fitter and simulator");
 
 import time
 from astropy.io import fits
-
+import matplotlib.pyplot as plt
 import os
+import numpy as np
+import pylab as py
+import img_scale
+
 codedir=os.getcwd();
 #if want to be able to run this from wherever, should simply change the codedir 
 sedfile=codedir+'/Widget/sf_templates.fits'
@@ -18,8 +22,22 @@ def runcode():
     print("Runnning fitter code....")
     os.system(codedir+"/Fitting/v0/fitter"+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
 
-def showresults():
+def showresults(): #read-in the results from output.fits and show plots
     print("Showing results....")
+    hdulist=fits.open(outfile)
+#    hdulist.info()
+    model_ccd=hdulist[1].data #model color-color plot
+    print model_ccd.shape
+    print model_ccd.dtype.name
+    img=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
+    img[:,:]=img_scale.linear(model_ccd,scale_min=0,scale_max=1.0)
+#    py.clf()
+    py.imshow(img) #,aspect='equal') 
+    py.title('testing image')
+#    print min(model_ccd),max(model_ccd)
+#    imgplot=plt.imshow(img)
+    plt.imshow(img)
+    return
 
 defaults=raw_input("Do you wish to see/edit the default file settings (y/n)?");
 if (defaults == 'y'):
@@ -136,6 +154,7 @@ if (mdefaults == 'y'):
     from functools import partial
     from Tkinter import *
     root=Tk();
+    root.title("SurveySim")
     labelframe = LabelFrame(root, text="Luminosity Function Parameters",width=50);
     labelframe.pack(fill="both", expand="yes");
     label=Label(labelframe,text="Initial value/Minimum/Maximum/Fixed",width=50);
