@@ -931,57 +931,70 @@ pro graphs
   widget_control,dcount1,get_value=index
   wset,index
   
+  f = alog10(f1/1.d3)
+  h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
+  binsize=xh[1]-xh[0]
+  df1=(10.0^(xh+binsize)-10.0^xh)
+  dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
+  xpts=10.^(xh+binsize/2)
+
   ;Herschel ATLAS counts at 250,350 and 500 (Clements et al. 2010)
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux=flux/1.d3
-     plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=[5.d1,1.d5],ystyle=1
+     xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
+     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
+     oplot,xpts,h,psym=2
   endif else begin
      print,'Error: File "counts_clements10.dat" not found'
-     plot,[100,500],[5.d2,1.d5],/nodata,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',ystyle=1
+     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
   endelse
-
-  f = alog10(f1/1.d3)
-  h = histogram(f,nbins=20,locations=xh,min=min(f),max=max(f))
-  df1=(10.0^shift(xh,-1)-10.0^xh)
-  dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
-  xh=10.^(xh)
-  oplot,xh,dcounts,psym=10
 
   widget_control,dcount2,get_value=index
   wset,index
 
   f = alog10(f2/1.d3)
-  h = histogram(f,nbins=20,locations=xh,min=min(f),max=max(f))
-  df1=(10.0^shift(xh,-1)-10.0^xh)
+  h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
+  binsize=xh[1]-xh[0]
+  df1=(10.0^(xh+binsize)-10.0^xh)
   dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
-  xh=10.^(xh)
-  plot,xh,h,psym=10,/ylog,ystyle=0,xstyle=1,xtitle='F_{350}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 2 Counts'
+  xpts=10.^(xh+binsize/2)
 
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux=flux/1.d3
-     oplot,flux,diff_counts,psym=1,symsize=2
+     xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
+     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
-  endif
-
+     oplot,xpts,h,psym=2
+  endif else begin
+     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts'
+  endelse
+  
   widget_control,dcount3,get_value=index
   wset,index
 
   f = alog10(f3/1.d3)
-  h = histogram(f,nbins=20,locations=xh,min=min(f),max=max(f))
-  df1=(10.0^shift(xh,-1)-10.0^xh)
+  h = histogram(f,nbins=10,locations=xh,min=min(f),max=max(f))
+  binsize=xh[1]-xh[0]
+  df1=(10.0^(xh+binsize)-10.0^xh)
   dcounts=(h/df1)*10.0^(2.5*xh)*3.2828e3/sdat.area
-  xh=10.^(xh)
-  plot,xh,h,psym=10,/ylog,ystyle=0,xstyle=1,xtitle='F_{500}[Log(Jy)]',ytitle='dN/dS (Log)',title='Band 3 Counts'
+  xpts=10.^(xh+binsize/2)
 
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux=flux/1.d3
-     oplot,flux,diff_counts,psym=1,symsize=2
+     xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
+     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
-  endif
+     oplot,xpts,h,psym=2
+  endif else begin
+     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts'
+  endelse
 
   comp = mrdfits(files.oname,0,head,/silent)
   model = mrdfits(files.oname,1,/silent)
