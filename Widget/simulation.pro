@@ -507,13 +507,13 @@ pro read_output
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
-     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     yrange=[min([min(dcounts),min(diff_counts)])/1.2,max([max(dcounts),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
-     oplot,xpts,h,psym=2
+     oplot,xpts,dcounts,psym=2
   endif else begin
      print,'Error: File "counts_clements10.dat" not found'
-     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
+     plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
   endelse
   device,/close
   
@@ -528,12 +528,12 @@ pro read_output
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
-     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     yrange=[min([min(dcounts),min(diff_counts)])/1.2,max([max(dcounts),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
-     oplot,xpts,h,psym=2
+     oplot,xpts,dcounts,psym=2
   endif else begin
-     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts'
+     plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts'
   endelse
   
   device,/close
@@ -549,12 +549,12 @@ pro read_output
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
-     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     yrange=[min([min(dcounts),min(diff_counts)])/1.2,max([max(dcounts),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
-     oplot,xpts,h,psym=2
+     oplot,xpts,dcounts,psym=2
   endif else begin
-     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts'
+     plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts'
   endelse
 
   device,/close
@@ -1022,13 +1022,13 @@ pro graphs
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
-     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     yrange=[min([min(dcounts),min(diff_counts)])/1.2,max([max(dcounts),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
-     oplot,xpts,h,psym=2
+     oplot,xpts,dcounts,psym=2
   endif else begin
      print,'Error: File "counts_clements10.dat" not found'
-     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
+     plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
   endelse
 
   widget_control,dcount2,get_value=index
@@ -1044,12 +1044,12 @@ pro graphs
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
-     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     yrange=[min([min(dcounts),min(diff_counts)])/1.2,max([max(dcounts),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
-     oplot,xpts,h,psym=2
+     oplot,xpts,dcounts,psym=2
   endif else begin
-     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts'
+     plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts'
   endelse
   
   widget_control,dcount3,get_value=index
@@ -1065,12 +1065,12 @@ pro graphs
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      xrange=[min([min(xpts),min(flux)])/1.2,max([max(xpts),max(flux)])*1.2]
-     yrange=[min([min(h),min(diff_counts)])/1.2,max([max(h),max(diff_counts)])*1.2]
+     yrange=[min([min(dcounts),min(diff_counts)])/1.2,max([max(dcounts),max(diff_counts)])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
-     oplot,xpts,h,psym=2
+     oplot,xpts,dcounts,psym=2
   endif else begin
-     plot,xpts,h,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts'
+     plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts'
   endelse
 
   comp = mrdfits(files.oname,0,head,/silent)
