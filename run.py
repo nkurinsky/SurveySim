@@ -54,23 +54,31 @@ def showresults(): #read-in the results from output.fits and show plots
     #make actual figure
     fig=plt.figure()
     a1=fig.add_subplot(2,3,1)
-    a1.set_title('Redshifts')
+    a1.set_title('Luminosity function')
+    a1.set_xlabel('log(L)')
+    a1.set_ylabel('phi [Mpc^-3]')
+    a1.set_xlim(8, 13)
+    a1.set_ylim(10.**(-6),10.**(-1))
+    a1.set_xscale('linear')
+    a1.set_yscale('log')
+
+    a2=fig.add_subplot(2,3,2)
+    a2.set_title('Redshifts')
     zbins=range(25)
     zbins=np.divide(zbins,5.0)
     hist(sim_srcs_zs,bins=zbins,histtype='step',color='black')
+    a2.set_xlabel('z')
+    a2.set_ylabel('N(z)')
+    a2.set_xlim(0, 5)
 
-    a1.set_xlabel('z')
-    a1.set_ylabel('N(z)')
-    a1.set_xlim(0, 5)
-
-    a2=fig.add_subplot(2,3,2)
-    a2.set_title('250um counts')
-    a2.set_xscale('log')
-    a2.set_yscale('log')
-    a2.set_xlabel('S [mJy]')
-    a2.set_ylabel('(dN/dS)*S^2.5')
-    a2.set_xlim(20,1000)
-    a2.set_ylim(200,50000)
+    a3=fig.add_subplot(2,3,3)
+    a3.set_title('250um counts')
+    a3.set_xscale('log')
+    a3.set_yscale('log')
+    a3.set_xlabel('S [mJy]')
+    a3.set_ylabel('(dN/dS)*S^2.5')
+    a3.set_xlim(20,1000)
+    a3.set_ylim(200,200000)
     cfile=open(codedir+'/Widget/counts_clements10.dat','r')
 #    flux250=np.empty([15],dtype=float)
     flux250=[]
@@ -105,23 +113,20 @@ def showresults(): #read-in the results from output.fits and show plots
             a=find((sim_srcs_f1 <=fbins[ind]))
             tmp=sim_srcs_f1[a]
             b=find(tmp > fbins[ind+1])
-            tmp=fbins[ind]
-            dnds_sim[ind]=(tmp**(2.5))*len(b)/area[0]
+            tmp=fbins[ind+1]
+            ds=fbins[ind]-fbins[ind+1]
+            dnds_sim[ind]=(tmp**(2.5))*len(b)/(ds*area[0])
             #print fbins[ind],len(b),dnds_sim[ind]
         ind=ind+1
-    print dnds_sim
-#    plt.errorbar(flux250,dnds_sim,dnds_sim*0.0,color='black')
-    plt.plot(flux250,dnds_sim,'-',color='black')
-#    hist(sim_srcs_f1,bins=fbins,histtype='step',color='black')
+    plt.plot(fbins,dnds_sim,color='black')
 
-
-    a3=fig.add_subplot(2,3,3)
-    a3.set_xlabel('x')
-    a3.set_ylabel('y')
+#    a3=fig.add_subplot(2,3,3)
+#    a3.set_xlabel('x')
+#    a3.set_ylabel('y')
     #plot(x,y)
-    a3.set_xlim(0,2)
-    a3.set_ylim(-2, 2)
-    a3.set_aspect('equal', 'datalim')
+#    a3.set_xlim(0,2)
+#    a3.set_ylim(-2, 2)
+#    a3.set_aspect('equal', 'datalim')
 
     a4=fig.add_subplot(2,3,4) 
     imgplot=plt.imshow(img1)
