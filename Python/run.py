@@ -8,8 +8,9 @@ from astropy.io import fits
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-import pylab as py
 import img_scale
+from pylab import *
+import math
 
 codedir=os.getcwd();
 #if want to be able to run this from wherever, should simply change the codedir 
@@ -25,18 +26,121 @@ def runcode():
 def showresults(): #read-in the results from output.fits and show plots
     print("Showing results....")
     hdulist=fits.open(outfile)
-#    hdulist.info()
-    model_ccd=hdulist[1].data #model color-color plot
-    print model_ccd.shape
-    print model_ccd.dtype.name
-    img=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
-    img[:,:]=img_scale.linear(model_ccd,scale_min=0,scale_max=1.0)
-#    py.clf()
-    py.imshow(img) #,aspect='equal') 
-    py.title('testing image')
-#    print min(model_ccd),max(model_ccd)
-#    imgplot=plt.imshow(img)
-    plt.imshow(img)
+#all the extensions headers here are identical -- apply to ccd images
+    hdr=hdulist[0].header #the header associated with extension=0
+    model_ccd=hdulist[1].data #model color-color distribution
+    obs_ccd=hdulist[2].data #observations color-color distribution
+    res_ccd=hdulist[0].data #residual color-color distribution
+    sim_srcs_table=hdulist[3]# the table with simulated source properties
+    sim_srcs_table_data=hdulist[3].data
+    #the field names are f1,f2,f3,z,m,lum,c7,p0,p1
+    sim_srcs_zs=sim_srcs_table_data.field('z')
+    sim_srcs_f1=sim_srcs_table_data.field('f1')
+#    mctable=hdulist[3]#.columns #MCMC chain
+#    mctable.columns
+#    mctable.shape
+    #cols=hdulist[4].columns
+#    partable=hdulist[4].data #parameters table
+#    print mctable.shape,partable.shape
+#    print model_ccd.dtype.name
+    img1=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
+    img2=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
+    img3=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
+
+    img1[:,:]=img_scale.linear(model_ccd,scale_min=0,scale_max=100.0)
+    img2[:,:]=img_scale.linear(obs_ccd,scale_min=0,scale_max=100.0)
+    img3[:,:]=img_scale.linear(res_ccd,scale_min=0,scale_max=100.0)
+
+    #make actual figure
+    fig=plt.figure()
+    a1=fig.add_subplot(2,3,1)
+    a1.set_title('Luminosity function')
+    a1.set_xlabel('log(L)')
+    a1.set_ylabel('phi [Mpc^-3]')
+    a1.set_xlim(8, 13)
+    a1.set_ylim(10.**(-6),10.**(-1))
+    a1.set_xscale('linear')
+    a1.set_yscale('log')
+
+    a2=fig.add_subplot(2,3,2)
+    a2.set_title('Redshifts')
+    zbins=range(25)
+    zbins=np.divide(zbins,5.0)
+    hist(sim_srcs_zs,bins=zbins,histtype='step',color='black')
+    a2.set_xlabel('z')
+    a2.set_ylabel('N(z)')
+    a2.set_xlim(0, 5)
+
+    a3=fig.add_subplot(2,3,3)
+    a3.set_title('250um counts')
+    a3.set_xscale('log')
+    a3.set_yscale('log')
+    a3.set_xlabel('S [mJy]')
+    a3.set_ylabel('(dN/dS)*S^2.5')
+    a3.set_xlim(20,1000)
+    a3.set_ylim(200,200000)
+    cfile=open(codedir+'/Widget/counts_clements10.dat','r')
+#    flux250=np.empty([15],dtype=float)
+    flux250=[]
+    dnds250=[]
+    dnds_err250=[]
+    ind=0
+    for line in cfile:
+        if((ind >= 2) and (ind <=17)):
+            line=line.strip()
+            columns=line.split()
+#            flux250[ind-2]=columns[0]
+#            dnds250[ind-2]=columns[5]
+#            dnds_err250[ind-2]=columns[6]
+            flux250.append(columns[0])
+            dnds250.append(columns[5])
+            dnds_err250.append(columns[6])
+            #print flux[ind],dnds[ind]
+        ind=ind+1
+#    counts=cfile.read()
+#    print counts.shape
+    flux250=np.asarray(flux250,dtype=float)
+    dnds250=np.asarray(dnds250,dtype=float)
+    dnds_err250=np.asarray(dnds_err250,dtype=float)
+    plt.errorbar(flux250,dnds250,dnds_err250,capsize=0,ls='none',marker='o',color='black',elinewidth=2)
+    cfile.close()
+
+    fbins=flux250
+    dnds_sim=fbins*0.0
+    ind=0
+    for fbin in fbins:
+        if(ind < 15):
+            a=find((sim_srcs_f1 <=fbins[ind]))
+            tmp=sim_srcs_f1[a]
+            b=find(tmp > fbins[ind+1])
+            tmp=fbins[ind+1]
+            ds=fbins[ind]-fbins[ind+1]
+            dnds_sim[ind]=(tmp**(2.5))*len(b)/(ds*area[0])
+            #print fbins[ind],len(b),dnds_sim[ind]
+        ind=ind+1
+    plt.plot(fbins,dnds_sim,color='black')
+
+#    a3=fig.add_subplot(2,3,3)
+#    a3.set_xlabel('x')
+#    a3.set_ylabel('y')
+    #plot(x,y)
+#    a3.set_xlim(0,2)
+#    a3.set_ylim(-2, 2)
+#    a3.set_aspect('equal', 'datalim')
+
+    a4=fig.add_subplot(2,3,4) 
+    imgplot=plt.imshow(img1)
+    a4.set_title('Model')
+
+    a5=fig.add_subplot(2,3,5)
+    imgplot=plt.imshow(img2)
+    a5.set_title('Observations')
+
+    a6=fig.add_subplot(2,3,6)
+    imgplot=plt.imshow(img3)
+    a6.set_title('Residual')
+
+    plt.show()
     return
 
 defaults=raw_input("Do you wish to see/edit the default file settings (y/n)?");
@@ -74,7 +178,7 @@ wavelength=[250,350,500]
 flim=[25.0,20.0,15.0]
 
 def update_mfile(modelfile):
-    hdu1=fits.open(modelfile)
+    hdu1=fits.open(modelfile,mode='update') 
     hdr=hdu1[0].header #the header associated with extension=0
 
     #create/update luminosity function parameters in model file header
