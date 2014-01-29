@@ -1030,7 +1030,6 @@ pro graphs
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{1.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
      oplot,xpts,dcounts,psym=2
-     oplot,xpts,dcounts/10,psym=4
   endif else begin
      print,'Error: File "counts_clements10.dat" not found'
      plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{1.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
