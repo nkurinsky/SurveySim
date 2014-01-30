@@ -178,7 +178,7 @@ int main(int argc,char** argv){
   params_table.readKey("CEXP_MAX",cexp[3]);
   params_table.readKey("CEXP_DP",cexp[4]);
 
-  int nparams = param_inds.size();
+  unsigned long nparams = param_inds.size();
   bool vary_cexp = false;
   int cind = nparams;
   if(cexp[1] == 0){
@@ -254,7 +254,7 @@ int main(int argc,char** argv){
   for(p=0;p<param_inds.size();p++)
     ptemp[0][p] = pcurrent[0][p] = lpars[param_inds[p]];
   if(vary_cexp)
-    ptemp[0][cind] = pcurrent[0][cind] = cexp[0]
+    ptemp[0][cind] = pcurrent[0][cind] = cexp[0];
 
   for(m=1;m<NCHAIN;m++){ 
     for(p=0;p<param_inds.size();p++){
@@ -393,9 +393,11 @@ int main(int argc,char** argv){
   printf("Model chi2: %lf\n",output.chisqr);
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
   
-  string *parnames = new string[param_inds.size()];
+  string *parnames = new string[nparams];
   for(p=0;p<param_inds.size();p++)
     parnames[p] = pnames[param_inds[p]];
+  if(vary_cexp)
+    parnames[cind] = "CEXP";
   
   bool saved;
   saved = survey.save(outfile);
