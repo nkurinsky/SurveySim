@@ -247,6 +247,7 @@ int main(int argc,char** argv){
   ns=8;
   survey.set_size(area,dz,zmin,nz,ns);
   MCChains mcchain(NCHAIN,nparams,runs,CONV_STEP);
+  ResultChain counts(3,NCHAIN*runs);
   mcchain.set_constraints(rmax,a_ci);
   MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,ANNRNG,r);
 
@@ -359,6 +360,7 @@ int main(int argc,char** argv){
       
       accept = metrop.accept(m,trial);
       mcchain.add_link(m,ptemp[m],trial,accept);
+      counts.add_link(output.dnds,trial);
 
       if(accept){
 	if (oprint) 
@@ -394,6 +396,7 @@ int main(int argc,char** argv){
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
   
   string *parnames = new string[nparams];
+  string countnames[]= {"dnds250","dnds350","dnds500"};
   for(p=0;p<param_inds.size();p++)
     parnames[p] = pnames[param_inds[p]];
   if(vary_cexp)
@@ -402,6 +405,7 @@ int main(int argc,char** argv){
   bool saved;
   saved = survey.save(outfile);
   saved &= mcchain.save(outfile,parnames);
+  saved &= counts.save(outfiles,countnames);
   if(saved)
     printf("Save Successful\n");
   else

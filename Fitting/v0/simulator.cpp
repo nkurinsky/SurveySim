@@ -33,14 +33,35 @@ sprop::sprop(){
   c2 = -99.0;
 }
 
-products::products(){
-  dndz.resize(10);
-  dnds.resize(8);
+products::products(int nz, int ns[]){
+  dndz.resize(nz);
+  dnds[0].resize(ns[0]);
+  dnds[1].resize(ns[1]);
+  dnds[2].resize(ns[2]);
 }
 
-products::products(int nz, int ns){
-  dndz.resize(nz);
-  dnds.resize(ns);
+int simulator::binNum(int band, double flux){  
+  switch(band){
+  case 0:
+    for (int i=0;i<dndsInfo.bnum[0];i++)
+      if(flux < dndsInfo.b250[i])
+	return i-1;
+    break;
+  case 1:
+    for (int i=0;i<dndsInfo.bnum[1];i++)
+      if(flux < dndsInfo.b350[i])
+	return i-1;
+    break;
+  case 2:
+    for (int i=0;i<dndsInfo.bnum[2];i++)      
+      if(flux < dndsInfo.b500[i])
+	return i-1;
+    break;
+  default:
+    cout << "ERROR: Invalid band request, simulator::binNum\n";
+  }
+  
+  return dndsInfo.bnum[band]-1;
 }
 
 simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,string sedfile){
@@ -76,7 +97,7 @@ void simulator::set_size(double area,double dz,double zmin,int nz,int ns){
   this->dz = (dz > 0) ? dz : 0.1;
   this->zmin = (zmin > 0.001) ? zmin : 0.001;
   this->nz = (nz > 1) ? nz : 50;
-  this->ns = (ns > 1) ? ns : 8;
+  this->ns = (ns > 1) ? ns : 8; //currently unused
 }
 
 void simulator::set_color_exp(double val){
@@ -109,7 +130,7 @@ void simulator::set_obs(string obsfile){
 
 products simulator::simulate(){
   sources.clear();
-  products output(nz,ns);
+  products output(nz,dndsInfo.bnum);
 
   if(seds != NULL){
 
@@ -138,9 +159,7 @@ products simulator::simulate(){
     static int src_iter;
     static bool detected = true;
     static double lum_ratio;
-
-    //just temporary, complains if unused variables
-    output.dnds[0]=0;
+    static int dndsi;
 
     gsl_rng * r;
     const gsl_rng_type * T;    
@@ -151,7 +170,6 @@ products simulator::simulate(){
     //NOTE templates are given in W/Hz
     for (is=0;is<nz;is++){
       zarray[is]=(is+1)*dz+zmin;
-      output.dndz[is]=0;
 
       //for color evolution:
       lum_ratio = pow((1.0+zarray[is]),color_exp);
@@ -190,6 +208,11 @@ products simulator::simulate(){
 	    flux_sim[i] += noise[i];
 	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
 	      detected = false;
+	    else{
+	      dndsi = binNum(i,flux_sim[i]);
+	      if((dndsi < 0) and (dndsi < dndsInfo.bnum[i]))
+		output.dnds[i][dndsi]+=1.0;
+	    }
 	  }
 	  
 	  //check for detectability, if "Yes" add to list
@@ -221,6 +244,10 @@ products simulator::simulate(){
     
     diagnostic->init_model(c1,c2,w,snum);
     output.chisqr=diagnostic->get_chisq();
+    //note: this is not general, but temporarily implemented for publication
+    output.dnds[0]*=dndsInfo.S250/dndsInfo.db250;
+    output.dnds[1]*=dndsInfo.S350/dndsInfo.db350;
+    output.dnds[2]*=dndsInfo.S500/dndsInfo.db500;
     last_output = output;
 
     delete[] c1;
@@ -265,51 +292,46 @@ bool simulator::save(string outfile){
   
   unsigned long size = sources.size();
   printf("%s %lu\n","Soures Being Saved: ",size);
-  int pnum = 2;
+
   valarray<double> f1(size),f2(size),f3(size),luminosity(size);
   valarray<double> redshift(size);
-  valarray<double> param(size);
-  valarray< valarray<double> > params(pnum);
-  for (int i=0;i<pnum;i++)
-    params[i].resize(size);
   
   for(unsigned long i=0;i<size;i++){
     f1[i] = sources[i].fluxes[0];
     f2[i] = sources[i].fluxes[1];
     f3[i] = sources[i].fluxes[2];
-    param[i] = 1.0; //placeholder for now
     redshift[i] = sources[i].redshift;
     luminosity[i] = sources[i].luminosity;
-    for(int j=0;j<pnum;j++)
-      params[j][i] = 1.0; //also placeholder for now
   }
   
-  static std::vector<string> colname((LUMPARS+pnum),"");
-  static std::vector<string> colunit((LUMPARS+pnum),"");
-  static std::vector<string> colform((LUMPARS+pnum),"f13.8");
-  
-  static string pnames[] = {"P0","P1","P2","P3","P4"};
+  static std::vector<string> colname(11,"");
+  static std::vector<string> colunit(11,"-");
+  static std::vector<string> colform(11,"f13.8");
   
   colname[0] = "F1";
   colname[1] = "F2";
   colname[2] = "F3";
   colname[3] = "Z";
-  colname[4] = "M";
-  colname[5] = "Lum";
+  colname[4] = "Lum";
+  colname[5] = "s1";
+  colname[6] = "s2";
+  colname[7] = "s3";
+  colname[8] = "dNds1";
+  colname[9] = "dNds2";
+  colname[10] = "dNds3";
   
   colunit[0] = "Jy";
   colunit[1] = "Jy";
   colunit[2] = "Jy";
-  colunit[3] = "-";
-  colunit[4] = "-";
-  colunit[5] = "W/Hz";
-  
-  colform[5] = "e13.5";
-  
-  for(int i=LUMPARS;i<LUMPARS+pnum;i++){
-    colname[i] = pnames[i-LUMPARS];
-    colunit[i] = "-";
-  }
+  colunit[4] = "W/Hz";
+  colunit[5] = "mJy";
+  colunit[6] = "mJy";
+  colunit[7] = "mJy";
+  colname[8] = "Jy^1.5/sr";
+  colname[9] = "Jy^1.5/sr";
+  colname[10] = "Jy^1.5/sr";
+
+  colform[4] = "e13.5";
   
   static string hname("Parameter Distributions");
   Table *newTable= pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
@@ -318,10 +340,14 @@ bool simulator::save(string outfile){
   newTable->column(colname[1]).write(f2,1);
   newTable->column(colname[2]).write(f3,1);
   newTable->column(colname[3]).write(redshift,1);
-  newTable->column(colname[4]).write(param,1);
-  newTable->column(colname[5]).write(luminosity,1);
-  for (int i=LUMPARS;i<LUMPARS+pnum;i++)
-    newTable->column(colname[i]).write(params[i-LUMPARS],1);
+  newTable->column(colname[4]).write(luminosity,1);
+  newTable->column(colname[5]).write(dndsInfo.b250,1);
+  newTable->column(colname[6]).write(dndsInfo.b350,1);
+  newTable->column(colname[7]).write(dndsInfo.b500,1);
+  newTable->column(colname[8]).write(last_output.dnds[0],1);
+  newTable->column(colname[9]).write(last_output.dnds[1],1);
+  newTable->column(colname[10]).write(last_output.dnds[2],1);
+
   return true;
 }
 

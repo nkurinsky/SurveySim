@@ -63,3 +63,14 @@ class MCChains {
   bool save(string filename, string parnames[]);
   ~MCChains();
 };
+
+class ResultChain {
+ private:
+  int i;
+  vector<vector<valarray<double> > > results;
+  vector<double> chisqrs;
+ public:
+  ResultChain(int num_arrays, int nresults);
+  bool add_link(valarray<double> arrays[], double chisqr);
+  bool save(string filename, string resnames[]);
+};

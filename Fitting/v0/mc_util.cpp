@@ -337,3 +337,58 @@ MCChains::~MCChains(){
   delete[] bestpars;
   delete[] chainlength;
 }
+
+ResultChain::ResultChain(int num_arrays, int nresults){
+  results.resize(num_arrays);
+  chisqrs.reserve(nresults);
+  for (i=0;i<num_arrays;i++){
+    results[i].reserve(nresults);
+  }
+}
+
+bool ResultChain::add_link(valarray<double> arrays[], double chisqr){
+  if(arrays == NULL)
+    return false;
+  
+  chisqrs.push_back(chisqr);
+  for(i=0;i<results.size();i++){
+    results[i].push_back(arrays[i]);
+  }
+
+  return true;
+}
+
+bool ResultChain::save(string filename, string resnames[]){
+  using namespace CCfits;
+  std::auto_ptr<FITS> pFits(0);
+  
+  try{
+    pFits.reset(new FITS(filename,Write));
+  }
+  catch (CCfits::FITS::CantOpen){
+    std::cerr << "Unknown Error Occurred, Can't save results" << endl;
+    return false;
+  }
+  
+  int tablewidth = results.size()+1;
+  std::vector<string> colnames(tablewidth,"CHISQ");
+  std::vector<string> colform(tablewidth,"f13.5");
+  string hname("Results");
+  
+  for(i=0;i<results.size();i++){
+    colnames[i+1] = resnames[i];
+  }
+
+  printf("Making Table\n");
+  Table *newTable = pFits->addTable(hname,chisqrs.size(),colnames,colform,AsciiTbl);
+  printf("Made Table\n");
+
+  newTable->column(colnames[0]).write(chisqrs,1);
+  for(i=0;i<results.size();i++){
+    printf("%s ",colnames[i+1].c_str());
+    newTable->column(colnames[i+1]).write(results[i],1);
+  }
+
+  printf("\n");
+  return true;
+}
