@@ -23,6 +23,9 @@ struct products{
   double chisqr;
   valarray<double> dndz;
   valarray<double> dnds[3];
+  products(){
+    dndz.resize(1);
+  }
   products(int nz, int ns[]);
 };
 

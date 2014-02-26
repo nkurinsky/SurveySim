@@ -405,7 +405,7 @@ int main(int argc,char** argv){
   bool saved;
   saved = survey.save(outfile);
   saved &= mcchain.save(outfile,parnames);
-  saved &= counts.save(outfiles,countnames);
+  saved &= counts.save(outfile,countnames);
   if(saved)
     printf("Save Successful\n");
   else

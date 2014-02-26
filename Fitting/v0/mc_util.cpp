@@ -341,7 +341,7 @@ MCChains::~MCChains(){
 ResultChain::ResultChain(int num_arrays, int nresults){
   results.resize(num_arrays);
   chisqrs.reserve(nresults);
-  for (i=0;i<num_arrays;i++){
+  for (int i=0;i<num_arrays;i++){
     results[i].reserve(nresults);
   }
 }
@@ -387,7 +387,7 @@ bool ResultChain::save(string filename, string resnames[]){
   newTable->column(colnames[0]).write(chisqrs,1);
   for(i=0;i<results.size();i++){
     printf("%s ",colnames[i+1].c_str());
-    newTable->column(colnames[i+1]).write(results[i],1);
+    newTable->column(colnames[i+1]).writeArrays(results[i],1);
   }
 
   printf("\n");

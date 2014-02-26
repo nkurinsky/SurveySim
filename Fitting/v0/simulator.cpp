@@ -128,6 +128,7 @@ simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,st
   int osize = observations->get_snum();
   observations->get_all_colors(c1,c2);
   diagnostic->init_obs(c1,c2,osize);
+  last_output = new products();
 }
 
 void simulator::set_bands(double b[],double b_err[],double f_lims[]){
