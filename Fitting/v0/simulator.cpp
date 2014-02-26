@@ -342,9 +342,7 @@ bool simulator::save(string outfile){
   unsigned long size = sources.size();
   printf("%s %lu\n","Soures Being Saved: ",size);
 
-  valarray<double> f1(size),f2(size),f3(size),luminosity(size);
-  valarray<double> redshift(size);
-  
+  valarray<double> f1(size),f2(size),f3(size),luminosity(size),redshift(size);
   for(unsigned long i=0;i<size;i++){
     f1[i] = sources[i].fluxes[0];
     f2[i] = sources[i].fluxes[1];
@@ -376,23 +374,27 @@ bool simulator::save(string outfile){
   colunit[5] = "mJy";
   colunit[6] = "mJy";
   colunit[7] = "mJy";
-  colname[8] = "Jy^1.5/sr";
-  colname[9] = "Jy^1.5/sr";
-  colname[10] = "Jy^1.5/sr";
+  colunit[8] = "Jy^1.5/sr";
+  colunit[9] = "Jy^1.5/sr";
+  colunit[10] = "Jy^1.5/sr";
 
   colform[4] = "e13.5";
   
   static string hname("Parameter Distributions");
+  printf("Creating Table\n");
   Table *newTable= pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
+  printf("Table Created\n");
   
   newTable->column(colname[0]).write(f1,1);
   newTable->column(colname[1]).write(f2,1);
   newTable->column(colname[2]).write(f3,1);
   newTable->column(colname[3]).write(redshift,1);
   newTable->column(colname[4]).write(luminosity,1);
+  printf("Saving domain\n");
   newTable->column(colname[5]).write(dndsInfo.b250,1);
   newTable->column(colname[6]).write(dndsInfo.b350,1);
   newTable->column(colname[7]).write(dndsInfo.b500,1);
+  printf("Saving results\n");
   newTable->column(colname[8]).write(last_output->dnds[0],1);
   newTable->column(colname[9]).write(last_output->dnds[1],1);
   newTable->column(colname[10]).write(last_output->dnds[2],1);
