@@ -28,7 +28,7 @@ struct products{
 
 struct clementsBins{
   //temporary structure created to compute clements'10 style number counts
-  int bnum[3]={16,13,10};
+  int bnum[]={16,13,10};
   //bin minima [mJy]
   valarray<double> b250 ({34.0,38.0,42.0,47.0,52.0,56.0,63.0,73.0,83.0,93.0,125.0,175.0,250.0,350.0,450.0,800.0},16);
   valarray<double> b350 ({38.0,41.0,46.0,50.0,55.0,61.0,71.0,82.0,91.0,125.0,175.0,250.0,700.0},13);
