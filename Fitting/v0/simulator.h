@@ -42,11 +42,11 @@ struct clementsBins{
   valarray<double> S350;
   valarray<double> S500;
   clementsBins();
-}
+};
 
 class simulator{
  private:
-  products last_output;
+  products *last_output;
   clementsBins dndsInfo;
   int binNum(int band, double flux);
   vector<sprop> sources;
@@ -66,7 +66,9 @@ class simulator{
   int ns;
  public:
   simulator(){
-    last_output.chisqr=0;
+    int bnumtemp[] = {0,0,0};
+    last_output = new products(0,bnumtemp);
+    last_output->chisqr=0;
     color_exp=0; //default to no color evolution
     area = pow((M_PI/180.0),2.0); //default to 1sq degree
     zmin = 0.1; //default to 0.1-6.0, 0.1 steps
@@ -81,7 +83,7 @@ class simulator{
   void set_obs(string obsfile);
   void reset();
   products simulate();
-  double model_chisq() { return last_output.chisqr; }
+  double model_chisq() { return last_output->chisqr; }
   bool save(string outfile);
   ~simulator();
 };

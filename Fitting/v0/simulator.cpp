@@ -176,8 +176,8 @@ void simulator::set_obs(string obsfile){
 
 products simulator::simulate(){
   sources.clear();
-  products output(nz,dndsInfo.bnum);
-
+  products *output =  new products(nz,dndsInfo.bnum);
+  
   if(seds != NULL){
 
     static int is,js,jsmin;
@@ -257,7 +257,7 @@ products simulator::simulate(){
 	    else{
 	      dndsi = binNum(i,flux_sim[i]);
 	      if((dndsi < 0) and (dndsi < dndsInfo.bnum[i]))
-		output.dnds[i][dndsi]+=1.0;
+		output->dnds[i][dndsi]+=1.0;
 	    }
 	  }
 	  
@@ -265,7 +265,7 @@ products simulator::simulate(){
 	  if(detected){
 	    temp_src = new sprop(zarray[is],flux_sim,lums[js],weights[is]);
 	    sources.push_back(*temp_src);
-	    output.dndz[is]+=1; 
+	    output->dndz[is]+=1; 
 	    delete temp_src;
 	  }
 	}
@@ -289,11 +289,13 @@ products simulator::simulate(){
     }
     
     diagnostic->init_model(c1,c2,w,snum);
-    output.chisqr=diagnostic->get_chisq();
+    output->chisqr=diagnostic->get_chisq();
     //note: this is not general, but temporarily implemented for publication
-    output.dnds[0]*=dndsInfo.S250/dndsInfo.db250;
-    output.dnds[1]*=dndsInfo.S350/dndsInfo.db350;
-    output.dnds[2]*=dndsInfo.S500/dndsInfo.db500;
+    output->dnds[0]*=dndsInfo.S250/dndsInfo.db250;
+    output->dnds[1]*=dndsInfo.S350/dndsInfo.db350;
+    output->dnds[2]*=dndsInfo.S500/dndsInfo.db500;
+    
+    delete last_output;
     last_output = output;
 
     delete[] c1;
@@ -303,7 +305,7 @@ products simulator::simulate(){
   else{
     cout << "ERROR: NULL Model Library" << endl;
   }
-  return output;
+  return *output;
 }
 
 
@@ -390,9 +392,9 @@ bool simulator::save(string outfile){
   newTable->column(colname[5]).write(dndsInfo.b250,1);
   newTable->column(colname[6]).write(dndsInfo.b350,1);
   newTable->column(colname[7]).write(dndsInfo.b500,1);
-  newTable->column(colname[8]).write(last_output.dnds[0],1);
-  newTable->column(colname[9]).write(last_output.dnds[1],1);
-  newTable->column(colname[10]).write(last_output.dnds[2],1);
+  newTable->column(colname[8]).write(last_output->dnds[0],1);
+  newTable->column(colname[9]).write(last_output->dnds[1],1);
+  newTable->column(colname[10]).write(last_output->dnds[2],1);
 
   return true;
 }
@@ -404,6 +406,8 @@ simulator::~simulator(){
     delete seds;  
   if(diagnostic != NULL)
     delete diagnostic;
+  if(last_output != NULL)
+    delete last_output;
 }
 
 void simulator::reset(){
