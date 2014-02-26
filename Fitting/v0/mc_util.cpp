@@ -373,6 +373,7 @@ bool ResultChain::save(string filename, string resnames[]){
   int tablewidth = results.size()+1;
   std::vector<string> colnames(tablewidth,"CHISQ");
   std::vector<string> colform(tablewidth,"f13.5");
+  std::vector<string> colunit(tablewidth,"-");
   string hname("Results");
   
   for(i=0;i<results.size();i++){
@@ -380,7 +381,7 @@ bool ResultChain::save(string filename, string resnames[]){
   }
 
   printf("Making Table\n");
-  Table *newTable = pFits->addTable(hname,chisqrs.size(),colnames,colform,AsciiTbl);
+  Table *newTable = pFits->addTable(hname,chisqrs.size(),colnames,colform,colunit,AsciiTbl);
   printf("Made Table\n");
 
   newTable->column(colnames[0]).write(chisqrs,1);

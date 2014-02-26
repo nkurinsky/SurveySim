@@ -66,7 +66,7 @@ class MCChains {
 
 class ResultChain {
  private:
-  int i;
+  unsigned long i;
   vector<vector<valarray<double> > > results;
   vector<double> chisqrs;
  public:
