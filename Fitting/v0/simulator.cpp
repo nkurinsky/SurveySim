@@ -257,7 +257,7 @@ products simulator::simulate(){
 	      detected = false;
 	    else{
 	      dndsi = binNum(i,flux_sim[i]);
-	      if((dndsi < 0) and (dndsi < dndsInfo.bnum[i]))
+	      if((dndsi >= 0) and (dndsi < dndsInfo.bnum[i]))
 		output.dnds[i][dndsi]+=1.0;
 	    }
 	  }
