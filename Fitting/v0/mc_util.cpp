@@ -396,7 +396,7 @@ bool ResultChain::save(string filename, string resnames[]){
 
   std::cout << *newTable << std::endl;
 
-  newTable->column(colnames[0]).write(chisqrs,nrows,1);
+  newTable->column(colnames[0]).write(chisqrs,1);
   printf("%s ",colnames[0].c_str());
   for(i=0;i<results.size();i++){
     printf("%s ",colnames[i+1].c_str());
