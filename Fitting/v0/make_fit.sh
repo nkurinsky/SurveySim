@@ -56,7 +56,7 @@ else
     printf "failed for unknown reason, check directory structure"
 fi
 
-printf "\nBuild Successful...Exiting\n\n"
+printf "\nBuild Successful\n\n"
 
 rm *.o
 

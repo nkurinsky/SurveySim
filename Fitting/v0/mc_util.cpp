@@ -363,8 +363,6 @@ bool ResultChain::save(string filename, string resnames[]){
   using namespace CCfits;
   std::auto_ptr<FITS> pFits(0);
 
-  FITS::setVerboseMode(true);
-  
   try{
     pFits.reset(new FITS(filename,Write));
   }
@@ -382,19 +380,15 @@ bool ResultChain::save(string filename, string resnames[]){
   colform[2] = "13D";
   colform[3] = "10D";
 
+  for(unsigned long i=0;i<results.size();i++)
+    colnames[i+1]=resnames[i];
+
   string hname("Results Extension");
   int nrows(chisqrs.size());
-
-  for(i=0;i<results.size();i++){
-    colnames[i+1] = resnames[i];
-    printf("%s\n",resnames[i].c_str());
-  }
 
   printf("Making Table: %i\n",nrows);
   Table *newTable = pFits->addTable(hname,nrows,colnames,colform,colunit);
   printf("Made Table\n");
-
-  std::cout << *newTable << std::endl;
 
   newTable->column(colnames[0]).write(chisqrs,1);
   printf("%s ",colnames[0].c_str());
