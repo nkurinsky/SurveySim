@@ -51,7 +51,7 @@ int main(int argc,char** argv){
   char wtemp[2];
   string wnum;
   unsigned long NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO,burn_num;
-  products output;
+  //products output;
   double bs[BANDS],errs[BANDS],flims[BANDS];
   //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
   double lpars[LUMPARS],lfix[LUMPARS],lmax[LUMPARS],lmin[LUMPARS],ldp[LUMPARS],cexp[5];
@@ -246,6 +246,9 @@ int main(int argc,char** argv){
   //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
   ns=8;
   survey.set_size(area,dz,zmin,nz,ns);
+  int bnum[]={16,13,10};
+  products output(nz,bnum);
+
   MCChains mcchain(NCHAIN,nparams,runs,CONV_STEP);
   ResultChain counts(3,NCHAIN*runs);
   mcchain.set_constraints(rmax,a_ci);
