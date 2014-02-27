@@ -34,10 +34,10 @@ sprop::sprop(){
 }
 
 products::products(int nz, int ns[]){
-  dndz.resize(nz);
-  dnds[0].resize(ns[0]);
-  dnds[1].resize(ns[1]);
-  dnds[2].resize(ns[2]);
+  dndz.resize(nz,-1);
+  dnds[0].resize(ns[0],-1);
+  dnds[1].resize(ns[1],-1);
+  dnds[2].resize(ns[2],-1);
 }
 
 clementsBins::clementsBins(){
@@ -257,6 +257,7 @@ products simulator::simulate(){
 	      detected = false;
 	    else{
 	      dndsi = binNum(i,flux_sim[i]);
+	      printf("%i %i\n",i,dndsi);
 	      if((dndsi >= 0) and (dndsi < dndsInfo.bnum[i]))
 		output.dnds[i][dndsi]+=1.0;
 	    }
@@ -296,6 +297,8 @@ products simulator::simulate(){
     output.dnds[1]*=dndsInfo.S350/dndsInfo.db350;
     output.dnds[2]*=dndsInfo.S500/dndsInfo.db500;
     last_output = output;
+
+    printf("%f %f %f\n",output.dnds[0][0],output.dnds[1][0],output.dnds[2][0]);
 
     delete[] c1;
     delete[] c2;
