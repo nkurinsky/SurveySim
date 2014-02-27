@@ -69,7 +69,6 @@ class simulator{
   int ns;
  public:
   simulator(){
-    int bnumtemp[] = {0,0,0};
     last_output.chisqr=0;
     color_exp=0; //default to no color evolution
     area = pow((M_PI/180.0),2.0); //default to 1sq degree

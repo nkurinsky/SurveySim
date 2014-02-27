@@ -49,7 +49,7 @@ fi
 printf "\nProgram successfully compiled as \"fitter\"\n"
 
 printf "Copying to Widget directory..."
-cp fitter ../../Widget/
+cp -r fitter* ../../Widget/
 if [ "$?" = "0" ]; then
     printf "Successful \n"
 else

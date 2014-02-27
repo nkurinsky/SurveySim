@@ -377,11 +377,6 @@ bool ResultChain::save(string filename, string resnames[]){
   std::vector<string> colnames(tablewidth,"CHISQ");
   std::vector<string> colform(tablewidth,"1D");
   std::vector<string> colunit(tablewidth,"");
-  
-  colform[1] = "16D";
-  colform[2] = "13D";
-  colform[3] = "10D";
-
   string hname("Results Extension");
   int nrows(chisqrs.size());
 
