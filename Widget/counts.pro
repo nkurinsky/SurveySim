@@ -9,9 +9,9 @@ pro counts
   gpts = where(chis gt median(chis))
   res = res[gpts]
 
-  c1=res.dnds250*3.2828e3/10
-  c2=res.dnds350*3.2828e3/10
-  c3=res.dnds500*3.2828e3/10
+  c1=res.dnds250
+  c2=res.dnds350
+  c3=res.dnds500
 
   c1mean = []
   c2mean = []

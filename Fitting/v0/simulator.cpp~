@@ -299,9 +299,9 @@ products simulator::simulate(){
     diagnostic->init_model(c1,c2,w,snum);
     output.chisqr=diagnostic->get_chisq();
     //note: this is not general, but temporarily implemented for publication
-    output.dnds[0]*=dndsInfo.S250/dndsInfo.db250*(SDEG_PER_STER/area);
-    output.dnds[1]*=dndsInfo.S350/dndsInfo.db350*(SDEG_PER_STER/area);
-    output.dnds[2]*=dndsInfo.S500/dndsInfo.db500*(SDEG_PER_STER/area);
+    output.dnds[0]*=dndsInfo.S250/dndsInfo.db250;
+    output.dnds[1]*=dndsInfo.S350/dndsInfo.db350;
+    output.dnds[2]*=dndsInfo.S500/dndsInfo.db500;
     last_output = output;
 
     //printf("%f %f %f\n",output.dnds[0][0],output.dnds[1][0],output.dnds[2][0]);

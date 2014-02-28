@@ -60,7 +60,7 @@ pro counts
   set_plot,'x'
 
   x = indgen(n_elements(c1mean))
-  plot,x,c1mean,xrange=[0,16],xstyle=1,yrange=[0,40],ystyle=1
+  plot,x,c1mean,xrange=[0,16],xstyle=1
   oplot,x,c1plus,linestyle=1
   oplot,x,c1minus,linestyle=1
 
