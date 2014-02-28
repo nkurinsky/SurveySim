@@ -576,7 +576,7 @@ pro read_output
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux /= 1.d3
-     xrange=[min([xd1,flux])/1.2,max([xd1,flux])*1.2]
+     xrange=[min([xd1,flux]),max([xd1,flux])]
      yrange=[min([yd1,diff_counts,c1minus])/1.2,max([yd1,diff_counts,c1plus])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
@@ -593,7 +593,7 @@ pro read_output
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux /= 1.d3
-     xrange=[min([xd2,flux])/1.2,max([xd2,flux])*1.2]
+     xrange=[min([xd2,flux]),max([xd2,flux])]
      yrange=[min([yd2,diff_counts,c2minus])/1.2,max([yd2,diff_counts,c2plus])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
@@ -609,7 +609,7 @@ pro read_output
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux /= 1.d3
-     xrange=[min([xd3,flux])/1.2,max([xd3,flux])*1.2]
+     xrange=[min([xd3,flux]),max([xd3,flux])]
      yrange=[min([yd3,diff_counts,c3minus])/1.2,max([yd3,diff_counts,c3plus])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
@@ -1151,7 +1151,7 @@ pro graphs
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux /= 1.d3
-     xrange=[min([xd1,flux])/1.2,max([xd1,flux])*1.2]
+     xrange=[min([xd1,flux]),max([xd1,flux])]
      yrange=[min([yd1,diff_counts,c1minus])/1.2,max([yd1,diff_counts,c1plus])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
@@ -1169,7 +1169,7 @@ pro graphs
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux /= 1.d3
-     xrange=[min([xd2,flux])/1.2,max([xd2,flux])*1.2]
+     xrange=[min([xd2,flux]),max([xd2,flux])]
      yrange=[min([yd2,diff_counts,c2minus])/1.2,max([yd2,diff_counts,c2plus])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
@@ -1186,7 +1186,7 @@ pro graphs
   if( file_test('counts_clements10.dat')) then begin
      readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
      flux /= 1.d3
-     xrange=[min([xd3,flux])/1.2,max([xd3,flux])*1.2]
+     xrange=[min([xd3,flux]),max([xd3,flux])]
      yrange=[min([yd3,diff_counts,c3minus])/1.2,max([yd3,diff_counts,c3plus])*1.2]
      plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
      oploterr,flux,diff_counts,diff_err
