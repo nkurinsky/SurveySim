@@ -302,9 +302,9 @@ products simulator::simulate(){
     output.dnds[0]*=dndsInfo.S250/dndsInfo.db250;
     output.dnds[1]*=dndsInfo.S350/dndsInfo.db350;
     output.dnds[2]*=dndsInfo.S500/dndsInfo.db500;
-    output.dnds[0]*=(SDEG_PER_STER/area);
-    output.dnds[1]*=(SDEG_PER_STER/area);
-    output.dnds[2]*=(SDEG_PER_STER/area);
+    output.dnds[0]/=area;
+    output.dnds[1]/=area;
+    output.dnds[2]/=area;
     last_output = output;
 
     //printf("%f %f %f\n",output.dnds[0][0],output.dnds[1][0],output.dnds[2][0]);
@@ -327,7 +327,7 @@ bool simulator::save(string outfile){
     return opened;
   
   using namespace CCfits;
-  FITS::setVerboseMode(true);
+  //FITS::setVerboseMode(true);
   std::auto_ptr<FITS> pFits(0);
 
   try{
@@ -395,20 +395,16 @@ bool simulator::save(string outfile){
   colform[10] = "e13.5";
   
   static string hname("Parameter Distributions");
-  printf("Creating Table\n");
   Table *newTable= pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
-  printf("Table Created\n");
-  
+    
   newTable->column(colname[0]).write(f1,1);
   newTable->column(colname[1]).write(f2,1);
   newTable->column(colname[2]).write(f3,1);
   newTable->column(colname[3]).write(redshift,1);
   newTable->column(colname[4]).write(luminosity,1);
-  printf("Saving domain\n");
   newTable->column(colname[5]).write(dndsInfo.b250,1);
   newTable->column(colname[6]).write(dndsInfo.b350,1);
   newTable->column(colname[7]).write(dndsInfo.b500,1);
-  printf("Saving results\n");
   newTable->column(colname[8]).write(last_output.dnds[0],1);
   newTable->column(colname[9]).write(last_output.dnds[1],1);
   newTable->column(colname[10]).write(last_output.dnds[2],1);
