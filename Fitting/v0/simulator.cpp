@@ -299,9 +299,12 @@ products simulator::simulate(){
     diagnostic->init_model(c1,c2,w,snum);
     output.chisqr=diagnostic->get_chisq();
     //note: this is not general, but temporarily implemented for publication
-    output.dnds[0]*=dndsInfo.S250/dndsInfo.db250*(SDEG_PER_STER/area);
-    output.dnds[1]*=dndsInfo.S350/dndsInfo.db350*(SDEG_PER_STER/area);
-    output.dnds[2]*=dndsInfo.S500/dndsInfo.db500*(SDEG_PER_STER/area);
+    output.dnds[0]*=dndsInfo.S250/dndsInfo.db250;
+    output.dnds[1]*=dndsInfo.S350/dndsInfo.db350;
+    output.dnds[2]*=dndsInfo.S500/dndsInfo.db500;
+    output.dnds[0]*=(SDEG_PER_STER/area);
+    output.dnds[1]*=(SDEG_PER_STER/area);
+    output.dnds[2]*=(SDEG_PER_STER/area);
     last_output = output;
 
     //printf("%f %f %f\n",output.dnds[0][0],output.dnds[1][0],output.dnds[2][0]);
@@ -319,11 +322,12 @@ products simulator::simulate(){
 
 bool simulator::save(string outfile){
   bool opened =  diagnostic->write_fits(outfile);
-  
+
   if(not opened)
     return opened;
   
   using namespace CCfits;
+  FITS::setVerboseMode(true);
   std::auto_ptr<FITS> pFits(0);
 
   try{
@@ -386,6 +390,9 @@ bool simulator::save(string outfile){
   colunit[10] = "Jy^1.5/sr";
 
   colform[4] = "e13.5";
+  colform[8] = "e13.5";
+  colform[9] = "e13.5";
+  colform[10] = "e13.5";
   
   static string hname("Parameter Distributions");
   printf("Creating Table\n");
