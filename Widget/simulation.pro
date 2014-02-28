@@ -486,8 +486,26 @@ pro read_output
   f2 = dists[gpts].f2
   f3 = dists[gpts].f3
   z = dists[gpts].z
-  m = dists[gpts].m
   lum = dists[gpts].lum
+
+  xd1 = dists.s1
+  xd2 = dists.s2
+  xd3 = dists.s3
+  yd1 = dists.dnds1
+  yd2 = dists.dnds2
+  yd3 = dists.dnds3
+
+  gpts = where(xd1 gt 0)
+  xd1 = xd1[gpts]/1.d3
+  yd1 = yd1[gpts]
+
+  gpts = where(xd2 gt 0)
+  xd2 = xd2[gpts]/1.d3
+  yd2 = yd2[gpts]
+  
+  gpts = where(xd3 gt 0)
+  xd3 = xd3[gpts]/1.d3
+  yd3 = yd3[gpts]
 
   set_plot,'ps'
   device,filename='redshift_dist.eps',xsize=10,ysize=8,/inches,/encapsulated,/times,set_font='Times-Roman',/color
@@ -516,6 +534,7 @@ pro read_output
      print,'Error: File "counts_clements10.dat" not found'
      plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
   endelse
+  oplot,xd1,yd1,psym=4
   device,/close
   
   device,filename='band2_counts.eps',xsize=10,ysize=8,/inches,/encapsulated,/times,set_font='Times-Roman',/color
@@ -537,7 +556,7 @@ pro read_output
   endif else begin
      plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts'
   endelse
-  
+  oplot,xd2,yd2,psym=4
   device,/close
   device,filename='band3_counts.eps',xsize=10,ysize=8,/inches,/encapsulated,/times,set_font='Times-Roman',/color
 
@@ -559,7 +578,7 @@ pro read_output
   endif else begin
      plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts'
   endelse
-
+  oplot,xd3,yd3,psym=2
   device,/close
 
   comp = mrdfits(files.oname,0,head,/silent)
@@ -953,8 +972,84 @@ pro graphs
   f2 = dists[gpts].f2
   f3 = dists[gpts].f3
   z = dists[gpts].z
-  m = dists[gpts].m
   lum = dists[gpts].lum
+
+  xd1 = dists.s1
+  xd2 = dists.s2
+  xd3 = dists.s3
+  yd1 = dists.dnds1
+  yd2 = dists.dnds2
+  yd3 = dists.dnds3
+
+  gpts = where(xd1 gt 0)
+  xd1 = xd1[gpts]/1.d3
+  yd1 = yd1[gpts]
+
+  gpts = where(xd2 gt 0)
+  xd2 = xd2[gpts]/1.d3
+  yd2 = yd2[gpts]
+
+  gpts = where(xd3 gt 0)
+  xd3 = xd3[gpts]/1.d3
+  yd3 = yd3[gpts]
+
+  count_dists = mrdfits(files.oname,6,head,/silent)
+
+  alpha = 0.159                ;one std deviation
+  plusfrac = (1.0-alpha)
+  minusfrac = alpha
+
+  chis = count_dists.chisq
+  gpts = where(chis gt median(chis))
+  count_dists = count_dists[gpts]
+  c1=count_dists.dnds250
+  c2=count_dists.dnds350
+  c3=count_dists.dnds500
+  c1mean = []
+  c2mean = []
+  c3mean = []
+  c1plus = []
+  c2plus = []
+  c3plus = []
+  c1minus = []
+  c2minus = []
+  c3minus = []
+  c1size = n_elements(count_dists[0].dnds250)
+  c2size = n_elements(count_dists[0].dnds350)
+  c3size = n_elements(count_dists[0].dnds500)
+
+  for i=0,c1size-1 do begin
+     dnds = c1[i,*]
+     dnds = dnds[sort(dnds)]
+     dnds = dnds[where(dnds gt 0)]
+     pi = plusfrac*n_elements(dnds)
+     mi = minusfrac*n_elements(dnds)
+     c1mean = [c1mean,mean(dnds)]
+     c1plus = [c1plus,dnds[pi]]
+     c1minus = [c1minus,dnds[mi]]
+  endfor
+
+  for i=0,c2size-1 do begin
+     dnds = c2[i,*]
+     dnds = dnds[sort(dnds)]
+     dnds = dnds[where(dnds gt 0)]
+     pi = plusfrac*n_elements(dnds)
+     mi = minusfrac*n_elements(dnds)
+     c2mean = [c2mean,mean(dnds)]
+     c2plus = [c2plus,dnds[pi]]
+     c2minus = [c2minus,dnds[mi]]
+  endfor
+
+  for i=0,c3size-1 do begin
+     dnds = c3[i,*]
+     dnds = dnds[sort(dnds)]
+     dnds = dnds[where(dnds gt 0)]
+     pi = plusfrac*n_elements(dnds)
+     mi = minusfrac*n_elements(dnds)
+     c3mean = [c3mean,mean(dnds)]
+     c3plus = [c3plus,dnds[pi]]
+     c3minus = [c3minus,dnds[mi]]
+  endfor
 
   pnum_out = fxpar(head,'tfields')
 
@@ -1034,6 +1129,9 @@ pro graphs
      print,'Error: File "counts_clements10.dat" not found'
      plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
   endelse
+  oplot,xd1,yd1,psym=4
+  oplot,xd1,c1plus,linestyle=1
+  oplot,xd1,c1minus,linestyle=1
 
   widget_control,dcount2,get_value=index
   wset,index
@@ -1056,7 +1154,10 @@ pro graphs
   endif else begin
      plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts'
   endelse
-  
+  oplot,xd2,yd2,psym=4
+  oplot,xd2,c2plus,linestyle=1
+  oplot,xd2,c2minus,linestyle=1
+
   widget_control,dcount3,get_value=index
   wset,index
 
@@ -1078,6 +1179,9 @@ pro graphs
   endif else begin
      plot,xpts,dcounts,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts'
   endelse
+  oplot,xd3,yd3,psym=4
+  oplot,xd3,c3plus,linestyle=1
+  oplot,xd3,c3minus,linestyle=1
 
   comp = mrdfits(files.oname,0,head,/silent)
   model = mrdfits(files.oname,1,/silent)
