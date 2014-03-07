@@ -34,10 +34,10 @@ sprop::sprop(){
 }
 
 products::products(int nz, int ns[]){
-  dndz.resize(nz,-1);
-  dnds[0].resize(ns[0],-1);
-  dnds[1].resize(ns[1],-1);
-  dnds[2].resize(ns[2],-1);
+  dndz.resize(nz);
+  dnds[0].resize(ns[0]);
+  dnds[1].resize(ns[1]);
+  dnds[2].resize(ns[2]);
 }
 
 clementsBins::clementsBins(){
@@ -129,6 +129,10 @@ simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,st
   observations->get_all_colors(c1,c2);
   diagnostic->init_obs(c1,c2,osize);
   last_output.chisqr=0;
+
+  last_output.dnds[0].resize(dndsInfo.bnum[0]);
+  last_output.dnds[1].resize(dndsInfo.bnum[1]);
+  last_output.dnds[2].resize(dndsInfo.bnum[2]);
 }
 
 void simulator::set_bands(double b[],double b_err[],double f_lims[]){
@@ -145,6 +149,8 @@ void simulator::set_size(double area,double dz,double zmin,int nz,int ns){
   this->zmin = (zmin > 0.001) ? zmin : 0.001;
   this->nz = (nz > 1) ? nz : 50;
   this->ns = (ns > 1) ? ns : 8; //currently unused
+
+  last_output.dndz.resize(nz);
 }
 
 void simulator::set_color_exp(double val){
@@ -257,7 +263,7 @@ products simulator::simulate(){
 	      detected = false;
 	    else{
 	      dndsi = binNum(i,flux_sim[i]);
-	      printf("%i %i\n",i,dndsi);
+	      //printf("%i %i\n",i,dndsi);
 	      if((dndsi >= 0) and (dndsi < dndsInfo.bnum[i]))
 		output.dnds[i][dndsi]+=1.0;
 	    }
@@ -296,9 +302,12 @@ products simulator::simulate(){
     output.dnds[0]*=dndsInfo.S250/dndsInfo.db250;
     output.dnds[1]*=dndsInfo.S350/dndsInfo.db350;
     output.dnds[2]*=dndsInfo.S500/dndsInfo.db500;
+    output.dnds[0]/=area;
+    output.dnds[1]/=area;
+    output.dnds[2]/=area;
     last_output = output;
 
-    printf("%f %f %f\n",output.dnds[0][0],output.dnds[1][0],output.dnds[2][0]);
+    //printf("%f %f %f\n",output.dnds[0][0],output.dnds[1][0],output.dnds[2][0]);
 
     delete[] c1;
     delete[] c2;
@@ -313,11 +322,12 @@ products simulator::simulate(){
 
 bool simulator::save(string outfile){
   bool opened =  diagnostic->write_fits(outfile);
-  
+
   if(not opened)
     return opened;
   
   using namespace CCfits;
+  //FITS::setVerboseMode(true);
   std::auto_ptr<FITS> pFits(0);
 
   try{
@@ -380,22 +390,21 @@ bool simulator::save(string outfile){
   colunit[10] = "Jy^1.5/sr";
 
   colform[4] = "e13.5";
+  colform[8] = "e13.5";
+  colform[9] = "e13.5";
+  colform[10] = "e13.5";
   
   static string hname("Parameter Distributions");
-  printf("Creating Table\n");
   Table *newTable= pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
-  printf("Table Created\n");
-  
+    
   newTable->column(colname[0]).write(f1,1);
   newTable->column(colname[1]).write(f2,1);
   newTable->column(colname[2]).write(f3,1);
   newTable->column(colname[3]).write(redshift,1);
   newTable->column(colname[4]).write(luminosity,1);
-  printf("Saving domain\n");
   newTable->column(colname[5]).write(dndsInfo.b250,1);
   newTable->column(colname[6]).write(dndsInfo.b350,1);
   newTable->column(colname[7]).write(dndsInfo.b500,1);
-  printf("Saving results\n");
   newTable->column(colname[8]).write(last_output.dnds[0],1);
   newTable->column(colname[9]).write(last_output.dnds[1],1);
   newTable->column(colname[10]).write(last_output.dnds[2],1);

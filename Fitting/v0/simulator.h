@@ -4,6 +4,7 @@
 #include "hist_lib.h"
 
 #define LUMPARS 7
+#define SDEG_PER_STER 3282.8
 
 //Storage structure for each individual source
 struct sprop{
