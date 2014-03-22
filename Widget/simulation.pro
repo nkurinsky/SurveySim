@@ -16,8 +16,6 @@ pro simulation
   !y.thick=0
   !p.charthick=0
   !p.charsize=0
-  !p.color = 0
-  !p.background = 255
 
 ;==================================================================
 ;the INFO structure holds the key widget control parameters as well as 
@@ -486,8 +484,6 @@ pro read_output
   !y.thick=5
   !p.charthick=5
   !p.charsize=1.5
-  !p.color = 0
-  !p.background = 255
 
   dists = mrdfits(files.oname,3,head,/silent)
 
@@ -966,8 +962,6 @@ pro graphs
   !y.thick=0
   !p.charthick=0
   !p.charsize=0
-  !p.color = 0
-  !p.background = 255
 
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
@@ -1352,8 +1346,6 @@ pro diagnostics
   !y.thick=0
   !p.charthick=0
   !p.charsize=0
-  !p.color = 0
-  !p.background = 255
 
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
