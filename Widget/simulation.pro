@@ -10,12 +10,7 @@
 pro simulation
 
   COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
-  
-  !p.thick=0
-  !x.thick=0
-  !y.thick=0
-  !p.charthick=0
-  !p.charsize=0
+  plot_settings ;will reset the global settings
 
 ;==================================================================
 ;the INFO structure holds the key widget control parameters as well as 
@@ -191,6 +186,9 @@ pro simulation
   wset,info.win_id3
   
 ;plot SEDs (generalize to any SED template file)
+  set_plot,'x'
+  device,decomposed=0
+  plot_settings,plot_type='x'
   if file_test(files.sedfile) then begin
      templ=mrdfits(files.sedfile,/silent) 
      loadct,1,/silent
@@ -479,12 +477,6 @@ pro read_output
   
   COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
 
-  !p.thick=5
-  !x.thick=5
-  !y.thick=5
-  !p.charthick=5
-  !p.charsize=1.5
-
   dists = mrdfits(files.oname,3,head,/silent)
 
   gpts = where(dists.f3 gt 0)
@@ -513,7 +505,7 @@ pro read_output
   xd3 = xd3[gpts]/1.d3
   yd3 = yd3[gpts]
 
-    count_dists = mrdfits(files.oname,6,head,/silent)
+  count_dists = mrdfits(files.oname,6,head,/silent)
 
   alpha = 0.159                ;one std deviation
   plusfrac = (1.0-alpha)
@@ -572,6 +564,7 @@ pro read_output
   endfor
 
   set_plot,'ps'
+  plot_settings,plot_type='ps'
   device,filename='redshift_dist.eps',xsize=10,ysize=8,/inches,/encapsulated,/times,set_font='Times-Roman',/color
   h = histogram(z,binsize=0.1,locations=xh,min=0.2,max=5.0)
   plot,xh,h,psym=10,xrange=[0,max(z)],xstyle=1,xtitle='z',ytitle='dN/dz',title='Redshift Distribution'
@@ -820,6 +813,7 @@ pro read_output
   color_scale = 256/((chi_max-chi_min)*1.2)
 
   set_plot,'ps'
+  plot_settings,plot_type='ps'
   device,filename='fit_results.eps',xsize=10,ysize=8,/inches,/times,set_font='Times-Roman',/color,/encapsulated
   multiplot,[dim,dim],/init,/rowmajor,mTitle="MCMC Fitting Results",gap=0.005
   cgText, 0.6, 0.9, Alignment=0, /Normal, 'Fitting Results:', Charsize=1.25
@@ -957,12 +951,6 @@ pro graphs
 
   COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
 
-  !p.thick=0
-  !x.thick=0
-  !y.thick=0
-  !p.charthick=0
-  !p.charsize=0
-
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
   size_screen = size_screen*0.8
@@ -997,6 +985,8 @@ pro graphs
   xmanager,'graphs',gmain,/no_block
   
   set_plot,'x'
+  device,decomposed=0
+  plot_settings,plot_type='x'
   loadct,0,/silent
 
   res = mrdfits(files.oname,0,head,/silent)
@@ -1341,12 +1331,6 @@ pro diagnostics
 
   COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
 
-  !p.thick=0
-  !x.thick=0
-  !y.thick=0
-  !p.charthick=0
-  !p.charsize=0
-
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
   size_screen = size_screen*0.8
@@ -1383,6 +1367,7 @@ pro diagnostics
   xmanager,'diagnostics',dmain,/no_block
   
   set_plot,'x'
+  plot_settings,plot_type='x'
   device,decomposed=0
   loadct,0,/silent
   
@@ -1568,8 +1553,11 @@ pro diagnostics_event,ev
 
 end
 
-pro plot_settings,plot_type=''
+pro plot_settings,plot_type=plot_type
   cleanplot,/silent
+  
+  if not keyword_set(plot_type) then plot_type='reset'
+  
   if strlowcase(plot_type) eq 'ps' then begin
      !p.thick=5
      !x.thick=5
@@ -1581,7 +1569,7 @@ pro plot_settings,plot_type=''
      !p.background=255
      !p.color=0
      cleanplot,/showonly
-  endif else then begin
+  endif else begin
      print,"Returning to default plot settings"
   endelse
 end
