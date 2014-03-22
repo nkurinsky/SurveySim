@@ -1409,7 +1409,7 @@ pro diagnostics
   wset,index
 
   multiplot,[dim,dim],/init,/rowmajor,mTitle="MCMC Fitting Results",gap=0.005
-  cgText, 0.6, 0.9, Alignment=0, /Normal, 'Fitting Results:', Charsize=1.25
+  cgText, 0.6, 0.9, Alignment=0, /Normal, 'Fitting Results:', Charsize=1.25,color='black'
 
   for x=0,dim-1 do begin
      p = []
@@ -1423,7 +1423,7 @@ pro diagnostics
         if (x eq y) then begin  ;make histogram
            stats = moment(p[chistpts],maxmoment=2)
            print,"Variable: ",tags[x],", Mean: ",stats[0]," Variance: ",stats[1]
-           cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(stats[1],format='(D0.3)')))
+           cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(stats[1],format='(D0.3)'))),color='black'
            h = histogram(p[chistpts],locations=xh,max=prange[1],min=prange[0],nbins=nbins)
            h = float(h)/float(max(h))
            loadct,1,/silent
