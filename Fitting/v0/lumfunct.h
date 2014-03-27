@@ -1,6 +1,9 @@
 //created by Anna Sajina (09/27/12) 
 //based on earlier code by Noah Kurinsky
 
+#ifndef LUMFUNCT_H
+#define LUMFUNCT_H
+
 #include "functions.h"
 
 using namespace std;
@@ -35,4 +38,4 @@ class lumfunct {
   //~lumfunct(); uncomment if you want a destructor
 };
 
-
+#endif

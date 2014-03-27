@@ -2,6 +2,9 @@
 //10/16/2012
 //This header keeps various cosmology functions
 
+#ifndef COSMO_H
+#define COSMO_H
+
 #include "constants.h"
 
 // luminosity distances
@@ -38,3 +41,4 @@ double dvdz (double zmax, double area)
   return my_dvdz;
 }
 
+#endif

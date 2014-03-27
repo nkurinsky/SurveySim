@@ -1,5 +1,8 @@
 #include "functions.h"
 
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
+
 using namespace CCfits;
 
 class obs{
@@ -33,3 +36,5 @@ class obs_lib{
     return observations.size();}
   ~obs_lib();
 };
+
+#endif

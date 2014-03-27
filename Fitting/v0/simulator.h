@@ -1,3 +1,6 @@
+#ifndef SIMULATOR_H
+#define SIMULATOR_H
+
 #include "obs_lib.h"
 #include "sed_lib.h"
 #include "lumfunct.h"
@@ -89,3 +92,5 @@ class simulator{
   bool save(string outfile);
   ~simulator();
 };
+
+#endif

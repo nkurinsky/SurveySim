@@ -3,6 +3,9 @@
 //This header file provides the interface for the various small functions
 //used for constraining models
 
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
+
 //standard includes used by all programs in simulation
 #include <cstdio>
 #include <stdio.h>
@@ -30,9 +33,6 @@
 // - for scientific constants
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_const_mksa.h>
-// - for multidimensional minimization
-#include <gsl/gsl_multimin.h>
-#include <gsl/gsl_vector.h>
 
 using namespace std;
 
@@ -44,3 +44,5 @@ double * gauss_random(gsl_rng * r,double range[],double mean,double sigma,int si
 
 //Generates spectral color of a galaxy from fluxes and bands
 double get_color(double f1,double f2);
+
+#endif

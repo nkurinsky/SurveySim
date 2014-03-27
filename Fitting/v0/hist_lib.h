@@ -7,6 +7,9 @@
   Interface to be expanded to compute statistics on histograms
 */
 
+#ifndef HIST_LIB_H
+#define HIST_LIB_H
+
 #include "functions.h"
 
 //Needed for array manipulation by the GSL statistics procedures
@@ -44,3 +47,5 @@ class hist_lib{
   double fit_err();
   double poiss_err(int x);
 };
+
+#endif

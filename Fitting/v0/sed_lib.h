@@ -1,3 +1,6 @@
+#ifndef SED_LIB_H
+#define SED_LIB_H
+
 #include "functions.h"
 
 using namespace CCfits;
@@ -37,3 +40,5 @@ class sed_lib{
     return seds.size();}
   ~sed_lib();
 };
+
+#endif

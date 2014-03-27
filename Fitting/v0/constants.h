@@ -2,6 +2,9 @@
 //9/27/2012
 //This header file holds the values of constants
 
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
 //this includes some basic math definitions including
 //M_PI for pi
 #define _USE_MATH_DEFINES
@@ -17,3 +20,5 @@
 #define OM (0.272) // from Komatsu et al. 2011
 #define OL (0.728) // from Komatsu et al. 2011
 #define d_hub (4062.33) // Hubble distance, i.e. c/Ho [Mpc]
+
+#endif

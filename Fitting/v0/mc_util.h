@@ -6,6 +6,9 @@
   and tracking accepted moves for m chains
 */
 
+#ifndef MC_UTIL_H
+#define MC_UTIL_H
+
 #include "functions.h"
 #include <deque>
 
@@ -74,3 +77,5 @@ class ResultChain {
   bool add_link(valarray<double> arrays[], double chisqr);
   bool save(string filename, string resnames[]);
 };
+
+#endif
