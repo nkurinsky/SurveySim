@@ -661,9 +661,9 @@ pro read_output
            polyfill,xfill,yfill,color=color(i,j)
         endif
 
-        if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
+        ;if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
      endfor
-     oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
+     ;oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
   endfor
 
   device,/close
@@ -688,9 +688,9 @@ pro read_output
            polyfill,xfill,yfill,color=color(i,j)
         endif
 
-        if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
+        ;if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
      endfor
-     oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
+     ;oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
   endfor
 
   device,/close
@@ -732,9 +732,9 @@ pro read_output
               polyfill,xfill,yfill,color=color(i,j)
            endif
            
-           if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
+           ;if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
         endfor
-        oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
+        ;oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
      endfor
   endfor
 
@@ -1227,9 +1227,9 @@ pro graphs
            polyfill,xfill,yfill,color=color(i,j)
         endif
 
-        if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
+        ;if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
      endfor
-     oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
+     ;oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
   endfor
 
   widget_control,obs_colors,get_value=index
@@ -1251,9 +1251,9 @@ pro graphs
            polyfill,xfill,yfill,color=color(i,j)
         endif
 
-        if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
+        ;if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
      endfor
-     oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
+     ;oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
   endfor
 
   widget_control,comp_colors,get_value=index
@@ -1294,9 +1294,9 @@ pro graphs
               polyfill,xfill,yfill,color=color(i,j)
            endif
            
-           if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
+           ;if(i eq xysize-1) then oplot,[hist_min,hist_max],[a[j+1],a[j+1]],linestyle=1        
         endfor
-        oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
+        ;oplot,[a[i+1],a[i+1]],[hist_min,hist_max],linestyle=1
      endfor
   endfor
 
