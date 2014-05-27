@@ -1,0 +1,11 @@
+This is the redistributable version of the MCMC code, with the compilation procedure
+
+./configure
+make
+sudo make install
+
+on Mac and Linux systems. Note that you must have GSL, CCFits, and cfitsio installed for configure to complete; it will tell you the first of these which is missing and promptly exit. the Libraries are contained in the corresponding folder as tarballs, which can be extracted by
+
+tar xzvf [file.tar.gz]
+
+and compiled according to the instructions within.
