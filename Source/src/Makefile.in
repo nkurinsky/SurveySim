@@ -157,7 +157,6 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTION = foreign
-AM_LDFLAGS = -L./ -lm -lgsl -lgslcblas -lcfitsio -lCCFits
 fitter_SOURCES = constants.h cosmo.h functions.h hist_lib.h lumfunct.h mc_util.h obs_lib.h sed_lib.h simulator.h main.cpp functions.cpp hist_lib.cpp lumfunct.cpp mc_util.cpp obs_lib.cpp sed_lib.cpp simulator.cpp
 all: all-am
 
