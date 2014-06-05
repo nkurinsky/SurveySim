@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 
 print("Welcome to SurveySim");
 print("a MCMC-based galaxy evolution fitter and simulator");
@@ -13,15 +13,16 @@ from pylab import *
 import math
 
 codedir=os.getcwd();
+codedir=codedir[:len(codedir)-7]
 #if want to be able to run this from wherever, should simply change the codedir 
-sedfile=codedir+'/Widget/sf_templates.fits'
-modelfile=codedir+'/Widget/model.fits'
-obsfile=codedir+'/Widget/observation.fits'
-outfile=codedir+'/Widget/output.fits'
+sedfile=codedir+'/IDL/sf_templates.fits'
+modelfile=codedir+'/IDL/model.fits'
+obsfile=codedir+'/IDL/observation.fits'
+outfile=codedir+'/Python/output.fits'
 
 def runcode():
     print("Runnning fitter code....")
-    os.system(codedir+"/Fitting/v0/fitter"+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
+    os.system("fitter"+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
 
 def showresults(): #read-in the results from output.fits and show plots
     print("Showing results....")
