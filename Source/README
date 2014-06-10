@@ -1,3 +1,6 @@
+Installation:
+(Note: For best (tested) results, use bash when performing the installation)
+
 This is the redistributable version of the MCMC code, with the compilation procedure
 
      ./configure
@@ -32,7 +35,9 @@ establish references
 	make
 	sudo make install
 Note: If the compilation fails, make sure the ColumnVectorData header file is correct;
-it may need to be updated from the CCFits site, which is an easy fix.
+it may need to be updated from the CCFits site, which is an easy fix. Also make sure 
+that the directory containing the configure script is called "CCfits", otherwise some
+of the header files will not be found and the make command will fail.
 
 ====================================================================================
 
@@ -43,3 +48,10 @@ command
 	xcode-select --install
 for 10.9. Without these, the ./configure script will not be able to find user
 libraries and will fail.
+
+OSX 10.7:
+You should use clang and clang++ to compile and link all three libraries, as the llvm
+compiler is very buggy and the gsl checks will fail. To do this, add
+	 CC=clang CXX=clang++
+to your ./configure commands. This is not necessary for the final program but is 
+important for make check in gsl.
