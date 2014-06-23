@@ -69,7 +69,7 @@ sed_lib::sed_lib(string fitsfile){
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline,lnum);
   gsl_spline_init(spline,lums,inds,lnum);
-
+  
   double fluxes[bandnum];
   sed *new_sed;
   
@@ -87,14 +87,30 @@ sed_lib::sed_lib(string fitsfile){
     seds.push_back(new_sed);
   }
 
+  filter_init = false;
+
   delete[] bands;
   delete pInfile;
+}
+
+bool sed_lib::init_filter_lib(string file){
+  
+  if(filters.load_library(filterlibfile)){
+    w = gsl_integration_workspace_alloc(SL_INT_SIZE);
+    return true;
+  }
+  
+  return false;
+}
+
+bool sed_lib::load_filter(short filter_id, string name){
+  return filters.load_filter(filter_id,name);
 }
 
 //needs to interpolate to correct luminosity 
 //rounds to nearest template, in future may average/interp
 //make sure lums sorted in order!!! currently an assumption
-double sed_lib::get_flux(double lum,double band){
+double sed_lib::get_flux(double lum, double band, double redshift){
   static int i = 0;
   i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
   if (i < 0)
@@ -106,13 +122,49 @@ double sed_lib::get_flux(double lum,double band){
       return seds[i]->get_flux(band);
     else{
       printf("%s\n%s\n","ERROR: Band out of model range.","Check that the obs bands are within range and unit consistent");
-      return -1;
     }
   }
   else{
     printf("%s %i \n","ERROR: Unitialized Model Called!!!",i);
-    return -1;
   }
+  
+  return -1;
+}
+
+double sed_lib::get_filter_flux(double lum, double redshift, short filter_id){
+
+  static int i = 0;
+
+  //determine which model to use; pick that closer to 'lum' called
+  i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
+  
+  if (i < 0)
+    i = 0;
+  else if (i >= int(lnum))
+    i = int(lnum)-1;
+  
+  if (seds[i] != NULL){
+    if (filters.init()){
+      if((filter_id >= 0) and (filter_id < 3) and (filters.get(filter_id).low() < filters.get(filter_id).high())){
+	if((filters->get(filter_id).low() >= brange[0]) and (filter->get(filter_id).high() <= brange[1]))
+	  return convolve_filter(i,redshift,filter_id);
+	else{
+	  printf("%s\n%s\n","ERROR: Filter out of model range.","Check that the obs bands are within range and unit consistent");
+	}
+      }
+      else{
+	printf("%s %i %s\n","ERROR: Filter number",filter_id,"invalid, 0-2 acceptable, or filter unititialized.");
+      }
+    }
+    else{
+      printf("%s %i \n","ERROR: Filter library not initialized!!!",i);
+    }
+  }
+  else{
+    printf("%s %i \n","ERROR: Unitialized Model Called!!!",i);
+  } 
+
+  return -1;
 }
 
 double sed_lib::get_dl(){
@@ -136,7 +188,60 @@ sed_lib::~sed_lib(){
   for (unsigned int i=0;i<seds.size();i++){
     delete seds[i];
   }
+  
   gsl_spline_free(spline);
   gsl_interp_accel_free(acc);
+  
+  if(filters.init())
+    gsl_integration_workspace_free(w);
+  
   delete[] lums;
+}
+
+double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
+
+  static bool conv_init = false;
+  static double scale;
+  static double result;
+  static double error;
+  static flux_yield_params p;
+  static gsl_function F;
+  double bounds[2];
+
+  if(not conv_init){
+    F.function = &flux_yield;
+    F.params = &p;
+    p.lum_ind = -1;
+    p.filt_ind = -1;
+    p.z = -1;
+    conv_init = true;
+    printf("Initializing Filter Convolution Variables\n");
+  }
+
+  if(p.z != redshift){
+    scale = (1+redshift)*Wm2Hz_TO_mJy/(4.0*M_PI*pow(lumdist(redshift)*MPC_TO_METER,2.0));
+    scale *= pow((1.0+redshift),color_exp);
+    current_redshift = redshift;
+  }
+  else if ((p.lum_ind == lum_id) and (p.filt_ind == filter_id)){
+    return result;
+  }
+
+  result = error = -1;
+  p.lum_ind = lum_id;
+  p.filt_ind = filter_id;
+  p.z = redshift;
+
+  bounds[0] = filters.get(filter_id).low();
+  bounds[1] = filters.get(filter_id).high();
+
+  gsl_integration_qags (&F, bounds[0], bounds[1], 0, SL_INT_PRECISION, SL_INT_SIZE, w, &result, &error); 
+
+  return result*scale;
+}
+
+double sed_lib::flux_yield (double x, void * params) {
+  flux_yield_params *p = (flux_yield_params*) params;
+  
+  return (seds[p->lum_ind]->get_flux(x/(1.0+p->z)) * filters.get(p->filt_ind).transmission(x));
 }

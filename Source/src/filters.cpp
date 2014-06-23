@@ -10,6 +10,8 @@ filter::filter(){
   filter_size=0;
   lambda=NULL;
   response=NULL;
+  acc=NULL;
+  spline=NULL;
 }
 
 filter::filter(string filtername, string filename){
@@ -18,6 +20,8 @@ filter::filter(string filtername, string filename){
   filter_size=0;
   lambda=NULL;
   response=NULL;
+  acc=NULL;
+  spline=NULL;
   load(filtername,filename);
 }
 
@@ -72,6 +76,11 @@ bool filter::load(string filtername, string filename){
     filter_limits[0] = vlambda.front();
     filter_limits[1] = vlambda.back();
 
+    if(lambda != NULL)
+      delete [] lambda;
+    if(response != NULL)
+      delete [] response;
+
     //convert vectors to arrays for gsl functions and storage
     lambda = new double[filter_size];
     response = new double[filter_size];    
@@ -80,6 +89,11 @@ bool filter::load(string filtername, string filename){
       response[i] = vresponse[i];
     }
     
+    if(init){
+      gsl_spline_free(spline);
+      gsl_interp_accel_free(acc);
+    }   
+
     acc = gsl_interp_accel_alloc();
     spline = gsl_spline_alloc(gsl_interp_cspline,filter_size);
     gsl_spline_init(spline,lambda,response,filter_size);
@@ -143,14 +157,27 @@ filter::~filter(){
   }
 }
 
-
+filter_lib::filter_lib(}{
+  init = false;
+}
 
 filter_lib::filter_lib(string ffilename){
-  if(!load_library(ffilename))
+  if(load_library(ffilename)){
+    init = true;
+  }
+  else{
     printf("ERROR: file \"%s\" not read successfully, library not initialized\n",ffilename.c_str());
+    init = false;
+  }
 }
 
 bool filter_lib::load_library(string ffilename){
+  
+  if(init){
+    library.clear();
+    init = false;
+  }
+
   char buffer[256];
   char name[256];
   char filename[256];
@@ -199,21 +226,24 @@ bool filter_lib::load_library(string ffilename){
 bool filter_lib::load_filter(short num, string fname){
   int found=-1;
   
-  if ((num >=0) and (num <3)){
-    for(int i=0;i<library.size();i++){
-      if(library[i].name == fname){
-	found = i;
-	i = library.size();
+  if(init){
+    if ((num >=0) and (num <3)){
+      for(int i=0;i<library.size();i++){
+	if(library[i].name == fname){
+	  found = i;
+	  i = library.size();
+	}
       }
+      if (found != -1)
+	return filters[num].load(fname,library[found].filename);
+      else
+	printf("Error: Filter \"%s\" not found in library\n",fname.c_str());
     }
-    if (found != -1)
-      return filters[num].load(fname,library[found].filename);
     else
-      printf("Error: Filter \"%s\" not found in library\n",fname.c_str());
+      printf("Error: Invalid filter number %i\n",num);
   }
-  else
-    printf("Error: Invalid filter number %i\n",num);
-  
+  else printf("Error: library not initialized\n");
+
   return false;
 }
 
