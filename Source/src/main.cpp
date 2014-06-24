@@ -36,36 +36,50 @@ int main(int argc,char** argv){
   string obsfile(argv[1]);
   string modfile(argv[2]);
   string sedfile(argv[3]);
+  string filterfile;
   //If outfile specified as argument, change from default
   if(argc > 4)
     outfile = argv[4];
-
-  bool oprint=true;
-  bool accept;
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
-  unsigned long runs;
-  unsigned long i,m,p;
-  int nz,ns;
-  double area, dz, zmax, zmin, rtemp, rmax, a_ci;
-  double TMAX,IDEALPCT,ANNRNG;
+  
+  //general variable declarations
+  bool accept,vary_cexp,oprint=true,saved;
+  unsigned long runs,i,m,p,NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO,burn_num, nparams;
+  int nz,ns, cind;
+  double area, dz, zmax, zmin, rtemp, rmax, a_ci,TMAX,IDEALPCT,ANNRNG, temp, trial;
   char wtemp[2];
   string wnum;
-  unsigned long NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO,burn_num;
-  //products output;
-  double bs[BANDS],errs[BANDS],flims[BANDS];
-  //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
-  double lpars[LUMPARS],lfix[LUMPARS],lmax[LUMPARS],lmin[LUMPARS],ldp[LUMPARS],cexp[5];
   vector<int> param_inds;
   const gsl_rng_type * T;
 
-  FITS *pInfile,*pInfile2;
-  pInfile = new FITS(modfile,Read);
-  pInfile2 = new FITS(obsfile,Read);
+  //mcmc variables and arrays
+  double chi_min=1.0E+4; 
+  double prng[nparams][runs];
+  double ptemp[NCHAIN][nparams];
+  double pbest[nparams];
+  double pcurrent[NCHAIN][nparams];
+
+  //declarations for filters and band specifications
+  double filters[BANDS], errs[BANDS], flims[BANDS];
+  //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
+  double lpars[LUMPARS],lfix[LUMPARS],lmax[LUMPARS],lmin[LUMPARS],ldp[LUMPARS],cexp[5];
+  
+  //IO variables
+  string suffix[] = {"","_FIX","_MIN","_MAX","_DP"};
+  double *arrays[] = {lpars,lfix,lmin,lmax,ldp}; //used to loop over these arrays
+  string tag;
+
+  //counts
+  string countnames[]= {"dnds250","dnds350","dnds500"};
+  
+  std::unique_ptr<FITS> pInfile (new FITS(modfile,Read));
+  std::unique_ptr<FITS> pInfile2 (new FITS(obsfile,Read));
   
   //reading primary header from fits file
   HDU& params_table = pInfile->pHDU();
   HDU& obs_table = pInfile2->pHDU();
 
+  //Read in simulation settings
   params_table.readKey("RUNS",rtemp);
   runs = (unsigned long) rtemp;
   params_table.readKey("ZMIN",zmin);
@@ -89,6 +103,7 @@ int main(int argc,char** argv){
   params_table.readKey("PRINT",rtemp);
   oprint = rtemp == 0.0 ? true : false;
 
+  //output found settings
   if(oprint)
     printf("Printing Verbose Output\n");
   else
@@ -113,74 +128,42 @@ int main(int argc,char** argv){
   printf("Simulation Settings:\n");
   printf("Run Number Max: %lu\nNumber Redshift Bins: %i\nRedshift Bin Width: %f\nArea: %f\n\n",runs,nz,dz,area);
 
+  //EDIT HERE FOR FILTERS!!!
+  filters[0] = "SPIRE_250";
+  filters[1] = "SPIRE_350";
+  filters[2] = "SPIRE_500";
   for(i=0;i<BANDS;i++){
     sprintf(wtemp,"%lu",i+1);
     wnum = string(wtemp);
-    obs_table.readKey("WAVE_"+wnum,bs[i]); //should already be in microns
     obs_table.readKey("W"+wnum+"_FMIN",flims[i]); //should be in mJy
     obs_table.readKey("W"+wnum+"_FERR",errs[i]);
-    printf("Band %s:\t%8.3e %7.3e %7.3e\n",wnum.c_str(),bs[i],flims[i],errs[i]);
+    printf("Band %s:\t%8.3e %7.3e %7.3e\n",wnum.c_str(),filters[i],flims[i],errs[i]);
   }
   
   //=================================================================  
   //Read-in Luminosity Function Parameters
   //-----------------------------------------------------------------
 
-  //read parameter values
-  params_table.readKey("PHI0",lpars[0]);
-  params_table.readKey("L0",lpars[1]);
-  params_table.readKey("ALPHA",lpars[2]);
-  params_table.readKey("BETA",lpars[3]);
-  params_table.readKey("P",lpars[4]);
-  params_table.readKey("Q",lpars[5]);
-  params_table.readKey("ZCUT",lpars[6]);
-  //read parameter value fitting boolean
-  params_table.readKey("PHI0_FIX",lfix[0]);
-  params_table.readKey("L0_FIX",lfix[1]);
-  params_table.readKey("ALPHA_FI",lfix[2]);
-  params_table.readKey("BETA_FIX",lfix[3]);
-  params_table.readKey("P_FIX",lfix[4]);
-  params_table.readKey("Q_FIX",lfix[5]);
-  params_table.readKey("ZCUT_FIX",lfix[6]);
-  //read parameter minimum values
-  params_table.readKey("PHI0_MIN",lmin[0]);
-  params_table.readKey("L0_MIN",lmin[1]);
-  params_table.readKey("ALPHA_MI",lmin[2]);
-  params_table.readKey("BETA_MIN",lmin[3]);
-  params_table.readKey("P_MIN",lmin[4]);
-  params_table.readKey("Q_MIN",lmin[5]);
-  params_table.readKey("ZCUT_MIN",lmin[6]);
-  //read parameter maximum values
-  params_table.readKey("PHI0_MAX",lmax[0]);
-  params_table.readKey("L0_MAX",lmax[1]);
-  params_table.readKey("ALPHA_MA",lmax[2]);
-  params_table.readKey("BETA_MAX",lmax[3]);
-  params_table.readKey("P_MAX",lmax[4]);
-  params_table.readKey("Q_MAX",lmax[5]);
-  params_table.readKey("ZCUT_MAX",lmax[6]);
-  //read parameter sigma values
-  params_table.readKey("PHI0_DP",ldp[0]);
-  params_table.readKey("L0_DP",ldp[1]);
-  params_table.readKey("ALPHA_DP",ldp[2]);
-  params_table.readKey("BETA_DP",ldp[3]);
-  params_table.readKey("P_DP",ldp[4]);
-  params_table.readKey("Q_DP",ldp[5]);
-  params_table.readKey("ZCUT_DP",ldp[6]);
-  
-  for (i=0;i<LUMPARS;i++)
+  for(int i=0;i<LUMPARS;i++){
+    for(int j=0;j<5;j++){
+      tag = pnames[i]+suffix[j];
+      tag = tag.substr(0,8);
+      params_table.readKey(tag,arrays[j][i]);
+    }
     if(lfix[i] == 0)
       param_inds.push_back(i);
+  }
+  
+  //color evolution parameters
+  for(int j=0;j<5;j++){
+    tag = "CEXP"+suffix[j];
+    tag = tag.substr(0,8);
+    params_table.readKey(tag,cexp[j]);
+  }
 
-  //read color_exp values
-  params_table.readKey("CEXP",cexp[0]);
-  params_table.readKey("CEXP_FIX",cexp[1]);
-  params_table.readKey("CEXP_MIN",cexp[2]);
-  params_table.readKey("CEXP_MAX",cexp[3]);
-  params_table.readKey("CEXP_DP",cexp[4]);
-
-  unsigned long nparams = param_inds.size();
-  bool vary_cexp = false;
-  int cind = nparams;
+  nparams = param_inds.size();
+  vary_cexp = false;
+  cind = nparams;
   if(cexp[1] == 0){
     nparams++;
     vary_cexp = true;
@@ -199,14 +182,28 @@ int main(int argc,char** argv){
   lumfunct lf;
   lf.set_params(lpars);
 
+  //initialize simulator
+  simulator survey(filterfile, filters, errs, flims, obsfile, sedfile); 
+  survey.set_color_exp(cexp[0]); //color evolution
+  survey.set_lumfunct(&lf);
+  
+  gsl_rng_default_seed=time(NULL);
+  T=gsl_rng_default;
+  r=gsl_rng_alloc(T);
+  
+  //NON GENERAL COUNTS
+  //the flux array is logarithmic in steps of 0.3dex 
+  //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
+  ns=8;
+  survey.set_size(area,dz,zmin,nz,ns);
+  int bnum[]={16,13,10};
+  products output(nz,bnum);
+
   printf("Initial p: %5.3f, and q: %5.3f\n",lpars[4],lpars[5]);
   printf("p range: %5.3f - %5.3f, sigma: %5.3f\n",lmin[4],lmax[4],ldp[4]);
   printf("q range: %5.3f - %5.3f, sigma: %5.3f\n",lmin[5],lmax[5],ldp[5]);
   printf("Color Evolution: %5.3f\n",cexp[0]);
   printf("Redshift Cutoff: %5.3f\n",lpars[6]);
-
-  delete pInfile;
-  delete pInfile2;
 
   /*
     Loop trough the mcmc runs
@@ -216,39 +213,7 @@ int main(int argc,char** argv){
     The chain results (including all accepted guesses) will provide us with the posterior 
     probability distributions for the fitted parameters.
   */
-
-  //initialize simulator
-  simulator survey(bs,errs,flims,obsfile,sedfile); 
-  survey.set_color_exp(cexp[0]); //color evolution
-  survey.set_lumfunct(&lf);
-
-  //the initial chi2_min value
-  //this is iterated each time a better value is found
-  double chi_min=1.0E+4; 
-  double trial;
-  double prng[nparams][runs];
-
-  // the temperature, keep fixed for now, but can also try annealing 
-  // in the future, this has similar effect as the width of the proposal
-  // distribution, as determines how likely a far flung guess is of being 
-  // accepted (see metrop function)
-  //double tmc=10.00; //to distinguish it from the random T
-  double temp;
-  double ptemp[NCHAIN][nparams];
-  double pbest[nparams];
-  double pcurrent[NCHAIN][nparams];
-
-  gsl_rng_default_seed=time(NULL);
-  T=gsl_rng_default;
-  r=gsl_rng_alloc(T);
-
-  //the flux array is logarithmic in steps of 0.3dex 
-  //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
-  ns=8;
-  survey.set_size(area,dz,zmin,nz,ns);
-  int bnum[]={16,13,10};
-  products output(nz,bnum);
-
+  
   MCChains mcchain(NCHAIN,nparams,runs,CONV_STEP);
   ResultChain counts(3,NCHAIN*runs);
   mcchain.set_constraints(rmax,a_ci);
@@ -388,24 +353,24 @@ int main(int argc,char** argv){
   }
   
   mcchain.get_best_link(pbest,chi_min);
+
   for(p=0;p<param_inds.size();p++)
     lpars[param_inds[p]] = pbest[p];
   lf.set_params(lpars);
   if(vary_cexp)
     survey.set_color_exp(pbest[cind]);
+
   printf("\nRe-Running Best Fit...\n");
   output=survey.simulate();
   printf("Model chi2: %lf\n",output.chisqr);
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
   
-  string *parnames = new string[nparams];
-  string countnames[]= {"dnds250","dnds350","dnds500"};
+  unique_ptr<string> parnames (new string[nparams]);
   for(p=0;p<param_inds.size();p++)
     parnames[p] = pnames[param_inds[p]];
   if(vary_cexp)
     parnames[cind] = "CEXP";
   
-  bool saved;
   saved = survey.save(outfile);
   saved &= mcchain.save(outfile,parnames);
   saved &= counts.save(outfile,countnames);
@@ -414,7 +379,6 @@ int main(int argc,char** argv){
   else
     printf("Save Failed\n");
   
-  delete[] parnames;
   gsl_rng_free (r);
   
   printf("\nFitting Complete\n\n");

@@ -62,7 +62,6 @@ class simulator{
   sed_lib *seds;
   obs_lib *observations;
   hist_lib * diagnostic;
-  double bands[3];
   double band_errs[3];
   double flux_limits[3];
   double color_exp;
@@ -79,8 +78,9 @@ class simulator{
     zmin = 0.1; //default to 0.1-6.0, 0.1 steps
     nz = 59;
     dz = 0.1;}
-  simulator(double b[],double b_err[],double f_lims[],string obsfile,string sedfile);
-  void set_bands(double b[],double b_err[],double f_lims[]);
+  simulator(string filterfile, string filters[], double f_lims[], double errors[], string obsfile, string sedfile);
+  bool load_filter_lib(string file);
+  bool load_filter(short filt_id, string name, double error, double flim);
   void set_size(double area,double dz,double zmin,int nz,int ns);
   void set_color_exp(double val);
   void set_lumfunct(lumfunct *lf);

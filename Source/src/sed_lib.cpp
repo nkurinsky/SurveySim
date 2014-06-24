@@ -87,7 +87,7 @@ sed_lib::sed_lib(string fitsfile){
     seds.push_back(new_sed);
   }
 
-  filter_init = false;
+  color_exp = 0;
 
   delete[] bands;
   delete pInfile;
@@ -95,7 +95,7 @@ sed_lib::sed_lib(string fitsfile){
 
 bool sed_lib::init_filter_lib(string file){
   
-  if(filters.load_library(filterlibfile)){
+  if(filters.load_library(file)){
     w = gsl_integration_workspace_alloc(SL_INT_SIZE);
     return true;
   }
@@ -146,7 +146,7 @@ double sed_lib::get_filter_flux(double lum, double redshift, short filter_id){
   if (seds[i] != NULL){
     if (filters.init()){
       if((filter_id >= 0) and (filter_id < 3) and (filters.get(filter_id).low() < filters.get(filter_id).high())){
-	if((filters->get(filter_id).low() >= brange[0]) and (filter->get(filter_id).high() <= brange[1]))
+	if((filters.get(filter_id).low() >= brange[0]) and (filters.get(filter_id).high() <= brange[1]))
 	  return convolve_filter(i,redshift,filter_id);
 	else{
 	  printf("%s\n%s\n","ERROR: Filter out of model range.","Check that the obs bands are within range and unit consistent");
@@ -165,6 +165,10 @@ double sed_lib::get_filter_flux(double lum, double redshift, short filter_id){
   } 
 
   return -1;
+}
+
+void sed_lib::set_color_evolution(double exp){
+  color_exp = exp;
 }
 
 double sed_lib::get_dl(){
@@ -211,6 +215,7 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
   if(not conv_init){
     F.function = &flux_yield;
     F.params = &p;
+    p.wlib = this;
     p.lum_ind = -1;
     p.filt_ind = -1;
     p.z = -1;
@@ -221,7 +226,6 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
   if(p.z != redshift){
     scale = (1+redshift)*Wm2Hz_TO_mJy/(4.0*M_PI*pow(lumdist(redshift)*MPC_TO_METER,2.0));
     scale *= pow((1.0+redshift),color_exp);
-    current_redshift = redshift;
   }
   else if ((p.lum_ind == lum_id) and (p.filt_ind == filter_id)){
     return result;
@@ -240,8 +244,8 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
   return result*scale;
 }
 
-double sed_lib::flux_yield (double x, void * params) {
+double flux_yield (double x, void * params) {
   flux_yield_params *p = (flux_yield_params*) params;
   
-  return (seds[p->lum_ind]->get_flux(x/(1.0+p->z)) * filters.get(p->filt_ind).transmission(x));
+  return (p->wlib->seds[p->lum_ind]->get_flux(x/(1.0+p->z)) * p->wlib->filters.get(p->filt_ind).transmission(x));
 }

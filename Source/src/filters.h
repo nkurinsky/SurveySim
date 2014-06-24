@@ -41,7 +41,7 @@ class filter_lib{
   filter_lib();
   filter_lib(string ffilename);
   bool init(){
-    return init;}
+    return initialized;}
   bool load_library(string ffilename);
   bool load_filter(short num, string fname);
   filter& get(short num);
@@ -50,7 +50,7 @@ class filter_lib{
   vector<filter_info> library;
   filter filters[3];
   filter dummy;
-  bool init;
+  bool initialized;
 };
 
 #endif

@@ -157,25 +157,25 @@ filter::~filter(){
   }
 }
 
-filter_lib::filter_lib(}{
-  init = false;
+filter_lib::filter_lib(){
+  initialized = false;
 }
 
 filter_lib::filter_lib(string ffilename){
   if(load_library(ffilename)){
-    init = true;
+    initialized = true;
   }
   else{
     printf("ERROR: file \"%s\" not read successfully, library not initialized\n",ffilename.c_str());
-    init = false;
+    initialized = false;
   }
 }
 
 bool filter_lib::load_library(string ffilename){
   
-  if(init){
+  if(initialized){
     library.clear();
-    init = false;
+    initialized = false;
   }
 
   char buffer[256];
@@ -226,7 +226,7 @@ bool filter_lib::load_library(string ffilename){
 bool filter_lib::load_filter(short num, string fname){
   int found=-1;
   
-  if(init){
+  if(initialized){
     if ((num >=0) and (num <3)){
       for(int i=0;i<library.size();i++){
 	if(library[i].name == fname){

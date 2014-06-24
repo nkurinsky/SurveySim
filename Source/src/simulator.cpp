@@ -110,16 +110,22 @@ int simulator::binNum(int band, double flux){
   return dndsInfo.bnum[band]-1;
 }
 
-simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,string sedfile){
+simulator::simulator(string filterfile, string filters[], double f_lims[], double errors[], string obsfile, string sedfile){
 
-  for (int i=0;i<3;i++){
-    bands[i] = b[i];
-    band_errs[i] = b_err[i];
-    flux_limits[i]= f_lims[i];
-  }
+  seds = NULL;
+
   color_exp = 0.0;
   observations = new obs_lib(obsfile);
   seds = new sed_lib(sedfile);
+
+  //initialize filters
+  if(seds->init_filter_lib(filterfile)){
+    for(short i=0;i<3;i++){
+      seds->load_filter(i,filters[i]);
+      flux_limits[i]= f_lims[i];
+      band_errs[i] = errors[i];
+    }
+  }
 
   //initialize observation portion of histograms
   //possibility here to integrate obs_lib into hist_lib
@@ -135,12 +141,20 @@ simulator::simulator(double b[],double b_err[],double f_lims[],string obsfile,st
   last_output.dnds[2].resize(dndsInfo.bnum[2]);
 }
 
-void simulator::set_bands(double b[],double b_err[],double f_lims[]){
-  for (int i=0;i<3;i++){
-    bands[i] = b[i];
-    band_errs[i] = b_err[i];
-    flux_limits[i]= f_lims[i];
+bool simulator::load_filter_lib(string file){
+  return seds->init_filter_lib(file);
+}
+
+bool simulator::load_filter(short filt_id, string name, double error, double flim){
+  if((filt_id < 3) and (filt_id >= 0)){
+    band_errs[filt_id] = error;
+    flux_limits[filt_id] = flim;
   }
+  else{
+    printf("ERROR: Invalid filt_id\n");
+    return false;
+  }
+  return seds->load_filter(filt_id,name);
 }
 
 void simulator::set_size(double area,double dz,double zmin,int nz,int ns){
@@ -154,7 +168,8 @@ void simulator::set_size(double area,double dz,double zmin,int nz,int ns){
 }
 
 void simulator::set_color_exp(double val){
-  color_exp = val;
+  if (seds != NULL)
+    seds->set_color_evolution(val);
 }
 
 void simulator::set_lumfunct(lumfunct *lf){
@@ -167,6 +182,8 @@ void simulator::set_lumfunct(lumfunct *lf){
 
 
 void simulator::set_sed_lib(string sedfile){
+  if(seds != NULL)
+    delete seds;
   seds = new sed_lib(sedfile);
 }
 
@@ -192,10 +209,9 @@ products simulator::simulate(){
 
     int lnum = seds->get_lnum();
     double dl = seds->get_dl();
-    static double sf;
     static long nsrcs;
     double lums[lnum];
-    double zarray[nz],weights[nz];    
+    double zarray[nz];    
     
     seds->get_lums(lums);
     
@@ -206,12 +222,11 @@ products simulator::simulate(){
     //previous approach was round to nearest template value.
     // We interpolate here, in future will convolve filter
  
-    static double b_rest[3],flux_sim[3];
+    static double flux_sim[3];
     static double noise[3];
     static sprop *temp_src;
     static int src_iter;
     static bool detected = true;
-    static double lum_ratio;
     static int dndsi;
 
     gsl_rng * r;
@@ -224,24 +239,12 @@ products simulator::simulate(){
     for (is=0;is<nz;is++){
       zarray[is]=(is+1)*dz+zmin;
 
-      //for color evolution:
-      lum_ratio = pow((1.0+zarray[is]),color_exp);
-      
       tmpz=zarray[is]+dz/2.0;
       vol=(dvdz(tmpz,area)*dz);
-      weights[is] = 1.e0; //still here in case scaling must be done
 
-      b_rest[0]=bands[0]/(1.0+zarray[is]);
-      b_rest[1]=bands[1]/(1.0+zarray[is]);
-      b_rest[2]=bands[2]/(1.0+zarray[is]);
-
-      //denominator of conversion from luminosity to flux, precompute for speed
-      sf = 4.0*M_PI*pow(lumdist(zarray[is])*MPC_TO_METER,2.0); 
-      
       jsmin = 0;
       for (js=0;js<lnum;js++){
-	flux_sim[0] = seds->get_flux(lums[js],b_rest[0])*lum_ratio;
-	flux_sim[0] *= (1+zarray[is])*Wm2Hz_TO_mJy/sf;
+	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],0);
 	if(flux_sim[0]>=flux_limits[0]){
 	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
 	  js = lnum; //break out of loop
@@ -256,8 +259,7 @@ products simulator::simulate(){
 	  detected = true;
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
-	    flux_sim[i] = seds->get_flux(lums[js],b_rest[i])*lum_ratio;
-	    flux_sim[i] *= (1+zarray[is])*Wm2Hz_TO_mJy/sf;
+	    flux_sim[i] = seds->get_filter_flux(lums[js],zarray[is],i);
 	    flux_sim[i] += noise[i];
 	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
 	      detected = false;
@@ -271,7 +273,7 @@ products simulator::simulate(){
 	  
 	  //check for detectability, if "Yes" add to list
 	  if(detected){
-	    temp_src = new sprop(zarray[is],flux_sim,lums[js],weights[is]);
+	    temp_src = new sprop(zarray[is],flux_sim,lums[js],1.0);
 	    sources.push_back(*temp_src);
 	    output.dndz[is]+=1; 
 	    delete temp_src;
