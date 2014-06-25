@@ -43,7 +43,7 @@ cfitsio: make the cfitsio library, install it in /usr/local and establish refere
 
 CCFits: make the CCFits library, linking with cfitsio, install it in /usr/local and 
 establish references
-	./confifgure --with-cfitsio=/usr/local
+	./configure --with-cfitsio=/usr/local
 	make
 	sudo make install
 Note: If the compilation fails, make sure the ColumnVectorData header file is correct;
