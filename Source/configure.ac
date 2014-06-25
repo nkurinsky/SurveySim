@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.63])
+AC_PREREQ([2.69])
 
 AC_INIT([SurveySim], [1.0], [nkurinsky91@gmail.com])
 AC_CONFIG_SRCDIR([src/constants.h])
