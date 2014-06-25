@@ -4,10 +4,8 @@
 AC_PREREQ([2.63])
 
 AC_INIT([SurveySim], [1.0], [nkurinsky91@gmail.com])
-AM_INIT_AUTOMAKE([SurveySim], [1.0])
-
 AC_CONFIG_SRCDIR([src/constants.h])
-#AC_CONFIG_HEADERS([config.h])
+AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CXX

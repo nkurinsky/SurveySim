@@ -29,6 +29,13 @@ int main(int argc,char** argv){
     printf("%s","Calling sequence should be \"fit obsfile modfile sedfile [output]\"\n");
     return 1;}
 
+  char * ffile = getenv("FILTERFILE");
+  if(ffile == NULL){
+    printf("ERROR: Environment variable \"FILTERFILE\" not specified\n");
+    printf("\tVariable required for filter I/O, should point to master filter list\n");
+    return 1;
+  }
+
   printf("\nMCMC Fitting Code Compiled: %s\n\n",__DATE__);
   
   //File names passed in by Widget
@@ -36,7 +43,7 @@ int main(int argc,char** argv){
   string obsfile(argv[1]);
   string modfile(argv[2]);
   string sedfile(argv[3]);
-  string filterfile;
+  string filterfile(getenv("FILTERFILE"));
   //If outfile specified as argument, change from default
   if(argc > 4)
     outfile = argv[4];
@@ -59,7 +66,8 @@ int main(int argc,char** argv){
   double pcurrent[NCHAIN][nparams];
 
   //declarations for filters and band specifications
-  double filters[BANDS], errs[BANDS], flims[BANDS];
+  string filters[BANDS];
+  double errs[BANDS], flims[BANDS];
   //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
   double lpars[LUMPARS],lfix[LUMPARS],lmax[LUMPARS],lmin[LUMPARS],ldp[LUMPARS],cexp[5];
@@ -137,7 +145,7 @@ int main(int argc,char** argv){
     wnum = string(wtemp);
     obs_table.readKey("W"+wnum+"_FMIN",flims[i]); //should be in mJy
     obs_table.readKey("W"+wnum+"_FERR",errs[i]);
-    printf("Band %s:\t%8.3e %7.3e %7.3e\n",wnum.c_str(),filters[i],flims[i],errs[i]);
+    printf("Band %s:\t%s %7.3e %7.3e\n",wnum.c_str(),filters[i].c_str(),flims[i],errs[i]);
   }
   
   //=================================================================  
@@ -365,14 +373,14 @@ int main(int argc,char** argv){
   printf("Model chi2: %lf\n",output.chisqr);
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
   
-  unique_ptr<string> parnames (new string[nparams]);
+  unique_ptr<string[]> parnames (new string[nparams]);
   for(p=0;p<param_inds.size();p++)
     parnames[p] = pnames[param_inds[p]];
   if(vary_cexp)
     parnames[cind] = "CEXP";
   
   saved = survey.save(outfile);
-  saved &= mcchain.save(outfile,parnames);
+  saved &= mcchain.save(outfile,parnames.get());
   saved &= counts.save(outfile,countnames);
   if(saved)
     printf("Save Successful\n");
