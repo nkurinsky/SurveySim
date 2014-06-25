@@ -1,0 +1,34 @@
+# Master Filter List
+#
+#
+
+KPNO_357	0.357_KPNO.res 
+KPNO_658	0.658_KPNO.res
+KPNO_1253	1.253_KPNO.res
+NICMOS		1.6_NICMOS.res 
+KPNO_2146	2.146_KPNO.res
+IRAC_3.6	3.6_IRAC.res  
+IRAC_4.5	4.5_IRAC.res 
+IRAC_5.8	5.8_IRAC.res
+IRAC_8		8_IRAC.res
+PU_16		16_PU.res
+SQUARE_16	16_SQUARE.res
+SQUARE_18	18_SQUARE.res  
+SQUARE_20	20_SQUARE.res 
+SQUARE_22	22_SQUARE.res
+MIPS_24		24_MIPS.res 
+SQUARE_26	26_SQUARE.res 
+SQUARE_28	28_SQUARE.res  
+SQUARE_30	30_SQUARE.res 
+SQUARE_32	32_SQUARE.res 
+SQUARE_70	70_MIPS.res
+PACS_70		70_PACS.res
+PACS_100	100_PACS.res  
+MIPS_160	160_MIPS.res     
+SPIRE_250	/Users/noahkurinsky/Desktop/filt/250_SPIRE.res  
+SPIRE_350	/Users/noahkurinsky/Desktop/filt/350_SPIRE.res  
+SPIRE_500	/Users/noahkurinsky/Desktop/filt/500_SPIRE.res    
+SCUBA_850	/Users/noahkurinsky/Desktop/filt/850_SCUBA.res
+MAMBO_1200	1200_MAMBO.res
+214100_SQUARE.res
+491500_SQUARE.res

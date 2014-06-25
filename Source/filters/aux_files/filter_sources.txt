@@ -1,4 +1,0 @@
-Spitzer Response: http://irsa.ipac.caltech.edu/data/SPITZER/docs/
-Herschel Spire Response: https://nhscsci.ipac.caltech.edu/sc/index.php/Spire/PhotInstrumentDescription
-Herschel PACS Response: https://nhscsci.ipac.caltech.edu/sc/index.php/Pacs/FilterCurves
-Wise Response: http://wise2.ipac.caltech.edu/docs/release/allsky/expsup/sec4_4h.html#WISEZMA
