@@ -14,7 +14,7 @@ filter::filter(){
   spline=NULL;
 }
 
-filter::filter(string filtername, string filename){
+filter::filter(string filtername, vector<double> band, vector<double> transmission){
   name="NULL";
   init=false;
   filter_size=0;
@@ -22,88 +22,50 @@ filter::filter(string filtername, string filename){
   response=NULL;
   acc=NULL;
   spline=NULL;
-  load(filtername,filename);
+  load(filtername,band,transmission);
 }
 
-bool filter::load(string filtername, string filename){
-  char buffer[256];
-  double dlambda, dresponse;
-  vector<double> vlambda;
-  vector<double> vresponse;
-  long linenumber=0;
-  int matchnum=0;
+bool filter::load(string filtername, vector<double> band, vector<double> transmission){
   
-  FILE *infile;
-  infile = fopen(filename.c_str(),"r");
-  if(infile != NULL){
-    while(!feof(infile)){
-      //read operations, line by line
-      if(fgets(buffer,255,infile) != NULL){
-	linenumber++;
-	switch(buffer[0]){
-	case EOF:
-	case '\n':
-	case '#':
-	  break;
-	default:
-	  matchnum = sscanf(buffer," %lf %lf",&dlambda,&dresponse);
-	  if((dlambda < 0) or (matchnum != 2))
-	    printf("Warning: Invalid value detected in filter file \"%s\" at line %li, discarding line\n", filename.c_str(),linenumber);
-	  else{
-	    if(dlambda < 0)
-	      dlambda = 0;
-	    vlambda.push_back(dlambda);
-	    vresponse.push_back(dresponse);
-	  }
-	}
-      }
-    }
-    fclose(infile);
-
-    if(vlambda.size() < 2){
-      printf("Error: Not enough valid lines in filter file, filter not initialized\n");
-      return false;
-    }
-    
-    if(vlambda.size() != vresponse.size()){
-      printf("Error: Filter file improperly formatted (different number of wavelength and response values), filter not initialized\n");
-      return false;
-    }
-    
-    init=true;
-    name = filtername;
-    filter_size = vlambda.size();
-    filter_limits[0] = vlambda.front();
-    filter_limits[1] = vlambda.back();
-
-    if(lambda != NULL)
-      delete [] lambda;
-    if(response != NULL)
-      delete [] response;
-
-    //convert vectors to arrays for gsl functions and storage
-    lambda = new double[filter_size];
-    response = new double[filter_size];    
-    for(unsigned long i=0;i<filter_size;i++){
-      lambda[i] = vlambda[i];
-      response[i] = vresponse[i];
-    }
-    
-    if(init){
-      gsl_spline_free(spline);
-      gsl_interp_accel_free(acc);
-    }   
-
-    acc = gsl_interp_accel_alloc();
-    spline = gsl_spline_alloc(gsl_interp_cspline,filter_size);
-    gsl_spline_init(spline,lambda,response,filter_size);
-    
-  }
-  else{
-    printf("ERROR: Could not read filter file \"%s\" specified for filter \"%s\"\n",filename.c_str(),filtername.c_str());
+  if(band.size() < 2){
+    printf("Error: Not enough valid lines in filter file, filter not initialized\n");
     return false;
   }
+  
+  if(band.size() != transmission.size()){
+    printf("Error: Filter file improperly formatted (different number of wavelength and response values), filter not initialized\n");
+    return false;
+  }
+  
+  init=true;
+  name = filtername;
+  filter_size = band.size();
+  filter_limits[0] = band.front();
+  filter_limits[1] = band.back();
 
+  if(lambda != NULL)
+    delete [] lambda;
+  if(response != NULL)
+    delete [] response;
+  
+  //convert vectors to arrays for gsl functions and storage
+  //NORMALIZE
+  lambda = new double[filter_size];
+  response = new double[filter_size];    
+  for(unsigned long i=0;i<filter_size;i++){
+    lambda[i] = band[i];
+    response[i] = transmission[i];
+  }
+    
+  if(init){
+    gsl_spline_free(spline);
+    gsl_interp_accel_free(acc);
+  }   
+
+  acc = gsl_interp_accel_alloc();
+  spline = gsl_spline_alloc(gsl_interp_cspline,filter_size);
+  gsl_spline_init(spline,lambda,response,filter_size);
+  
   return true;
 }
 
@@ -178,11 +140,12 @@ bool filter_lib::load_library(string ffilename){
     initialized = false;
   }
 
-  char buffer[256];
-  char name[256];
-  char filename[256];
+  bool invalid_name = false;
+  char buffer[256], name[256], info[256];
+  double scale_exp, dlambda, dresponse;
   filter_info temp;
   int matchnum;
+  int bad = 0;
 
   long linenumber=0;
   
@@ -198,23 +161,76 @@ bool filter_lib::load_library(string ffilename){
 	case '\n':
 	case '#':
 	  break;
+	case '>':
+	  //if vectors not empty, finalize previous filter
+	  if(temp.band.size() != 0){
+	    library.push_back(temp);
+	    temp.band.clear();
+	    temp.transmission.clear();
+	  }
+	  
+	  //new filter
+	  if(invalid_name){
+	    printf("Discarded %i lines after bad filter initializer\n",bad);
+	    invalid_name = false;
+	    bad = 0;
+	  }
+	  
+	  scale_exp = 0;
+	  matchnum = sscanf(buffer," > %s %lf %s", name, &scale_exp, info);	  
+	  
+	  switch(matchnum){
+	  case 0:
+	    printf("Warning: Invalid value detected in filter library file \"%s\" at line %li, discarding line\n", ffilename.c_str(),linenumber);
+	    invalid_name = true;
+	    break;
+	  case 1:
+	    temp.info = "";
+	    temp.scale = 1;
+	    break;
+	  case 2:
+	    temp.name = (string) name;
+	    if(scale_exp != 0){
+	      temp.scale = pow(10,scale_exp);
+	      temp.info = "";
+	    }
+	    else{
+	      temp.info = (string) info;
+	      temp.scale = 1;
+	    }
+	    break;
+	  default: //3 or more (could never be more)
+	    temp.name = (string) name;
+	    temp.scale = pow(10,scale_exp);
+	    temp.info = (string) info;
+	    break;
+	  }
+	  break;
 	default:
-	  matchnum = sscanf(buffer," %s %s", name, filename);
-	  if(matchnum < 1)
+	  if(invalid_name){
+	    bad++;
+	    break;
+	  }
+	  
+	  matchnum = sscanf(buffer," %lf %lf",&dlambda,&dresponse);
+	  if((dlambda < 0) or (matchnum != 2))
 	    printf("Warning: Invalid value detected in filter library file \"%s\" at line %li, discarding line\n", ffilename.c_str(),linenumber);
 	  else{
-	    temp.name = (string) name;
-	    temp.filename = (string) filename;
-	    if(matchnum == 1){
-	      temp.filename=temp.name;
-	      temp.name.erase(temp.name.length()-4,4);
-	    }
-	    library.push_back(temp);
+	    if(dresponse < 0)
+	      dresponse = 0;
+	    temp.band.push_back(dlambda*temp.scale);
+	    temp.transmission.push_back(dresponse);
 	  }
 	}
       }
     }
+
+    //finalize previous filter
+    if(temp.band.size() != 0)
+      library.push_back(temp);
+
     fclose(infile);
+    initialized = true;
     return true;
   }
   else{
@@ -235,7 +251,7 @@ bool filter_lib::load_filter(short num, string fname){
 	}
       }
       if (found != -1)
-	return filters[num].load(fname,library[found].filename);
+	return filters[num].load(fname,library[found].band, library[found].transmission);
       else
 	printf("Error: Filter \"%s\" not found in library\n",fname.c_str());
     }
@@ -260,5 +276,5 @@ filter& filter_lib::get(short num){
 void filter_lib::print(){
   printf("Number of Filters in Library: %lu\nFilter List:\n",library.size());
   for(unsigned long i=0;i<library.size();i++)
-    printf("\t%16s\t%s\n",library[i].name.c_str(),library[i].filename.c_str());
+    printf("\t%16s\t%6.3lf\t%s\n",library[i].name.c_str(),library[i].scale,library[i].info.c_str());
 }

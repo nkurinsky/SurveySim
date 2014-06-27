@@ -222,7 +222,7 @@ products simulator::simulate(){
     //previous approach was round to nearest template value.
     // We interpolate here, in future will convolve filter
  
-    static double flux_sim[3];
+    static double flux_sim[3], flux_raw[3];
     static double noise[3];
     static sprop *temp_src;
     static int src_iter;
@@ -255,12 +255,14 @@ products simulator::simulate(){
       for (js=jsmin;js<lnum;js++){
 	//source number is dn/(dldv)*Dv*Dl
 	nsrcs = long(dl*vol*lf->get_nsrcs(zarray[is],lums[js]));
+	for (int i=0;i<3;i++){
+	  flux_raw[i] = seds->get_filter_flux(lums[js],zarray[is],i);
+	}
 	for (src_iter=0;src_iter<nsrcs;src_iter++){
 	  detected = true;
 	  for (int i=0;i<3;i++){
 	    noise[i]=gsl_ran_gaussian(r,band_errs[i]);
-	    flux_sim[i] = seds->get_filter_flux(lums[js],zarray[is],i);
-	    flux_sim[i] += noise[i];
+	    flux_sim[i] = flux_raw[i]+noise[i];
 	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
 	      detected = false;
 	    else{

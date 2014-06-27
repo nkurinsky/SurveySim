@@ -53,7 +53,7 @@ sed_lib::sed_lib(string fitsfile){
   bands = new double[bandnum];
 
  //read in the total IR luminosities associated with the different z=0 SED templates
-  double temp;
+  double temp, scale;
   HDU& header = pInfile->pHDU();
   
   printf("%s\n","Initialize Luminosities");
@@ -65,6 +65,8 @@ sed_lib::sed_lib(string fitsfile){
     lums[i] = temp;
     inds[i] = i;
   }
+  header.readKey("SCALE",temp);
+  scale = pow(10,temp);
   
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline,lnum);
@@ -74,7 +76,7 @@ sed_lib::sed_lib(string fitsfile){
   sed *new_sed;
   
   for (unsigned int fi=0;fi<bandnum;fi++){
-    bands[fi]=contents[fi];
+    bands[fi]=contents[fi]*scale;
   }
   
   brange[0] = bands[0];

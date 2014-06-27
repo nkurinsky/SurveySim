@@ -35,6 +35,8 @@ int main(int argc,char** argv){
     printf("\tVariable required for filter I/O, should point to master filter list\n");
     return 1;
   }
+  else
+    printf("Filter library: %s\n",ffile);
 
   printf("\nMCMC Fitting Code Compiled: %s\n\n",__DATE__);
   
@@ -43,7 +45,7 @@ int main(int argc,char** argv){
   string obsfile(argv[1]);
   string modfile(argv[2]);
   string sedfile(argv[3]);
-  string filterfile(getenv("FILTERFILE"));
+  string filterfile(ffile);
   //If outfile specified as argument, change from default
   if(argc > 4)
     outfile = argv[4];
@@ -57,13 +59,6 @@ int main(int argc,char** argv){
   string wnum;
   vector<int> param_inds;
   const gsl_rng_type * T;
-
-  //mcmc variables and arrays
-  double chi_min=1.0E+4; 
-  double prng[nparams][runs];
-  double ptemp[NCHAIN][nparams];
-  double pbest[nparams];
-  double pcurrent[NCHAIN][nparams];
 
   //declarations for filters and band specifications
   string filters[BANDS];
@@ -227,12 +222,20 @@ int main(int argc,char** argv){
   mcchain.set_constraints(rmax,a_ci);
   MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,ANNRNG,r);
 
+  //mcmc variables and arrays
+  double chi_min=1.0E+4; 
+  double prng[nparams][runs];
+  double ptemp[NCHAIN][nparams];
+  double pbest[nparams];
+  double pcurrent[NCHAIN][nparams];
+
   //initialize first chain to initial parameters
-  for(p=0;p<param_inds.size();p++)
+  for(p=0;p<param_inds.size();p++){
     ptemp[0][p] = pcurrent[0][p] = lpars[param_inds[p]];
+  }
   if(vary_cexp)
     ptemp[0][cind] = pcurrent[0][cind] = cexp[0];
-
+  
   for(m=1;m<NCHAIN;m++){ 
     for(p=0;p<param_inds.size();p++){
       ptemp[m][p] = pcurrent[m][p] = gsl_ran_flat(r,lmin[param_inds[p]],lmax[param_inds[p]]);

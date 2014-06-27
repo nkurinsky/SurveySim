@@ -12,14 +12,17 @@
 
 struct filter_info{
   string name;
-  string filename;
+  string info;
+  double scale;
+  vector<double> band;
+  vector<double> transmission;
 };
 
 class filter{
  public:
   filter();
-  filter(string filtername, string filename);
-  bool load(string filtername, string filename);
+  filter(string filtername, vector<double> band, vector<double> transmission);
+  bool load(string filtername, vector<double> band, vector<double> transmission);
   double transmission(double wavelength);
   double low();
   double high();
