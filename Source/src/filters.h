@@ -31,12 +31,13 @@ class filter{
  private:
   string name;
   double *lambda;
-  double *response;
+  double *response;x
   gsl_interp_accel *acc;
   gsl_spline *spline;
   bool init;
   double filter_limits[2];
   unsigned long filter_size;
+  double trap_integrate(vector<double> lambda, vector<double> response);
 };
 
 class filter_lib{

@@ -27,6 +27,8 @@ filter::filter(string filtername, vector<double> band, vector<double> transmissi
 
 bool filter::load(string filtername, vector<double> band, vector<double> transmission){
   
+  double width = 0;
+  
   if(band.size() < 2){
     printf("Error: Not enough valid lines in filter file, filter not initialized\n");
     return false;
@@ -49,12 +51,13 @@ bool filter::load(string filtername, vector<double> band, vector<double> transmi
     delete [] response;
   
   //convert vectors to arrays for gsl functions and storage
-  //NORMALIZE
   lambda = new double[filter_size];
-  response = new double[filter_size];    
+  response = new double[filter_size];
+  //compute normalization
+  width = trap_integrate(band,transmission);
   for(unsigned long i=0;i<filter_size;i++){
     lambda[i] = band[i];
-    response[i] = transmission[i];
+    response[i] = transmission[i]/width;
   }
     
   if(init){
@@ -117,6 +120,14 @@ filter::~filter(){
     delete [] lambda;
     delete [] response;
   }
+}
+
+double filter::trap_integrate(vector<double> lambda, vector<double> response){
+  double tsum = 0;
+  for(int i=1;i<lambda.size();i++){
+    tsum += (lambda[i] - lambda[i-1])*(response[i]+response[i-1]);
+  }
+  return tsum/2.0;
 }
 
 filter_lib::filter_lib(){
