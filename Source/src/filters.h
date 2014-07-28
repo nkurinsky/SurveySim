@@ -31,7 +31,7 @@ class filter{
  private:
   string name;
   double *lambda;
-  double *response;x
+  double *response;
   gsl_interp_accel *acc;
   gsl_spline *spline;
   bool init;

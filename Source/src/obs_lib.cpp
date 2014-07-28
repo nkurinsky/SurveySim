@@ -5,7 +5,7 @@ obs::obs(){
   c2 = -99;
 }
 
-obs::obs(double * f,double *bands){
+obs::obs(double * f){
   for (int i=0;i<3;i++){
     fluxes[i] = f[i];
   }
@@ -32,10 +32,7 @@ void obs::get_colors(double &c1,double &c2){
 }
 
 obs::~obs(){
-  if(interp_init){
-    gsl_spline_free(spline);
-    gsl_interp_accel_free(acc);
-  }
+
 }
 
 obs_lib::obs_lib(string fitsfile){
@@ -48,70 +45,71 @@ obs_lib::obs_lib(string fitsfile){
   
   try{header.readKey("FHDU",hdunum);}
   catch(HDU::NoSuchKeyword){
-    printf("FHDU not set, defaulting to HDU %i\n",extnum);}
+    printf("FHDU not set, defaulting to HDU %i\n",hdunum);}
+
+  try{
   
-  ExtHDU& table;
-  try{table = pInfile->extension(extnum);}
+    ExtHDU& table = pInfile->extension(hdunum);
+
+    const string ti[3] = {"1","2","3"};
+    string column[6];
+    for (int i=0;i<3;i++){
+      try{table.readKey("F"+ti[i]+"COL",column[i]);}
+      catch(HDU::NoSuchKeyword){
+	printf("Keyword F%iCOL missing from header (%s)\n",i,fitsfile.c_str());
+	exit(1);
+      }
+      try{table.readKey("EF"+ti[i]+"COL",column[i+3]);}
+      catch(HDU::NoSuchKeyword){
+	printf("Keyword EF%iCOL missing from header (%s)\n",i,fitsfile.c_str());
+	exit(1);
+      }
+      try{table.readKey("F"+ti[i]+"MIN",flim[i]);}
+      catch(HDU::NoSuchKeyword){
+	printf("Keyword F%iLIM missing from header (%s)\n",i,fitsfile.c_str());
+	exit(1);
+      }
+      try{table.readKey("F"+ti[i]+"FILT",filter[i]);}
+      catch(HDU::NoSuchKeyword){
+	printf("Keyword F%iFILT missing from header (%s)\n",i,fitsfile.c_str());
+	exit(1);
+      }
+    }
+    
+    unsigned long tablesize(table.rows());
+    valarray<valarray<double> > col(valarray<double>(tablesize),6);
+    string unit;
+    for(int i=0;i<6;i++){
+      try{
+	unit = table.column(column[i]).unit();
+	table.column(column[i]).read(col[i],1,tablesize);
+	if(unit == "Jy")
+	  col[i] *= 1e3; //convert to mJy
+      }
+      catch(Table::NoSuchColumn){
+	printf("Column %s does not exist in %s\n",column[i].c_str(),fitsfile.c_str());
+	exit(1);
+      }
+    }
+    
+    //errors are mean of observation errors
+    for(int i=0;i<3;i++){
+      ferr[i] = col[i+3].sum()/tablesize;
+    }
+    
+    observations.reserve(tablesize);
+    double fluxes[3];
+    
+    for (unsigned int i=0;i<observations.size();i++){
+      for (int j=0;j<3;j++)
+	fluxes[j]=col[j][i];
+      observations.push_back(new obs(fluxes));
+    }
+  }
   catch(FITS::NoSuchHDU){
-    printf("HDU %i does not exist inf %s\n",extnum,fitsfile.c_str());
+    printf("HDU %i does not exist inf %s\n",hdunum,fitsfile.c_str());
     exit(1);
   }
-
-  const string ti[3] = {"1","2","3"};
-  string column[6];
-  for (int i=0;i<3;i++){
-    try{table.readKey("F"+ti[i]+"COL",column[i]);}
-    catch(HDU::NoSuchKeyword){
-      printf("Keyword F%iCOL missing from header (%s)\n",i,fitsfile.c_str());
-      exit(1);
-    }
-    try{table.readKey("EF"+ti[i]+"COL",column[i+3]);}
-    catch(HDU::NoSuchKeyword){
-      printf("Keyword EF%iCOL missing from header (%s)\n",i,fitsfile.c_str());
-      exit(1);
-    }
-    try{table.readKey("F"+ti[i]+"MIN",flim[i]);}
-    catch(HDU::NoSuchKeyword){
-      printf("Keyword F%iLIM missing from header (%s)\n",i,fitsfile.c_str());
-      exit(1);
-    }
-    try{table.readKey("F"+ti[i]+"FILT",filter[i]);}
-    catch(HDU::NoSuchKeyword){
-      printf("Keyword F%iFILT missing from header (%s)\n",i,fitsfile.c_str());
-      exit(1);
-    }
-  }
-  
-  unsigned long tablesize(table.rows());
-  valarray<double> col(tablesize)[6];
-  string unit;
-  for(int i=0;i<6;i++){
-    try{
-      unit = table.column(column[i]).unit();
-      table.column(column[i]).read(col[i],1,tablesize);
-      if(unit == "Jy")
-	col[i] *= 1e3; //convert to mJy
-    }
-    catch(Table::NoSuchColum){
-      printf("Column %s does not exist in %s\n",column[i],fitsfile.c_str());
-      exit(1);
-    }
-  }
-
-  //errors are mean of observation errors
-  for(int i=0;i<3;i++){
-    ferr[i] = col[i+3].sum()/tablesize;
-  }
-
-  observations.resize(tablesize);
-  double fluxes[3];
-  
-  for (unsigned int i=0;i<observations.size();i++){
-    for (int j=0;j<3;j++)
-      fluxes[j]=col[j][i];
-    observations[i].reset(new obs(fluxes));
-  }
-  
 }
   
 double obs_lib::get_flux(int i,int band){
@@ -140,7 +138,7 @@ void obs_lib::get_all_colors(double* &c1,double* &c2){
 
 void obs_lib::info(string filters[],double flims[],double ferrs[]){
   if(filters == NULL)
-    filters = new double[3];
+    filters = new string[3];
   if(flims == NULL)
     flims = new double[3];
   if(ferrs == NULL)

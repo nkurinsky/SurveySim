@@ -112,7 +112,7 @@ int simulator::binNum(int band, double flux){
 
 simulator::simulator(string filterfile, string filters[], double f_lims[], double errors[], string obsfile, string sedfile){
 
-  seds = NULL;
+  seds.reset(NULL);
 
   color_exp = 0.0;
   observations.reset(new obs_lib(obsfile));
@@ -168,7 +168,7 @@ void simulator::set_size(double area,double dz,double zmin,int nz,int ns){
 }
 
 void simulator::set_color_exp(double val){
-  if (seds != NULL)
+  if (seds.get() != NULL)
     seds->set_color_evolution(val);
 }
 
@@ -198,7 +198,7 @@ products simulator::simulate(){
   sources.clear();
   products output(nz,dndsInfo.bnum);
   
-  if(seds != NULL){
+  if(seds.get() != NULL){
 
     static int is,js,jsmin;
     static double tmpz,vol;
@@ -307,7 +307,9 @@ products simulator::simulate(){
 
     //printf("%f %f %f\n",output.dnds[0][0],output.dnds[1][0],output.dnds[2][0]);
     
-    delete[] c1,c2,w;
+    delete[] c1;
+    delete[] c2;
+    delete[] w;
     
   }
   else{
@@ -392,7 +394,7 @@ bool simulator::save(string outfile){
   colform[10] = "e13.5";
   
   static string hname("Parameter Distributions");
-  std::auto_ptr<Table> newTable= pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
+  std::auto_ptr<Table> newTable(pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl));
     
   newTable->column(colname[0]).write(f1,1);
   newTable->column(colname[1]).write(f2,1);

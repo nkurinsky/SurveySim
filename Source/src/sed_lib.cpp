@@ -57,10 +57,11 @@ sed_lib::sed_lib(string fitsfile){
   HDU& header = pInfile->pHDU();
   
   printf("%s\n","Initialize Luminosities");
+  char buffer[10];
   for (unsigned int i=0;i<lnum;i++) {
     std::string a = "ROW";
-    //convert integer to string...may not be best way
-    a+= static_cast<ostringstream*>( &(ostringstream() << i+1) )->str();
+    sprintf(buffer,"%i",i+1);
+    a.append(buffer);
     header.readKey(a,temp);
     lums[i] = temp;
     inds[i] = i;

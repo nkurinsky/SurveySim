@@ -20,7 +20,7 @@ class obs{
 
 class obs_lib{
  private:
-  vector<std::auto_ptr<obs> > observations;
+  vector<obs*> observations;
   string filter[3];
   double ferr[3];
   double flim[3];
