@@ -1,12 +1,17 @@
+// -*-c++-*-
+
 #ifndef SED_LIB_H
 #define SED_LIB_H
 
 #include "functions.h"
 #include "filters.h"
 #include "cosmo.h"
+#include <map>
+#include <tuple>
 
-#define SL_INT_SIZE 10000
-#define SL_INT_PRECISION 1E-4
+//for filter convolution integrals
+#define SL_INT_SIZE 1000
+#define SL_INT_PRECISION 1E-3
 
 using namespace CCfits;
 
@@ -62,6 +67,7 @@ struct flux_yield_params{
   short lum_ind;
   short filt_ind;
   double z;
+  flux_yield_params();
 };
 
 

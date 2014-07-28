@@ -1,0 +1,30 @@
+This file gives information on the required format of input data fits files
+
+===================================================================================
+
+For compatibility with the common fits table format astronomical data is supplied
+in, this program expects data input as a FITS table with keywords added to the
+headers to facilitate proper input and provide additional information. 
+
+The keyword "FHDR" in the primary header is required if the data is not located 
+in the first FITS extension; if located in a higher extension, it should be 
+specified here.
+
+The following keywords are required in the header of the table containing the data:
+    - F1COL, F2COL, F3COL - name of the column fluxes are located in
+    - EF1COL, EF2COL, EF3COL - name of column flux errors are located in
+    - F1FILT, F2FILT, F3FILT - name of filter corresponding to observations for
+      	      each flux column (should correspond to filter in library)
+    - F1MIN, F2MIN, F3MIN - flux limits for each band
+Fluxes will be assumed to be in mJy unless otherwise speicified in column format
+fields. This does not matter for fluxes, as consistent units given the same colors,
+but for calculation of standard error from the mean of flux errors, used to 
+generate random flux errors during simulation.
+
+In addition, it is ideal for all bands to have observations (non-zero values),
+however the program will automatically exclude those observations with zero values
+in case this step is missed as zeros are incompatible with color calculation and
+will create overflow when calculating colors.
+
+In this manner, one can use utilities in IDL or python to simply add keywords,
+or use the IDL/python interfaces to automatically add these keywords.

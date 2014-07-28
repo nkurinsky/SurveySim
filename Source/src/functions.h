@@ -14,6 +14,8 @@
 #include <time.h>
 #include <stdlib.h>
 #include <vector>
+#include <map>
+#include <memory>
 
 //For FITS input/output
 #include <CCFits/CCfits>

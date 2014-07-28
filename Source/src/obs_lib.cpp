@@ -3,34 +3,27 @@
 obs::obs(){
   c1 = -99;
   c2 = -99;
-  interp_init = false;
 }
 
 obs::obs(double * f,double *bands){
-  bool do_colors = true;
   for (int i=0;i<3;i++){
     fluxes[i] = f[i];
-    if((bands[i] <= 0.0000000E0) or (f[i] <= 0.00000000E0))
-      do_colors = false;
   }
-
-  if(do_colors){
-    c1 = get_color(fluxes[2],fluxes[0]);
-    c2 = get_color(fluxes[2],fluxes[1]);
-  }
-  else{
-    c1 = -99.0;
-    c2 = -99.0;
-  }
-
-  acc = gsl_interp_accel_alloc();
-  spline = gsl_spline_alloc(gsl_interp_cspline,3);
-  gsl_spline_init(spline,bands,f,3);
-  interp_init = true;
+  
+  c1 = get_color(fluxes[2],fluxes[0]);
+  c2 = get_color(fluxes[2],fluxes[1]);
 }
 
-double obs::get_flux(double band){
-  return gsl_spline_eval(spline,band,acc);
+double obs::get_flux(int band){
+  switch(band){
+  case 0:
+  case 1:
+  case 2:
+    return fluxes[band];
+    break;
+  default:
+    return -1;
+  }
 }
 
 void obs::get_colors(double &c1,double &c2){
@@ -47,49 +40,81 @@ obs::~obs(){
 
 obs_lib::obs_lib(string fitsfile){
   //initialize FITS input
-  FITS* pInfile;
-  pInfile = new FITS(fitsfile,Read);
+  std::auto_ptr<FITS> pInfile(new FITS(fitsfile,Read));
   
   //reading primary header from fits file
-  HDU& table = pInfile->pHDU();
-  //extracting conents of image from fits file
-  std::valarray<double> contents;
-  PHDU& image = pInfile->pHDU();
-  image.read(contents);
-
-  static string ti[3] = {"1","2","3"};
-  double btemp,fetemp,fltemp;
-  observations.resize(image.axis(1));
-
-  if(image.axis(0) != 3){
-    printf("%s \n","ERROR: (Obs_Lib) Incorrect Number of Bands");
+  HDU& header = pInfile->pHDU();
+  int hdunum(1);
+  
+  try{header.readKey("FHDU",hdunum);}
+  catch(HDU::NoSuchKeyword){
+    printf("FHDU not set, defaulting to HDU %i\n",extnum);}
+  
+  ExtHDU& table;
+  try{table = pInfile->extension(extnum);}
+  catch(FITS::NoSuchHDU){
+    printf("HDU %i does not exist inf %s\n",extnum,fitsfile.c_str());
+    exit(1);
   }
-  else{
 
-    for (int i=0;i<3;i++){
-      table.readKey("WAVE_"+ti[i],btemp);
-      table.readKey("W"+ti[i]+"_FERR",fetemp);
-      table.readKey("W"+ti[i]+"_FMIN",fltemp);
-      bands[i]=btemp;
-      ferr[i]=fetemp;
-      flim[i]=fltemp;
+  const string ti[3] = {"1","2","3"};
+  string column[6];
+  for (int i=0;i<3;i++){
+    try{table.readKey("F"+ti[i]+"COL",column[i]);}
+    catch(HDU::NoSuchKeyword){
+      printf("Keyword F%iCOL missing from header (%s)\n",i,fitsfile.c_str());
+      exit(1);
     }
-    
-    obs *new_obs;
-    double fluxes[3];
-    
-    for (unsigned int i=0;i<observations.size();i++){
-      for (int j=0;j<3;j++)
-	fluxes[j]=contents[i*3+j];
-      new_obs = new obs(fluxes,bands);
-      observations[i] = new_obs;
+    try{table.readKey("EF"+ti[i]+"COL",column[i+3]);}
+    catch(HDU::NoSuchKeyword){
+      printf("Keyword EF%iCOL missing from header (%s)\n",i,fitsfile.c_str());
+      exit(1);
+    }
+    try{table.readKey("F"+ti[i]+"MIN",flim[i]);}
+    catch(HDU::NoSuchKeyword){
+      printf("Keyword F%iLIM missing from header (%s)\n",i,fitsfile.c_str());
+      exit(1);
+    }
+    try{table.readKey("F"+ti[i]+"FILT",filter[i]);}
+    catch(HDU::NoSuchKeyword){
+      printf("Keyword F%iFILT missing from header (%s)\n",i,fitsfile.c_str());
+      exit(1);
     }
   }
   
-  delete pInfile;
+  unsigned long tablesize(table.rows());
+  valarray<double> col(tablesize)[6];
+  string unit;
+  for(int i=0;i<6;i++){
+    try{
+      unit = table.column(column[i]).unit();
+      table.column(column[i]).read(col[i],1,tablesize);
+      if(unit == "Jy")
+	col[i] *= 1e3; //convert to mJy
+    }
+    catch(Table::NoSuchColum){
+      printf("Column %s does not exist in %s\n",column[i],fitsfile.c_str());
+      exit(1);
+    }
+  }
+
+  //errors are mean of observation errors
+  for(int i=0;i<3;i++){
+    ferr[i] = col[i+3].sum()/tablesize;
+  }
+
+  observations.resize(tablesize);
+  double fluxes[3];
+  
+  for (unsigned int i=0;i<observations.size();i++){
+    for (int j=0;j<3;j++)
+      fluxes[j]=col[j][i];
+    observations[i].reset(new obs(fluxes));
+  }
+  
 }
   
-double obs_lib::get_flux(int i,double band){
+double obs_lib::get_flux(int i,int band){
   if(i < int(observations.size()))
     return observations[i]->get_flux(band);
   else
@@ -113,20 +138,21 @@ void obs_lib::get_all_colors(double* &c1,double* &c2){
   }
 }
 
-void obs_lib::info(double *b,double *flims,double *ferrs){
-  b = new double[3];
-  flims = new double[3];
-  ferrs = new double[3];
-
+void obs_lib::info(string filters[],double flims[],double ferrs[]){
+  if(filters == NULL)
+    filters = new double[3];
+  if(flims == NULL)
+    flims = new double[3];
+  if(ferrs == NULL)
+    ferrs = new double[3];
+  
   for(int i=0;i<3;i++){
-    b[i] = bands[i];
-    flims[i] = flim[i];
-    ferrs[i] = ferr[i];
+    filters[i] = this->filter[i];
+    flims[i] = this->flim[i];
+    ferrs[i] = this->ferr[i];
   }
 }
 
 obs_lib::~obs_lib(){
-  for (unsigned int i=0;i<observations.size();i++){
-    delete observations[i];
-  }
+
 }

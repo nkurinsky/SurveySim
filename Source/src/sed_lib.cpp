@@ -207,47 +207,52 @@ sed_lib::~sed_lib(){
 double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
 
   static bool conv_init = false;
-  static double scale;
-  static double result;
-  static double error;
+  double scale,result,error;
   static flux_yield_params p;
   static gsl_function F;
   double bounds[2];
+
+  static map<tuple<short,double>,double > fluxes[3];
+  tuple<short,double> params (lum_id,redshift);
 
   if(not conv_init){
     F.function = &flux_yield;
     F.params = &p;
     p.wlib = this;
-    p.lum_ind = -1;
-    p.filt_ind = -1;
-    p.z = -1;
     conv_init = true;
     printf("Initializing Filter Convolution Variables\n");
-  }
+  }  
 
-  if(p.z != redshift){
+  //we use a map here to ensure that a given redshift/SED/filter combination is only convolved once; we recompute color evolution every time as this may change in fitting, while filters/SEDs are static.
+  if(fluxes[filter_id].count(params) == 0){
     scale = (1+redshift)*Wm2Hz_TO_mJy/(4.0*M_PI*pow(lumdist(redshift)*MPC_TO_METER,2.0));
-    scale *= pow((1.0+redshift),color_exp);
+    
+    result = error = -1;
+    p.lum_ind = lum_id;
+    p.filt_ind = filter_id;
+    p.z = redshift;
+    
+    bounds[0] = filters.get(filter_id).low();
+    bounds[1] = filters.get(filter_id).high();
+    
+    gsl_integration_qags (&F, bounds[0], bounds[1], 0, SL_INT_PRECISION, SL_INT_SIZE, w, &result, &error); 
+    
+    result*=scale;
+    fluxes[filter_id][params] = result;
   }
-  else if ((p.lum_ind == lum_id) and (p.filt_ind == filter_id)){
-    return result;
-  }
 
-  result = error = -1;
-  p.lum_ind = lum_id;
-  p.filt_ind = filter_id;
-  p.z = redshift;
-
-  bounds[0] = filters.get(filter_id).low();
-  bounds[1] = filters.get(filter_id).high();
-
-  gsl_integration_qags (&F, bounds[0], bounds[1], 0, SL_INT_PRECISION, SL_INT_SIZE, w, &result, &error); 
-
-  return result*scale;
+  return fluxes[filter_id][params]*pow((1.0+redshift),color_exp);
 }
 
 double flux_yield (double x, void * params) {
   flux_yield_params *p = (flux_yield_params*) params;
   
   return (p->wlib->seds[p->lum_ind]->get_flux(x/(1.0+p->z)) * p->wlib->filters.get(p->filt_ind).transmission(x));
+}
+
+flux_yield_params::flux_yield_params(){
+  wlib=NULL;
+  lum_ind = -1;
+  filt_ind = -1;
+  z = -1;
 }
