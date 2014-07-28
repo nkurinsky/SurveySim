@@ -1,3 +1,5 @@
+// -*-c++-*-
+
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
@@ -59,9 +61,9 @@ class simulator{
   vector<sprop> sources;
   //bool simulated;
   lumfunct *lf;
-  sed_lib *seds;
-  obs_lib *observations;
-  hist_lib * diagnostic;
+  std::auto_ptr<sed_lib> seds;
+  std::auto_ptr<obs_lib> observations;
+  std::auto_ptr<hist_lib> diagnostic;
   double band_errs[3];
   double flux_limits[3];
   double color_exp;

@@ -115,8 +115,8 @@ simulator::simulator(string filterfile, string filters[], double f_lims[], doubl
   seds = NULL;
 
   color_exp = 0.0;
-  observations = new obs_lib(obsfile);
-  seds = new sed_lib(sedfile);
+  observations.reset(new obs_lib(obsfile));
+  seds.reset(new sed_lib(sedfile));
 
   //initialize filters
   if(seds->init_filter_lib(filterfile)){
@@ -129,7 +129,7 @@ simulator::simulator(string filterfile, string filters[], double f_lims[], doubl
 
   //initialize observation portion of histograms
   //possibility here to integrate obs_lib into hist_lib
-  diagnostic = new hist_lib();
+  diagnostic.reset(new hist_lib());
   double *c1,*c2;
   int osize = observations->get_snum();
   observations->get_all_colors(c1,c2);
@@ -182,16 +182,12 @@ void simulator::set_lumfunct(lumfunct *lf){
 
 
 void simulator::set_sed_lib(string sedfile){
-  if(seds != NULL)
-    delete seds;
-  seds = new sed_lib(sedfile);
+  seds.reset(new sed_lib(sedfile));
 }
 
 
 void simulator::set_obs(string obsfile){
-  if(observations != NULL)
-    delete observations;
-  observations = new obs_lib(obsfile);
+  observations.reset(new obs_lib(obsfile));
   double *c1,*c2;
   int osize = observations->get_snum();
   observations->get_all_colors(c1,c2);
@@ -288,12 +284,10 @@ products simulator::simulate(){
     // generate diagnostic color-color plots
     //*************************************************************************
     
-    double *c1,*c2,*w;
-    
     int snum(sources.size());
-    c1 = new double[snum];
-    c2 = new double[snum];
-    w = new double[snum];
+    double * c1(new double[snum]);
+    double * c2(new double[snum]);
+    double * w (new double[snum]);
     for (int i=0;i<snum;i++){
       c1[i] = sources[i].c1;
       c2[i] = sources[i].c2;
@@ -312,10 +306,9 @@ products simulator::simulate(){
     last_output = output;
 
     //printf("%f %f %f\n",output.dnds[0][0],output.dnds[1][0],output.dnds[2][0]);
-
-    delete[] c1;
-    delete[] c2;
-    delete[] w;
+    
+    delete[] c1,c2,w;
+    
   }
   else{
     cout << "ERROR: NULL Model Library" << endl;
@@ -399,7 +392,7 @@ bool simulator::save(string outfile){
   colform[10] = "e13.5";
   
   static string hname("Parameter Distributions");
-  Table *newTable= pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
+  std::auto_ptr<Table> newTable= pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
     
   newTable->column(colname[0]).write(f1,1);
   newTable->column(colname[1]).write(f2,1);
@@ -417,12 +410,7 @@ bool simulator::save(string outfile){
 }
 
 simulator::~simulator(){
-  if(observations != NULL)
-    delete observations;
-  if(seds != NULL)
-    delete seds;  
-  if(diagnostic != NULL)
-    delete diagnostic;
+
 }
 
 void simulator::reset(){
