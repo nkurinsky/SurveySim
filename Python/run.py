@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/python
 
 print("Welcome to SurveySim");
 print("a MCMC-based galaxy evolution fitter and simulator");
@@ -175,7 +175,8 @@ value_dp=[0.0,0.0,0.0,0.0,0.3,0.1,0.0,0.0]
 
 #initialize survey parameters
 area=[4.0,4.0,4.0]
-wavelength=[250,350,500]
+band=['Band1','Band2','Band3']
+filter_choices=['None','PACS_100','PACS_160','SPIRE_250','SPIRE_350','SPIRE_500']
 flim=[25.0,20.0,15.0]
 
 def update_mfile(modelfile):
@@ -230,9 +231,18 @@ def update_mfile(modelfile):
     hdr.set('CEXP_MIN',value_min[6],'Minimum cexp value')
     hdr.set('CEXP_MAX',value_max[6],'Maximum cexp value')
     hdr.set('CEXP_DP',value_dp[6],'sigma cexp')
-    
+
+#====================================================================
+# Survey properties 
+#--------------------------------------------------------------------   
     hdr.set('AREA',area[0],'Observed Solid Angle of survey')
-  
+    hdr.set('Band_1',band[0],'1st filter name')
+    hdr.set('Band_2',band[1],'2nd filter name')
+    hdr.set('Band_3',band[2],'3rd filter name')
+    hdr.set('Fluxlim1',flim[0],'1st band flux limit')
+    hdr.set('Fluxlim2',flim[1],'2nd band flux limit')
+    hdr.set('Fluxlim3',flim[2],'3rd band flux limit')
+#---------------------------------------------------------------------  
     #these aren't currently user controllable in widget, but can change them right here at own risk  
     hdr.set('ZMIN',0.0,'Simulation minimum redshift')
     hdr.set('ZMAX',5.0,'Simulation maximum redshift')
@@ -270,6 +280,8 @@ if (mdefaults == 'y'):
     v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
     v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
 
+    defband=[StringVar(),StringVar(),StringVar()]
+
     def makeform(labelframe, fields):
         entries = []
         ind=0;
@@ -305,9 +317,12 @@ if (mdefaults == 'y'):
         
     labelframe2 = LabelFrame(root, text="Survey properties",width=50);
     labelframe2.pack(fill="both", expand="yes");
-    label=Label(labelframe2,text="Area [sqdeg]/wavelength [um]/Flux limit [mJy]",width=50);
+   # label=Label(labelframe2,text="Area [sqdeg]/wavelength [um]/Flux limit [mJy]",width=50);
+    label=Label(labelframe2,text="Filter/Area [sqdeg]/Flux limit [mJy]",width=50);
     label.pack();
     fields2='Band 1','Band 2','Band 3'
+#just placeholder, don't actually want to label the rows here
+    #fields2='1,2,3'
 
     def fetch(entries):
         for entry in entries:
@@ -318,30 +333,41 @@ if (mdefaults == 'y'):
     f1=DoubleVar()
     f2=DoubleVar()
     f3=DoubleVar()
+
+    db1=StringVar()
+    db2=StringVar()
+    db3=StringVar()
     def makeform2(labelframe2, fields2):
         entries2 = []
         ind=0;
         for field in fields2:
             row = Frame(labelframe2)
-            lab = Label(row, width=10, text=field, anchor='w')
+ #           lab = Label(row, width=10, text=field, anchor='w')
+            lab = Label(row, width=10, anchor='w')
             row.pack(side=TOP, padx=2, pady=5)
             lab.pack(side=LEFT)
             if(ind == 0):
                 ent0_1 = Entry(row,textvar=f1)
+                option1=OptionMenu(row,db1,*filter_choices)
+                option1.pack(side='left',padx=10,pady=10)
+                db1.set(band[0])
             if(ind == 1):
-                ent0_1 = Entry(row,textvar=f2)
+                ent0_1 = Entry(row,textvar=f2) 
+                option2=OptionMenu(row,db2,*filter_choices)
+                option2.pack(side='left',padx=10,pady=10)
             if(ind == 2):
                 ent0_1 = Entry(row,textvar=f3)
+                option3=OptionMenu(row,db3,*filter_choices)
+                option3.pack(side='left',padx=10,pady=10)
             ent0_1.pack(side=RIGHT) 
+            db1.set(band[0])
+            db2.set(band[1])
+            db3.set(band[2])
             f1.set(flim[0])
             f2.set(flim[1])
             f3.set(flim[2])
 
             entries2.append((field, ent0_1))
-            ent1_1 = Entry(row)
-            ent1_1.insert(10,wavelength[ind])
-            ent1_1.pack(side=RIGHT) #, expand=YES, fill=X)
-            entries2.append((field, ent1_1))
             ent2_1 = Entry(row)
             ent2_1.insert(10,area[ind])
             ent2_1.pack(side=RIGHT) #, expand=YES, fill=X)
@@ -358,6 +384,9 @@ if (mdefaults == 'y'):
             value_max[ind]=v_max[ind].get()
             value_fix[ind]=v_fixed[ind].get()
             ind=ind+1
+        band[0]=db1.get()
+        band[1]=db2.get()
+        band[2]=db3.get()
         flim[0]=f1.get()
         flim[1]=f2.get()
         flim[2]=f3.get()
