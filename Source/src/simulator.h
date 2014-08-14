@@ -8,9 +8,6 @@
 #include "lumfunct.h"
 #include "hist_lib.h"
 
-#define LUMPARS 7
-#define SDEG_PER_STER 3282.8
-
 //Storage structure for each individual source
 struct sprop{
   //source properties (as determined by distributions)
@@ -80,7 +77,7 @@ class simulator{
     zmin = 0.1; //default to 0.1-6.0, 0.1 steps
     nz = 59;
     dz = 0.1;}
-  simulator(string filterfile, string filters[], double f_lims[], double errors[], string obsfile, string sedfile);
+  simulator(string filterfile, string obsfile, string sedfile);
   bool load_filter_lib(string file);
   bool load_filter(short filt_id, string name, double error, double flim);
   void set_size(double area,double dz,double zmin,int nz,int ns);

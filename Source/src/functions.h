@@ -1,4 +1,4 @@
-//Noah Kurinsky
+//Noah Kurinsky -*-c++-*-
 //7/5/2012
 //This header file provides the interface for the various small functions
 //used for constraining models
@@ -36,15 +36,75 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_const_mksa.h>
 
+#define LUMPARS 7
+#define SDEG_PER_STER 3282.8
+
 using namespace std;
-
-//Generate random numbers by use of procedures outlined in GNU Scientific Library Ch. 18 (Sections 1-5)
-double * random(gsl_rng * r,double range[],int size);
-
-//For Generation of Gaussian random number generator distributions (GNU Scientific Library Ch 20.2)
-double * gauss_random(gsl_rng * r,double range[],double mean,double sigma,int size);
 
 //Generates spectral color of a galaxy from fluxes and bands
 double get_color(double f1,double f2);
+
+class Configuration{
+public:
+  Configuration(int argc, char *argv[]);
+  void print();
+  double areaSteradian();
+  void LFparameters(double lpars[],short type = 0);
+  
+  string outfile;
+  string obsfile;
+  string modfile;
+  string sedfile;
+  string filterfile;
+  
+  bool vary_cexp;
+  bool oprint;
+
+  int nz;
+  int ns;
+  int cind;
+  unsigned long runs;
+  unsigned long nchain;
+  unsigned long burn_step;
+  unsigned long burn_ratio;
+  unsigned long conv_step;
+  unsigned long burn_num;
+  unsigned long nparams;
+
+  double area;
+  double dz;
+  double zmax;
+  double zmin;
+  double rmax;
+  double a_ci;
+  double tmax;
+  double idealpct;
+  double annrng;
+  
+  vector<int> param_inds;
+  double LFParameters[LUMPARS][5];
+  double colorEvolution[5];
+
+  const short value = 0;
+  const short fixed = 1;
+  const short min = 1;
+  const short max = 1;
+  const short step = 1;
+
+private:
+  void load();
+  
+};
+
+class RandomNumberGenerator{
+public:
+  RandomNumberGenerator();
+  ~RandomNumberGenerator();
+  double gaussian(double mean, double sigma);
+  double flat(double min, double max);
+private:
+  const gsl_rng_type *T;
+  gsl_rng *r;
+};
 
 #endif

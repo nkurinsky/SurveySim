@@ -20,159 +20,38 @@
 
 using namespace std; 
 
-gsl_rng * r;  // global generator
-
 int main(int argc,char** argv){
   
-  if(argc < 4){
-    printf("%s","ERROR: Invalid number of arguments.\n");
-    printf("%s","Calling sequence should be \"fit obsfile modfile sedfile [output]\"\n");
-    return 1;}
-
-  char * ffile = getenv("FILTERFILE");
-  if(ffile == NULL){
-    printf("ERROR: Environment variable \"FILTERFILE\" not specified\n");
-    printf("\tVariable required for filter I/O, should point to master filter list\n");
-    return 1;
-  }
-  else
-    printf("Filter library: %s\n",ffile);
-
   printf("\nMCMC Fitting Code Compiled: %s\n\n",__DATE__);
   
-  //File names passed in by Widget
-  string outfile("output.fits");
-  string obsfile(argv[1]);
-  string modfile(argv[2]);
-  string sedfile(argv[3]);
-  string filterfile(ffile);
-  //If outfile specified as argument, change from default
-  if(argc > 4)
-    outfile = argv[4];
+  Configuration q(argc,argv);
+  q.print();
+  RandomNumberGenerator rng;
   
   //general variable declarations
-  bool accept,vary_cexp,oprint=true,saved;
-  unsigned long runs,i,m,p,NCHAIN,BURN_STEP,CONV_STEP,BURN_RATIO,burn_num, nparams;
-  int nz,ns, cind;
-  double area, dz, zmax, zmin, rtemp, rmax, a_ci,TMAX,IDEALPCT,ANNRNG, temp, trial;
-  char wtemp[2];
-  string wnum;
-  vector<int> param_inds;
-  const gsl_rng_type * T;
+  bool accept,saved;
+  unsigned long i,m;
+  unsigned long pi;
+  vector<int>::const_iterator p;
+  double temp, trial;
 
-  //declarations for filters and band specifications
-  string filters[BANDS];
-  double errs[BANDS], flims[BANDS];
-  //these arrays holds phi0,L0,alpha,beta,p, and q as well as range and fixed
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
-  double lpars[LUMPARS],lfix[LUMPARS],lmax[LUMPARS],lmin[LUMPARS],ldp[LUMPARS],cexp[5];
+  //this array holds phi0,L0,alpha,beta,p, and q
+  double lpars[LUMPARS];
+  double lmin[LUMPARS];
+  double lmax[LUMPARS];
+  double lsigma[LUMPARS];
+  q.LFparameters(lpars);
+  q.LFparameters(lmin,q.min);
+  q.LFparameters(lmax,q.max);
+  q.LFparameters(lsigma,q.step);
+  double CE = q.colorEvolution[q.value];
+  double CEmin = q.colorEvolution[q.min];
+  double CEmax = q.colorEvolution[q.max];
+  double CEsigma = q.colorEvolution[q.step];
   
-  //IO variables
-  string suffix[] = {"","_FIX","_MIN","_MAX","_DP"};
-  double *arrays[] = {lpars,lfix,lmin,lmax,ldp}; //used to loop over these arrays
-  string tag;
-
   //counts
   string countnames[]= {"dnds250","dnds350","dnds500"};
-  
-  std::unique_ptr<FITS> pInfile (new FITS(modfile,Read));
-  std::unique_ptr<FITS> pInfile2 (new FITS(obsfile,Read));
-  
-  //reading primary header from fits file
-  HDU& params_table = pInfile->pHDU();
-  HDU& obs_table = pInfile2->pHDU();
 
-  //Read in simulation settings
-  params_table.readKey("RUNS",rtemp);
-  runs = (unsigned long) rtemp;
-  params_table.readKey("ZMIN",zmin);
-  params_table.readKey("ZMAX",zmax);
-  params_table.readKey("DZ",dz);
-  params_table.readKey("AREA",area);
-
-  params_table.readKey("NCHAIN",rtemp);
-  NCHAIN = (unsigned long) rtemp;
-  params_table.readKey("TMAX",TMAX);
-  params_table.readKey("ANN_PCT",IDEALPCT);
-  params_table.readKey("ANN_RNG",ANNRNG);
-  params_table.readKey("BURN_STE",rtemp);
-  BURN_STEP = (unsigned long) rtemp;
-  params_table.readKey("CONV_STE",rtemp);
-  CONV_STEP = (unsigned long) rtemp;
-  params_table.readKey("BURNVRUN",rtemp);
-  BURN_RATIO = (unsigned long) rtemp;
-  params_table.readKey("CONV_RMA",rmax);
-  params_table.readKey("CONV_CON",a_ci);
-  params_table.readKey("PRINT",rtemp);
-  oprint = rtemp == 0.0 ? true : false;
-
-  //output found settings
-  if(oprint)
-    printf("Printing Verbose Output\n");
-  else
-    printf("Printing Concise Output\n");
-
-  printf("MC Settings\n");
-  printf("Chain Number    : %lu\n",NCHAIN);
-  printf("Starting Temp   : %5.2f\n",TMAX);
-  printf("Ideal Accept Pct: %4.2f\n",IDEALPCT);
-  printf("Burn-in Step    : %lu\n",BURN_STEP);
-  printf("Convergence Step: %lu\n",CONV_STEP);
-  printf("Run:Burn-In     : %lu\n",BURN_RATIO);
-  printf("Convergence Criterion: %4.2f\n",rmax);
-  printf("Confidence Interval  : %4.2f\n",a_ci);
-
-  //this is necessary for correct cosmological volume determinations
-  //hence correct number count predictions
-  area*=pow((M_PI/180.0),2.0); //in steradians from sq.deg.
-
-  //compute redshift bin number from FITS values
-  nz = (zmax-zmin)/dz;
-  printf("Simulation Settings:\n");
-  printf("Run Number Max: %lu\nNumber Redshift Bins: %i\nRedshift Bin Width: %f\nArea: %f\n\n",runs,nz,dz,area);
-
-  //EDIT HERE FOR FILTERS!!!
-  filters[0] = "SPIRE_250";
-  filters[1] = "SPIRE_350";
-  filters[2] = "SPIRE_500";
-  for(i=0;i<BANDS;i++){
-    sprintf(wtemp,"%lu",i+1);
-    wnum = string(wtemp);
-    obs_table.readKey("W"+wnum+"_FMIN",flims[i]); //should be in mJy
-    obs_table.readKey("W"+wnum+"_FERR",errs[i]);
-    printf("Band %s:\t%s %7.3e %7.3e\n",wnum.c_str(),filters[i].c_str(),flims[i],errs[i]);
-  }
-  
-  //=================================================================  
-  //Read-in Luminosity Function Parameters
-  //-----------------------------------------------------------------
-
-  for(int i=0;i<LUMPARS;i++){
-    for(int j=0;j<5;j++){
-      tag = pnames[i]+suffix[j];
-      tag = tag.substr(0,8);
-      params_table.readKey(tag,arrays[j][i]);
-    }
-    if(lfix[i] == 0)
-      param_inds.push_back(i);
-  }
-  
-  //color evolution parameters
-  for(int j=0;j<5;j++){
-    tag = "CEXP"+suffix[j];
-    tag = tag.substr(0,8);
-    params_table.readKey(tag,cexp[j]);
-  }
-
-  nparams = param_inds.size();
-  vary_cexp = false;
-  cind = nparams;
-  if(cexp[1] == 0){
-    nparams++;
-    vary_cexp = true;
-  }
-  printf("\nNumber Unfixed Parameters: %lu\n",nparams);
-  
   /*
     note that the dp values here are the widths of the "proposal distribution"
     the smaller they are the slower will converge onto the right answer
@@ -186,27 +65,16 @@ int main(int argc,char** argv){
   lf.set_params(lpars);
 
   //initialize simulator
-  simulator survey(filterfile, filters, errs, flims, obsfile, sedfile); 
-  survey.set_color_exp(cexp[0]); //color evolution
+  simulator survey(q.filterfile,q.obsfile,q.sedfile); 
+  survey.set_color_exp(CE); //color evolution
   survey.set_lumfunct(&lf);
-  
-  gsl_rng_default_seed=time(NULL);
-  T=gsl_rng_default;
-  r=gsl_rng_alloc(T);
   
   //NON GENERAL COUNTS
   //the flux array is logarithmic in steps of 0.3dex 
-  //for now lets just use one band (here 250um) although of course might be nice to keep the rest at some point, but one step at a time.
-  ns=8;
-  survey.set_size(area,dz,zmin,nz,ns);
+  q.ns=8;
+  survey.set_size(q.areaSteradian(),q.dz,q.zmin,q.nz,q.ns);
   int bnum[]={16,13,10};
-  products output(nz,bnum);
-
-  printf("Initial p: %5.3f, and q: %5.3f\n",lpars[4],lpars[5]);
-  printf("p range: %5.3f - %5.3f, sigma: %5.3f\n",lmin[4],lmax[4],ldp[4]);
-  printf("q range: %5.3f - %5.3f, sigma: %5.3f\n",lmin[5],lmax[5],ldp[5]);
-  printf("Color Evolution: %5.3f\n",cexp[0]);
-  printf("Redshift Cutoff: %5.3f\n",lpars[6]);
+  products output(q.nz,bnum);
 
   /*
     Loop trough the mcmc runs
@@ -217,147 +85,143 @@ int main(int argc,char** argv){
     probability distributions for the fitted parameters.
   */
   
-  MCChains mcchain(NCHAIN,nparams,runs,CONV_STEP);
-  ResultChain counts(3,NCHAIN*runs);
-  mcchain.set_constraints(rmax,a_ci);
-  MetropSampler metrop(NCHAIN,TMAX,IDEALPCT,ANNRNG,r);
+  MCChains mcchain(q.nchain,q.nparams,q.runs,q.conv_step);
+  ResultChain counts(3,q.nchain*q.runs);
+  mcchain.set_constraints(q.rmax,q.a_ci);
+  MetropSampler metrop(q.nchain,q.tmax,q.idealpct,q.annrng);
 
   //mcmc variables and arrays
   double chi_min=1.0E+4; 
-  double prng[nparams][runs];
-  double ptemp[NCHAIN][nparams];
-  double pbest[nparams];
-  double pcurrent[NCHAIN][nparams];
+  double ptemp[q.nchain][q.nparams];
+  double pbest[q.nparams];
+  double pcurrent[q.nchain][q.nparams];
+  
 
   //initialize first chain to initial parameters
-  for(p=0;p<param_inds.size();p++){
-    ptemp[0][p] = pcurrent[0][p] = lpars[param_inds[p]];
-  }
-  if(vary_cexp)
-    ptemp[0][cind] = pcurrent[0][cind] = cexp[0];
+  for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi)
+    ptemp[0][pi] = pcurrent[0][pi] = lpars[*p];
+  if(q.vary_cexp)
+    ptemp[0][q.cind] = pcurrent[0][q.cind] = CE;
   
-  for(m=1;m<NCHAIN;m++){ 
-    for(p=0;p<param_inds.size();p++){
-      ptemp[m][p] = pcurrent[m][p] = gsl_ran_flat(r,lmin[param_inds[p]],lmax[param_inds[p]]);
-    }
-    if(vary_cexp)
-      ptemp[m][cind] = pcurrent[m][cind] = gsl_ran_flat(r,cexp[2],cexp[3]);
+  for(m=1;m<q.nchain;m++){ 
+    for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi)
+      ptemp[m][pi] = pcurrent[m][pi] = rng.flat(lmin[*p],lmax[*p]);
+    if(q.vary_cexp)
+      ptemp[m][q.cind] = pcurrent[m][q.cind] = rng.flat(CEmin,CEmax);
   }
   
-  if (oprint)
+  if (q.oprint)
     printf("\n ---------- Beginning MC Burn-in Phase ---------- \n");
   else
     printf("\nBeginning MC Burn-in Phase...\n");
 
-  burn_num = runs/BURN_RATIO;
-
-  for (i=0;i<burn_num;i++){
-    for (m=0;m<NCHAIN;m++){
-      for(p=0;p<param_inds.size();p++){
-	prng[p][i]=gsl_ran_gaussian(r,ldp[param_inds[p]]);
-	temp=pcurrent[m][p]+prng[p][i];
-	if((temp >= lmin[param_inds[p]]) && (temp <= lmax[param_inds[p]])) {
-	  ptemp[m][p]=temp;
-	  lpars[param_inds[p]] = temp;
+  for (i=0;i<q.burn_num;i++){
+    for (m=0;m<q.nchain;m++){
+      for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
+	temp=rng.gaussian(pcurrent[m][pi],lsigma[*p]);
+	if( ( temp >= lmin[*p] ) and ( temp <= lmin[*p] ) ) {
+	  ptemp[m][pi]=temp;
+	  lpars[*p] = temp;
 	}
       }
-      if(vary_cexp){
-	prng[cind][i]=gsl_ran_gaussian(r,cexp[4]);
-	temp=pcurrent[m][cind]+prng[cind][i];
-	if((temp >= cexp[2]) && (temp <= cexp[3])) {
-	  ptemp[m][cind]=temp;
+      if(q.vary_cexp){
+	temp=rng.gaussian(pcurrent[m][q.cind],CEsigma);
+	if( ( temp >= CEmin ) and ( temp <= CEmax ) ) {
+	  ptemp[m][q.cind]=temp;
 	  survey.set_color_exp(temp);
 	}
       }
 
-      if (oprint) 
-	printf("%lu %lu - %lf %lf : ",(i+1),(m+1),lpars[4],lpars[5]);
+      if (q.oprint) 
+	printf("%lu %lu - %lf %lf %lf %lf %lf %lf %lf %lf : ",(i+1),(m+1),lpars[0],lpars[1],lpars[2],lpars[3],lpars[4],lpars[5],lpars[6],(q.vary_cexp ? ptemp[m][q.cind] : CE));
       lf.set_params(lpars);
       output=survey.simulate();
       trial=output.chisqr;
-      if (oprint)
+      if (q.oprint)
 	printf("Iteration Chi-Square: %lf",trial);
       
       if(trial < chi_min){
-	if (oprint) 
+	if (q.oprint) 
 	  printf(" -- Current Best Trial");
 	chi_min=trial;
-	for(p=0;p<nparams;p++)
-	  pbest[p]=ptemp[m][p];
+	for(pi=0;pi<q.nparams;pi++)
+	  pbest[pi]=ptemp[m][pi];
       }
-      if (oprint)
+      if (q.oprint)
 	printf("\n");
 
       if(metrop.accept(m,trial)){
-	for(p=0;p<nparams;p++)
-	  pcurrent[m][p]=ptemp[m][p];
+	for(pi=0;pi<q.nparams;pi++)
+	  pcurrent[m][pi]=ptemp[m][pi];
       }      
     }
-    if(((i+1) % BURN_STEP) == 0)
+    if(((i+1) % q.burn_step) == 0)
       if(not metrop.anneal())
-	i = runs;
+	i = q.runs;
   }
   
-  for(m=0;m<NCHAIN;m++)
-    for(p=0;p<nparams;p++)
-      ptemp[m][p] = pcurrent[m][p] = pbest[p];
+  for(m=0;m<q.nchain;m++)
+    for(pi=0;pi<q.nparams;pi++)
+      ptemp[m][pi] = pcurrent[m][pi] = pbest[pi];
   
   metrop.reset();
   
-  if (oprint)
-    printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",runs);
+  if (q.oprint)
+    printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",q.runs);
   else
-    printf("\nBeginning Fitting, Run Maximum: %ld\n",runs);
+    printf("\nBeginning Fitting, Run Maximum: %ld\n",q.runs);
   
-  for (i=0;i<runs;i++){
-    for (m=0;m<NCHAIN;m++){
-      for(p=0;p<param_inds.size();p++){
-	prng[p][i]=gsl_ran_gaussian(r,ldp[param_inds[p]]);
-	temp=pcurrent[m][p]+prng[p][i];
-	if((temp >= lmin[param_inds[p]]) && (temp <= lmax[param_inds[p]])){
-	  ptemp[m][p]=temp;
-	  lpars[param_inds[p]] = temp;
+  for (i=0;i<q.runs;i++){
+    for (m=0;m<q.nchain;m++){
+      for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
+	temp = rng.gaussian(pcurrent[m][pi],lsigma[*p]);
+	if( ( temp >= lmin[*p] ) and ( temp <= lmax[*p] ) ) {
+	  ptemp[m][pi]=temp;
+	  lpars[*p] = temp;
 	}
       }
 
-      if(vary_cexp){
-	prng[cind][i]=gsl_ran_gaussian(r,cexp[4]);
-	temp=pcurrent[m][cind]+prng[cind][i];
-	if((temp >= cexp[2]) && (temp <= cexp[3])) {
-	  ptemp[m][cind]=temp;
+      if(q.vary_cexp){
+	temp = rng.gaussian(pcurrent[m][q.cind],CEsigma);
+	if( (temp >= CEmin ) and ( temp <= CEmax ) ) {
+	  ptemp[m][q.cind] = temp;
 	  survey.set_color_exp(temp);
 	}
       }
       
-      if (oprint)
-	printf("%lu %lu - %lf %lf : ",(i+1),(m+1),lpars[4],lpars[5]);
+      if (q.oprint){
+	printf("%lu %lu -",(i+1),(m+1));
+	for(pi=0;pi<q.nparams;pi++)
+	  printf(" %lf",ptemp[m][pi]);
+	printf(" : ");
+      }
       lf.set_params(lpars);
       output=survey.simulate();
       trial=output.chisqr;
-      if (oprint)
-	printf("Model chi2: %lf",trial);
+      if (q.oprint)
+	printf("Model Chi-Square: %lf",trial);
       
       accept = metrop.accept(m,trial);
       mcchain.add_link(m,ptemp[m],trial,accept);
       counts.add_link(output.dnds,trial);
 
       if(accept){
-	if (oprint) 
+	if (q.oprint) 
 	  printf(" -- Accepted\n");
-	for(p=0;p<nparams;p++)
-	  pcurrent[m][p]=ptemp[m][p];
+	for(pi=0;pi<q.nparams;pi++)
+	  pcurrent[m][pi]=ptemp[m][pi];
       }
-      else if (oprint)
+      else if (q.oprint)
 	printf(" -- Rejected\n");
     }
     
-    if(((i+1) % CONV_STEP) == 0){
+    if(((i+1) % q.conv_step) == 0){
       printf("Checking Convergence\n");
-      if (i < burn_num)
+      if (i < q.burn_num)
 	metrop.anneal();
       if(mcchain.converged()){
 	printf("Chains Converged!\n");
-	i = runs;}
+	i = q.runs;}
       else
 	printf("Chains Have Not Converged\n");
     } 
@@ -365,32 +229,31 @@ int main(int argc,char** argv){
   
   mcchain.get_best_link(pbest,chi_min);
 
-  for(p=0;p<param_inds.size();p++)
-    lpars[param_inds[p]] = pbest[p];
+  for(pi=0;pi<q.param_inds.size();pi++)
+    lpars[q.param_inds[pi]] = pbest[pi];
   lf.set_params(lpars);
-  if(vary_cexp)
-    survey.set_color_exp(pbest[cind]);
+  if(q.vary_cexp)
+    survey.set_color_exp(pbest[q.cind]);
 
   printf("\nRe-Running Best Fit...\n");
   output=survey.simulate();
   printf("Model chi2: %lf\n",output.chisqr);
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
   
-  unique_ptr<string[]> parnames (new string[nparams]);
-  for(p=0;p<param_inds.size();p++)
-    parnames[p] = pnames[param_inds[p]];
-  if(vary_cexp)
-    parnames[cind] = "CEXP";
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"}; 
+  unique_ptr<string[]> parnames (new string[q.nparams]);
+  for(pi=0;pi<q.param_inds.size();pi++)
+    parnames[pi] = pnames[q.param_inds[pi]];
+  if(q.vary_cexp)
+    parnames[q.cind] = "CEXP";
   
-  saved = survey.save(outfile);
-  saved &= mcchain.save(outfile,parnames.get());
-  saved &= counts.save(outfile,countnames);
+  saved = survey.save(q.outfile);
+  saved &= mcchain.save(q.outfile,parnames.get());
+  saved &= counts.save(q.outfile,countnames);
   if(saved)
     printf("Save Successful\n");
   else
     printf("Save Failed\n");
-  
-  gsl_rng_free (r);
   
   printf("\nFitting Complete\n\n");
   

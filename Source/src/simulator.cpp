@@ -110,13 +110,18 @@ int simulator::binNum(int band, double flux){
   return dndsInfo.bnum[band]-1;
 }
 
-simulator::simulator(string filterfile, string filters[], double f_lims[], double errors[], string obsfile, string sedfile){
+simulator::simulator(string filterfile, string obsfile, string sedfile){
 
   seds.reset(NULL);
 
   color_exp = 0.0;
   observations.reset(new obs_lib(obsfile));
   seds.reset(new sed_lib(sedfile));
+
+  string filters[3];
+  double f_lims[3];
+  double errors[3];
+  observations->info(filters,f_lims,errors);
 
   //initialize filters
   if(seds->init_filter_lib(filterfile)){

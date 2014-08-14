@@ -28,9 +28,9 @@ class MetropSampler {
   deque<bool> recent;
   deque<double> trials;
   unsigned long recent_num;
-  gsl_rng *rgen;
+  RandomNumberGenerator rng;
  public:
-  MetropSampler(int nchains,double maxTemp, double idealpct, double acpt_buf, gsl_rng *rgen);
+  MetropSampler(int nchains,double maxTemp, double idealpct, double acpt_buf);
   bool accept(int chainnum, double trial);
   double acceptance(int chainnum);
   double mean_acceptance();
