@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <cctype>
 
 //For FITS input/output
 #include <CCFits/CCfits>
@@ -43,6 +44,8 @@ using namespace std;
 
 //Generates spectral color of a galaxy from fluxes and bands
 double get_color(double f1,double f2);
+
+string toLower(const string &oldstr);
 
 class Configuration{
 public:
@@ -82,14 +85,13 @@ public:
   double annrng;
   
   vector<int> param_inds;
-  double LFParameters[LUMPARS][5];
-  double colorEvolution[5];
+  double LFParameters[LUMPARS][4];
+  double colorEvolution[4];
 
   const short value = 0;
   const short fixed = 1;
-  const short min = 1;
-  const short max = 1;
-  const short step = 1;
+  const short min = 2;
+  const short max = 3;
 
 private:
   void load();
@@ -100,7 +102,7 @@ class RandomNumberGenerator{
 public:
   RandomNumberGenerator();
   ~RandomNumberGenerator();
-  double gaussian(double mean, double sigma);
+  double gaussian(double mean, double sigma, double min, double max);
   double flat(double min, double max);
 private:
   const gsl_rng_type *T;

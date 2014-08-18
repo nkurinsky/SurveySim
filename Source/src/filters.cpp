@@ -200,7 +200,7 @@ bool filter_lib::load_library(string ffilename){
 	    temp.scale = 1;
 	    break;
 	  case 2:
-	    temp.name = (string) name;
+	    temp.name = toLower(static_cast<string>(name));
 	    if(scale_exp != 0){
 	      temp.scale = pow(10,scale_exp);
 	      temp.info = "";
@@ -211,9 +211,9 @@ bool filter_lib::load_library(string ffilename){
 	    }
 	    break;
 	  default: //3 or more (could never be more)
-	    temp.name = (string) name;
+	    temp.name = toLower(static_cast<string>(name));
 	    temp.scale = pow(10,scale_exp);
-	    temp.info = (string) info;
+	    temp.info = static_cast<string>(info);
 	    break;
 	  }
 	  break;
@@ -252,19 +252,22 @@ bool filter_lib::load_library(string ffilename){
 
 bool filter_lib::load_filter(short num, string fname){
   int found=-1;
+  string fSearchName(toLower(fname));
   
   if(initialized){
     if ((num >=0) and (num <3)){
       for(int i=0;i<library.size();i++){
-	if(library[i].name == fname){
+	if(library[i].name == fSearchName){
 	  found = i;
 	  i = library.size();
 	}
       }
       if (found != -1)
 	return filters[num].load(fname,library[found].band, library[found].transmission);
-      else
+      else{
 	printf("Error: Filter \"%s\" not found in library\n",fname.c_str());
+	exit(1);
+      }
     }
     else
       printf("Error: Invalid filter number %i\n",num);

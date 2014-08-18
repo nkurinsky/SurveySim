@@ -3,10 +3,13 @@
 print("Welcome to SurveySim");
 print("a MCMC-based galaxy evolution fitter and simulator");
 
-import time
-from astropy.io import fits
-import matplotlib.pyplot as plt
 import os
+import sys
+sys.path.append("./functions")
+
+import time
+import pyfits as fits
+import matplotlib.pyplot as plt
 import numpy as np
 import img_scale
 from pylab import *
@@ -80,7 +83,7 @@ def showresults(): #read-in the results from output.fits and show plots
     a3.set_ylabel('(dN/dS)*S^2.5')
     a3.set_xlim(20,1000)
     a3.set_ylim(200,200000)
-    cfile=open(codedir+'/Widget/counts_clements10.dat','r')
+    cfile=open(codedir+'/IDL/counts_clements10.dat','r')
 #    flux250=np.empty([15],dtype=float)
     flux250=[]
     dnds250=[]

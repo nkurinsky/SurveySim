@@ -13,7 +13,7 @@ hist_lib::hist_lib(){
 hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size){
   static double temp_range[2];
   static double x,y;
- 
+
   //set the range to the absolute extremes of the color arrays
   x = gsl_stats_min(obs_c1,H_STRIDE,obs_size);
   y = gsl_stats_min(obs_c2,H_STRIDE,obs_size);
@@ -40,6 +40,12 @@ hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size){
 }
 
 void hist_lib::init_obs(double c1[],double c2[],int size){
+
+  if(size <= 0){
+    printf("ERROR: hist_lib::init_obs called with size <= 0\n");
+    exit(1);
+  }
+
   if(obs_hist != NULL){
     for (int i=0;i<xysize;i++){
       delete[] obs_hist[i];
@@ -247,11 +253,11 @@ double ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cn
   return retvals;
 }
 
-//here replace sqrt with tabulated vals and new formula
 double hist_lib::fit_err(){
-  //Chi-square
+  //Caluclate reduced Chi-square
   static double chisq,obs_temp,mod_temp,obs_temp_err,mod_temp_err,err_temp,chisq_temp;
   
+  double binnum = pow(xysize,2);
   comparison_hist = new double*[xysize];
   for (int i=0;i<xysize;i++){
     comparison_hist[i] = new double[xysize];
@@ -274,7 +280,7 @@ double hist_lib::fit_err(){
       comparison_hist[i][j] = chisq_temp;
     }
   }
-  return chisq;
+  return (chisq/binnum); //Reduced chisq = chisq/dof
 }
 
 double hist_lib::poiss_err(int x){

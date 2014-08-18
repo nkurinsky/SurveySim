@@ -14,6 +14,16 @@
 
 #define RECENT_NUM 100
 
+class ParameterSettings{
+ public:
+  ParameterSettings(size_t nparams);
+  void set(short pnum, double Minimum, double Maximum, double standardDeviation, double bestValue);
+  vector<double> min;
+  vector<double> max;
+  vector<double> sigma;
+  vector<double> best;
+};
+
 class MetropSampler {
  private:
   int nchains;
@@ -61,6 +71,8 @@ class MCChains {
   MCChains(int nchains, int npars, int nruns, int convstep);
   bool add_link(int chain, double pars[], double chisqr, bool accpt);
   void get_best_link(double pars[], double chisqr);
+  void get_fit_results(double pars[], double sigma[]);
+  void get_stdev(double sigma[]);
   bool set_constraints(double Rmax, double alpha);
   bool converged();
   bool save(string filename, string parnames[]);

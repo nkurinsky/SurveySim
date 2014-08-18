@@ -51,27 +51,30 @@ obs_lib::obs_lib(string fitsfile){
   
     ExtHDU& table = pInfile->extension(hdunum);
 
-    const string ti[3] = {"1","2","3"};
+    char cnum[2];
+    string num;
     string column[6];
     for (int i=0;i<3;i++){
-      try{table.readKey("F"+ti[i]+"COL",column[i]);}
+      sprintf(cnum,"%i",i+1);
+      num = cnum;
+      try{table.readKey("F"+num+"COL",column[i]);}
       catch(HDU::NoSuchKeyword){
-	printf("Keyword F%iCOL missing from header (%s)\n",i,fitsfile.c_str());
+	printf("Keyword F%sCOL missing from header (%s)\n",num.c_str(),fitsfile.c_str());
 	exit(1);
       }
-      try{table.readKey("EF"+ti[i]+"COL",column[i+3]);}
+      try{table.readKey("EF"+num+"COL",column[i+3]);}
       catch(HDU::NoSuchKeyword){
-	printf("Keyword EF%iCOL missing from header (%s)\n",i,fitsfile.c_str());
+	printf("Keyword EF%sCOL missing from header (%s)\n",num.c_str(),fitsfile.c_str());
 	exit(1);
       }
-      try{table.readKey("F"+ti[i]+"MIN",flim[i]);}
+      try{table.readKey("F"+num+"MIN",flim[i]);}
       catch(HDU::NoSuchKeyword){
-	printf("Keyword F%iLIM missing from header (%s)\n",i,fitsfile.c_str());
+	printf("Keyword F%sLIM missing from header (%s)\n",num.c_str(),fitsfile.c_str());
 	exit(1);
       }
-      try{table.readKey("F"+ti[i]+"FILT",filter[i]);}
+      try{table.readKey("F"+num+"FILT",filter[i]);}
       catch(HDU::NoSuchKeyword){
-	printf("Keyword F%iFILT missing from header (%s)\n",i,fitsfile.c_str());
+	printf("Keyword F%sFILT missing from header (%s)\n",num.c_str(),fitsfile.c_str());
 	exit(1);
       }
     }
@@ -100,7 +103,7 @@ obs_lib::obs_lib(string fitsfile){
     observations.reserve(tablesize);
     double fluxes[3];
     
-    for (unsigned int i=0;i<observations.size();i++){
+    for (unsigned int i=0;i<tablesize;i++){
       for (int j=0;j<3;j++)
 	fluxes[j]=col[j][i];
       observations.push_back(new obs(fluxes));

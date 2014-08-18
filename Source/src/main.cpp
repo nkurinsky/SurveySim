@@ -18,6 +18,16 @@
 //Array size definitions 
 #define BANDS 3
 
+#define VERBOSE( ARG ) \
+  if(q.oprint){	       \
+    ARG;	       \
+  }
+
+#define TERSE( ARG )   \
+  if(!q.oprint){       \
+    ARG;	       \
+  }
+
 using namespace std; 
 
 int main(int argc,char** argv){
@@ -25,7 +35,7 @@ int main(int argc,char** argv){
   printf("\nMCMC Fitting Code Compiled: %s\n\n",__DATE__);
   
   Configuration q(argc,argv);
-  q.print();
+  VERBOSE(q.print());
   RandomNumberGenerator rng;
   
   //general variable declarations
@@ -33,34 +43,22 @@ int main(int argc,char** argv){
   unsigned long i,m;
   unsigned long pi;
   vector<int>::const_iterator p;
-  double temp, trial;
+  double trial;
 
   //this array holds phi0,L0,alpha,beta,p, and q
   double lpars[LUMPARS];
   double lmin[LUMPARS];
   double lmax[LUMPARS];
-  double lsigma[LUMPARS];
   q.LFparameters(lpars);
   q.LFparameters(lmin,q.min);
   q.LFparameters(lmax,q.max);
-  q.LFparameters(lsigma,q.step);
   double CE = q.colorEvolution[q.value];
   double CEmin = q.colorEvolution[q.min];
   double CEmax = q.colorEvolution[q.max];
-  double CEsigma = q.colorEvolution[q.step];
   
   //counts
   string countnames[]= {"dnds250","dnds350","dnds500"};
-
-  /*
-    note that the dp values here are the widths of the "proposal distribution"
-    the smaller they are the slower will converge onto the right answer
-    the bigger they are, the less well sampled the probability distribution 
-    will be and hence the less accurate the final answer
-    needs to find the "goldilocks" zone here but that's very problem specific 
-    so requires trial and error as we actually start fitting data. 
-  */
-
+  
   lumfunct lf;
   lf.set_params(lpars);
 
@@ -75,150 +73,130 @@ int main(int argc,char** argv){
   survey.set_size(q.areaSteradian(),q.dz,q.zmin,q.nz,q.ns);
   int bnum[]={16,13,10};
   products output(q.nz,bnum);
-
-  /*
-    Loop trough the mcmc runs
-    At each step, from some initial paramer value "p" call on the simulator.cpp 
-    program to evaluate the chi2 for that particular color-color plot. 
-    Then use the metrop algorithm (below) to decide whether or not to keep a particular guess
-    The chain results (including all accepted guesses) will provide us with the posterior 
-    probability distributions for the fitted parameters.
-  */
   
   MCChains mcchain(q.nchain,q.nparams,q.runs,q.conv_step);
-  ResultChain counts(3,q.nchain*q.runs);
+  MCChains burnchain(q.nchain,q.nparams,q.runs,q.conv_step);
   mcchain.set_constraints(q.rmax,q.a_ci);
+  burnchain.set_constraints(1.5,0.25);
+
+  ResultChain counts(3,q.nchain*q.runs);
+ 
   MetropSampler metrop(q.nchain,q.tmax,q.idealpct,q.annrng);
 
   //mcmc variables and arrays
   double chi_min=1.0E+4; 
   double ptemp[q.nchain][q.nparams];
-  double pbest[q.nparams];
   double pcurrent[q.nchain][q.nparams];
+  double *setvars[q.nparams];
+  ParameterSettings pset(q.nparams);
   
+  for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
+    setvars[pi] = &lpars[*p];
+    pcurrent[0][pi] = *setvars[pi];
+    pset.set(pi,lmin[*p],lmax[*p],(lmax[*p] - lmin[*p])/6.0,lpars[*p]);
+  }
+  if(q.vary_cexp){
+    setvars[q.cind] = &CE;
+    pcurrent[0][q.cind] = *setvars[pi];
+    pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/6.0,CE);
+  }
 
-  //initialize first chain to initial parameters
-  for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi)
-    ptemp[0][pi] = pcurrent[0][pi] = lpars[*p];
-  if(q.vary_cexp)
-    ptemp[0][q.cind] = pcurrent[0][q.cind] = CE;
-  
   for(m=1;m<q.nchain;m++){ 
-    for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi)
-      ptemp[m][pi] = pcurrent[m][pi] = rng.flat(lmin[*p],lmax[*p]);
-    if(q.vary_cexp)
-      ptemp[m][q.cind] = pcurrent[m][q.cind] = rng.flat(CEmin,CEmax);
+    for(pi=0;pi<q.nparams;pi++)
+      pcurrent[m][pi] = rng.flat(lmin[*p],lmax[*p]);
   }
   
-  if (q.oprint)
-    printf("\n ---------- Beginning MC Burn-in Phase ---------- \n");
-  else
-    printf("\nBeginning MC Burn-in Phase...\n");
+  VERBOSE(printf("\n ---------- Beginning MC Burn-in Phase ---------- \n"));
+  TERSE(printf("\nBeginning MC Burn-in Phase...\n"));
 
   for (i=0;i<q.burn_num;i++){
     for (m=0;m<q.nchain;m++){
-      for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
-	temp=rng.gaussian(pcurrent[m][pi],lsigma[*p]);
-	if( ( temp >= lmin[*p] ) and ( temp <= lmin[*p] ) ) {
-	  ptemp[m][pi]=temp;
-	  lpars[*p] = temp;
-	}
-      }
-      if(q.vary_cexp){
-	temp=rng.gaussian(pcurrent[m][q.cind],CEsigma);
-	if( ( temp >= CEmin ) and ( temp <= CEmax ) ) {
-	  ptemp[m][q.cind]=temp;
-	  survey.set_color_exp(temp);
-	}
-      }
-
-      if (q.oprint) 
-	printf("%lu %lu - %lf %lf %lf %lf %lf %lf %lf %lf : ",(i+1),(m+1),lpars[0],lpars[1],lpars[2],lpars[3],lpars[4],lpars[5],lpars[6],(q.vary_cexp ? ptemp[m][q.cind] : CE));
+      
+      for(pi = 0;pi<q.nparams;pi++)
+	*(setvars[pi]) = ptemp[m][pi] = rng.gaussian(pcurrent[m][pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
+      
+      VERBOSE(printf("%lu %lu -",(i+1),(m+1)));
+      for(pi=0;pi<LUMPARS;pi++)
+	VERBOSE(printf(" %5.2lf",lpars[pi]));
+      VERBOSE(printf(" %5.2lf : ",(q.vary_cexp ? ptemp[m][q.cind] : CE)));
+      
       lf.set_params(lpars);
+      survey.set_color_exp(CE);
+      
       output=survey.simulate();
       trial=output.chisqr;
-      if (q.oprint)
-	printf("Iteration Chi-Square: %lf",trial);
       
+      VERBOSE(printf("Iteration Chi-Square: %lf",trial));      
       if(trial < chi_min){
-	if (q.oprint) 
-	  printf(" -- Current Best Trial");
+	VERBOSE(printf(" -- Current Best Trial"));
 	chi_min=trial;
 	for(pi=0;pi<q.nparams;pi++)
-	  pbest[pi]=ptemp[m][pi];
+	  pset.best[pi]=ptemp[m][pi];
       }
-      if (q.oprint)
-	printf("\n");
+      VERBOSE(printf("\n"));
 
-      if(metrop.accept(m,trial)){
+      accept = metrop.accept(m,trial);
+      if(accept)
 	for(pi=0;pi<q.nparams;pi++)
 	  pcurrent[m][pi]=ptemp[m][pi];
-      }      
+
+      burnchain.add_link(m,ptemp[m],trial,accept);
     }
-    if(((i+1) % q.burn_step) == 0)
+    
+    if(((i+1) % q.burn_step) == 0){
       if(not metrop.anneal())
 	i = q.runs;
+      if(burnchain.converged()){
+	VERBOSE(printf("Burn Chain Converged\n"));
+	i = q.runs;}
+      burnchain.get_stdev(pset.sigma.data());
+    }
   }
   
   for(m=0;m<q.nchain;m++)
     for(pi=0;pi<q.nparams;pi++)
-      ptemp[m][pi] = pcurrent[m][pi] = pbest[pi];
+      pcurrent[m][pi] = pset.best[pi];
   
   metrop.reset();
   
-  if (q.oprint)
-    printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",q.runs);
-  else
-    printf("\nBeginning Fitting, Run Maximum: %ld\n",q.runs);
+  VERBOSE(printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",q.runs));
+  TERSE(printf("\nBeginning Fitting, Run Maximum: %ld\n",q.runs));
   
   for (i=0;i<q.runs;i++){
     for (m=0;m<q.nchain;m++){
-      for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
-	temp = rng.gaussian(pcurrent[m][pi],lsigma[*p]);
-	if( ( temp >= lmin[*p] ) and ( temp <= lmax[*p] ) ) {
-	  ptemp[m][pi]=temp;
-	  lpars[*p] = temp;
-	}
-      }
-
-      if(q.vary_cexp){
-	temp = rng.gaussian(pcurrent[m][q.cind],CEsigma);
-	if( (temp >= CEmin ) and ( temp <= CEmax ) ) {
-	  ptemp[m][q.cind] = temp;
-	  survey.set_color_exp(temp);
-	}
-      }
       
-      if (q.oprint){
-	printf("%lu %lu -",(i+1),(m+1));
-	for(pi=0;pi<q.nparams;pi++)
-	  printf(" %lf",ptemp[m][pi]);
-	printf(" : ");
-      }
+      for(pi = 0;pi<q.nparams;pi++)
+	*(setvars[pi]) = ptemp[m][pi] = rng.gaussian(pcurrent[m][pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
+      
+      VERBOSE(printf("%lu %lu -",(i+1),(m+1)));
+      for(pi=0;pi<q.nparams;pi++)
+	VERBOSE(printf(" %lf",ptemp[m][pi]));
+      VERBOSE(printf(" : "));
+      
       lf.set_params(lpars);
       output=survey.simulate();
       trial=output.chisqr;
-      if (q.oprint)
-	printf("Model Chi-Square: %lf",trial);
+      VERBOSE(printf("Model Chi-Square: %lf",trial));
       
       accept = metrop.accept(m,trial);
+      survey.set_color_exp(CE);
+
       mcchain.add_link(m,ptemp[m],trial,accept);
       counts.add_link(output.dnds,trial);
 
       if(accept){
-	if (q.oprint) 
-	  printf(" -- Accepted\n");
+	VERBOSE(printf(" -- Accepted\n"));
 	for(pi=0;pi<q.nparams;pi++)
 	  pcurrent[m][pi]=ptemp[m][pi];
       }
-      else if (q.oprint)
-	printf(" -- Rejected\n");
+      VERBOSE(printf(" -- Rejected\n"));
     }
     
     if(((i+1) % q.conv_step) == 0){
       printf("Checking Convergence\n");
       if (i < q.burn_num)
 	metrop.anneal();
+      mcchain.get_stdev(pset.sigma.data());
       if(mcchain.converged()){
 	printf("Chains Converged!\n");
 	i = q.runs;}
@@ -227,14 +205,14 @@ int main(int argc,char** argv){
     } 
   }
   
-  mcchain.get_best_link(pbest,chi_min);
+  mcchain.get_best_link(pset.best.data(),chi_min);
 
   for(pi=0;pi<q.param_inds.size();pi++)
-    lpars[q.param_inds[pi]] = pbest[pi];
+    lpars[q.param_inds[pi]] = pset.best[pi];
   lf.set_params(lpars);
   if(q.vary_cexp)
-    survey.set_color_exp(pbest[q.cind]);
-
+    survey.set_color_exp(pset.best[q.cind]);
+  
   printf("\nRe-Running Best Fit...\n");
   output=survey.simulate();
   printf("Model chi2: %lf\n",output.chisqr);
@@ -242,23 +220,23 @@ int main(int argc,char** argv){
   
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"}; 
   unique_ptr<string[]> parnames (new string[q.nparams]);
+  
   for(pi=0;pi<q.param_inds.size();pi++)
     parnames[pi] = pnames[q.param_inds[pi]];
   if(q.vary_cexp)
     parnames[q.cind] = "CEXP";
   
+  VERBOSE(printf("Saving Survey\n"));
   saved = survey.save(q.outfile);
+  VERBOSE(printf("Saving Chains\n"));
   saved &= mcchain.save(q.outfile,parnames.get());
+  VERBOSE(printf("Saving Counts\n"));
   saved &= counts.save(q.outfile,countnames);
-  if(saved)
-    printf("Save Successful\n");
-  else
-    printf("Save Failed\n");
-  
+
+  saved ? printf("Save Successful") : printf("Save Failed");
   printf("\nFitting Complete\n\n");
   
-  if(saved)
-    return 0;
-  else
-    return 1;
+  return saved ? 0 : 1;
 }
+
+

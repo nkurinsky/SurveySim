@@ -62,11 +62,20 @@ sed_lib::sed_lib(string fitsfile){
     std::string a = "ROW";
     sprintf(buffer,"%i",i+1);
     a.append(buffer);
-    header.readKey(a,temp);
+    try{header.readKey(a,temp);}
+    catch(HDU::NoSuchKeyword){
+      printf("Keyword %s missing from header (%s)\n",a.c_str(),fitsfile.c_str());
+      exit(1);
+    }
     lums[i] = temp;
     inds[i] = i;
   }
-  header.readKey("SCALE",temp);
+  
+  try{header.readKey("SCALE",temp);}
+  catch(HDU::NoSuchKeyword){
+    printf("Keyword SCALE missing from header (%s)\n",fitsfile.c_str());
+    exit(1);
+  }
   scale = pow(10,temp);
   
   acc = gsl_interp_accel_alloc();

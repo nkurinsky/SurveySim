@@ -115,15 +115,19 @@ simulator::simulator(string filterfile, string obsfile, string sedfile){
   seds.reset(NULL);
 
   color_exp = 0.0;
+  printf("Initializing Observations:\n");
   observations.reset(new obs_lib(obsfile));
+  printf("Initializing SED Library:\n");
   seds.reset(new sed_lib(sedfile));
-
+  
   string filters[3];
   double f_lims[3];
   double errors[3];
+  printf("Getting Filter Information\n");
   observations->info(filters,f_lims,errors);
 
   //initialize filters
+  printf("Initializing Filters\n");
   if(seds->init_filter_lib(filterfile)){
     for(short i=0;i<3;i++){
       seds->load_filter(i,filters[i]);
@@ -134,16 +138,21 @@ simulator::simulator(string filterfile, string obsfile, string sedfile){
 
   //initialize observation portion of histograms
   //possibility here to integrate obs_lib into hist_lib
+  printf("Initializing Diagnostic Class\n");
   diagnostic.reset(new hist_lib());
   double *c1,*c2;
   int osize = observations->get_snum();
+  printf("\tGetting Colors\n");
   observations->get_all_colors(c1,c2);
+  printf("\tInitializing Observations\n");
   diagnostic->init_obs(c1,c2,osize);
   last_output.chisqr=0;
 
+  printf("Initializing Counts Containers\n");
   last_output.dnds[0].resize(dndsInfo.bnum[0]);
   last_output.dnds[1].resize(dndsInfo.bnum[1]);
   last_output.dnds[2].resize(dndsInfo.bnum[2]);
+  printf("Simulator Initialized\n");
 }
 
 bool simulator::load_filter_lib(string file){

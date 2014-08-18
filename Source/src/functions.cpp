@@ -5,6 +5,13 @@ double get_color(double f1,double f2){
   return log10(f1/f2);
 }
 
+string toLower(const string &oldstr){
+  string newstr(oldstr);
+  for(string::iterator it = newstr.begin(); it != newstr.end(); it++)
+    *it = tolower(*it);
+  return newstr;
+}
+
 Configuration::Configuration(int argc, char *argv[]){
   if(argc < 4){
     printf("ERROR: Invalid number of arguments.\n");
@@ -33,6 +40,7 @@ Configuration::Configuration(int argc, char *argv[]){
 
 void Configuration::print(){
 
+  printf("\n>> Printing Configuration <<\n\n");
   //output found settings
   if(oprint)
     printf("Using Verbose Output\n\n");
@@ -40,13 +48,12 @@ void Configuration::print(){
     printf("Using Concise Output\n\n");
 
   printf("File Settings:\n");
-  printf("  Main Settings:  %s\n",sedfile.c_str());
+  printf("  Main Settings:  %s\n",modfile.c_str());
   printf("  SED library:    %s\n",sedfile.c_str());
-  printf("  Observations:   %s\n",sedfile.c_str());
+  printf("  Observations:   %s\n",obsfile.c_str());
   printf("  Filter library: %s\n",filterfile.c_str());
 
-  printf(">> Printing Configuration <<\n");
-  printf("MCMC Settings:\n");
+  printf("\nMCMC Settings:\n");
   printf("  Chain Number         : %lu\n", nchain);
   printf("  Starting Temp        : %5.2f\n",tmax);
   printf("  Ideal Accept Pct     : %4.2f\n",idealpct);
@@ -66,21 +73,19 @@ void Configuration::print(){
   printf("\nLuminosity Function Parameter Settings:\n");
   printf("Parameter\tStart\t Min \t Max \tStep \tFit\n");
   for(int i=0;i<LUMPARS;i++){
-    printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%s\n",
+    printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
 	   pnames[i].c_str(),
 	   LFParameters[i][value],
 	   LFParameters[i][min],
 	   LFParameters[i][max],
-	   LFParameters[i][step],
 	   LFParameters[i][fixed] == 0.0 ? "True" : "False"
 	   );
   }
-  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
+  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
 	 "CEXP",
 	 colorEvolution[value],
 	 colorEvolution[min],
 	 colorEvolution[max],
-	 colorEvolution[step],
 	 colorEvolution[fixed] == 0.0 ? "True" : "False"
 	 );
 
@@ -101,7 +106,7 @@ void Configuration::load(){
   
   //IO variables
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};  
-  string suffix[] = {"","_FIX","_MIN","_MAX","_DP"};
+  string suffix[] = {"","_FIX","_MIN","_MAX"};
   string tag;
   
   std::unique_ptr<CCfits::FITS> pInfile;
@@ -159,7 +164,7 @@ void Configuration::load(){
   }
   
   //color evolution parameters
-  for(int j=0;j<5;j++){
+  for(int j=0;j<4;j++){
     tag = "CEXP"+suffix[j];
     tag = tag.substr(0,8);
     tab.readKey(tag,colorEvolution[j]);
@@ -188,8 +193,13 @@ RandomNumberGenerator::~RandomNumberGenerator(){
   gsl_rng_free (r);
 }
 
-double RandomNumberGenerator::gaussian(double mean, double sigma){
-  return mean+gsl_ran_gaussian(r,sigma);
+double RandomNumberGenerator::gaussian(double mean, double sigma, double min, double max){
+  static double temp;
+  do{
+    temp = mean+gsl_ran_gaussian(r,sigma);
+  }while((temp < min) or (temp > max));
+  
+  return temp;
 }
 
 double RandomNumberGenerator::flat(double min, double max){

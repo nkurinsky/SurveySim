@@ -8,6 +8,24 @@
 
 #include "mc_util.h"
 
+ParameterSettings::ParameterSettings(size_t nparams){
+  min.resize(nparams);
+  max.resize(nparams);
+  sigma.resize(nparams);
+  best.resize(nparams);
+}
+
+void ParameterSettings::set(short pnum, double Minimum, double Maximum, double standardDeviation, double bestValue){
+  if(pnum < min.size()){
+    min[pnum] = Minimum;
+    max[pnum] = Maximum;
+    sigma[pnum] = standardDeviation;
+    best[pnum] = bestValue;
+  }
+  else
+    printf("ParameterSettings::set called with incorrect pnum value %i\n",pnum);
+}
+
 int dcomp(const void * a,const void * b){
   
   if((*(double*)a) > (*(double*)b)) return 1;
@@ -131,7 +149,7 @@ MCChains::MCChains(int nchains, int npars, int nruns, int convstep){
   chainlength = new int[nchains];
   for (i=0;i<nchains;i++)
     chainlength[i]=0;
-  chi_min = 1000.0;
+  chi_min = 1e10;
   //defaults to 95% CI
   Rmax = 1.05;
   alpha = 0.05;
@@ -170,6 +188,37 @@ void MCChains::get_best_link(double pars[], double chisqr){
   for(int i=0;i<npars;i++)
     pars[i] = bestpars[i];
   chisqr = chi_min;
+}
+
+void MCChains::get_fit_results(double pars[], double sigma[]){
+  vector<double> values;
+  double mean, variance;
+  unsigned long size;
+  
+  for(int i=0;i<npars;i++){
+    variance = mean = 0.0;
+    values.clear();
+    for(int j=0;i<nchains;j++){
+      size = chains[j*chainwidth+i].size();
+      for(unsigned long k = size/2; k < size; k++){
+	values.push_back(chains[j*chainwidth+i][k]);
+	mean += values.back();
+      }
+    }
+    mean /= static_cast<double>(values.size());
+    for(vector<double>::const_iterator val = values.begin(); val != values.end(); val++){
+      variance += pow(*val - mean,2);
+    }
+    variance /= (static_cast<double>(values.size()) - 1);
+
+    pars[i] = mean;
+    sigma[i] = sqrt(variance);
+  }
+}
+
+void MCChains::get_stdev(double sigma[]){
+  double pars[npars];
+  get_fit_results(pars,sigma);
 }
 
 bool MCChains::set_constraints(double Rmax, double alpha){

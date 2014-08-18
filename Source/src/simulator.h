@@ -58,9 +58,9 @@ class simulator{
   vector<sprop> sources;
   //bool simulated;
   lumfunct *lf;
-  std::auto_ptr<sed_lib> seds;
-  std::auto_ptr<obs_lib> observations;
-  std::auto_ptr<hist_lib> diagnostic;
+  std::unique_ptr<sed_lib> seds;
+  std::unique_ptr<obs_lib> observations;
+  std::unique_ptr<hist_lib> diagnostic;
   double band_errs[3];
   double flux_limits[3];
   double color_exp;
