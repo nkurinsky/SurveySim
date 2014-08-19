@@ -246,7 +246,7 @@ PRO simulation_event,ev
         sxaddpar, hdr, 'W2_FERR',flux_err[1],'Wavelength corresponding to second flux'
         sxaddpar, hdr, 'W3_FERR',flux_err[2],'Wavelength corresponding to third flux'
                 
-        mwrfits,values,'observation.fits',hdr,/create
+        mwrfits,values,'observaation.fits',hdr,/create
 
         ;make model fits file
 
@@ -477,6 +477,7 @@ pro read_output
   
   COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
 
+  print,file.oname
   dists = mrdfits(files.oname,3,head,/silent)
 
   gpts = where(dists.f3 gt 0)
@@ -517,28 +518,30 @@ pro read_output
   c1=count_dists.dnds250
   c2=count_dists.dnds350
   c3=count_dists.dnds500
-  c1mean = []
-  c2mean = []
-  c3mean = []
-  c1plus = []
-  c2plus = []
-  c3plus = []
-  c1minus = []
-  c2minus = []
-  c3minus = []
+
   c1size = n_elements(count_dists[0].dnds250)
   c2size = n_elements(count_dists[0].dnds350)
   c3size = n_elements(count_dists[0].dnds500)
 
-  for i=0,c1size-1 do begin
-     dnds = c1[i,*]
+  c1mean = make_array(c1size,value=0.0)
+  c2mean = make_array(c2size,value=0.0)
+  c3mean = make_array(c3size,value=0.0)
+  c1plus = make_array(c1size,value=0.0)
+  c2plus = make_array(c2size,value=0.0)
+  c3plus = make_array(c3size,value=0.0)
+  c1minus = make_array(c1size,value=0.0)
+  c2minus = make_array(c2size,value=0.0)
+  c3minus = make_array(c3size,value=0.0)
+
+    for i=0,c1size-1 do begin
+     dnds = c1[c1size-i-1,*]
      dnds = dnds[sort(dnds)]
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c1mean = [c1mean,mean(dnds)]
-     c1plus = [c1plus,dnds[pi]]
-     c1minus = [c1minus,dnds[mi]]
+     c1mean[i] = mean(dnds)
+     c1plus[i] = dnds[pi]
+     c1minus[i] = dnds[mi]
   endfor
 
   for i=0,c2size-1 do begin
@@ -547,9 +550,9 @@ pro read_output
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c2mean = [c2mean,mean(dnds)]
-     c2plus = [c2plus,dnds[pi]]
-     c2minus = [c2minus,dnds[mi]]
+     c2mean[i] = mean(dnds)
+     c2plus[i] = dnds[pi]
+     c2minus[i] = dnds[mi]
   endfor
 
   for i=0,c3size-1 do begin
@@ -558,9 +561,9 @@ pro read_output
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c3mean = [c3mean,mean(dnds)]
-     c3plus = [c3plus,dnds[pi]]
-     c3minus = [c3minus,dnds[mi]]
+     c3mean = mean(dnds)
+     c3plus = dnds[pi]
+     c3minus = dnds[mi]
   endfor
 
   set_plot,'ps'
@@ -792,16 +795,16 @@ pro read_output
   dim = n_elements(tags)
   nbins = 50.0
   
-  chis = []
   cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
+  chis = make_array(n_elements(cpts),value=res.(cpts[0]))
   for ci=0,n_elements(cpts)-1 do begin
-     chis = [chis,res.(cpts[ci])]
+     chis[ci] = res.(cpts[ci])
   endfor
 
-  accept = []
   apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
+  accept = make_array(n_elements(apts),value=res.(apts[0]))
   for ai=0,n_elements(apts)-1 do begin
-     accept = [accept,res.(apts[ai])]
+     accept[ai] = res.(apts[ai])
   endfor
   
   chi_med = median(chis)
@@ -819,10 +822,11 @@ pro read_output
   cgText, 0.6, 0.9, Alignment=0, /Normal, 'Fitting Results:', Charsize=1.25
 
   for x=0,dim-1 do begin
-     p = []
+     
      ppts = where(strmatch(alltags,tags[x]+'*',/FOLD_CASE) eq 1)
+     p = make_array(n_elements(ppts),value = res.(ppts[pi]))
      for pi=0,n_elements(ppts)-1 do begin
-        p = [p,res.(ppts[pi])]
+        p[pi] = res.(ppts[pi])
      endfor
      prange = [min(p),max(p)]
      for y=0,dim-1 do begin
@@ -843,10 +847,10 @@ pro read_output
 
         endif else if (x lt y) then begin ;make liklihood space
 
-           q = []
            qpts = where(strmatch(alltags,tags[y]+'*',/FOLD_CASE) eq 1)
+           q = make_array(n_elements(qpts),value = res.(qpts[qi]))
            for qi=0,n_elements(qpts)-1 do begin
-              q = [q,res.(qpts[qi])]
+              q[qi] = res.(qpts[qi])
            endfor
            qrange = [min(q),max(q)]
            dp=(prange[1]-prange[0])/nbins
@@ -1041,28 +1045,26 @@ pro graphs
   c1=count_dists.dnds250
   c2=count_dists.dnds350
   c3=count_dists.dnds500
-  c1mean = []
-  c2mean = []
-  c3mean = []
-  c1plus = []
-  c2plus = []
-  c3plus = []
-  c1minus = []
-  c2minus = []
-  c3minus = []
-  c1size = n_elements(count_dists[0].dnds250)
-  c2size = n_elements(count_dists[0].dnds350)
-  c3size = n_elements(count_dists[0].dnds500)
 
-  for i=0,c1size-1 do begin
-     dnds = c1[i,*]
+  c1mean = make_array(c1size,value=0.0)
+  c2mean = make_array(c2size,value=0.0)
+  c3mean = make_array(c3size,value=0.0)
+  c1plus = make_array(c1size,value=0.0)
+  c2plus = make_array(c2size,value=0.0)
+  c3plus = make_array(c3size,value=0.0)
+  c1minus = make_array(c1size,value=0.0)
+  c2minus = make_array(c2size,value=0.0)
+  c3minus = make_array(c3size,value=0.0)
+
+    for i=0,c1size-1 do begin
+     dnds = c1[c1size-i-1,*]
      dnds = dnds[sort(dnds)]
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c1mean = [c1mean,mean(dnds)]
-     c1plus = [c1plus,dnds[pi]]
-     c1minus = [c1minus,dnds[mi]]
+     c1mean[i] = mean(dnds)
+     c1plus[i] = dnds[pi]
+     c1minus[i] = dnds[mi]
   endfor
 
   for i=0,c2size-1 do begin
@@ -1071,9 +1073,9 @@ pro graphs
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c2mean = [c2mean,mean(dnds)]
-     c2plus = [c2plus,dnds[pi]]
-     c2minus = [c2minus,dnds[mi]]
+     c2mean[i] = mean(dnds)
+     c2plus[i] = dnds[pi]
+     c2minus[i] = dnds[mi]
   endfor
 
   for i=0,c3size-1 do begin
@@ -1082,9 +1084,9 @@ pro graphs
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c3mean = [c3mean,mean(dnds)]
-     c3plus = [c3plus,dnds[pi]]
-     c3minus = [c3minus,dnds[mi]]
+     c3mean = mean(dnds)
+     c3plus = dnds[pi]
+     c3minus = dnds[mi]
   endfor
 
   pnum_out = fxpar(head,'tfields')
@@ -1384,17 +1386,17 @@ pro diagnostics
 
   dim = n_elements(tags)
   nbins = 50.0
-  
-  chis = []
+    
   cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
+  chis = make_array(n_elements(cpts),value=res.(cpts[0]))
   for ci=0,n_elements(cpts)-1 do begin
-     chis = [chis,res.(cpts[ci])]
+     chis[ci] = res.(cpts[ci])
   endfor
 
-  accept = []
   apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
+  accept = make_array(n_elements(apts),value=res.(apts[0]))
   for ai=0,n_elements(apts)-1 do begin
-     accept = [accept,res.(apts[ai])]
+     accept[ai] = res.(apts[ai])
   endfor
   
   chi_med = median(chis)
@@ -1412,10 +1414,10 @@ pro diagnostics
   cgText, 0.6, 0.9, Alignment=0, /Normal, 'Fitting Results:', Charsize=1.25,color='black'
 
   for x=0,dim-1 do begin
-     p = []
      ppts = where(strmatch(alltags,tags[x]+'*',/FOLD_CASE) eq 1)
+     p = make_array(n_elements(ppts),value = res.(ppts[pi]))
      for pi=0,n_elements(ppts)-1 do begin
-        p = [p,res.(ppts[pi])]
+        p[pi] = res.(ppts[pi])
      endfor
      prange = [min(p),max(p)]
      for y=0,dim-1 do begin
@@ -1436,10 +1438,10 @@ pro diagnostics
 
         endif else if (x lt y) then begin ;make liklihood space
 
-           q = []
            qpts = where(strmatch(alltags,tags[y]+'*',/FOLD_CASE) eq 1)
+           q = make_array(n_elements(qpts),value = res.(qpts[qi]))
            for qi=0,n_elements(qpts)-1 do begin
-              q = [q,res.(qpts[qi])]
+              q[qi] = res.(qpts[qi])
            endfor
            qrange = [min(q),max(q)]
            dp=(prange[1]-prange[0])/nbins

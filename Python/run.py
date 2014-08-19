@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 print("Welcome to SurveySim");
 print("a MCMC-based galaxy evolution fitter and simulator");
@@ -122,7 +122,7 @@ def showresults(): #read-in the results from output.fits and show plots
             dnds_sim[ind]=(tmp**(2.5))*len(b)/(ds*area[0])
             #print fbins[ind],len(b),dnds_sim[ind]
         ind=ind+1
-    plt.plot(fbins,dnds_sim,color='black')
+    plt.scatter(fbins,dnds_sim,color='black')
 
 #    a3=fig.add_subplot(2,3,3)
 #    a3.set_xlabel('x')

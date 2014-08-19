@@ -366,7 +366,7 @@ bool simulator::save(string outfile){
   pFits->pHDU().addKey("CEXP",color_exp,"Color Evolution Param");
   
   unsigned long size = sources.size();
-  printf("%s %lu\n","Soures Being Saved: ",size);
+  printf("%s %lu\n","Sources Being Saved: ",size);
 
   valarray<double> f1(size),f2(size),f3(size),luminosity(size),redshift(size);
   for(unsigned long i=0;i<size;i++){
@@ -376,11 +376,13 @@ bool simulator::save(string outfile){
     redshift[i] = sources[i].redshift;
     luminosity[i] = sources[i].luminosity;
   }
+
+  printf("1");
   
   static std::vector<string> colname(11,"");
   static std::vector<string> colunit(11,"-");
   static std::vector<string> colform(11,"f13.8");
-  
+
   colname[0] = "F1";
   colname[1] = "F2";
   colname[2] = "F3";
@@ -408,10 +410,19 @@ bool simulator::save(string outfile){
   colform[8] = "e13.5";
   colform[9] = "e13.5";
   colform[10] = "e13.5";
-  
+
   static string hname("Parameter Distributions");
-  std::auto_ptr<Table> newTable(pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl));
-    
+  Table* newTable;
+  try{
+    newTable = pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
+  }
+  catch(...){
+    printf("Could not create table\n");
+    exit(1);
+  }
+  
+  printf("2");
+  
   newTable->column(colname[0]).write(f1,1);
   newTable->column(colname[1]).write(f2,1);
   newTable->column(colname[2]).write(f3,1);
@@ -423,7 +434,9 @@ bool simulator::save(string outfile){
   newTable->column(colname[8]).write(last_output.dnds[0],1);
   newTable->column(colname[9]).write(last_output.dnds[1],1);
   newTable->column(colname[10]).write(last_output.dnds[2],1);
-
+  
+  printf("3\n");
+  
   return true;
 }
 

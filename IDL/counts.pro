@@ -13,28 +13,28 @@ pro counts
   c2=res.dnds350
   c3=res.dnds500
 
-  c1mean = []
-  c2mean = []
-  c3mean = []
-  c1plus = []
-  c2plus = []
-  c3plus = []
-  c1minus = []
-  c2minus = []
-  c3minus = []
-
   c1size = n_elements(res[0].dnds250)
   c2size = n_elements(res[0].dnds350)
-  c3size = n_elements(res[0].dnds500)  
+  c3size = n_elements(res[0].dnds500)
+
+  c1mean = make_array(c1size,value=0.0)
+  c2mean = make_array(c2size,value=0.0)
+  c3mean = make_array(c3size,value=0.0)
+  c1plus = make_array(c1size,value=0.0)
+  c2plus = make_array(c2size,value=0.0)
+  c3plus = make_array(c3size,value=0.0)
+  c1minus = make_array(c1size,value=0.0)
+  c2minus = make_array(c2size,value=0.0)
+  c3minus = make_array(c3size,value=0.0)
   
   for i=0,c1size-1 do begin
-     dnds = c1[i,*]
+     dnds = c1[c1size-i-1,*]
      dnds = dnds[sort(dnds)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c1mean = [c1mean,mean(dnds)]
-     c1plus = [c1plus,dnds[pi]]
-     c1minus = [c1minus,dnds[mi]]
+     c1mean[i] = mean(dnds)
+     c1plus[i] = dnds[pi]
+     c1minus[i] = dnds[mi]
   endfor
 
   for i=0,c2size-1 do begin
@@ -42,9 +42,9 @@ pro counts
      dnds = dnds[sort(dnds)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c2mean = [c2mean,mean(dnds)]
-     c2plus = [c2plus,dnds[pi]]
-     c2minus = [c2minus,dnds[mi]]
+     c2mean[i] = mean(dnds)
+     c2plus[i] = dnds[pi]
+     c2minus[i] = dnds[mi]
   endfor
 
   for i=0,c3size-1 do begin
@@ -52,16 +52,16 @@ pro counts
      dnds = dnds[sort(dnds)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c3mean = [c3mean,mean(dnds)]
-     c3plus = [c3plus,dnds[pi]]
-     c3minus = [c3minus,dnds[mi]]
+     c3mean = mean(dnds)
+     c3plus = dnds[pi]
+     c3minus = dnds[mi]
   endfor
 
   set_plot,'x'
 
   x = indgen(n_elements(c1mean))
-  plot,x,c1mean,xrange=[0,16],xstyle=1
-  oplot,x,c1plus,linestyle=1
-  oplot,x,c1minus,linestyle=1
+  plot,x,c1mean,xrange=[0,16]
+  ;;oplot,x,c1plus,linestyle=1
+  ;;oplot,x,c1minus,linestyle=2
 
 end
