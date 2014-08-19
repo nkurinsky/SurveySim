@@ -89,7 +89,8 @@ int main(int argc,char** argv){
   double pcurrent[q.nchain][q.nparams];
   double *setvars[q.nparams];
   ParameterSettings pset(q.nparams);
-  
+
+  VERBOSE(printf("Initializing Chains\n"));
   for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
     setvars[pi] = &lpars[*p];
     pcurrent[0][pi] = *setvars[pi];
