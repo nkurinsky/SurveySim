@@ -77,8 +77,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) README compile \
-	depcomp install-sh missing
+	$(top_srcdir)/configure $(am__configure_deps) README \
+	config/compile config/depcomp config/install-sh config/missing \
+	$(top_srcdir)/config/compile $(top_srcdir)/config/install-sh \
+	$(top_srcdir)/config/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -279,6 +281,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = src filters templates
+EXTRA_DIST = autogen.sh
 all: all-recursive
 
 .SUFFIXES:

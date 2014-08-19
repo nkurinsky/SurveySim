@@ -334,7 +334,9 @@ products simulator::simulate(){
 
 
 bool simulator::save(string outfile){
+  printf("\tWriting Diagnostic\n");
   bool opened =  diagnostic->write_fits(outfile);
+  printf("\tDiagnostic Written\n");
 
   if(not opened)
     return opened;
