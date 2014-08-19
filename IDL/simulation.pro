@@ -113,9 +113,9 @@ pro simulation
      sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1.e3}
      
      CD, Current=thisdir
-     files = {ofile:thisdir+'/observation.save', $
+     files = {ofile:'/usr/local/surveysim/obs/spire_fls_dr2.fits', $
               mfile:thisdir+'/model.fits', $
-              sedfile:thisdir+'/sf_templates.fits', $
+              sedfile:'/usr/local/surveysim/templates/sf_templates.fits', $
               oname:thisdir+'/output.fits' }
      
      msettings = {$
@@ -212,41 +212,21 @@ PRO simulation_event,ev
      'go'  : begin              ;save settings, intialize FITS file, and pass to C++ fitting routine
         save,ldata,ldat0,bands,sdat,cdat,msettings,files,filename='params.save' ;save parameters
         
-                                ;make observation FITS file
+                                ;update observation FITS file
         widget_control,info.ot,get_value=bvals
-        wave = [bvals[0].wave,bvals[1].wave,bvals[2].wave]
         flux_min = [bvals[0].fmin,bvals[1].fmin,bvals[2].fmin]
         flux_err = [bvals[0].ferr,bvals[1].ferr,bvals[2].ferr]
 
-        if (file_test(files.ofile)) then begin
-           print,files.ofile
-           restore,files.ofile
-           values = dblarr(n_elements(wave),n_elements(f1))
-        endif else begin
-           print,'Error: file "observation.save" not found'
-           print,'Simulation attempt unsuccessful'
-           break
-        endelse
+        hdr = headfits(files.ofile)
+        hnum = sxpar(hdr,"FHDU")
+        hdr = headfits(files.ofile,exten=hnum)
 
-        for i=0,n_elements(f1)-1 do begin
-           values(0,i) = f1[i]
-           values(1,i) = f2[i]
-           values(2,i) = f3[i]
-        endfor
-        
-        sxaddpar, hdr, 'DATE', systime(),'Date of creation'
-        sxaddpar, hdr, 'FLUX_NUM',n_elements(f1),'Number of observations included in file'
-        sxaddpar, hdr, 'WAVE_1',wave[0],'Wavelength corresponding to first flux'
-        sxaddpar, hdr, 'WAVE_2',wave[1],'Wavelength corresponding to second flux'
-        sxaddpar, hdr, 'WAVE_3',wave[2],'Wavelength corresponding to third flux'
-        sxaddpar, hdr, 'W1_FMIN',flux_min[0],'Wavelength corresponding to first flux'
-        sxaddpar, hdr, 'W2_FMIN',flux_min[1],'Wavelength corresponding to second flux'
-        sxaddpar, hdr, 'W3_FMIN',flux_min[2],'Wavelength corresponding to third flux'
-        sxaddpar, hdr, 'W1_FERR',flux_err[0],'Wavelength corresponding to first flux'
-        sxaddpar, hdr, 'W2_FERR',flux_err[1],'Wavelength corresponding to second flux'
-        sxaddpar, hdr, 'W3_FERR',flux_err[2],'Wavelength corresponding to third flux'
-                
-        mwrfits,values,'observaation.fits',hdr,/create
+        ;add filters
+        sxaddpar, hdr, 'F1MIN',flux_min[0],'Flux cutoff, first column'
+        sxaddpar, hdr, 'F2MIN',flux_min[1],'Flux cutoff, second column'
+        sxaddpar, hdr, 'F3MIN',flux_min[2],'Flux cutoff, third column'
+      
+        modfits,files.ofile,0,hdr,exten_no=hnum
 
         ;make model fits file
 
@@ -325,7 +305,7 @@ PRO simulation_event,ev
 ;===============================================================
 ;Run the actual simulation
 ;---------------------------------------------------------------
-        args = 'observation.fits '+files.mfile+' '+files.sedfile+' '+files.oname
+        args = files.ofile+' '+files.mfile+' '+files.sedfile+' '+files.oname
         spawn,'fitter '+args
 
         read_output
@@ -477,7 +457,7 @@ pro read_output
   
   COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
 
-  print,file.oname
+  print,files.oname
   dists = mrdfits(files.oname,3,head,/silent)
 
   gpts = where(dists.f3 gt 0)
@@ -561,9 +541,9 @@ pro read_output
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c3mean = mean(dnds)
-     c3plus = dnds[pi]
-     c3minus = dnds[mi]
+     c3mean[i] = mean(dnds)
+     c3plus[i] = dnds[pi]
+     c3minus[i] = dnds[mi]
   endfor
 
   set_plot,'ps'
@@ -796,15 +776,22 @@ pro read_output
   nbins = 50.0
   
   cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
-  chis = make_array(n_elements(cpts),value=res.(cpts[0]))
   for ci=0,n_elements(cpts)-1 do begin
-     chis[ci] = res.(cpts[ci])
+     if(ci eq 0) then begin
+        chis = res.(cpts[ci])
+     endif else begin
+        chis = [chis,res.(cpts[ci])]
+     endelse
   endfor
-
+  
   apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
-  accept = make_array(n_elements(apts),value=res.(apts[0]))
+  accept = make_array(n_elements(apts),n_elements(res.(cpts[0])),value=0.0)
   for ai=0,n_elements(apts)-1 do begin
-     accept[ai] = res.(apts[ai])
+     if(ai eq 0) then begin
+        accept = res.(apts[ai])
+     endif else begin
+        accept = [accept,res.(apts[ai])]
+     endelse
   endfor
   
   chi_med = median(chis)
@@ -824,9 +811,13 @@ pro read_output
   for x=0,dim-1 do begin
      
      ppts = where(strmatch(alltags,tags[x]+'*',/FOLD_CASE) eq 1)
-     p = make_array(n_elements(ppts),value = res.(ppts[pi]))
+     p = make_array(n_elements(ppts),n_elements(res.(ppts[0])),value = 0.0)
      for pi=0,n_elements(ppts)-1 do begin
-        p[pi] = res.(ppts[pi])
+        if(pi eq 0) then begin
+           p = res.(ppts[pi])
+        endif else begin
+           p = [p,res.(ppts[pi])]
+        endelse
      endfor
      prange = [min(p),max(p)]
      for y=0,dim-1 do begin
@@ -848,9 +839,12 @@ pro read_output
         endif else if (x lt y) then begin ;make liklihood space
 
            qpts = where(strmatch(alltags,tags[y]+'*',/FOLD_CASE) eq 1)
-           q = make_array(n_elements(qpts),value = res.(qpts[qi]))
            for qi=0,n_elements(qpts)-1 do begin
-              q[qi] = res.(qpts[qi])
+              if(qi eq 0) then begin
+                 q = res.(qpts[qi])
+              endif else begin
+                 q = [q,res.(qpts[qi])]
+              endelse
            endfor
            qrange = [min(q),max(q)]
            dp=(prange[1]-prange[0])/nbins
@@ -871,10 +865,10 @@ pro read_output
                  yfill = [j,j+dq,j+dq,j]
                  
                  gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
-                 chi_plot = mean(chis[gpts])
+                 chi_plot = n_elements(gpts)
                  
                  if(gpts[0] ne -1) then begin
-                    polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
+                    polyfill,xfill,yfill,color=color_scale*(alog(chi_plot))
                  endif
               endfor
            endfor
@@ -1046,6 +1040,10 @@ pro graphs
   c2=count_dists.dnds350
   c3=count_dists.dnds500
 
+  c1size = n_elements(count_dists[0].dnds250)
+  c2size = n_elements(count_dists[0].dnds350)
+  c3size = n_elements(count_dists[0].dnds500)
+  
   c1mean = make_array(c1size,value=0.0)
   c2mean = make_array(c2size,value=0.0)
   c3mean = make_array(c3size,value=0.0)
@@ -1084,9 +1082,9 @@ pro graphs
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     c3mean = mean(dnds)
-     c3plus = dnds[pi]
-     c3minus = dnds[mi]
+     c3mean[i] = mean(dnds)
+     c3plus[i] = dnds[pi]
+     c3minus[i] = dnds[mi]
   endfor
 
   pnum_out = fxpar(head,'tfields')
@@ -1265,8 +1263,8 @@ pro graphs
   neg = where(comp lt 0)
   resmod = comp
   resobs = abs(comp)
-  resmod[neg] = 0
-  resobs[pos] = 0
+  if(neg[0] ne -1) then resmod[neg] = 0
+  if(pos[0] ne -1) then resobs[pos] = 0
 
   plot,[hist_min,hist_max],[hist_min,hist_max],/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=textoidl('\alpha_{250}^{500}'),ytitle=textoidl('\alpha_{350}^{500}'),title='Color Distribution Comparison'
   hb = 0.5
@@ -1386,17 +1384,23 @@ pro diagnostics
 
   dim = n_elements(tags)
   nbins = 50.0
-    
+  
   cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
-  chis = make_array(n_elements(cpts),value=res.(cpts[0]))
   for ci=0,n_elements(cpts)-1 do begin
-     chis[ci] = res.(cpts[ci])
+     if(ci eq 0) then begin
+        chis = res.(cpts[ci])
+     endif else begin
+        chis = [chis,res.(cpts[ci])]
+     endelse
   endfor
 
   apts = where(strmatch(alltags,'ACPT*',/FOLD_CASE) eq 1)
-  accept = make_array(n_elements(apts),value=res.(apts[0]))
   for ai=0,n_elements(apts)-1 do begin
-     accept[ai] = res.(apts[ai])
+     if(ai eq 0) then begin
+        accept = res.(apts[ai])
+     endif else begin
+        accept = [accept,res.(apts[ai])]
+     endelse
   endfor
   
   chi_med = median(chis)
@@ -1415,9 +1419,12 @@ pro diagnostics
 
   for x=0,dim-1 do begin
      ppts = where(strmatch(alltags,tags[x]+'*',/FOLD_CASE) eq 1)
-     p = make_array(n_elements(ppts),value = res.(ppts[pi]))
      for pi=0,n_elements(ppts)-1 do begin
-        p[pi] = res.(ppts[pi])
+        if(pi eq 0) then begin
+           p = res.(ppts[pi])
+        endif else begin
+           p = [p,res.(ppts[pi])]
+        endelse
      endfor
      prange = [min(p),max(p)]
      for y=0,dim-1 do begin
@@ -1439,9 +1446,12 @@ pro diagnostics
         endif else if (x lt y) then begin ;make liklihood space
 
            qpts = where(strmatch(alltags,tags[y]+'*',/FOLD_CASE) eq 1)
-           q = make_array(n_elements(qpts),value = res.(qpts[qi]))
            for qi=0,n_elements(qpts)-1 do begin
-              q[qi] = res.(qpts[qi])
+              if(qi eq 0) then begin
+                 q = res.(qpts[qi])
+              endif else begin
+                 q = [q,res.(qpts[qi])]
+              endelse
            endfor
            qrange = [min(q),max(q)]
            dp=(prange[1]-prange[0])/nbins
@@ -1462,10 +1472,10 @@ pro diagnostics
                  yfill = [j,j+dq,j+dq,j]
                  
                  gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
-                 chi_plot = mean(chis[gpts])
+                 chi_plot = n_elements(gpts)
                  
                  if(gpts[0] ne -1) then begin
-                    polyfill,xfill,yfill,color=color_scale*(chi_max - alog(chi_plot))
+                    polyfill,xfill,yfill,color=color_scale*alog(chi_plot)
                  endif
               endfor
            endfor

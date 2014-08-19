@@ -334,111 +334,120 @@ products simulator::simulate(){
 
 
 bool simulator::save(string outfile){
-  printf("\tWriting Diagnostic\n");
-  bool opened =  diagnostic->write_fits(outfile);
-  printf("\tDiagnostic Written\n");
-
-  if(not opened)
-    return opened;
-  
-  using namespace CCfits;
-  //FITS::setVerboseMode(true);
-  std::auto_ptr<FITS> pFits(0);
-
   try{
-    pFits.reset(new FITS(outfile,Write));
-  }
-  catch (CCfits::FITS::CantOpen){
-    cerr << "Can't open " << outfile << endl;
-    opened = false;       
-  }
-  
-  double lpars[LUMPARS];
-  lf->get_params(lpars);
-  
-  pFits->pHDU().addKey("PHI0",lpars[0],"Normalization"); 
-  pFits->pHDU().addKey("L0",lpars[1],"Knee location z=0"); 
-  pFits->pHDU().addKey("ALPHA",lpars[2],"upper slope"); 
-  pFits->pHDU().addKey("BETA",lpars[3],"lower slope"); 
-  pFits->pHDU().addKey("P",lpars[4],"Norm evolution"); 
-  pFits->pHDU().addKey("Q",lpars[5],"Knee evolution"); 
-  pFits->pHDU().addKey("ZCUT",lpars[6],"Z Evolution Cutoff");
-  pFits->pHDU().addKey("CEXP",color_exp,"Color Evolution Param");
-  
-  unsigned long size = sources.size();
-  printf("%s %lu\n","Sources Being Saved: ",size);
+    printf("\tWriting Diagnostic\n");
+    bool opened =  diagnostic->write_fits(outfile);
+    printf("\tDiagnostic Written\n");
+    
+    if(not opened)
+      return opened;
+    
+    using namespace CCfits;
+    //FITS::setVerboseMode(true);
+    std::auto_ptr<FITS> pFits(0);
+    
+    try{
+      pFits.reset(new FITS(outfile,Write));
+    }
+    catch (CCfits::FITS::CantOpen){
+      cerr << "Can't open " << outfile << endl;
+      opened = false;       
+    }
+    
+    double lpars[LUMPARS];
+    lf->get_params(lpars);
+    
+    pFits->pHDU().addKey("PHI0",lpars[0],"Normalization"); 
+    pFits->pHDU().addKey("L0",lpars[1],"Knee location z=0"); 
+    pFits->pHDU().addKey("ALPHA",lpars[2],"upper slope"); 
+    pFits->pHDU().addKey("BETA",lpars[3],"lower slope"); 
+    pFits->pHDU().addKey("P",lpars[4],"Norm evolution"); 
+    pFits->pHDU().addKey("Q",lpars[5],"Knee evolution"); 
+    pFits->pHDU().addKey("ZCUT",lpars[6],"Z Evolution Cutoff");
+    pFits->pHDU().addKey("CEXP",color_exp,"Color Evolution Param");
+    
+    unsigned long size = sources.size();
+    printf("%s %lu\n","Sources Being Saved: ",size);
+    
+    valarray<double> f1(size),f2(size),f3(size),luminosity(size),redshift(size);
+    for(unsigned long i=0;i<size;i++){
+      f1[i] = sources[i].fluxes[0];
+      f2[i] = sources[i].fluxes[1];
+      f3[i] = sources[i].fluxes[2];
+      redshift[i] = sources[i].redshift;
+      luminosity[i] = sources[i].luminosity;
+    }
+    
+    printf("1");
+    
+    static std::vector<string> colname(11,"");
+    static std::vector<string> colunit(11,"-");
+    static std::vector<string> colform(11,"f13.8");
+    
+    colname[0] = "F1";
+    colname[1] = "F2";
+    colname[2] = "F3";
+    colname[3] = "Z";
+    colname[4] = "Lum";
+    colname[5] = "s1";
+    colname[6] = "s2";
+    colname[7] = "s3";
+    colname[8] = "dNds1";
+    colname[9] = "dNds2";
+    colname[10] = "dNds3";
+    
+    colunit[0] = "Jy";
+    colunit[1] = "Jy";
+    colunit[2] = "Jy";
+    colunit[4] = "W/Hz";
+    colunit[5] = "mJy";
+    colunit[6] = "mJy";
+    colunit[7] = "mJy";
+    colunit[8] = "Jy^1.5/sr";
+    colunit[9] = "Jy^1.5/sr";
+    colunit[10] = "Jy^1.5/sr";
+    
+    colform[4] = "e13.5";
+    colform[8] = "e13.5";
+    colform[9] = "e13.5";
+    colform[10] = "e13.5";
+    
+    static string hname("Parameter Distributions");
+    Table* newTable;
+    try{
+      newTable = pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
+    }
+    catch(...){
+      printf("Could not create table\n");
+      exit(1);
+    }
+    
+    printf("2");
+    
+    newTable->column(colname[0]).write(f1,1);
+    newTable->column(colname[1]).write(f2,1);
+    newTable->column(colname[2]).write(f3,1);
+    newTable->column(colname[3]).write(redshift,1);
+    newTable->column(colname[4]).write(luminosity,1);
+    newTable->column(colname[5]).write(dndsInfo.b250,1);
+    newTable->column(colname[6]).write(dndsInfo.b350,1);
+    newTable->column(colname[7]).write(dndsInfo.b500,1);
+    newTable->column(colname[8]).write(last_output.dnds[0],1);
+    newTable->column(colname[9]).write(last_output.dnds[1],1);
+    newTable->column(colname[10]).write(last_output.dnds[2],1);
+    
+    printf("3\n");
 
-  valarray<double> f1(size),f2(size),f3(size),luminosity(size),redshift(size);
-  for(unsigned long i=0;i<size;i++){
-    f1[i] = sources[i].fluxes[0];
-    f2[i] = sources[i].fluxes[1];
-    f3[i] = sources[i].fluxes[2];
-    redshift[i] = sources[i].redshift;
-    luminosity[i] = sources[i].luminosity;
-  }
-
-  printf("1");
-  
-  static std::vector<string> colname(11,"");
-  static std::vector<string> colunit(11,"-");
-  static std::vector<string> colform(11,"f13.8");
-
-  colname[0] = "F1";
-  colname[1] = "F2";
-  colname[2] = "F3";
-  colname[3] = "Z";
-  colname[4] = "Lum";
-  colname[5] = "s1";
-  colname[6] = "s2";
-  colname[7] = "s3";
-  colname[8] = "dNds1";
-  colname[9] = "dNds2";
-  colname[10] = "dNds3";
-  
-  colunit[0] = "Jy";
-  colunit[1] = "Jy";
-  colunit[2] = "Jy";
-  colunit[4] = "W/Hz";
-  colunit[5] = "mJy";
-  colunit[6] = "mJy";
-  colunit[7] = "mJy";
-  colunit[8] = "Jy^1.5/sr";
-  colunit[9] = "Jy^1.5/sr";
-  colunit[10] = "Jy^1.5/sr";
-
-  colform[4] = "e13.5";
-  colform[8] = "e13.5";
-  colform[9] = "e13.5";
-  colform[10] = "e13.5";
-
-  static string hname("Parameter Distributions");
-  Table* newTable;
-  try{
-    newTable = pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);
   }
   catch(...){
-    printf("Could not create table\n");
+    printf("Caught Save Error\n");
     exit(1);
   }
+    
+    return true;
+  }
   
-  printf("2");
-  
-  newTable->column(colname[0]).write(f1,1);
-  newTable->column(colname[1]).write(f2,1);
-  newTable->column(colname[2]).write(f3,1);
-  newTable->column(colname[3]).write(redshift,1);
-  newTable->column(colname[4]).write(luminosity,1);
-  newTable->column(colname[5]).write(dndsInfo.b250,1);
-  newTable->column(colname[6]).write(dndsInfo.b350,1);
-  newTable->column(colname[7]).write(dndsInfo.b500,1);
-  newTable->column(colname[8]).write(last_output.dnds[0],1);
-  newTable->column(colname[9]).write(last_output.dnds[1],1);
-  newTable->column(colname[10]).write(last_output.dnds[2],1);
-  
-  printf("3\n");
-  
-  return true;
-}
+
 
 simulator::~simulator(){
 

@@ -5032,7 +5032,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile filters/Makefile templates/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5784,6 +5784,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "filters/Makefile") CONFIG_FILES="$CONFIG_FILES filters/Makefile" ;;
     "templates/Makefile") CONFIG_FILES="$CONFIG_FILES templates/Makefile" ;;
+    "obs/Makefile") CONFIG_FILES="$CONFIG_FILES obs/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
