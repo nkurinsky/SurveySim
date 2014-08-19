@@ -42,7 +42,6 @@ int main(int argc,char** argv){
   bool accept,saved;
   unsigned long i,m;
   unsigned long pi;
-  vector<int>::const_iterator p;
   double trial;
 
   //this array holds phi0,L0,alpha,beta,p, and q
@@ -91,20 +90,21 @@ int main(int argc,char** argv){
   ParameterSettings pset(q.nparams);
 
   VERBOSE(printf("Initializing Chains\n"));
+  vector<int>::const_iterator p;
   for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
-    setvars[pi] = &lpars[*p];
-    pcurrent[0][pi] = *setvars[pi];
+    setvars[pi] = &(lpars[*p]);
+    pcurrent[0][pi] = *(setvars[pi]);
     pset.set(pi,lmin[*p],lmax[*p],(lmax[*p] - lmin[*p])/6.0,lpars[*p]);
   }
   if(q.vary_cexp){
     setvars[q.cind] = &CE;
-    pcurrent[0][q.cind] = *setvars[pi];
+    pcurrent[0][q.cind] = *(setvars[pi]);
     pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/6.0,CE);
   }
 
   for(m=1;m<q.nchain;m++){ 
     for(pi=0;pi<q.nparams;pi++)
-      pcurrent[m][pi] = rng.flat(lmin[*p],lmax[*p]);
+      pcurrent[m][pi] = rng.flat(pset.min[pi],pset.max[pi]);
   }
   
   VERBOSE(printf("\n ---------- Beginning MC Burn-in Phase ---------- \n"));
@@ -150,6 +150,7 @@ int main(int argc,char** argv){
       if(burnchain.converged()){
 	VERBOSE(printf("Burn Chain Converged\n"));
 	i = q.runs;}
+      VERBOSE(printf("Calculating Parameter Variance\n"));
       burnchain.get_stdev(pset.sigma.data());
     }
   }
@@ -222,8 +223,8 @@ int main(int argc,char** argv){
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"}; 
   unique_ptr<string[]> parnames (new string[q.nparams]);
   
-  for(pi=0;pi<q.param_inds.size();pi++)
-    parnames[pi] = pnames[q.param_inds[pi]];
+  for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
+    parnames[pi] = pnames[*p];
   if(q.vary_cexp)
     parnames[q.cind] = "CEXP";
   

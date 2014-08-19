@@ -154,7 +154,7 @@ void Configuration::load(){
   //-----------------------------------------------------------------
 
   for(int i=0;i<LUMPARS;i++){
-    for(int j=0;j<5;j++){
+    for(int j=0;j<4;j++){
       tag = pnames[i]+suffix[j];
       tag = tag.substr(0,8);
       tab.readKey(tag,LFParameters[i][j]);

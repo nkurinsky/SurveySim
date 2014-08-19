@@ -2,3 +2,5 @@ Makefile
 *.o
 config.log
 config.status
+.deps
+fitter

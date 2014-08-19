@@ -1,3 +1,5 @@
 #!/bin/bash
 
-fitter /Users/noah/SurveySim/Source/obs/spire_fls_dr2.fits model.fits /usr/local/surveysim/templates/sf_templates.fits
+export rootdir=${HOME}/SurveySim
+
+fitter ${rootdir}/Source/obs/spire_fls_dr2.fits $rootdir/IDL/model.fits /usr/local/surveysim/templates/sf_templates.fits

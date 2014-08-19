@@ -198,8 +198,9 @@ void MCChains::get_fit_results(double pars[], double sigma[]){
   for(int i=0;i<npars;i++){
     variance = mean = 0.0;
     values.clear();
-    for(int j=0;i<nchains;j++){
-      size = chains[j*chainwidth+i].size();
+    for(int j=0;j<nchains;j++){
+      size = chainlength[j];
+      printf("\t%i %i %lu\n",i,j,size);
       for(unsigned long k = size/2; k < size; k++){
 	values.push_back(chains[j*chainwidth+i][k]);
 	mean += values.back();
