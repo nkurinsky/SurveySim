@@ -28,7 +28,8 @@ tarballs, which can be extracted by
 
 and compiled according to the instructions within. The tested method by which to 
 install these libraries such that all users can access them and the configure script
-can find them, is to follow the procedure below:
+can find them, is to follow the procedure below; you do not have to move the 
+directories, just run these commands in your untarred files:
 
 GSL: make the GSL library, install it in /usr/local and establish references
 	./configure
