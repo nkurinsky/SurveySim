@@ -6,7 +6,7 @@ pro counts
   minusfrac = alpha
 
   chis = res.chisq
-  gpts = where(chis gt median(chis))
+  gpts = where(chis lt median(chis))
   res = res[gpts]
 
   c1=res.dnds250
@@ -32,6 +32,7 @@ pro counts
      dnds = dnds[sort(dnds)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
+     print,pi,mi
      c1mean[i] = mean(dnds)
      c1plus[i] = dnds[pi]
      c1minus[i] = dnds[mi]
