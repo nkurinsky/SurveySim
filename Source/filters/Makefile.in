@@ -77,7 +77,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = filters
-DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am README
+DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
+	$(dist_filter_DATA) README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -132,7 +133,7 @@ am__uninstall_files_from_dir = { \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
 am__installdirs = "$(DESTDIR)$(filterdir)"
-DATA = $(filter_DATA)
+DATA = $(dist_filter_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
@@ -168,6 +169,7 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
+MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 OBJEXT = @OBJEXT@
@@ -228,11 +230,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 filterdir = $(prefix)/@PACKAGE@/filters
-filter_DATA = filterlib.txt
+dist_filter_DATA = filterlib.txt
 all: all-am
 
 .SUFFIXES:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -257,14 +259,14 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-$(top_srcdir)/configure:  $(am__configure_deps)
+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-filterDATA: $(filter_DATA)
+install-dist_filterDATA: $(dist_filter_DATA)
 	@$(NORMAL_INSTALL)
-	@list='$(filter_DATA)'; test -n "$(filterdir)" || list=; \
+	@list='$(dist_filter_DATA)'; test -n "$(filterdir)" || list=; \
 	if test -n "$$list"; then \
 	  echo " $(MKDIR_P) '$(DESTDIR)$(filterdir)'"; \
 	  $(MKDIR_P) "$(DESTDIR)$(filterdir)" || exit 1; \
@@ -278,9 +280,9 @@ install-filterDATA: $(filter_DATA)
 	  $(INSTALL_DATA) $$files "$(DESTDIR)$(filterdir)" || exit $$?; \
 	done
 
-uninstall-filterDATA:
+uninstall-dist_filterDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(filter_DATA)'; test -n "$(filterdir)" || list=; \
+	@list='$(dist_filter_DATA)'; test -n "$(filterdir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(filterdir)'; $(am__uninstall_files_from_dir)
 tags TAGS:
@@ -377,7 +379,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-filterDATA
+install-data-am: install-dist_filterDATA
 
 install-dvi: install-dvi-am
 
@@ -421,21 +423,21 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-filterDATA
+uninstall-am: uninstall-dist_filterDATA
 
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic cscopelist-am \
 	ctags-am distclean distclean-generic distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-filterDATA install-html \
+	install-data-am install-dist_filterDATA install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-generic pdf pdf-am ps ps-am tags-am uninstall \
-	uninstall-am uninstall-filterDATA
+	uninstall-am uninstall-dist_filterDATA
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

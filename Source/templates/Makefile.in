@@ -77,7 +77,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = templates
-DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am README
+DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
+	$(dist_template_DATA) README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -132,7 +133,7 @@ am__uninstall_files_from_dir = { \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
 am__installdirs = "$(DESTDIR)$(templatedir)"
-DATA = $(template_DATA)
+DATA = $(dist_template_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
@@ -168,6 +169,7 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
+MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 OBJEXT = @OBJEXT@
@@ -228,11 +230,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 templatedir = $(prefix)/@PACKAGE@/templates
-template_DATA = sf_templates.fits
+dist_template_DATA = sf_templates.fits
 all: all-am
 
 .SUFFIXES:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -257,14 +259,14 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-$(top_srcdir)/configure:  $(am__configure_deps)
+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-templateDATA: $(template_DATA)
+install-dist_templateDATA: $(dist_template_DATA)
 	@$(NORMAL_INSTALL)
-	@list='$(template_DATA)'; test -n "$(templatedir)" || list=; \
+	@list='$(dist_template_DATA)'; test -n "$(templatedir)" || list=; \
 	if test -n "$$list"; then \
 	  echo " $(MKDIR_P) '$(DESTDIR)$(templatedir)'"; \
 	  $(MKDIR_P) "$(DESTDIR)$(templatedir)" || exit 1; \
@@ -278,9 +280,9 @@ install-templateDATA: $(template_DATA)
 	  $(INSTALL_DATA) $$files "$(DESTDIR)$(templatedir)" || exit $$?; \
 	done
 
-uninstall-templateDATA:
+uninstall-dist_templateDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(template_DATA)'; test -n "$(templatedir)" || list=; \
+	@list='$(dist_template_DATA)'; test -n "$(templatedir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(templatedir)'; $(am__uninstall_files_from_dir)
 tags TAGS:
@@ -377,7 +379,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-templateDATA
+install-data-am: install-dist_templateDATA
 
 install-dvi: install-dvi-am
 
@@ -421,21 +423,21 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-templateDATA
+uninstall-am: uninstall-dist_templateDATA
 
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic cscopelist-am \
 	ctags-am distclean distclean-generic distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip install-templateDATA \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am tags-am uninstall uninstall-am \
-	uninstall-templateDATA
+	install-data-am install-dist_templateDATA install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic pdf pdf-am ps ps-am tags-am uninstall \
+	uninstall-am uninstall-dist_templateDATA
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

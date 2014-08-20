@@ -6,6 +6,7 @@ AC_PREREQ([2.69])
 AC_INIT([SurveySim], [1.0], [nkurinsky91@gmail.com])
 AC_CONFIG_SRCDIR([src/constants.h])
 
+AM_MAINTAINER_MODE([disable])
 AM_SILENT_RULES([yes])
 AM_INIT_AUTOMAKE
 
