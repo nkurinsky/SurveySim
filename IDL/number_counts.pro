@@ -1,5 +1,6 @@
 pro number_counts
-  
+
+  set_plot,'ps'
   dists = mrdfits('output.fits',3,head,/silent)
 
   gpts = where(dists.f3 gt 0)
@@ -35,8 +36,8 @@ pro number_counts
   minusfrac = alpha
 
   chis = count_dists.chisq
-  ;gpts = where(chis lt median(chis))
-  ;count_dists = count_dists[gpts]
+  gpts = where(chis lt median(chis))
+  count_dists = count_dists[gpts]
   c1=count_dists.dnds250
   c2=count_dists.dnds350
   c3=count_dists.dnds500
