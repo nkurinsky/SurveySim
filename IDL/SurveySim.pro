@@ -7,7 +7,7 @@
 ;
 ;==================================================================
 
-pro simulation
+pro SurveySim
 
   COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
   plot_settings ;will reset the global settings
