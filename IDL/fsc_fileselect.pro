@@ -709,14 +709,11 @@ IF theError NE 0 THEN BEGIN
    RETURN
 ENDIF
 
-;Anna Sajina modified on February 18, 2013
-;removing this ensures that we don't have an extra "directory" line
-
-;IF N_Elements(dirname) NE 0 THEN BEGIN
+IF N_Elements(dirname) NE 0 THEN BEGIN
    ;;dirname = StrJoin( StrSplit(dirname, '\\', /Regex, /Extract, /Preserve_Null), '/')
-;   self.directoryname = dirname
-;   Widget_Control, self.dirtextID, Set_Value=dirname
-;ENDIF
+   self.directoryname = dirname
+   Widget_Control, self.dirtextID, Set_Value=dirname
+ENDIF
 
 IF N_Elements(event_pro) NE 0 THEN BEGIN
    self.event_pro = event_pro
