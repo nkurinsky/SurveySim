@@ -6,7 +6,7 @@ pro counts
   minusfrac = alpha
 
   chis = res.chisq
-  gpts = where(chis gt median(chis))
+  gpts = where(chis lt median(chis))
   res = res[gpts]
 
   c1=res.dnds250
@@ -26,13 +26,18 @@ pro counts
   c1minus = make_array(c1size,value=0.0)
   c2minus = make_array(c2size,value=0.0)
   c3minus = make_array(c3size,value=0.0)
-  
+ 
+  c1median = c1mean
+  c1std = c1mean
+ 
   for i=0,c1size-1 do begin
-     dnds = c1[c1size-i-1,*]
+     dnds = c1[i,*]
      dnds = dnds[sort(dnds)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
      c1mean[i] = mean(dnds)
+     c1median[i] = median(dnds)
+     c1std[i] = stdev(dnds)
      c1plus[i] = dnds[pi]
      c1minus[i] = dnds[mi]
   endfor
@@ -60,8 +65,11 @@ pro counts
   set_plot,'x'
 
   x = indgen(n_elements(c1mean))
-  plot,x,c1mean,xrange=[0,16]
-  ;;oplot,x,c1plus,linestyle=1
-  ;;oplot,x,c1minus,linestyle=2
+  plot,x,c1mean,xrange=[0,16],psym=2,/ylog,yrange=[100,1000000]
+  oploterr,x,c1mean,c1std
+  print,c1std
+  oplot,x,c1median,psym=4
+  oplot,x,c1plus
+  oplot,x,c1minus
 
 end
