@@ -849,23 +849,23 @@ self.tlb = Widget_Base( self.parent, $
 
 leftbase = Widget_Base(self.tlb, Row=2, UValue=self)
 
-;self.dirbaseID = Widget_Base(leftbase, Row=1)
+self.dirbaseID = Widget_Base(leftbase, Row=1)
 
-;self.dirlabelID = Widget_Label( self.dirbaseID, $
-;                             Font=self.labelfont, $
-;                             Scr_XSize=self.labelsize, $
-;                             Value='Directory: ' )
+self.dirlabelID = Widget_Label( self.dirbaseID, $
+                             Font=self.labelfont, $
+                             Scr_XSize=self.labelsize, $
+                             Value='Directory: ' )
 
 
-;self.dirtextID = Widget_Text( self.dirbaseID, $
-;                           All_Events=1, $ 
-;                           Editable=1, $
-;                           Event_Func='FSC_FileSelect_Event_Handler', $
-;                           Font=self.textfont, $
-;                           UValue={method:'Directory_Events', object:self}, $
-;                           Value=self.directoryname, $
-;                           XSize=self.xsize, $
-;                           YSize=1 )
+self.dirtextID = Widget_Text( self.dirbaseID, $
+                           All_Events=1, $ 
+                           Editable=1, $
+                           Event_Func='FSC_FileSelect_Event_Handler', $
+                           Font=self.textfont, $
+                           UValue={method:'Directory_Events', object:self}, $
+                           Value=self.directoryname, $
+                           XSize=self.xsize, $
+                           YSize=1 )
 
 
 self.filebaseID = Widget_Base(leftbase, Row=1)
