@@ -105,11 +105,10 @@ pro simulation
      ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0,zcut:1.0}
      ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:-6.0,q:2.0,zcut:0.0}
      ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:2.0,q:8.0,zcut:0.0}
-     ldat4={phi0:0.0,lo:0.0,alpha:0.0,beta:0.0,p:0.3,q:0.1,zcut:0.0}
-     ldata=[ldat0,ldat1,ldat2,ldat3,ldat4]
+     ldata=[ldat0,ldat1,ldat2,ldat3]
                                 ;the fixed values: =1 if held fixed, =0 if variable
      
-     cdat = {a0:0.0,fixed:0.0,amin:0.0,amax:1.0,sigma:0.1}
+     cdat = {a0:0.0,fixed:0.0,amin:0.0,amax:1.0}
      sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1.e3}
      
      CD, Current=thisdir
@@ -143,7 +142,7 @@ pro simulation
   f2b = ['(i)','(i)','(i)','(i)','(i)','(i)','(i)']
   fmt2 = [[f2a],[f2b],[f2a],[f2a],[f2a]]
   fmt3 = ['(f5.2)','(i)','(f5.2)','(f5.2)','(f5.2)']
-  lrows=["Initial","Fixed","Min","Max","Sigma"]
+  lrows=["Initial","Fixed","Min","Max"]
   
 ;Luminosity Function Parameters
   l1 = widget_label(info.lum_table,value="Luminosity Function Parameters")
@@ -235,53 +234,53 @@ PRO simulation_event,ev
         fixed = lparam(1)
         min = lparam(2)
         max = lparam(3)
-        sigma = lparam(4)
         widget_control,info.t2,get_value=sparam
         sdat = sparam
         widget_control,info.t3,get_value=cparam
         cdat = cparam
 
         sxaddpar,hdr2,'DATE',systime(),'Date of creation'
+
         sxaddpar,hdr2,'PHI0',pars.phi0,'Luminosity Function Normalization'
         sxaddpar,hdr2,'PHI0_FIX',fixed.phi0,'Fix Phi0 (Y=1/N=0)'
         sxaddpar,hdr2,'PHI0_MIN',min.phi0,'Minimum Phi0 value'
         sxaddpar,hdr2,'PHI0_MAX',max.phi0,'Maximum Phi0 value'
-        sxaddpar,hdr2,'PHI0_DP',sigma.phi0,'Sigma Phi0 value'
+
         sxaddpar,hdr2,'L0',pars.lo,'Luminosity Function Knee'
         sxaddpar,hdr2,'L0_FIX',fixed.lo,'Fix L0 (Y=1/N=0)'
         sxaddpar,hdr2,'L0_MIN',min.lo,'Minimum L0 value'
         sxaddpar,hdr2,'L0_MAX',max.lo,'Maximum L0 value'
-        sxaddpar,hdr2,'L0_DP',sigma.lo,'Sigma L0 value'
+
         sxaddpar,hdr2,'ALPHA',pars.alpha,'Luminosity Function upper slope'
         sxaddpar,hdr2,'ALPHA_FIX',fixed.alpha,'Fix Alpha (Y=1/N=0)'
         sxaddpar,hdr2,'ALPHA_MIN',min.alpha,'Minimum Alpha value'
         sxaddpar,hdr2,'ALPHA_MAX',max.alpha,'Maximum Alpha value'
-        sxaddpar,hdr2,'ALPHA_DP',sigma.alpha,'Sigma Alpha value'
+
         sxaddpar,hdr2,'BETA',pars.beta,'Luminosity Function lower slope'
         sxaddpar,hdr2,'BETA_FIX',fixed.beta,'Fix Beta (Y=1/N=0)'
         sxaddpar,hdr2,'BETA_MIN',min.beta,'Minimum Beta value'
         sxaddpar,hdr2,'BETA_MAX',max.beta,'Maximum Beta value'
-        sxaddpar,hdr2,'BETA_DP',sigma.beta,'Sigma Beta value'
+
         sxaddpar,hdr2,'P',pars.p,'Luminosity Function PHI evolution term'
         sxaddpar,hdr2,'P_FIX',fixed.p,'Fix P (Y=1/N=0)'
         sxaddpar,hdr2,'P_MIN',min.p,'Minimum P value'
         sxaddpar,hdr2,'P_MAX',max.p,'Maximum P value'
-        sxaddpar,hdr2,'P_DP',sigma.p,'Sigma P value'
+
         sxaddpar,hdr2,'Q',pars.q,'Luminosity Function L evolution term'
         sxaddpar,hdr2,'Q_FIX',fixed.q,'Fix Q (Y=1/N=0)'
         sxaddpar,hdr2,'Q_MIN',min.q,'Minimum Q value'
         sxaddpar,hdr2,'Q_MAX',max.q,'Maximum Q value'
-        sxaddpar,hdr2,'Q_DP',sigma.q,'Sigma Q value'
+
         sxaddpar,hdr2,'ZCUT',pars.zcut,'Luminosity Function z evolution limit'
         sxaddpar,hdr2,'ZCUT_FIX',fixed.zcut,'Fix ZCUT (Y=1/N=0)'
         sxaddpar,hdr2,'ZCUT_MIN',min.zcut,'Minimum ZCUT value'
         sxaddpar,hdr2,'ZCUT_MAX',max.zcut,'Maximum ZCUT value'
-        sxaddpar,hdr2,'ZCUT_DP',sigma.zcut,'Sigma ZCUT value'
+
         sxaddpar,hdr2,'CEXP',cdat.a0,'Intrinsic luminosity evolution term'
         sxaddpar,hdr2,'CEXP_FIX',cdat.fixed,'Fix CEXP (Y=1/N=0)'
         sxaddpar,hdr2,'CEXP_MIN',cdat.amin,'Minimum CEXP value'
         sxaddpar,hdr2,'CEXP_MAX',cdat.amax,'Maximum CEXP value'
-        sxaddpar,hdr2,'CEXP_DP',cdat.sigma,'Sigma CEXP value'
+
         sxaddpar,hdr2,'RUNS',sdat.runs,'Number of Runs'
         sxaddpar,hdr2,'ZMIN',sdat.zmin,'Minimum Redshift Value'
         sxaddpar,hdr2,'ZMAX',sdat.zmax,'Maximum Redshift Value'
