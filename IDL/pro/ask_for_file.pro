@@ -1,4 +1,4 @@
-function ask_for_file,dialog,initial_filename
+function ask_for_file,prompt,initial_filename
   
   common ask_for_file_com,new_filename,dialog
   new_filename = initial_filename
@@ -6,7 +6,7 @@ function ask_for_file,dialog,initial_filename
   main = widget_base(title="Select File",/column,/align_center)
   body = widget_base(main,/column,/align_center)
   
-  text = widget_text(main,/wrap,value=dialog)
+  text = widget_text(main,/wrap,value=prompt)
   dialog = fsc_fileselect(body,/NoMaxSize,LabelName='New File')
   widget_control,dialog,set_value=new_filename
   
@@ -15,7 +15,7 @@ function ask_for_file,dialog,initial_filename
   cancel_btn = widget_button(btns,uvalue='skip',Value="Skip")
 
   widget_control,main,/realize
-  xmanager,'ask_for_file',main,/no_block
+  xmanager,'ask_for_file',main
   
-  return new_filename
+  return,new_filename
 end
