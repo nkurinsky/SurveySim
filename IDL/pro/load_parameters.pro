@@ -1,4 +1,4 @@
-function get_parameters,saveFile
+function load_parameters,saveFile
   
   if(file_test(saveFile)) then begin
      restore,saveFile

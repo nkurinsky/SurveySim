@@ -55,17 +55,26 @@ pro SurveySim
   ;survey parameter initialization
   ;-------------------------------------------------------------
   ;attempt to get saved parameters, create new if not saved
-  parameters = get_parameters(thisdir+"/params.save")
+  parameters = load_parameters(thisdir+"/params.save")
   
   fname = ["Filter 1","Filter 2","Filter 3"]
   ocols = ["Flux limit (mJy)","Standard Error (mJy)"]
   f = ['(f7.4)','(f7.4)']
   fmt = [[f],[f]]
   
-;The Survey properties table
+  ;The filter properties table
   lo = widget_label(info.obs_table,value="Survey Properties")
-  info.ot = widget_table(info.obs_table,value=bands,column_labels=ocols,row_labels=bname,uvalue='ot',/editable,alignment=1,column_widths=[100,100,150],format=fmt,scr_xsize=425,scr_ysize=95)
+  obs_row = widget_base(info.obs_table,/row)
   
+  info.ot = widget_table(obs_row,$
+                         uvalue='ot',/editable,alignment=1,$
+                         value=bands,$
+                         column_labels=["Flux limit (mJy)","Standard Error (mJy)"],$
+                         row_labels=["Filter 1","Filter 2","Filter 3"],$
+                         column_widths=[100,100],$
+                         format=[[f],[f]],$
+                         scr_xsize=425,scr_ysize=95)
+
   f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
   f2b = ['(i)','(i)','(i)','(i)','(i)','(i)','(i)']
   fmt2 = [[f2a],[f2b],[f2a],[f2a],[f2a]]
