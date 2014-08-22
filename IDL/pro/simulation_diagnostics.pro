@@ -35,7 +35,7 @@ pro simulation_diagnostics
   quit = widget_button(r3,uvalue='quit',value='Quit')
 
   widget_control,dmain,/realize
-  xmanager,'diagnostics',dmain,/no_block
+  xmanager,'simulation_diagnostics',dmain,/no_block
   
   set_plot,'x'
   plot_settings,plot_type='x'

@@ -33,7 +33,7 @@ pro simulation_results
   quit = widget_button(r3,uvalue='quit',value='Quit')
   
   widget_control,gmain,/realize
-  xmanager,'graphs',gmain,/no_block
+  xmanager,'simulation_results',gmain,/no_block
   
   set_plot,'x'
   device,decomposed=0
@@ -107,7 +107,7 @@ pro simulation_results
   c2minus = make_array(c2size,value=0.0)
   c3minus = make_array(c3size,value=0.0)
 
-    for i=0,c1size-1 do begin
+  for i=0,c1size-1 do begin
      dnds = c1[c1size-i-1,*]
      dnds = dnds[sort(dnds)]
      dnds = dnds[where(dnds gt 0)]

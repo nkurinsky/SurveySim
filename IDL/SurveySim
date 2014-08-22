@@ -1,8 +1,0 @@
-#!/bin/bash
-/usr/bin/env idl <<!here
-
-spawn,'pwd',pwd
-!path=!path+':'+pwd+'/pro'
-.COMPILE SurveySim
-RESOLVE_ALL
-SurveySim

@@ -1,7 +1,9 @@
-pro plot_seds,savefile="params.save"
+pro plot_seds,savefile=savefile
 
   COMMON simulation_com
   
+  if(n_elements(savefile) eq 0) then savefile="params.save"
+
   set_plot,'x'
   device,decomposed=0
   plot_settings,plot_type='x'
@@ -10,7 +12,7 @@ pro plot_seds,savefile="params.save"
      print,"Using plot_seds in standalone mode, looking for "+savefile
      parameters=load_parameters(savefile)
   endif else begin
-     wset,info.wind_id3
+     wset,info.win_id3
   endelse
   
   sedfile = parameters.files.sedfile
