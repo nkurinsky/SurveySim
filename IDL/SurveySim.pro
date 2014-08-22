@@ -6,8 +6,6 @@ pro SurveySim
   COMMON simulation_com,info,parameters
    
   CD, Current=thisdir 
-  !path = !path+':'+thisdir+'/pro' ;Allow functions in ./pro to be used by SurveySim
-  
   plot_settings                 ;will reset the global settings
   
 ;==================================================================
@@ -163,7 +161,7 @@ END
 
 ;widget event handling routine
 PRO SurveySim_event,ev
-  COMMON simulation_com,info,ldata,sdat,cdat,bands,msettings,files
+  COMMON simulation_com
 
   ; get event identifier
   widget_control,ev.id,get_uvalue=uvalue
@@ -322,7 +320,7 @@ END
 
 pro read_output
   
-  COMMON simulation_com,info,parameters
+  COMMON simulation_com
 
   print,files.oname
   dists = mrdfits(files.oname,3,head,/silent)
@@ -814,7 +812,7 @@ end
 
 pro graphs
 
-  COMMON simulation_com,info,parameters
+  COMMON simulation_com
 
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
@@ -1170,7 +1168,7 @@ pro graphs
 end
 
 pro graphs_event,ev
-  COMMON simulation_com,info,parameters
+  COMMON simulation_com
 
   widget_control,ev.id,get_uvalue=uvalue
 
@@ -1196,7 +1194,7 @@ end
 
 pro diagnostics
 
-  COMMON simulation_com,info,parameters
+  COMMON simulation_com
 
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
@@ -1409,7 +1407,7 @@ pro diagnostics
 end
 
 pro diagnostics_event,ev
-  COMMON simulation_com,info,parameters
+  COMMON simulation_com
 
   widget_control,ev.id,get_uvalue=uvalue
 

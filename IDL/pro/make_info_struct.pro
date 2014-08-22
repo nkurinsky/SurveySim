@@ -1,4 +1,4 @@
-pro make_info_struct
+function make_info_struct
   info={$                       ;widget settings
        base: 0L, $
        base1: 0L, $
