@@ -1,65 +1,25 @@
-
 ;==================================================================
-; Writen by Noah Kurinsky, version recent as of 10/17/13
-; Edited by Anna Sajina, December 2012
-; certain files in the same directory are required for proper
-; function of this widget:
-;
+; Writen by Noah Kurinsky, version recent as of 8/21/14
 ;==================================================================
 
 pro SurveySim
-
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
-  plot_settings ;will reset the global settings
-
+  COMMON simulation_com,info,parameters
+   
+  CD, Current=thisdir 
+  !path = !path+':'+thisdir+'/pro' ;Allow functions in ./pro to be used by SurveySim
+  
+  plot_settings                 ;will reset the global settings
+  
 ;==================================================================
 ;the INFO structure holds the key widget control parameters as well as 
 ;the basic simulation settings
 ;------------------------------------------------------------------
-  info={$                       ;widget settings
-       base: 0L, $
-       base1: 0L, $
-       base2: 0L, $
-       base_out: 0L, $
-       base1_out: 0L, $
-       base2_out: 0L, $
-       xsize1:150., $
-       ysize1:100., $
-       xsize2:150., $
-       ysize2:100., $
-       magnification:1.00, $  
-       draw1:0L, $
-       draw2:0L, $
-       draw3:0L, $
-       win_id1:0L, $
-       win_id2:0L, $
-       win_id3:0L, $
-       ncolors:0L, $
-;widget bases
-       p_main:0L, $
-       obs_table:0L, $
-       lum_table:0L, $
-       sed_table:0L, $
-       sim_table:0L, $
-       dbase:0L, $
-       button_base:0L, $
-;input tables and files
-       obsname:0L, $
-       sfile:0L, $
-       oname:0L, $
-       mname:0L, $
-       ot:0L, $
-       t1:0L, $
-       t2:0L, $
-       t3:0L, $
-       tset:0L, $
-       dprint:0L, $
-       print:1}
+  info = make_info_struct()
   
 ;====================================================================
 ; Colors
 ;--------------------------------------------------------------------
-;device, truecolor, depth=24 ;decompose=0
+
   loadct,3,/silent
   tvlct,red,green,blue,/get
   info.ncolors=!d.TABLE_SIZE
@@ -76,10 +36,14 @@ pro SurveySim
   plotSize = 100.
   info.magnification = size_screen[1]/(plotSize+info.ysize1)*0.9
   
-;widget base initialization
-  info.base = widget_base(title='Model Setup and Initialization',mbar=mbar,/column,/align_center) ;main base
-  info.base2= widget_base(info.base, /column,/align_center)                                       ;plot base
-  info.p_main = widget_base(info.base,/column,/align_center)                                      ;parameter base
+  ;widget base initialization
+  ;main base
+  info.base = widget_base(title='Model Setup and Initialization',mbar=mbar,/column,/align_center) 
+  ;plot base
+  info.base2= widget_base(info.base, /column,/align_center)
+  ;parameter base
+  info.p_main = widget_base(info.base,/column,/align_center)
+  
   info.obs_table = widget_base(info.p_main,/column,/align_center)
   info.lum_table = widget_base(info.p_main,/column,/align_center)
   info.sed_table = widget_base(info.p_main,/column,/align_center)
@@ -87,52 +51,16 @@ pro SurveySim
   info.dbase = widget_base(info.p_main,/column,/align_center) ; base for file dialogs
   info.button_base = widget_button(mbar,/menu,value="Menu")   ; base for buttons
   
-;=============================================================
-;survey parameter initialization
-;-------------------------------------------------------------
-;don't want to use the existing params.save as the wavelength
-;is in meters, whereas we use microns normally
-  if(file_test('params.save')) then begin
-     restore,'params.save'
-  endif else begin
-     band1 = {wave:250.d0,fmin:25.0,ferr:6.2}
-     band2 = {wave:350.d0,fmin:20.0,ferr:5.8}
-     band3 = {wave:500.d0,fmin:15.0,ferr:6.2}
-     bands = [band1,band2,band3]
-     
-                                ;luminosity function parameter initialization
-     ldat0={phi0:-2.2,lo:10.14,alpha:0.5,beta:3.0,p:-0.7,q:3.5,zcut:2.0}
-     ldat1={phi0:1.0,lo:1.0,alpha:1.0,beta:1.0,p:0.0,q:0.0,zcut:1.0}
-     ldat2={phi0:-5.0,lo:9.0,alpha:0.0,beta:0.0,p:-6.0,q:2.0,zcut:0.0}
-     ldat3={phi0:5.0,lo:11.0,alpha:2.0,beta:5.0,p:2.0,q:8.0,zcut:0.0}
-     ldata=[ldat0,ldat1,ldat2,ldat3]
-                                ;the fixed values: =1 if held fixed, =0 if variable
-     
-     cdat = {a0:0.0,fixed:0.0,amin:0.0,amax:1.0}
-     sdat = {area:10.0,zmin:0.0,zmax:5.0,dz:0.1,runs:1.e3}
-     
-     CD, Current=thisdir
-     files = {ofile:'/usr/local/surveysim/obs/spire_fls_dr2.fits', $
-              mfile:thisdir+'/model.fits', $
-              sedfile:'/usr/local/surveysim/templates/sf_templates.fits', $
-              oname:thisdir+'/output.fits' }
-     
-     msettings = {$
-                 nchain:5,$
-                 tmax:20.0,$
-                 acceptpct:0.25, $
-                 pct_range:0.05, $
-                 conv_conf:0.05, $
-                 conv_rmax:1.05, $
-                 conv_step:20, $
-                 burn_step:10, $
-                 burn_ratio:10}
-  endelse
+  ;=============================================================
+  ;survey parameter initialization
+  ;-------------------------------------------------------------
+  ;attempt to get saved parameters, create new if not saved
+  parameters = get_parameters(thisdir+"/params.save")
   
-  bname = ["Band 1","Band 2","Band 3"]
-  ocols = ["Wavelength (um)","Flux limit (mJy)","Standard Error (mJy)"]
-  f = ['(e9.2)','(f7.4)','(f7.4)']
-  fmt = [[f],[f],[f]]
+  fname = ["Filter 1","Filter 2","Filter 3"]
+  ocols = ["Flux limit (mJy)","Standard Error (mJy)"]
+  f = ['(f7.4)','(f7.4)']
+  fmt = [[f],[f]]
   
 ;The Survey properties table
   lo = widget_label(info.obs_table,value="Survey Properties")
@@ -178,20 +106,30 @@ pro SurveySim
                            ,uvalue="DRAW_WINDOW3",retain=2 $
                            ,/button_events, keyboard_events=1,/tracking_events)
   
-;initialize widget and establish control
+  ;initialize widget and establish control
   widget_control,/realize,info.base,xoffset=0,yoffset=0,Set_UValue=theObject
   widget_control, info.draw3, get_value=win_id3 & info.win_id3=win_id3
-  xmanager,'simulation',info.base,/NO_BLOCK
+  xmanager,'SurveySim',info.base,/NO_BLOCK
   wset,info.win_id3
+
+  ;get new sedfile if file does not exist (option to ignore too)
+  if file_test(files.sedfile) then begin
+     
+  endif
   
-;plot SEDs (generalize to any SED template file)
+  ;plot SEDs
   set_plot,'x'
   device,decomposed=0
   plot_settings,plot_type='x'
   if file_test(files.sedfile) then begin
+
      templ=mrdfits(files.sedfile,/silent) 
      loadct,1,/silent
-     plot,templ[*,0],templ[*,1],/xlog,/ylog,yrange=[1.d20,1.d28],ystyle=1,xtitle=TeXtoIDL('\lambda [\mum]'),ytitle=TeXtoIDL('L_{\nu} [W/Hz]')
+
+     plot,templ[*,0],templ[*,1],/xlog,/ylog,$
+          yrange=[1.d20,1.d28],ystyle=1,ytitle=TeXtoIDL('L_{\nu} [W/Hz]'),$
+          xtitle=TeXtoIDL('\lambda [\mum]')
+
      for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
   endif else begin
      print,'File '+files.sedfile+' does not exist, skipping plot'
@@ -200,16 +138,16 @@ pro SurveySim
 END
 
 ;widget event handling routine
-PRO simulation_event,ev
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+PRO SurveySim_event,ev
+  COMMON simulation_com,info,ldata,sdat,cdat,bands,msettings,files
 
   ; get event identifier
   widget_control,ev.id,get_uvalue=uvalue
 
   CASE uvalue OF
-     'save' : save,ldata,ldat0,bands,sdat,cdat,msettings,files,filename='params.save' ;save parameters
+     'save' : save,ldata,bands,sdat,cdat,msettings,files,filename='params.save' ;save parameters
      'go'  : begin              ;save settings, intialize FITS file, and pass to C++ fitting routine
-        save,ldata,ldat0,bands,sdat,cdat,msettings,files,filename='params.save' ;save parameters
+        save,ldata,bands,sdat,cdat,msettings,files,filename='params.save' ;save parameters
         
                                 ;update observation FITS file
         widget_control,info.ot,get_value=bvals
@@ -360,7 +298,7 @@ END
 
 pro settings
   
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,parameters
   
   smain = widget_base(title="Simulation Settings",/column)
   body = widget_base(smain,/row,/align_center)
@@ -396,7 +334,7 @@ end
 
 pro settings_event,ev
   
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,parameters
   
   widget_control,ev.id,get_uvalue=uvalue
 
@@ -454,7 +392,7 @@ end
 
 pro read_output
   
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,parameters
 
   print,files.oname
   dists = mrdfits(files.oname,3,head,/silent)
@@ -946,7 +884,7 @@ end
 
 pro graphs
 
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,parameters
 
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
@@ -1302,7 +1240,7 @@ pro graphs
 end
 
 pro graphs_event,ev
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,parameters
 
   widget_control,ev.id,get_uvalue=uvalue
 
@@ -1328,7 +1266,7 @@ end
 
 pro diagnostics
 
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,parameters
 
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
@@ -1541,7 +1479,7 @@ pro diagnostics
 end
 
 pro diagnostics_event,ev
-  COMMON simulation_com,info,ldata,ldat0,sdat,cdat,bands,msettings,files
+  COMMON simulation_com,info,parameters
 
   widget_control,ev.id,get_uvalue=uvalue
 
