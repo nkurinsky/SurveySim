@@ -46,7 +46,6 @@ pro SurveySim
   
   info.obs_table = widget_base(info.p_main,/column,/align_center)
   info.lum_table = widget_base(info.p_main,/column,/align_center)
-  info.sed_table = widget_base(info.p_main,/column,/align_center)
   info.sim_table = widget_base(info.p_main,/column,/align_center)
   info.dbase = widget_base(info.p_main,/column,/align_center) ; base for file dialogs
   info.button_base = widget_button(mbar,/menu,value="Menu")   ; base for buttons
@@ -56,42 +55,58 @@ pro SurveySim
   ;-------------------------------------------------------------
   ;attempt to get saved parameters, create new if not saved
   parameters = load_parameters(thisdir+"/params.save")
-  
-  fname = ["Filter 1","Filter 2","Filter 3"]
-  ocols = ["Flux limit (mJy)","Standard Error (mJy)"]
-  f = ['(f7.4)','(f7.4)']
-  fmt = [[f],[f]]
+  filter_names = filter_list("/usr/local/surveysim/filters/filterlib.txt")
+  filter_names = ["Select Filter",filter_names]
   
   ;The filter properties table
   lo = widget_label(info.obs_table,value="Survey Properties")
   obs_row = widget_base(info.obs_table,/row)
-  
+  filter_dialogs = widget_base(obs_row,/column,/align_center)
+  info.fd1 = widget_combobox(filter_dialogs, $
+                             value=filter_names,$
+                             title="Filter 1",$
+                             uvalue="fd1")
+  info.fd2 = widget_combobox(filter_dialogs, $
+                             value=filter_names,$
+                             title="Filter 2",$
+                             uvalue="fd2")
+  info.fd3 = widget_combobox(filter_dialogs, $
+                             value=filter_names,$
+                             title="Filter 3",$
+                             uvalue="fd3")
   info.ot = widget_table(obs_row,$
                          uvalue='ot',/editable,alignment=1,$
-                         value=bands,$
+                         value=parameters.filters.properties,$
                          column_labels=["Flux limit (mJy)","Standard Error (mJy)"],$
                          row_labels=["Filter 1","Filter 2","Filter 3"],$
                          column_widths=[100,100],$
                          format=[[f],[f]],$
                          scr_xsize=425,scr_ysize=95)
 
-  f2a = ['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)','(f5.2)']
-  f2b = ['(i)','(i)','(i)','(i)','(i)','(i)','(i)']
-  fmt2 = [[f2a],[f2b],[f2a],[f2a],[f2a]]
-  fmt3 = ['(f5.2)','(i)','(f5.2)','(f5.2)','(f5.2)']
-  lrows=["Initial","Fixed","Min","Max"]
+  widget_control, info.fd1, set_combobox_select=parameters.filters[0].filter_id
+  widget_control, info.fd2, set_combobox_select=parameters.filters[1].filter_id
+  widget_control, info.fd3, set_combobox_select=parameters.filters[2].filter_id
+
+  ;Survey Model Parameters
+  l1 = widget_label(info.lum_table,value="Survey Model Parameters")
+  info.t1 = widget_table(info.lum_table, $
+                         value=parameters.lumpars.pars,$
+                         row_labels=parameters.lumpars.name,$
+                         row_labels=tag_names(parameters.lumpars.pars),$
+                         uvalue='t1',$
+                         /editable,alignment=1,$
+                         format=make_array(shape(parameters.lumpars.pars),'(f5.2)'),$
+                         scr_xsize=537,scr_ysize=132)
   
-;Luminosity Function Parameters
-  l1 = widget_label(info.lum_table,value="Luminosity Function Parameters")
-  info.t1 = widget_table(info.lum_table,value=ldata,column_labels=tag_names(ldata),row_labels=lrows,uvalue='t1',/editable,alignment=1,format=fmt2,scr_xsize=537,scr_ysize=132)
-  
-  l3 = widget_label(info.sed_table,value="SED Evolution Parameters")
-  info.t3 = widget_table(info.sed_table,value=cdat,column_labels=lrows,row_labels=["Color Exp"],uvalue='t3',/editable,alignment=1,format=fmt3,scr_xsize=404,scr_ysize=55)
-  
-  tcols = ["Area (sdeg)","Z Min","Z Max","Z Binsize","Run Number"]
-;Simulation Parameters
+  ;Simulation Parameters
   l2 = widget_label(info.sim_table,value="Simulation Settings")
-  info.t2 = widget_table(info.sim_table,value=sdat,column_labels=tcols,/no_row_headers,uvalue='t2',/editable,alignment=1,format=['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(e9.2)'],column_widths=[100,100,100,100,100],scr_xsize=505,scr_ysize=55)
+  info.t2 = widget_table(info.sim_table,$ 
+                         value=parameters.surveyData,$
+                         column_labels=["Area (sdeg)","Z Min","Z Max","Z Binsize","Run Number"],$
+                         /no_row_headers,uvalue='t2',/editable,alignment=1,$
+                         format=['(f5.2)','(f5.2)','(f5.2)','(f5.2)','(e9.2)'],$
+                         column_widths=[100,100,100,100,100],$
+                         scr_xsize=505,scr_ysize=55)
   
   
 ;===========================================================================
@@ -111,19 +126,19 @@ pro SurveySim
 ;Show SED templates
 ;----------------------------------------------------------------------------
   info.draw3 = widget_draw(info.base2, xsize=info.magnification*info.xsize2,$
-                           ysize=info.magnification*info.ysize1 $
-                           ,uvalue="DRAW_WINDOW3",retain=2 $
-                           ,/button_events, keyboard_events=1,/tracking_events)
+                           ysize=info.magnification*info.ysize1, $
+                           uvalue="DRAW_WINDOW3",retain=2, $
+                           /button_events, keyboard_events=1,/tracking_events)
   
   ;initialize widget and establish control
   widget_control,/realize,info.base,xoffset=0,yoffset=0,Set_UValue=theObject
-  widget_control, info.draw3, get_value=win_id3 & info.win_id3=win_id3
+  widget_control, info.draw3, get_value= info.win_id3 
   xmanager,'SurveySim',info.base,/NO_BLOCK
   wset,info.win_id3
 
   ;get new sedfile if file does not exist (option to ignore too)
-  if file_test(files.sedfile) then begin
-     
+  if not file_test(files.sedfile) then begin
+     file.sedfile = ask_for_file("SED File "+files.sedfile+" not found, please enter new SED file",files.sedfile)
   endif
   
   ;plot SEDs

@@ -32,6 +32,9 @@ pro make_info_struct
        oname:0L, $
        mname:0L, $
        ot:0L, $
+       fd1:0L, $
+       fd2:0L, $
+       fd3:0L, $
        t1:0L, $
        t2:0L, $
        t3:0L, $

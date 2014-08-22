@@ -4,19 +4,15 @@ function load_parameters,saveFile
      restore,saveFile
   endif else begin
      
-     filter_properties = {fmin:25.0,ferr:6.2}
-     filter = {filter_id:1,properties:filter_properties}
+     filter_properties = {"Filter Properties",fmin:25.0,ferr:6.2}
+     filter = {"Filter",filter_id:0,properties:filter_properties}
      filters = replicate(filter,3)
-     
-     filters[1].filter_id=2
      filters[1].properties = {fmin:20.0,ferr:5.8}
-     
-     filters[2].filter_id=3
      filters[2].properties = {fmin:15.0,ferr:6.2}
      
                                 ;luminosity function parameter initialization
-     lpars = {value:-2.2,min:-2.4,max:-2.0}
-     lumstruct = {pars:lpars,fixed:1,name:"PHI0"}
+     lpars = {"Parameter Properties",value:-2.2,min:-2.4,max:-2.0}
+     lumstruct = {"Parameter",pars:lpars,fixed:1,name:"PHI0"}
      lumpars = replicate(lumstruct,8)
      
      names = ["PHI0","L0","ALPHA","BETA","P","Q","ZCUT","CEXP"]
@@ -35,15 +31,16 @@ function load_parameters,saveFile
      lumpars[4].fixed = 0
      lumpars[5].fixed = 0
      
-     surveyData = {area:10.0,zmin:0.0001,zmax:4.0,dz:0.1,runs:1.e4}
+     surveyData = {"Survey Properties",area:10.0,zmin:0.0001,zmax:4.0,dz:0.1,runs:1.e4}
      
      CD, Current=thisdir
-     files = {ofile:'/usr/local/surveysim/obs/spire_fls_dr2.fits', $
+     files = {"File Names", $
+              ofile:'/usr/local/surveysim/obs/spire_fls_dr2.fits', $
               mfile:thisdir+'/model.fits', $
               sedfile:'/usr/local/surveysim/templates/sf_templates.fits', $
               oname:thisdir+'/output.fits' }
      
-     msettings = {$
+     msettings = {"MCMC Settings"$
                  nchain:5,$
                  tmax:20.0,$
                  acceptpct:0.25, $
@@ -54,7 +51,8 @@ function load_parameters,saveFile
                  burn_step:10, $
                  burn_ratio:10}
      
-     parameters = {filters:filters,$
+     parameters = {"SurveySim Parameters", $
+                   filters:filters,$
                    lumpars:lumpars,$
                    surveyData:surveyData,$
                    files:files,$
