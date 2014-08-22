@@ -87,7 +87,8 @@ pro SurveySim
 
   ;Survey Model Parameters
   l1 = widget_label(info.lum_table,value="Survey Model Parameters")
-  info.t1 = widget_table(info.lum_table, $
+  lumrow = widget_base(info.lum_table,/row,/align_center)
+  info.t1 = widget_table(lumrow, $
                          value=parameters.lumpars.pars,$
                          row_labels=parameters.lumpars.name,$
                          row_labels=tag_names(parameters.lumpars.pars),$
@@ -95,6 +96,17 @@ pro SurveySim
                          /editable,alignment=1,$
                          format=make_array(shape(parameters.lumpars.pars),'(f5.2)'),$
                          scr_xsize=537,scr_ysize=132)
+  
+  fixvalues = parameters.lumpars.fixed
+  fnum = n_elements(fixvalues)
+  info.fixinfo = make_array(fnum,0L)
+  fixcol = widget_base(lumrow,/column,/align_center)
+  for i=0,fnum-1 do begin
+     info.fixinfo[i] = widget_combobox(fixcol, $
+                                       value=["Fitted","Fixed"],$
+                                       uvalue="fix"+strtrim(string(i),1))
+     widget_control, info.fixinfo[i], set_combobox_select=fixvalues[i]
+  endfor
   
   ;Simulation Parameters
   l2 = widget_label(info.sim_table,value="Simulation Settings")
@@ -142,23 +154,7 @@ pro SurveySim
                                             parameters.files.sedfile)
   endif
   
-  ;plot SEDs
-  set_plot,'x'
-  device,decomposed=0
-  plot_settings,plot_type='x'
-  if file_test(parameters.files.sedfile) then begin
-
-     templ=mrdfits(parameters.files.sedfile,/silent) 
-     loadct,1,/silent
-
-     plot,templ[*,0],templ[*,1],/xlog,/ylog,$
-          yrange=[1.d20,1.d28],ystyle=1,ytitle=TeXtoIDL('L_{\nu} [W/Hz]'),$
-          xtitle=TeXtoIDL('\lambda [\mum]')
-
-     for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
-  endif else begin
-     print,'File '+parameters.files.sedfile+' does not exist, skipping plot'
-  endelse
+  plot_seds
   
 END
 
@@ -275,44 +271,16 @@ PRO SurveySim_event,ev
      end
      'settings': begin
         settings
-        
-        wset,info.win_id3
-        if file_test(files.sedfile) then begin
-           templ=mrdfits(files.sedfile,/silent) 
-           loadct,1,/silent
-           plot,templ[*,0],templ[*,1],/xlog,/ylog,yrange=[1.d20,1.d28],ystyle=1,xtitle=TeXtoIDL('\lambda [\mum]'),ytitle=TeXtoIDL('L_{\nu} [W/Hz]')
-           for ipl=1,13 do oplot,templ[*,0],templ[*,ipl+1]
-        endif else begin
-           print,'File '+files.sedfile+' does not exist, skipping plot'
-        endelse
-
+        plot_seds
      end
      'diag': diagnostics
      'replot': begin
-        read_output
-        graphs
+        read_output,parameters.files.oname
+        graphs,parameters.files.oname
      end
-     'quit': begin
-        widget_control,ev.top,/destroy
-     end
+     'quit': widget_control,ev.top,/destroy
      'ot': widget_control,info.ot,get_value=bands
-     't1': begin
-        widget_control,info.t1,get_value=ldata
-        
-        i = ev.y
-        j = ev.x        
-
-        if (i eq 1) then begin
-           if(ldata[i].(j) lt 1) then begin
-              ldata[i].(j)=0
-              widget_control,ev.id,set_value=ldata
-           endif else if(ldata[i].(j) gt 1) then begin
-              ldata[i].(j)=1
-              widget_control,ev.id,set_value=ldata
-           endif
-        endif
-
-     end
+     't1': widget_control,info.t1,get_value=ldata
      't2': widget_control,info.t2,get_value=sdat
      't3': widget_control,info.t3,get_value=cdat
      'info': SurveySim_info
@@ -322,13 +290,8 @@ PRO SurveySim_event,ev
 END
 
 
+pro plot_SEDS
+  
+  common simulation_com
 
-
-
-
-
-
-
-
-
-
+end

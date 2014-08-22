@@ -36,6 +36,7 @@ function make_info_struct
        fd2:0L, $
        fd3:0L, $
        t1:0L, $
+       fixinfo:[], $
        t2:0L, $
        t3:0L, $
        tset:0L, $
