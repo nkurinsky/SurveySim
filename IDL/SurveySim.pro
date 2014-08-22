@@ -314,105 +314,11 @@ PRO SurveySim_event,ev
      end
      't2': widget_control,info.t2,get_value=sdat
      't3': widget_control,info.t3,get_value=cdat
-     'info': fit_info
+     'info': SurveySim_info
      ELSE:
   ENDCASE
 
 END
-
-pro settings
-  
-  COMMON simulation_com,info,parameters
-  
-  smain = widget_base(title="Simulation Settings",/column)
-  body = widget_base(smain,/row,/align_center)
-  sbase = widget_base(body,/column,/align_center)
-  fbase = widget_base(body,/column,/align_center)
-
-  l1 = widget_label(sbase,value="Monte Carlo Runtime Parameters")
-  info.tset = widget_table(sbase,value=[msettings],row_labels=tag_names(msettings),column_labels=["Value"],/editable,alignment=1,/column_major,uvalue='settings')
-
-  info.dprint = widget_droplist(fbase,value=["yes","no"],title="Enable Verbose Simulation Output",uvalue="print")
-  widget_control,info.dprint,set_droplist_select=info.print
-  
-  info.obsname = fsc_fileselect(fbase,/NoMaxSize,LabelName='Observation Save File')
-  widget_control,info.obsname,set_value=files.ofile
-  
-  info.sfile = fsc_fileselect(fbase,ObjectRef=sedObject,/NoMaxSize,LabelName='SED Templates File')
-  widget_control,info.sfile,set_value=files.sedfile
-
-  info.mname = fsc_fileselect(fbase,/NoMaxSize,LabelName='Model Fits File')
-  widget_control,info.mname,set_value=files.mfile
-
-  info.oname = fsc_fileselect(fbase,/NoMaxSize,LabelName='Output Fits File')
-  widget_control,info.oname,set_value=files.oname
-
-  btns = widget_base(smain,/row,/align_left)
-  save_btn = widget_button(btns,uvalue='save',Value="Save and Close")
-  cancel_btn = widget_button(btns,uvalue='cancel',Value="Cancel")
-
-  widget_control,smain,/realize
-  xmanager,'settings',smain,/no_block
-
-end
-
-pro settings_event,ev
-  
-  COMMON simulation_com,info,parameters
-  
-  widget_control,ev.id,get_uvalue=uvalue
-
-  switch uvalue of
-     'save' : begin
-        widget_control,info.tset,get_value=msettings
-        info.print = widget_info(info.dprint,/droplist_select)
-        widget_control,info.sfile,get_value=temp
-        files.sedfile=temp
-        widget_control,info.obsname,get_value=temp
-        files.ofile=temp
-        widget_control,info.mname,get_value=temp
-        files.mfile=temp
-        widget_control,info.oname,get_value=temp
-        files.oname=temp
-     end
-     'cancel': begin
-        widget_control,ev.top,/destroy
-     end
-  endswitch
-
-end
-
-pro fit_info
-  
-  main = widget_base(title="Information about Fitting Methodology",/column)
-  t1 = widget_text(main,/wrap,value=['Luminosity Function Fitter Version 1.0' $
-  ,'Noah Kurinsky and Anna Sajina' $
-  ,'Department of Physics and Astronomy, Tufts University, Medford MA' $
-  ,'Last Updated 5/1/13' $
-  ,'' $
-  ,'Notes on using this interface:' $
-  ,'- To allow a parameter to be fitted, set the value of the "fixed" row for that parameter to "0"' $
-  ,'- The ranges for the luminosity function parameters are only important for non-fixed parameters' $
-  ,'- The "sigma" row refers to the proposed distribution width (stdev of gaussian monte carlo steps'],xsize=80,ysize=20)
-  bthold = widget_base(main,/row,/align_center)
-  bt = widget_button(bthold,uvalue='close',value='Close',xsize=50,ysize=25)
-
-  widget_control,main,/realize
-  xmanager,'fit_info',main,/no_block
-
-end
-
-pro fit_info_event,ev
-
-  widget_control,ev.id,get_uvalue=uvalue
-
-  case uvalue of
-     'close': begin
-        widget_control,ev.top,/destroy
-     end
-  endcase
-
-end
 
 pro read_output
   
@@ -1526,23 +1432,3 @@ pro diagnostics_event,ev
 
 end
 
-pro plot_settings,plot_type=plot_type
-  cleanplot,/silent
-  
-  if not keyword_set(plot_type) then plot_type='reset'
-  
-  if strlowcase(plot_type) eq 'ps' then begin
-     !p.thick=5
-     !x.thick=5
-     !y.thick=5
-     !p.charthick=5
-     !p.charsize=1.5
-     cleanplot,/showonly
-  endif else if strlowcase(plot_type) eq 'x' then begin
-     !p.background=255
-     !p.color=0
-     cleanplot,/showonly
-  endif else begin
-     print,"Returning to default plot settings"
-  endelse
-end
