@@ -51,16 +51,16 @@ PRO Run_Simulation
   sxaddpar,hdr2,'DZ',parameters.surveyData.dz,'Redshit Bin Width'
   sxaddpar,hdr2,'AREA',parameters.surveyData.area,'Observed Solid Angle'
   
-  sxaddpar,hdr2,'NCHAIN',msettings.nchain,'Chain Number'
-  sxaddpar,hdr2,'TMAX',msettings.tmax,'Starting Anneal Temperature'
-  sxaddpar,hdr2,'ANN_PCT',msettings.acceptpct,'Ideal Acceptance Percentage'
-  sxaddpar,hdr2,'CONV_CONF',msettings.conv_conf,'Convergence CI Setting'
-  sxaddpar,hdr2,'CONV_RMAX',msettings.conv_rmax,'Convergence Rmax Criterion'
-  sxaddpar,hdr2,'CONV_STEP',msettings.conv_step,'Iterations between convergence checks'
-  sxaddpar,hdr2,'BURN_STEP',msettings.burn_step,'Iterations between anneal calls in burn-in'
-  sxaddpar,hdr2,'BURNVRUN',msettings.burn_ratio,'Ratio of normal to burn-in steps'
-  sxaddpar,hdr2,'ANN_RNG',msettings.pct_range,'Range within which to maintain acceptance'
-  sxaddpar,hdr2,'PRINT',info.print,'Whether to Print Debug MSGs'
+  sxaddpar,hdr2,'NCHAIN',parameters.msettings.nchain,'Chain Number'
+  sxaddpar,hdr2,'TMAX',parameters.msettings.tmax,'Starting Anneal Temperature'
+  sxaddpar,hdr2,'ANN_PCT',parameters.msettings.acceptpct,'Ideal Acceptance Percentage'
+  sxaddpar,hdr2,'CONV_CONF',parameters.msettings.conv_conf,'Convergence CI Setting'
+  sxaddpar,hdr2,'CONV_RMAX',parameters.msettings.conv_rmax,'Convergence Rmax Criterion'
+  sxaddpar,hdr2,'CONV_STEP',parameters.msettings.conv_step,'Iterations between convergence checks'
+  sxaddpar,hdr2,'BURN_STEP',parameters.msettings.burn_step,'Iterations between anneal calls in burn-in'
+  sxaddpar,hdr2,'BURNVRUN',parameters.msettings.burn_ratio,'Ratio of normal to burn-in steps'
+  sxaddpar,hdr2,'ANN_RNG',parameters.msettings.pct_range,'Range within which to maintain acceptance'
+  sxaddpar,hdr2,'PRINT',parameters.print,'Whether to Print Debug MSGs'
   
   mwrfits,[0],parameters.files.mfile,hdr2,/create
   

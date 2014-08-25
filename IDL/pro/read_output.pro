@@ -1,5 +1,9 @@
-pro read_output,filename
+pro read_output,savefile
   
+  parameters = load_parameters(savefile)
+  filename = parameters.files.oname
+  msettings = parameters.msettings
+
   print,filename
   dists = mrdfits(filename,3,head,/silent)
 
@@ -56,7 +60,7 @@ pro read_output,filename
   c2minus = make_array(c2size,value=0.0)
   c3minus = make_array(c3size,value=0.0)
 
-    for i=0,c1size-1 do begin
+  for i=0,c1size-1 do begin
      dnds = c1[c1size-i-1,*]
      dnds = dnds[sort(dnds)]
      dnds = dnds[where(dnds gt 0)]
