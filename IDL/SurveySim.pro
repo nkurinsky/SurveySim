@@ -81,9 +81,9 @@ pro SurveySim
                          value=parameters.filters.properties,$
                          column_labels=["Flux limit (mJy)","Standard Error (mJy)"],$
                          row_labels=["Filter 1","Filter 2","Filter 3"],$
-                         column_widths=[100,100],$
+                         column_widths=150, row_heights=20,$
                          format=make_array(size(parameters.filters.properties,/dimensions),value='(f5.2)'),$
-                         scr_xsize=225,scr_ysize=95)
+                         scr_xsize=380,scr_ysize=120)
 
   widget_control, info.fd1, set_combobox_select=parameters.filters[0].filter_id
   widget_control, info.fd2, set_combobox_select=parameters.filters[1].filter_id
@@ -96,11 +96,11 @@ pro SurveySim
                          value=parameters.lumpars.pars,$
                          row_labels=parameters.lumpars.name,$
                          column_labels=tag_names(parameters.lumpars.pars),$
-                         column_widths=[100,100,100,100], $
+                         column_widths=100, $
                          uvalue='t1',$
                          /editable,alignment=1,$
                          format=make_array(size(parameters.lumpars.pars,/dimensions),value='(f5.2)'),$
-                         scr_xsize=425,scr_ysize=132)
+                         scr_xsize=400,scr_ysize=132)
   
   fixvalues = parameters.lumpars.fixed
   fnum = n_elements(fixvalues)
