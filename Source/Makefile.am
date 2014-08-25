@@ -1,3 +1,2 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS = src filters templates obs
-
+SUBDIRS = src filters templates obs pro

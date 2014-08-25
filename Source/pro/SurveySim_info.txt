@@ -1,0 +1,9 @@
+Luminosity Function Fitter Version 1.0
+Noah Kurinsky and Anna Sajina
+Department of Physics and Astronomy, Tufts University, Medford MA
+Last Updated 5/1/13
+
+Notes on using this interface:
+- To allow a parameter to be fitted, set the value of the "fixed" row for that parameter to "0"
+- The ranges for the luminosity function parameters are only important for non-fixed parameters
+- The "sigma" row refers to the proposed distribution width (stdev of gaussian monte carlo steps
