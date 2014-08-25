@@ -1,9 +1,10 @@
 function load_parameters,saveFile=saveFile
   
   if( not keyword_set(saveFile)) then begin
-     saveFile='/usr/local/surveysim/params.save'
+     spawn,'echo $HOME',home
+     saveFile=home+'/.SurveySimParams.save'
   endif
-
+  
   if(file_test(saveFile)) then begin
      restore,saveFile
   endif else begin

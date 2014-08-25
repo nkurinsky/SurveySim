@@ -7,7 +7,6 @@
 @getprimaryscreensize
 @load_parameters
 @make_info_struct
-@number_counts
 @plot_seds
 @plot_settings
 @read_output
