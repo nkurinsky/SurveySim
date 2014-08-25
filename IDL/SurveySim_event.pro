@@ -74,8 +74,8 @@ PRO Run_Simulation
   spawn,command,exit_status=result
   
   if(result eq 0) then begin
-     read_output,parameters.files.oname
-     simulation_results,parameters.files.oname
+     read_output
+     simulation_results
   endif else begin
      print,"Fitting Failure"
   endelse
@@ -97,8 +97,8 @@ PRO SurveySim_event,ev
      end
      'dia': simulation_diagnostics
      'rep': begin
-        read_output,parameters.files.savefile
-        simulation_results,parameters.files.oname
+        read_output
+        simulation_results
      end
      'qui': widget_control,ev.top,/destroy
      'ot': begin

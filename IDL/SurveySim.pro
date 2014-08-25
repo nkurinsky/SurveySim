@@ -86,7 +86,7 @@ pro SurveySim,savefile=savefile
                          column_labels=["Flux limit (mJy)","Standard Error (mJy)"],$
                          /no_row_headers,$
                          column_widths=150, row_heights=28,$
-                         format=make_array(size(parameters.filters.properties,/dimensions),value='(f5.2)'),$
+                         format='(f5.2)',$
                          scr_xsize=304,scr_ysize=120)
 
   widget_control, info.fd1, set_combobox_select=parameters.filters[0].filter_id
@@ -103,7 +103,7 @@ pro SurveySim,savefile=savefile
                          column_widths=100, row_heights=28, $
                          uvalue='t1',$
                          /editable,alignment=1,$
-                         format=make_array(size(parameters.lumpars.pars,/dimensions),value='(f5.2)'),$
+                         format='(f5.2)',$
                          scr_xsize=374,scr_ysize=36+n_elements(parameters.lumpars.pars)*28)
   
   fixvalues = parameters.lumpars.fixed
