@@ -83,7 +83,7 @@ pro SurveySim
                          row_labels=["Filter 1","Filter 2","Filter 3"],$
                          column_widths=[100,100],$
                          format=make_array(size(parameters.filters.properties,/dimensions),value='(f5.2)'),$
-                         scr_xsize=425,scr_ysize=95)
+                         scr_xsize=225,scr_ysize=95)
 
   widget_control, info.fd1, set_combobox_select=parameters.filters[0].filter_id
   widget_control, info.fd2, set_combobox_select=parameters.filters[1].filter_id
@@ -96,10 +96,11 @@ pro SurveySim
                          value=parameters.lumpars.pars,$
                          row_labels=parameters.lumpars.name,$
                          column_labels=tag_names(parameters.lumpars.pars),$
+                         column_widths=[100,100,100,100], $
                          uvalue='t1',$
                          /editable,alignment=1,$
                          format=make_array(size(parameters.lumpars.pars,/dimensions),value='(f5.2)'),$
-                         scr_xsize=537,scr_ysize=132)
+                         scr_xsize=425,scr_ysize=132)
   
   fixvalues = parameters.lumpars.fixed
   fnum = n_elements(fixvalues)
