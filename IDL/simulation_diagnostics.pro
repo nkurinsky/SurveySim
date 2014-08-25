@@ -2,6 +2,15 @@ pro simulation_diagnostics
 
   COMMON simulation_com
 
+  if(n_elements(parameters) eq 0) then begin
+     if(keyword_set(savefile)) then begin
+        temp = load_parameters(savefile)
+     endif else begin
+        temp = load_parameters()
+     endelse
+     parameters = temp
+  endif
+
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
   size_screen = size_screen*0.8

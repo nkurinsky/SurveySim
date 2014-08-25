@@ -1,5 +1,9 @@
-function load_parameters,saveFile
+function load_parameters,saveFile=saveFile
   
+  if( not keyword_set(saveFile)) then begin
+     saveFile='/usr/local/surveysim/params.save'
+  endif
+
   if(file_test(saveFile)) then begin
      restore,saveFile
   endif else begin
@@ -35,6 +39,7 @@ function load_parameters,saveFile
      
      CD, Current=thisdir
      files = {FileNames, $
+              savefile: saveFile,$
               ofile:'/usr/local/surveysim/obs/spire_fls_dr2.fits', $
               mfile:thisdir+'/model.fits', $
               sedfile:'/usr/local/surveysim/templates/sf_templates.fits', $

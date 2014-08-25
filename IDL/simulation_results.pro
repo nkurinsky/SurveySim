@@ -1,15 +1,24 @@
-pro simulation_results
+pro simulation_results,savefile=savefile
 
   COMMON simulation_com
+
+  if(n_elements(parameters) eq 0) then begin
+     if(keyword_set(savefile)) then begin
+        temp = load_parameters(savefile)
+     endif else begin
+        temp = load_parameters()
+     endelse
+     parameters = temp
+  endif
 
   size_screen=get_screen_size()
   size_screen_alt = size_screen*0.85
   size_screen = size_screen*0.8
   gmain = widget_base(title='Simulation Output',/column,xsize=size_screen[0],ysize=size_screen_alt[1])
-  r1 = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
-  r2 = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
-  r2b = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
-  r3 = widget_base(gmain,/row) ;,xsize=size_screen[0],ysize=size_screen[1])
+  r1 = widget_base(gmain,/row)
+  r2 = widget_base(gmain,/row)
+  r2b = widget_base(gmain,/row)
+  r3 = widget_base(gmain,/row)
 
   widget_control,gmain,set_uvalue=mnum
   xdim = fix(size_screen[0]/3.0)
@@ -40,18 +49,7 @@ pro simulation_results
   plot_settings,plot_type='x'
   loadct,0,/silent
 
-  res = mrdfits(files.oname,0,head,/silent)
-
-  alpha = fxpar(head,'ALPHA')
-  beta = fxpar(head,'BETA')
-  phi0 = fxpar(head,'PHI0')
-  L0 = fxpar(head,'L0')
-  p = fxpar(head,'P')
-  q = fxpar(head,'Q')
-
-  omega_m = 0.28
-  omega_l = 0.72
-  
+  res = mrdfits(parameters.files.oname,0,head,/silent)
   dists = mrdfits(files.oname,3,head,/silent)
 
   gpts = where(dists.f3 gt 0)
@@ -80,104 +78,14 @@ pro simulation_results
   xd3 = xd3[gpts]/1.d3
   yd3 = yd3[gpts]
 
-  count_dists = mrdfits(files.oname,6,head,/silent)
-
-  alpha = 0.159                ;one std deviation
-  plusfrac = (1.0-alpha)
-  minusfrac = alpha
-
-  chis = count_dists.chisq
-  gpts = where(chis gt median(chis))
-  count_dists = count_dists[gpts]
-  c1=count_dists.dnds250
-  c2=count_dists.dnds350
-  c3=count_dists.dnds500
-
-  c1size = n_elements(count_dists[0].dnds250)
-  c2size = n_elements(count_dists[0].dnds350)
-  c3size = n_elements(count_dists[0].dnds500)
-  
-  c1mean = make_array(c1size,value=0.0)
-  c2mean = make_array(c2size,value=0.0)
-  c3mean = make_array(c3size,value=0.0)
-  c1plus = make_array(c1size,value=0.0)
-  c2plus = make_array(c2size,value=0.0)
-  c3plus = make_array(c3size,value=0.0)
-  c1minus = make_array(c1size,value=0.0)
-  c2minus = make_array(c2size,value=0.0)
-  c3minus = make_array(c3size,value=0.0)
-
-  for i=0,c1size-1 do begin
-     dnds = c1[c1size-i-1,*]
-     dnds = dnds[sort(dnds)]
-     dnds = dnds[where(dnds gt 0)]
-     pi = plusfrac*n_elements(dnds)
-     mi = minusfrac*n_elements(dnds)
-     c1mean[i] = mean(dnds)
-     c1plus[i] = dnds[pi]
-     c1minus[i] = dnds[mi]
-  endfor
-
-  for i=0,c2size-1 do begin
-     dnds = c2[i,*]
-     dnds = dnds[sort(dnds)]
-     dnds = dnds[where(dnds gt 0)]
-     pi = plusfrac*n_elements(dnds)
-     mi = minusfrac*n_elements(dnds)
-     c2mean[i] = mean(dnds)
-     c2plus[i] = dnds[pi]
-     c2minus[i] = dnds[mi]
-  endfor
-
-  for i=0,c3size-1 do begin
-     dnds = c3[i,*]
-     dnds = dnds[sort(dnds)]
-     dnds = dnds[where(dnds gt 0)]
-     pi = plusfrac*n_elements(dnds)
-     mi = minusfrac*n_elements(dnds)
-     c3mean[i] = mean(dnds)
-     c3plus[i] = dnds[pi]
-     c3minus[i] = dnds[mi]
-  endfor
+  counts = compute_counts(files.oname)
 
   pnum_out = fxpar(head,'tfields')
 
   widget_control,lumfunct,get_value=index
   wset,index
   device,decomposed=0
-
-  plot,[8,13],[1e-10,1e0],/ylog,/nodata,xtitle=textoidl('log_{10}(L_{fir}) [L_{sun}]'),ytitle=textoidl('log_{10}(N(L_{fir})/\Omega dV_C)'),ystyle=1
-  lums = indgen(21)/4.0+8.0
-
-  dz = 0.5
-
-  loadct,39,/silent
-  for zi=dz,5.0,dz do begin
-     if zi le 2.0 then begin
-        t1 = (10^phi0)*((1+zi)^p)
-        t2 = (10^L0)*((1+zi)^q)
-     endif else begin
-        t1 = (10^phi0)*((3.0)^p)
-        t2 = (10^L0)*((3.0)^q)
-     endelse
-
-     r = 10^lums/t2
-     nsrcs=t1/(r^alpha+r^beta)
-
-     oplot,lums,nsrcs,color=zi*40+20
-  endfor
-
-  for i=0.0,5.0,0.1 do begin
-     ind = (9+2*i/5)
-     oplot,[ind,ind+0.02,ind,ind+0.02,ind,ind+0.02],[10^(-8),10^(-8),10^(-7.9),10^(-7.9),10^(-7.8),10^(-7.8)],psym=2,color=i*40+20,symsize=0.75
-  endfor
-  
-  loadct,0,/silent
-  oplot,[8,13],[1,1],linestyle=1
-
-  xyouts,9.0,10^(-7.2),'Redshift'
-  xyouts,9.0,10^(-7.6),'0'
-  xyouts,10.9,10^(-7.6),'5'
+  plot_lumfunct
 
   widget_control,redshift,get_value=index
   wset,index
@@ -186,12 +94,10 @@ pro simulation_results
 
   widget_control,models,get_value=index
   wset,index
-
   f = alog10(lum)
-  h = histogram(f,nbins=20,locations=xh,min=min(f),max=max(f))
-  binsize=xh[1]-xh[0]
-  xpts=10.0^(xh+binsize/2)
-  plot,xpts,h,psym=2,/xlog,/ylog,xstyle=1,ystyle=0,title="Luminosity Distribution",xtitle="L",ytitle="dN/dL"
+  h = histogram(f,locations=xh,min=min(f),max=max(f))
+  xpts=10.0^(xh)
+  plot,xpts,h,psym=10,/xlog,/ylog,xstyle=1,ystyle=0,title="Luminosity Distribution",xtitle="L",ytitle="dN/dL"
 
   widget_control,dcount1,get_value=index
   wset,index

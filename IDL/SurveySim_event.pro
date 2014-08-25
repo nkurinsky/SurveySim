@@ -5,7 +5,7 @@
 PRO Run_Simulation
   COMMON simulation_com
 
-  save,parameters,filename='params.save'
+  save,parameters,filename=parameters.files.savefile
   
   filter_names = filter_list("/usr/local/surveysim/filters/filterlib.txt")
   flux_min = parameters.filters.properties.min
@@ -89,7 +89,7 @@ PRO SurveySim_event,ev
   case_value = strmid(uvalue,0,3)
 
   CASE case_value OF
-     'sav' : save,parameters,filename='params.save' ;save parameters
+     'sav' : save,parameters,filename=parameters.files.savefile ;save parameters
      'go'  : Run_Simulation              
      'set': begin
         settings
@@ -97,16 +97,25 @@ PRO SurveySim_event,ev
      end
      'dia': simulation_diagnostics
      'rep': begin
-        read_output,parameters.files.oname
+        read_output,parameters.files.savefile
         simulation_results,parameters.files.oname
      end
      'qui': widget_control,ev.top,/destroy
-     'ot': widget_control,info.ot,get_value=parameters.filters.properties
+     'ot': begin
+        widget_control,info.ot,get_value=temp
+        parameters.filters[ev.y].properties.(ev.x) = temp[ev.y].(ev.x)
+     end
      'fd1': parameters.filters[0].filter_id = ev.index
      'fd2': parameters.filters[1].filter_id = ev.index
      'fd3': parameters.filters[2].filter_id = ev.index
-     't1': widget_control,info.t1,get_value=parameters.lumpars.pars
-     't2': widget_control,info.t2,get_value=parameters.surveyData
+     't1': begin
+        widget_control,info.t1,get_value=temp
+        parameters.lumpars[ev.y].pars.(ev.x) = temp[ev.y].(ev.x)
+     end
+     't2': begin
+        widget_control,info.t2,get_value=temp
+        parameters.surveyData.(ev.x) = temp.(ev.x)
+     end
      'inf': SurveySim_info
      'fix':begin
         fix_ind = long(strmid(uvalue,3,strlen(uvalue)-3))

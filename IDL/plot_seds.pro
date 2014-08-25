@@ -2,15 +2,18 @@ pro plot_seds,savefile=savefile
 
   COMMON simulation_com
   
-  if(n_elements(savefile) eq 0) then savefile="params.save"
-
   set_plot,'x'
   device,decomposed=0
   plot_settings,plot_type='x'
 
   if(n_elements(parameters) eq 0) then begin
-     print,"Using plot_seds in standalone mode, looking for "+savefile
-     parameters=load_parameters(savefile)
+     if(keyword_set(savefile)) then begin
+        print,"Using plot_seds in standalone mode, looking for "+savefile
+        parameters=load_parameters(savefile)
+     endif else begin
+        print,"Using plot_seds in standalone mode, looking for default savefile"
+        parameters=load_parameters()
+     endelse
   endif else begin
      wset,info.win_id3
   endelse

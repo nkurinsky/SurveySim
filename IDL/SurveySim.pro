@@ -7,25 +7,28 @@ COMMON simulation_com,info,parameters
 @SurveySimIncludes
 @SurveySim_event
 
-pro SurveySim
+pro SurveySim,savefile=savefile
 
   COMMON simulation_com,info,parameters
   
   spawn,'pwd',thisdir
   plot_settings                 ;will reset the global settings
   
-;==================================================================
-;the INFO structure holds the key widget control parameters as well as 
-;the basic simulation settings
-;------------------------------------------------------------------
-  
-  temp=load_parameters(thisdir+'/params.save')
+  ;==================================================================
+  ;the INFO structure holds the key widget control parameters as well as 
+  ;the basic simulation settings
+  ;------------------------------------------------------------------
+  if(keyword_set(savefile)) then begin
+     temp=load_parameters(savefile)
+  endif else begin
+     temp=load_parameters()
+  endelse
   parameters = temp
   info = make_info_struct(n_elements(parameters.lumpars))
 
-;====================================================================
-; Colors
-;--------------------------------------------------------------------
+  ;====================================================================
+  ; Colors
+  ;--------------------------------------------------------------------
 
   loadct,3,/silent
   tvlct,red,green,blue,/get
@@ -35,7 +38,7 @@ pro SurveySim
   blue[info.ncolors-1]=0B
   tvlct,red,green,blue
   
-; Screen size
+  ; Screen size
   size_screen = get_screen_size()
   size_screen=size_screen*0.8
   spectrum_xsize=size_screen(0)*2./3. & spectrum_ysize=size_screen(1)/5.
