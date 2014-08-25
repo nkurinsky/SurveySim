@@ -24,12 +24,12 @@ PRO Run_Simulation
      if(filterids[i] ne 0) then begin
         sxaddpar, hdr, 'F'+str_ind+'MIN',flux_min[i],'Flux cutoff, column '+str_ind
         sxaddpar, hdr, 'F'+str_ind+'ERR',flux_err[i],'Flux error, column '+str_ind
-        sxaddpar, hdr, 'F'+str_ind+'FILT',filter_names[filterids[i]],'Filter name, column '+str_ind
+        sxaddpar, hdr, 'F'+str_ind+'FILT',filter_names[filterids[i]-1],'Filter name, column '+str_ind
      endif else begin
         print,"Please select filter for column "+str_ind
         return
      endelse
-  endif
+  endfor
      
   modfits,obs_fitsfile,0,hdr,exten_no=hnum
   
@@ -102,17 +102,18 @@ PRO SurveySim_event,ev
      end
      'qui': widget_control,ev.top,/destroy
      'ot': widget_control,info.ot,get_value=parameters.filters.properties
-     'fd1': widget_control,info.fd1, get_combobox_select=parameters.filters[0].filter_id
-     'fd2': widget_control,info.fd2, get_combobox_select=parameters.filters[1].filter_id
-     'fd3': widget_control,info.fd3, get_combobox_select=parameters.filters[2].filter_id
+     'fd1': parameters.filters[0].filter_id = ev.index
+     'fd2': parameters.filters[1].filter_id = ev.index
+     'fd3': parameters.filters[2].filter_id = ev.index
      't1': widget_control,info.t1,get_value=parameters.lumpars.pars
      't2': widget_control,info.t2,get_value=parameters.surveyData
      'inf': SurveySim_info
      'fix':begin
         fix_ind = long(strmid(uvalue,3,strlen(uvalue)-3))
-        widget_control,info.fixinfo[fix_ind],get_combobox_select=parameters.lumpars[fix_ind].fixed
+        parameters.lumpars[fix_ind].fixed = ev.index
      end
-     ELSE: print,"Unassigned: "+uvalue
+     'DRA': 
+     ELSE: print,"Unassigned: "+uvalue+' '+case_value
   ENDCASE
 
 END

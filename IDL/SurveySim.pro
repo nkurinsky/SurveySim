@@ -4,7 +4,8 @@
 
 COMMON simulation_com,info,parameters
 
-@pro/SurveySimIncludes
+@SurveySimIncludes
+@SurveySim_event
 
 pro SurveySim
 
@@ -66,7 +67,7 @@ pro SurveySim
   ;The filter properties table
   lo = widget_label(info.obs_table,value="Survey Properties")
   obs_row = widget_base(info.obs_table,/row)
-  filter_dialogs = widget_base(obs_row,/column,/align_center)
+  filter_dialogs = widget_base(obs_row,/column,/base_align_bottom,/align_bottom)
   info.fd1 = widget_combobox(filter_dialogs, $
                              value=filter_names,$
                              uvalue="fd1")
@@ -80,10 +81,10 @@ pro SurveySim
                          uvalue='ot',/editable,alignment=1,$
                          value=parameters.filters.properties,$
                          column_labels=["Flux limit (mJy)","Standard Error (mJy)"],$
-                         row_labels=["Filter 1","Filter 2","Filter 3"],$
-                         column_widths=150, row_heights=20,$
+                         /no_row_headers,$
+                         column_widths=150, row_heights=28,$
                          format=make_array(size(parameters.filters.properties,/dimensions),value='(f5.2)'),$
-                         scr_xsize=380,scr_ysize=120)
+                         scr_xsize=304,scr_ysize=120)
 
   widget_control, info.fd1, set_combobox_select=parameters.filters[0].filter_id
   widget_control, info.fd2, set_combobox_select=parameters.filters[1].filter_id
@@ -96,15 +97,15 @@ pro SurveySim
                          value=parameters.lumpars.pars,$
                          row_labels=parameters.lumpars.name,$
                          column_labels=tag_names(parameters.lumpars.pars),$
-                         column_widths=100, $
+                         column_widths=100, row_heights=28, $
                          uvalue='t1',$
                          /editable,alignment=1,$
                          format=make_array(size(parameters.lumpars.pars,/dimensions),value='(f5.2)'),$
-                         scr_xsize=400,scr_ysize=132)
+                         scr_xsize=374,scr_ysize=36+n_elements(parameters.lumpars.pars)*28)
   
   fixvalues = parameters.lumpars.fixed
   fnum = n_elements(fixvalues)
-  fixcol = widget_base(lumrow,/column,/align_center)
+  fixcol = widget_base(lumrow,/column,/align_bottom,/base_align_bottom)
   for i=0,fnum-1 do begin
      info.fixinfo[i] = widget_combobox(fixcol, $
                                        value=["Fitted","Fixed"],$
