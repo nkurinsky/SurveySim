@@ -279,7 +279,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src filters templates obs pro
+SUBDIRS = src filters templates obs idl
 all: all-recursive
 
 .SUFFIXES:

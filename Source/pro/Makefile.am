@@ -1,4 +1,0 @@
-AUTOMAKE_OPTIONS=foreign
-
-prodir = $(prefix)/@PACKAGE@/pro
-dist_pro_DATA = SurveySim.pro SurveySimIncludes.pro SurveySim_event.pro SurveySim_info.pro SurveySim_info.txt SurveySim_info_event.pro ask_for_file.pro ask_for_file_event.pro compute_counts.pro filter_list.pro fsc_fileselect.pro getprimaryscreensize.pro load_parameters.pro make_info_struct.pro plot_seds.pro plot_settings.pro read_output.pro settings.pro settings_event.pro simulation_diagnostics.pro simulation_diagnostics_event.pro simulation_results.pro simulation_results_event.pro
