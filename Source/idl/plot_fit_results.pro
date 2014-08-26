@@ -38,7 +38,7 @@ pro plot_fit_results,filename
 
   chi_min = alog(min(chis))
   chi_max = alog(max(chis))
-  color_scale = 256/((chi_max-chi_min)*1.2)
+  color_scale = 256/n_elements(chistpts)
 
   multiplot,[dim,dim],/init,/rowmajor,mTitle="MCMC Fitting Results",gap=0.005
   cgText, 0.6, 0.9, Alignment=0, /Normal, 'Fitting Results:', Charsize=1.25
@@ -46,7 +46,6 @@ pro plot_fit_results,filename
   for x=0,dim-1 do begin
      
      ppts = where(strmatch(alltags,tags[x]+'*',/FOLD_CASE) eq 1)
-     p = make_array(n_elements(ppts),n_elements(res.(ppts[0])),value = 0.0)
      for pi=0,n_elements(ppts)-1 do begin
         if(pi eq 0) then begin
            p = res.(ppts[pi])
@@ -55,21 +54,27 @@ pro plot_fit_results,filename
         endelse
      endfor
      prange = [min(p),max(p)]
+
      for y=0,dim-1 do begin
         multiplot
+
         if (x eq y) then begin  ;make histogram
-           stats = moment(p[chistpts],maxmoment=2)
+
+           pgood = p[chistpts]
+           stats = moment(pgood,maxmoment=2)
            print,"Variable: ",tags[x],", Mean: ",stats[0]," Variance: ",stats[1]
            cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(stats[1],format='(D0.3)')))
-           h = histogram(p[chistpts],locations=xh,max=prange[1],min=prange[0],nbins=nbins)
-           h = float(h)/float(max(h))
+           h = histogram(pgood,locations=xh, $
+                         binsize=3.49*sqrt(stats[1])/(n_elements(pgood^(0.333333)))
+           
+           h = float(h)/float(total(h))
            loadct,1,/silent
            
            xt = ''
            yt = ''
            if(x eq 0) then yt=tags[y]
            if(y eq dim-1) then xt=tags[x]
-           plot,xh,h,psym=10,xrange=prange,yrange=[0,1.2],xtitle=xt,ytitle=yt,xstyle=1,ystyle=1
+           plot,xh,h,psym=10,xrange=prange,yrange=[0,1],xtitle=xt,ytitle=yt,xstyle=1,ystyle=1
 
         endif else if (x lt y) then begin ;make liklihood space
 
@@ -82,8 +87,10 @@ pro plot_fit_results,filename
               endelse
            endfor
            qrange = [min(q),max(q)]
-           dp=(prange[1]-prange[0])/nbins
-           dq=(qrange[1]-qrange[0])/nbins
+           qgood = q[chistpts]
+           
+           dp=3.49*sqrt(stats[1])/(n_elements(pgood^(0.333333))
+           dq=3.49*sqrt(stats[1])/(n_elements(qgood^(0.333333))
 
            xt = ''
            yt = ''
@@ -93,17 +100,16 @@ pro plot_fit_results,filename
            loadct,1,/silent
            plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=xt,ytitle=yt
            loadct,39,/silent
+
            for i=prange[0],prange[1]-dp/2,dp do begin
               for j=qrange[0],qrange[1]-dq/2,dq do begin
-                 
-                 xfill = [i,i,i+dp,i+dp]
-                 yfill = [j,j+dq,j+dq,j]
-                 
-                 gpts = where((p gt i) and (p le i+dp) and (q gt j) and (q lt j+dq))
-                 chi_plot = n_elements(gpts)
+
+                 gpts = where((pgood gt i) and (pgood le i+dp) and (qgood gt j) and (qgood lt j+dq))
                  
                  if(gpts[0] ne -1) then begin
-                    polyfill,xfill,yfill,color=color_scale*(alog(chi_plot))
+                    xfill = [i,i,i+dp,i+dp]
+                    yfill = [j,j+dq,j+dq,j]
+                    polyfill,xfill,yfill,color=color_scale*n_elements(gpts)
                  endif
               endfor
            endfor
