@@ -65,7 +65,7 @@ pro plot_fit_results,filename
            print,"Variable: ",tags[x],", Mean: ",stats[0]," Variance: ",stats[1]
            cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(stats[1],format='(D0.3)')))
            h = histogram(pgood,locations=xh, $
-                         binsize=3.49*sqrt(stats[1])/(n_elements(pgood^(0.333333)))
+                         binsize=3.49*sqrt(stats[1])/(n_elements(pgood)^0.333333))
            
            h = float(h)/float(total(h))
            loadct,1,/silent
@@ -89,8 +89,8 @@ pro plot_fit_results,filename
            qrange = [min(q),max(q)]
            qgood = q[chistpts]
            
-           dp=3.49*sqrt(stats[1])/(n_elements(pgood^(0.333333))
-           dq=3.49*sqrt(stats[1])/(n_elements(qgood^(0.333333))
+           dp=3.49*sqrt(stats[1])/(n_elements(pgood)^0.333333)
+           dq=3.49*sqrt(stats[1])/(n_elements(qgood)^0.333333)
 
            xt = ''
            yt = ''
