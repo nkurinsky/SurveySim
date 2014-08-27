@@ -17,3 +17,5 @@
 @simulation_results
 @simulation_results_event
 @compute_counts
+@nbins
+@binsize
