@@ -1,5 +1,7 @@
 pro plot_fit_results,filename
   
+  COMMON simulation_com,info,parameters
+
   res = mrdfits(filename,4,/silent)
   alltags = tag_names(res)
   tags = alltags[where(strmatch(alltags,'*0',/FOLD_CASE) eq 1)]
@@ -11,7 +13,6 @@ pro plot_fit_results,filename
   print,'Fitted Variables: ',tags
 
   dim = n_elements(tags)
-  nbins = 20.0
   
   cpts = where(strmatch(alltags,'CHISQ*',/FOLD_CASE) eq 1)
   for ci=0,n_elements(cpts)-1 do begin
@@ -64,10 +65,11 @@ pro plot_fit_results,filename
            stats = moment(pgood,maxmoment=2)
            print,"Variable: ",tags[x],", Mean: ",stats[0]," Variance: ",stats[1]
            cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(stats[1],format='(D0.3)')))
-           h = histogram(pgood,locations=xh, $
-                         binsize=3.49*sqrt(stats[1])/(n_elements(pgood)^0.333333))
+
+           binnum = nbins(pgood,prange[0],prange[1])
+           h = histogram(pgood,locations=xh,nbins=binnum,min=prange[0],max=prange[1])
            
-           h = float(h)/float(total(h))
+           h = float(h)/float(max(h))
            loadct,1,/silent
            
            xt = ''
@@ -89,28 +91,33 @@ pro plot_fit_results,filename
            qrange = [min(q),max(q)]
            qgood = q[chistpts]
            
-           dp=3.49*sqrt(stats[1])/(n_elements(pgood)^0.333333)
-           dq=3.49*sqrt(stats[1])/(n_elements(qgood)^0.333333)
+           dp=binsize(pgood,prange[0],prange[1])
+           dq=binsize(qgood,qrange[0],qrange[1])
 
            xt = ''
            yt = ''
            if(x eq 0) then yt=tags[y]
            if(y eq dim-1) then xt=tags[x]
            
-           loadct,1,/silent
+           loadct,0,/silent
            plot,prange,qrange,/nodata,xstyle=1,ystyle=1,xminor=1,yminor=1,xtitle=xt,ytitle=yt
-           loadct,39,/silent
+           loadct,20,/silent
+           
+           mchist = hist_2d(pgood,qgood, $
+                            bin1=dp,min1=prange[0],max1=prange[1], $
+                            bin2=dq,min2=qrange[0],max2=qrange[1])
+           color_scale = 256/max(mchist)
 
            for i=prange[0],prange[1]-dp/2,dp do begin
               for j=qrange[0],qrange[1]-dq/2,dq do begin
 
-                 gpts = where((pgood gt i) and (pgood le i+dp) and (qgood gt j) and (qgood lt j+dq))
+                 mi = long((i-prange[0])/dp)
+                 mj = long((j-qrange[0])/dq)
                  
-                 if(gpts[0] ne -1) then begin
-                    xfill = [i,i,i+dp,i+dp]
-                    yfill = [j,j+dq,j+dq,j]
-                    polyfill,xfill,yfill,color=color_scale*n_elements(gpts)
-                 endif
+                 xfill = [i,i,i+dp,i+dp]
+                 yfill = [j,j+dq,j+dq,j]
+                 polyfill,xfill,yfill,color=color_scale*mchist[mi,mj]
+                 
               endfor
            endfor
 
