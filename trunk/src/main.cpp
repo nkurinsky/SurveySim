@@ -173,12 +173,13 @@ int main(int argc,char** argv){
       VERBOSE(printf(" : "));
       
       lf.set_params(lpars);
+      survey.set_color_exp(CE);
+
       output=survey.simulate();
       trial=output.chisqr;
       VERBOSE(printf("Model Chi-Square: %lf",trial));
       
       accept = metrop.accept(m,trial);
-      survey.set_color_exp(CE);
 
       mcchain.add_link(m,ptemp[m],trial,accept);
       counts.add_link(output.dnds,trial);
@@ -206,18 +207,23 @@ int main(int argc,char** argv){
   
   mcchain.get_best_link(pset.best.data(),chi_min);
 
-  for(pi=0;pi<q.param_inds.size();pi++)
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
+  printf("Best fit:\n");
+  for(pi=0;pi<q.param_inds.size();pi++){
     lpars[q.param_inds[pi]] = pset.best[pi];
+    printf("%s : %lf +\\- %lf\n",pnames[q.param_inds[pi]].c_str(),pset.best[pi],pset.sigma[pi]);
+  }
   lf.set_params(lpars);
-  if(q.vary_cexp)
+  if(q.vary_cexp){
     survey.set_color_exp(pset.best[q.cind]);
-  
+    printf("CEXP : %lf +\\- %lf\n",pset.best[pi],pset.sigma[pi]);
+  }  
+
   printf("\nRe-Running Best Fit...\n");
   output=survey.simulate();
-  printf("Model chi2: %lf\n",output.chisqr);
+  printf("Model chi2: %lf (%lf)\n",output.chisqr,chi_min);
   printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
-  
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"}; 
+
   unique_ptr<string[]> parnames (new string[q.nparams]);
   
   for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)

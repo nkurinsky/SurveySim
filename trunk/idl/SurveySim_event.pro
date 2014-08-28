@@ -17,7 +17,7 @@ PRO Run_Simulation
   hdr = headfits(obs_fitsfile,exten=hnum)
 
   for i=0,2 do begin
-     str_ind = strtrim(string(i),1)
+     str_ind = strtrim(string(i+1),1)
      if(parameters.filters[i].filter_id ne 0) then begin
         sxaddpar, hdr, 'F'+str_ind+'MIN',parameters.filters[i].properties.fmin,'Flux cutoff, column '+str_ind
         sxaddpar, hdr, 'F'+str_ind+'ERR',parameters.filters[i].properties.ferr,'Flux error, column '+str_ind

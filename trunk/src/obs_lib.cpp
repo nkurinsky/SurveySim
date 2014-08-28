@@ -77,6 +77,11 @@ obs_lib::obs_lib(string fitsfile){
 	printf("Keyword F%sFILT missing from header (%s)\n",num.c_str(),fitsfile.c_str());
 	exit(1);
       }
+      try{table.readKey("F"+num+"ERR",ferr[i]);}
+      catch(HDU::NoSuchKeyword){
+        printf("Keyword F%sERR missing from header (%s)\n",num.c_str(),fitsfile.c_str());
+        exit(1);
+      }
     }
     
     unsigned long tablesize(table.rows());
@@ -95,10 +100,10 @@ obs_lib::obs_lib(string fitsfile){
       }
     }
     
-    //errors are mean of observation errors
-    for(int i=0;i<3;i++){
-      ferr[i] = col[i+3].sum()/tablesize;
-    }
+    //errors are (were) mean of observation errors
+    //for(int i=0;i<3;i++){
+    //  ferr[i] = col[i+3].sum()/tablesize;
+    //}
     
     observations.reserve(tablesize);
     double fluxes[3];

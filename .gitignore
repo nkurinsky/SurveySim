@@ -1,0 +1,12 @@
+trunk/src/*.o
+trunk/src/Makefile
+trunk/src/fitter
+trunk/src/.deps
+trunk/Makefile
+trunk/obs/Makefile
+trunk/filters/Makefile
+trunk/idl/Makefile
+trunk/templates/Makefile
+
+trunk/config.log
+trunk/config.status
