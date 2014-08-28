@@ -8,9 +8,6 @@ PRO Run_Simulation
   save,parameters,filename=parameters.files.savefile
   
   filter_names = filter_list("/usr/local/surveysim/filters/filterlib.txt")
-  flux_min = parameters.filters.properties.min
-  flux_err = parameters.filters.properties.err
-  filterids = parameters.filters.filter_id
 
   obs_fitsfile = 'observation.fits'
   spawn,'cp '+parameters.files.ofile+' '+obs_fitsfile
@@ -21,10 +18,10 @@ PRO Run_Simulation
 
   for i=0,2 do begin
      str_ind = strtrim(string(i),1)
-     if(filterids[i] ne 0) then begin
-        sxaddpar, hdr, 'F'+str_ind+'MIN',flux_min[i],'Flux cutoff, column '+str_ind
-        sxaddpar, hdr, 'F'+str_ind+'ERR',flux_err[i],'Flux error, column '+str_ind
-        sxaddpar, hdr, 'F'+str_ind+'FILT',filter_names[filterids[i]-1],'Filter name, column '+str_ind
+     if(parameters.filters[i].filter_id ne 0) then begin
+        sxaddpar, hdr, 'F'+str_ind+'MIN',parameters.filters[i].properties.fmin,'Flux cutoff, column '+str_ind
+        sxaddpar, hdr, 'F'+str_ind+'ERR',parameters.filters[i].properties.ferr,'Flux error, column '+str_ind
+        sxaddpar, hdr, 'F'+str_ind+'FILT',filter_names[parameters.filters[i].filter_id - 1],'Filter name, column '+str_ind
      endif else begin
         print,"Please select filter for column "+str_ind
         return
@@ -41,8 +38,8 @@ PRO Run_Simulation
      parname=parameters.lumpars[i].name
      sxaddpar,hdr2,parname,parameters.lumpars[i].pars.value,'Luminosity Function Parameter '+strnum
      sxaddpar,hdr2,parname+'_FIX',parameters.lumpars[i].fixed,'Fix '+parname+' (Y=1/N=0)'
-     sxaddpar,hdr2,parname+'_MIN',parameters.lumpars[i].min,'Minimum '+parname+' value'
-     sxaddpar,hdr2,parname+'_MAX',parameters.lumpars[i].max,'Maximum '+parname+' value'
+     sxaddpar,hdr2,parname+'_MIN',parameters.lumpars[i].pars.min,'Minimum '+parname+' value'
+     sxaddpar,hdr2,parname+'_MAX',parameters.lumpars[i].pars.max,'Maximum '+parname+' value'
   endfor
   
   sxaddpar,hdr2,'RUNS',parameters.surveyData.runs,'Number of Runs'

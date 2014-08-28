@@ -55,19 +55,20 @@ pro plot_fit_results,filename
         endelse
      endfor
      prange = [min(p),max(p)]
+     pgood = p[chistpts]
+     dp = binsize(pgood,prange[0],prange[1])
 
      for y=0,dim-1 do begin
         multiplot
 
         if (x eq y) then begin  ;make histogram
 
-           pgood = p[chistpts]
            stats = moment(pgood,maxmoment=2)
-           print,"Variable: ",tags[x],", Mean: ",stats[0]," Variance: ",stats[1]
-           cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(stats[1],format='(D0.3)')))
+           perr = sqrt(stats[1])
+           print,"Variable: ",tags[x],", Mean: ",stats[0]," Error: ",perr
+           cgText, 0.6, 0.87-0.03*x, Alignment=0, /Normal, Charsize=1.25,textoidl(tags[x]+": "+strcompress(string(stats[0],format='(D0.3)'))+"\pm"+strcompress(string(perr,format='(D0.3)')))
 
-           binnum = nbins(pgood,prange[0],prange[1])
-           h = histogram(pgood,locations=xh,nbins=binnum,min=prange[0],max=prange[1])
+           h = histogram(pgood,locations=xh,binsize=dp,min=prange[0],max=prange[1])
            
            h = float(h)/float(max(h))
            loadct,1,/silent
@@ -76,7 +77,7 @@ pro plot_fit_results,filename
            yt = ''
            if(x eq 0) then yt=tags[y]
            if(y eq dim-1) then xt=tags[x]
-           plot,xh,h,psym=10,xrange=prange,yrange=[0,1],xtitle=xt,ytitle=yt,xstyle=1,ystyle=1
+           plot,xh,h,psym=10,xrange=prange,yrange=[0,1.2],xtitle=xt,ytitle=yt,xstyle=1,ystyle=1
 
         endif else if (x lt y) then begin ;make liklihood space
 
@@ -88,10 +89,9 @@ pro plot_fit_results,filename
                  q = [q,res.(qpts[qi])]
               endelse
            endfor
+
            qrange = [min(q),max(q)]
            qgood = q[chistpts]
-           
-           dp=binsize(pgood,prange[0],prange[1])
            dq=binsize(qgood,qrange[0],qrange[1])
 
            xt = ''
