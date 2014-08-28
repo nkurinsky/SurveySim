@@ -81,6 +81,7 @@ public:
   double rmax;
   double a_ci;
   double tmax;
+  double tscale;
   double idealpct;
   double annrng;
   

@@ -48,7 +48,8 @@ function load_parameters,saveFile=saveFile
      
      msettings = {MCMCSettings,$
                   nchain:5,$
-                  tmax:20.0,$
+                  tmax:500.0,$
+                  tscale:1e-3,$
                   acceptpct:0.25, $
                   pct_range:0.05, $
                   conv_conf:0.05, $

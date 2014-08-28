@@ -133,6 +133,7 @@ void Configuration::load(){
   tab.readKey("NCHAIN",rtemp);
   nchain = static_cast<unsigned long>(rtemp);
   tab.readKey("TMAX",tmax);
+  tab.readKey("TSCALE",tscale);
   tab.readKey("ANN_PCT",idealpct);
   tab.readKey("ANN_RNG",annrng);
   tab.readKey("BURN_STE",rtemp);

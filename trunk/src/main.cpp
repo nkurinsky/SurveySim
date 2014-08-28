@@ -76,11 +76,11 @@ int main(int argc,char** argv){
   MCChains mcchain(q.nchain,q.nparams,q.runs,q.conv_step);
   MCChains burnchain(q.nchain,q.nparams,q.runs,q.conv_step);
   mcchain.set_constraints(q.rmax,q.a_ci);
-  burnchain.set_constraints(1.5,0.25);
+  burnchain.set_constraints(q.rmax,q.a_ci);
 
   ResultChain counts(3,q.nchain*q.runs);
  
-  MetropSampler metrop(q.nchain,q.tmax,q.idealpct,q.annrng);
+  MetropSampler metrop(q.nchain,q.tmax,q.tscale,q.idealpct,q.annrng);
 
   //mcmc variables and arrays
   double chi_min=1.0E+4; 
@@ -147,9 +147,6 @@ int main(int argc,char** argv){
     if(((i+1) % q.burn_step) == 0){
       if(not metrop.anneal())
 	i = q.runs;
-      if(burnchain.converged()){
-	VERBOSE(printf("Burn Chain Converged\n"));
-	i = q.runs;}
       VERBOSE(printf("Calculating Parameter Variance\n"));
       burnchain.get_stdev(pset.sigma.data());
     }

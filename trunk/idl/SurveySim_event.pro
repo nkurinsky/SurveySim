@@ -53,6 +53,7 @@ PRO Run_Simulation
   
   sxaddpar,hdr2,'NCHAIN',parameters.msettings.nchain,'Chain Number'
   sxaddpar,hdr2,'TMAX',parameters.msettings.tmax,'Starting Anneal Temperature'
+  sxaddpar,hdr2,'TSCALE',parameters.msettings.tscale,'Annealing Temperature Scale'
   sxaddpar,hdr2,'ANN_PCT',parameters.msettings.acceptpct,'Ideal Acceptance Percentage'
   sxaddpar,hdr2,'CONV_CONF',parameters.msettings.conv_conf,'Convergence CI Setting'
   sxaddpar,hdr2,'CONV_RMAX',parameters.msettings.conv_rmax,'Convergence Rmax Criterion'

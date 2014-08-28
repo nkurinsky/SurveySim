@@ -33,7 +33,7 @@ int dcomp(const void * a,const void * b){
   else return 0;
 }
 
-MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct, double acpt_buf){
+MetropSampler::MetropSampler(int nchains, double maxTemp, double tempScale, double idealpct, double acpt_buf){
   this->nchains = nchains;
   accept_total = new long[nchains];
   iteration_total = new long[nchains];
@@ -44,6 +44,7 @@ MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct, doubl
     previous[i] = 1.0E+4;
   }
   temp = maxTemp;
+  tscale = tempScale;
   ideal_acceptance = idealpct;
   accept_buffer = acpt_buf;
   accept_ratio = 1.0/log(idealpct);
@@ -51,15 +52,12 @@ MetropSampler::MetropSampler(int nchains, double maxTemp, double idealpct, doubl
 
 bool MetropSampler::accept(int chainnum, double trial){
   static double itemp,tester;
-  tester=(trial-previous[chainnum])/temp;
-  
-  //to avoid errors from taking e^x where x is very large
-  if(tester <= -2){
-    accepted = (tester<0.0) ? true : false;
-  }
-  else{
+  tester=(trial-previous[chainnum])*tscale/temp;
+  accepted = true;
+
+  if(tester > 0){
     itemp=rng.flat(0.0,1.0);   //want uniform random number from 0-1
-    accepted = ((tester < 0.0) or (itemp < exp(-tester))) ? true : false;
+    accepted = (itemp < exp(-tester)) ? true : false;
   }
   
   iteration_total[chainnum]++;
