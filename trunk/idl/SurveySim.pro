@@ -40,6 +40,7 @@ pro SurveySim,savefile=savefile
   
   ; Screen size
   size_screen = get_screen_size()
+  realss = size_screen*0.8
   size_screen=size_screen*0.8
   spectrum_xsize=size_screen(0)*2./3. & spectrum_ysize=size_screen(1)/5.
   
@@ -48,7 +49,9 @@ pro SurveySim,savefile=savefile
   
   ;widget base initialization
   ;main base
-  info.base = widget_base(title='Model Setup and Initialization',mbar=mbar,/column,/align_center) 
+  info.base = widget_base(title='Model Setup and Initialization',mbar=mbar,/column,/align_center,$ 
+                          /scroll,x_scroll_size=info.magnification*info.xsize2*1.1,y_scroll_size=realss(1), $
+                          /base_align_center)
   ;plot base
   info.base2= widget_base(info.base, /column,/align_center)
   ;parameter base
