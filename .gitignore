@@ -10,3 +10,5 @@ trunk/templates/Makefile
 
 trunk/config.log
 trunk/config.status
+
+*.DS*
