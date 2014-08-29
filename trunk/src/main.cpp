@@ -145,9 +145,9 @@ int main(int argc,char** argv){
     }
     
     if(((i+1) % q.burn_step) == 0){
+      printf("\nAcceptance: %5.1lf%%\n",metrop.acceptance_rate()*100.0);
       if(not metrop.anneal())
 	i = q.runs;
-      VERBOSE(printf("Calculating Parameter Variance\n"));
       burnchain.get_stdev(pset.sigma.data());
     }
   }
@@ -189,7 +189,8 @@ int main(int argc,char** argv){
 	for(pi=0;pi<q.nparams;pi++)
 	  pcurrent[m][pi]=ptemp[m][pi];
       }
-      VERBOSE(printf(" -- Rejected\n"));
+      else
+	VERBOSE(printf(" -- Rejected\n"));
     }
     
     if(((i+1) % q.conv_step) == 0){
@@ -222,7 +223,7 @@ int main(int argc,char** argv){
   printf("\nRe-Running Best Fit...\n");
   output=survey.simulate();
   printf("Model chi2: %lf (%lf)\n",output.chisqr,chi_min);
-  printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance());
+  printf("Acceptance Rate: %lf%%\n",metrop.mean_acceptance()*100);
 
   unique_ptr<string[]> parnames (new string[q.nparams]);
   

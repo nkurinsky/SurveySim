@@ -52,7 +52,7 @@ MetropSampler::MetropSampler(int nchains, double maxTemp, double tempScale, doub
 
 bool MetropSampler::accept(int chainnum, double trial){
   static double itemp,tester;
-  tester=(trial-previous[chainnum])*tscale/temp;
+  tester=(trial-previous[chainnum])/(tscale*temp);
   accepted = true;
 
   if(tester > 0){
@@ -198,7 +198,6 @@ void MCChains::get_fit_results(double pars[], double sigma[]){
     values.clear();
     for(int j=0;j<nchains;j++){
       size = chainlength[j];
-      printf("\t%i %i %lu\n",i,j,size);
       for(unsigned long k = size/2; k < size; k++){
 	values.push_back(chains[j*chainwidth+i][k]);
 	mean += values.back();

@@ -121,6 +121,9 @@ pro plot_fit_results,filename
               endfor
            endfor
 
+           loadct,0,/silent
+           contour,mchist,nlevels=20,/overplot
+           
         endif 
      endfor
   endfor
