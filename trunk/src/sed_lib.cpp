@@ -231,12 +231,11 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
     double scale,result,error;
     double bounds[2];
     gsl_function F;
-    flux_yield_params p(&seds[lum_id],&filters.get(filter_ind),redshift);
+    flux_yield_params p(seds[lum_id],&filters.get(filter_id),redshift);
     F.function = &flux_yield;
     F.params = &p;
 
     scale = (1.0+redshift)*Wm2Hz_TO_mJy/(4.0*M_PI*pow(lumdist(redshift)*MPC_TO_METER,2.0));
-    printf("\t Convolve::Init: z=%lf,lum=%i, scale=%le\n",redshift,lum_id,scale);
 
     result = error = -1;
     bounds[0] = filters.get(filter_id).low();
