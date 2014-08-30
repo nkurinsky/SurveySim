@@ -16,9 +16,9 @@
 #define speed_of_light (2.998e8) // c [m/s]
 
 //cosmology
-#define Ho (73.8) //km/s/Mpc, based on Riess et al. 2011, ApJ
+#define H0 (73.8) //km/s/Mpc, based on Riess et al. 2011, ApJ
 #define OM (0.272) // from Komatsu et al. 2011
 #define OL (0.728) // from Komatsu et al. 2011
-#define d_hub (4062.33) // Hubble distance, i.e. c/Ho [Mpc]
+#define DH (4062.33) // Hubble distance, i.e. c/Ho [Mpc]
 
 #endif

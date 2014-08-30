@@ -40,6 +40,8 @@ class sed_lib{
   gsl_spline *spline;
   double brange[2];
   double color_exp;
+  double color_zcut;
+  double color_evolution;
   filter_lib filters;
   double convolve_filter(short lum_id, double redshift, short filter_id);
   friend double flux_yield(double wavelength, void * params);
@@ -50,7 +52,7 @@ class sed_lib{
   bool load_filter(short filter_id, string name);
   double get_flux(double lum, double redshift, double band);
   double get_filter_flux(double lum, double redshift, short filter_id);
-  void set_color_evolution(double exp);
+  void set_color_evolution(double exp, double zcut=1000);
   int get_lnum(){
     return lnum;}
   double get_dl();
@@ -63,11 +65,10 @@ class sed_lib{
 double flux_yield(double wavelength, void * params);
 
 struct flux_yield_params{
-  sed_lib * wlib;
-  short lum_ind;
-  short filt_ind;
+  sed *SED;
+  filter *FILT;
   double z;
-  flux_yield_params();
+  flux_yield_params(sed *mySED, filter *myFILT, double redshift);
 };
 
 

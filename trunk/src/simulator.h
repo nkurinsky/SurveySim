@@ -81,7 +81,7 @@ class simulator{
   bool load_filter_lib(string file);
   bool load_filter(short filt_id, string name, double error, double flim);
   void set_size(double area,double dz,double zmin,int nz,int ns);
-  void set_color_exp(double val);
+  void set_color_exp(double val, double zcut=1000);
   void set_lumfunct(lumfunct *lf);
   void set_sed_lib(string sedfile);
   void set_obs(string obsfile);

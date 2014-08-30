@@ -7,6 +7,7 @@
 
 #include "constants.h"
 #include <math.h>
+#include <unordered_map>
 
 // luminosity distances
 double lumdist(double zmax);

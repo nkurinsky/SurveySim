@@ -181,9 +181,9 @@ void simulator::set_size(double area,double dz,double zmin,int nz,int ns){
   last_output.dndz.resize(nz);
 }
 
-void simulator::set_color_exp(double val){
+void simulator::set_color_exp(double val, double zcut){
   if (seds.get() != NULL)
-    seds->set_color_evolution(val);
+    seds->set_color_evolution(val,zcut);
 }
 
 void simulator::set_lumfunct(lumfunct *lf){
@@ -247,7 +247,7 @@ products simulator::simulate(){
 
     //NOTE templates are given in W/Hz
     for (is=0;is<nz;is++){
-      zarray[is]=(is+1)*dz+zmin;
+      zarray[is]=(is)*dz+zmin;
 
       tmpz=zarray[is]+dz/2.0;
       vol=(dvdz(tmpz,area)*dz);
@@ -443,9 +443,9 @@ bool simulator::save(string outfile){
     printf("Caught Save Error\n");
     exit(1);
   }
-    
-    return true;
-  }
+  
+  return true;
+}
   
 
 

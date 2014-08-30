@@ -34,8 +34,11 @@ sed::~sed(){
     delete [] fluxes;
 }
 
-//modify to read Anna's type of file
 sed_lib::sed_lib(string fitsfile){
+
+  color_exp = 0;
+  color_zcut=0;
+  color_evolution = 1;
   
   double *bands;
   FITS *pInfile;  
@@ -179,8 +182,11 @@ double sed_lib::get_filter_flux(double lum, double redshift, short filter_id){
   return -1;
 }
 
-void sed_lib::set_color_evolution(double exp){
+void sed_lib::set_color_evolution(double exp, double zcut){
+  if(zcut >= 0)
+    color_zcut = zcut;
   color_exp = exp;
+  color_evolution = pow(1+zcut,color_exp);
 }
 
 double sed_lib::get_dl(){
@@ -216,53 +222,60 @@ sed_lib::~sed_lib(){
 
 double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
 
-  static bool conv_init = false;
-  double scale,result,error;
-  static flux_yield_params p;
-  static gsl_function F;
-  double bounds[2];
-
   static map<tuple<short,double>,double > fluxes[3];
   tuple<short,double> params (lum_id,redshift);
 
-  if(not conv_init){
-    F.function = &flux_yield;
-    F.params = &p;
-    p.wlib = this;
-    conv_init = true;
-    printf("Initializing Filter Convolution Variables\n");
-  }  
-
   //we use a map here to ensure that a given redshift/SED/filter combination is only convolved once; we recompute color evolution every time as this may change in fitting, while filters/SEDs are static.
   if(fluxes[filter_id].count(params) == 0){
-    scale = (1+redshift)*Wm2Hz_TO_mJy/(4.0*M_PI*pow(lumdist(redshift)*MPC_TO_METER,2.0));
-    
+
+    double scale,result,error;
+    double bounds[2];
+    gsl_function F;
+    flux_yield_params p(&seds[lum_id],&filters.get(filter_ind),redshift);
+    F.function = &flux_yield;
+    F.params = &p;
+
+    scale = (1.0+redshift)*Wm2Hz_TO_mJy/(4.0*M_PI*pow(lumdist(redshift)*MPC_TO_METER,2.0));
+    printf("\t Convolve::Init: z=%lf,lum=%i, scale=%le\n",redshift,lum_id,scale);
+
     result = error = -1;
-    p.lum_ind = lum_id;
-    p.filt_ind = filter_id;
-    p.z = redshift;
-    
     bounds[0] = filters.get(filter_id).low();
     bounds[1] = filters.get(filter_id).high();
     
     gsl_integration_qags (&F, bounds[0], bounds[1], 0, SL_INT_PRECISION, SL_INT_SIZE, w, &result, &error); 
     
+    printf("\tConvolve::Init: z=%lf,lum=%i, scale=%le result=%le ",redshift,lum_id,scale,result);
+
     result*=scale;
     fluxes[filter_id][params] = result;
+    
+    printf("flux=%le\n",result);
   }
 
-  return fluxes[filter_id][params]*pow((1.0+redshift),color_exp);
+  if(redshift < color_zcut)
+    return fluxes[filter_id][params]*pow((1.0+redshift),color_exp);
+
+  return fluxes[filter_id][params]*color_evolution;
 }
 
 double flux_yield (double x, void * params) {
   flux_yield_params *p = (flux_yield_params*) params;
+  double z = (p->z);
+  double x_em = (x/(1+z));
   
-  return (p->wlib->seds[p->lum_ind]->get_flux(x/(1.0+p->z)) * p->wlib->filters.get(p->filt_ind).transmission(x));
+  double flux = (p->SED->get_flux(x_em));
+  double transmission = (p->FILT->transmission(x));
+
+  return flux*transmission;
 }
 
-flux_yield_params::flux_yield_params(){
-  wlib=NULL;
-  lum_ind = -1;
-  filt_ind = -1;
-  z = -1;
+flux_yield_params::flux_yield_params(sed *mySED, filter *myFILT, double redshift){
+  if(mySED == NULL or myFILT == NULL){
+    printf("ERROR: Null pointer passed to flux_yield_params constructor\n");
+    exit(1);
+  }
+  
+  SED = mySED;
+  FILT = myFILT;
+  z = redshift;
 }
