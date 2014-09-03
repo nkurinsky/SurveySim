@@ -1,9 +1,9 @@
 // -*-c++-*-
 
-#include "functions.h"
-
 #ifndef OBS_LIB_H
 #define OBS_LIB_H
+
+#include "functions.h"
 
 using namespace CCfits;
 

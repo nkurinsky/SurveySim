@@ -1,4 +1,4 @@
-/*
+/* -*-c++-*-
   Utility Classes for Monte Carlo Fitter
   Written by Noah Kurinsky, 10/31/13
 
