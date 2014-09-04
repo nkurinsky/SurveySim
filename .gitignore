@@ -7,6 +7,7 @@ trunk/obs/Makefile
 trunk/filters/Makefile
 trunk/idl/Makefile
 trunk/templates/Makefile
+trunk/lib_aux/Makefile
 
 trunk/config.log
 trunk/config.status

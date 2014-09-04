@@ -112,3 +112,10 @@ void NumberCounts::setVerbose(bool flag){
 }
 
 
+const valarray<double>& NumberCounts::counts() const{
+    return _counts;
+}
+
+const valarray<double>& NumberCounts::bins() const{
+  return _bins;
+}

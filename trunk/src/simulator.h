@@ -7,6 +7,9 @@
 #include "sed_lib.h"
 #include "lumfunct.h"
 #include "hist_lib.h"
+#include "functions.h"
+#include "constants.h"
+#include "cosmo.h"
 
 //Storage structure for each individual source
 struct sprop{
@@ -26,41 +29,23 @@ struct products{
   double chisqr;
   valarray<double> dndz;
   valarray<double> dnds[3];
-  products(){
+  products() : chisqr(0){
     dndz.resize(1);
   }
   products(int nz, int ns[]);
 };
 
-struct clementsBins{
-  //temporary structure created to compute clements'10 style number counts
-  int bnum[3];
-  //bin minima [mJy]
-  valarray<double> b250;
-  valarray<double> b350;
-  valarray<double> b500;
-  //bin widths [Jy]
-  valarray<double> db250;
-  valarray<double> db350;
-  valarray<double> db500;
-  //bin minima [Jy]^2.5
-  valarray<double> S250;
-  valarray<double> S350;
-  valarray<double> S500;
-  clementsBins();
-};
-
 class simulator{
- private:
+private:
   products last_output;
-  clementsBins dndsInfo;
-  int binNum(int band, double flux);
   vector<sprop> sources;
   //bool simulated;
   lumfunct *lf;
   std::unique_ptr<sed_lib> seds;
   std::unique_ptr<obs_lib> observations;
   std::unique_ptr<hist_lib> diagnostic;
+  std::unique_ptr<numberCounts> counts[3];
+  string filters[3];
   double band_errs[3];
   double flux_limits[3];
   double color_exp;
@@ -69,14 +54,12 @@ class simulator{
   double zmin;
   int nz;
   int ns;
+  string filterFile;
+  RandomNumberGenerator rng;
+  void initialize_filters();
+  void initialize_counts();
  public:
-  simulator(){
-    last_output.chisqr=0;
-    color_exp=0; //default to no color evolution
-    area = pow((M_PI/180.0),2.0); //default to 1sq degree
-    zmin = 0.1; //default to 0.1-6.0, 0.1 steps
-    nz = 59;
-    dz = 0.1;}
+  simulator();
   simulator(string filterfile, string obsfile, string sedfile);
   bool load_filter_lib(string file);
   bool load_filter(short filt_id, string name, double error, double flim);

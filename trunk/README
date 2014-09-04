@@ -31,19 +31,18 @@ install these libraries such that all users can access them and the configure sc
 can find them, is to follow the procedure below; you do not have to move the 
 directories, just run these commands in your untarred files:
 
-GSL: make the GSL library, install it in /usr/local and establish references
+GSL: untar the file and enter it, then type
 	./configure
 	make
 	make check 2>&1
 	sudo make install
 
-cfitsio: make the cfitsio library, install it in /usr/local and establish references
+cfitsio: untar the file and enter it, then type
 	./configure --prefix=/usr/local
 	make
 	sudo make install
 
-CCFits: make the CCFits library, linking with cfitsio, install it in /usr/local and 
-establish references
+CCFits: untar the file and enter it, then type
 	./configure --with-cfitsio=/usr/local
 	make
 	sudo make install
