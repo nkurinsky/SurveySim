@@ -21,11 +21,9 @@ public:
   void compute(const valarray<double> &fluxes, 
 	       const double area, 
 	       valarray<double> &counts);
-  bool getCounts(valarray<double> &counts) const;
-  bool getBins(valarray<double> &bins) const;
-  void getName(string &name) const;
   void setName(string &name);
   void setVerbose(bool flag=true);
+  const string& name() const;
   const valarray<double>& counts() const;
   const valarray<double>& bins() const;
 private:  

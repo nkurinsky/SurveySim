@@ -1,6 +1,6 @@
 #include "numberCounts.h"
 
-NumberCounts::NumberCounts(const string &name) : _initialized(false), _name(name), _verbose(false){
+NumberCounts::NumberCounts(const string &name) :  _name(name), _initialized(false), _verbose(false){
 
 }
 
@@ -13,7 +13,6 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
   if(fluxes.min() > 0){
     double mean,N,sigma;
     double diff,nbins,binlow;
-    int i_nbins;
     valarray<double> logf(log10(fluxes));
     
     _range[0] = logf.min();
@@ -54,28 +53,8 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
   return _initialized;
 }
 
-bool NumberCounts::getCounts(valarray<double> &counts){
-  if(!_initialized){
-    printf("NumberCounts::getCounts Error: Uninitialized\n");
-    return false;
-  }
-  
-  counts = _counts;
-  return true;
-}
-
-bool NumberCounts::getBins(valarray<double> &bins){
-  if(!_initialized){
-    printf("NumberCounts::getBins Error: Uninitialized\n");
-    return false;
-  }
-
-  bins = _bin_center;
-  return true;
-}
-
-void NumberCounts::getName(string &name){
-  name = _name;
+const string& NumberCounts::name() const{
+  return _name;
 }
 
 void NumberCounts::setName(string &name){
@@ -117,5 +96,5 @@ const valarray<double>& NumberCounts::counts() const{
 }
 
 const valarray<double>& NumberCounts::bins() const{
-  return _bins;
+  return _bin_center;
 }

@@ -68,10 +68,8 @@ int main(int argc,char** argv){
   
   //NON GENERAL COUNTS
   //the flux array is logarithmic in steps of 0.3dex 
-  q.ns=8;
-  survey.set_size(q.areaSteradian(),q.dz,q.zmin,q.nz,q.ns);
-  int bnum[]={16,13,10};
-  products output(q.nz,bnum);
+  survey.set_size(q.areaSteradian(),q.dz,q.zmin,q.nz);
+  products output;
   
   MCChains mcchain(q.nchain,q.nparams,q.runs,q.conv_step);
   MCChains burnchain(q.nchain,q.nparams,q.runs,q.conv_step);

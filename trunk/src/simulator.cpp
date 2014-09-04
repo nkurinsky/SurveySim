@@ -37,13 +37,11 @@ products::products(int nz, int ns[]) : chisqr(0){
   dnds[2].resize(ns[2]);
 }
 
-simulator::simulator() : seds(NULL),
-			 observations(NULL), 
-			 color_exp(0.0), 
+simulator::simulator() : color_exp(0.0),
+			 area(3.046174e-4), //default to 1sq degree
+			 dz(0.1),
 			 zmin(0.1), 
-			 nz(59), 
-			 dz(0.1), 
-			 area(3.046174e-4) //default to 1sq degree
+			 nz(59) 
 {
   char * ffile = getenv("FILTERFILE");
   if(ffile != NULL)
@@ -84,12 +82,11 @@ bool simulator::load_filter(short filt_id, string name, double error, double fli
   return seds->load_filter(filt_id,name);
 }
 
-void simulator::set_size(double area,double dz,double zmin,int nz,int ns){
+void simulator::set_size(double area,double dz,double zmin,int nz){
   this->area = (area > 0) ? ((area < 41254.0) ? area : 41253.0) : 1;
   this->dz = (dz > 0) ? dz : 0.1;
   this->zmin = (zmin > 0.001) ? zmin : 0.001;
   this->nz = (nz > 1) ? nz : 50;
-  this->ns = (ns > 1) ? ns : 8; //currently unused
 
   last_output.dndz.resize(nz);
 }
@@ -112,7 +109,7 @@ void simulator::initialize_filters(){
   if((seds.get() != NULL) and (observations.get() != NULL)){
     
     printf("Initializing Filters\n");
-    if(seds->init_filter_lib(filterfile)){
+    if(seds->init_filter_lib(filterFile)){
       for(short i=0;i<3;i++)
 	seds->load_filter(i,filters[i]);
     }
@@ -130,8 +127,8 @@ void simulator::initialize_counts(){
       fluxes[i].resize(osize,0.0);
       for(int j=0;j<osize;j++)
 	fluxes[i][j] = observations->get_flux(j,i);
-      counts[i].reset(new numberCounts(fluxes[i],area,filters[i]));
-      last_output.dnds[i].resize(counts[i].bins().size());
+      counts[i].reset(new NumberCounts(fluxes[i],area,filters[i]));
+      last_output.dnds[i].resize(counts[i]->bins().size());
     }
 
   }
@@ -165,7 +162,10 @@ void simulator::set_obs(string obsfile){
 
 products simulator::simulate(){
   sources.clear();
-  products output(nz,[counts[0].bins().size(),counts[1].bins().size(),counts[2].bins().size()]);
+  int ns[] = {static_cast<int>(counts[0]->bins().size()),
+	      static_cast<int>(counts[1]->bins().size()),
+	      static_cast<int>(counts[2]->bins().size())};
+  products output(nz,ns);
   
   if(seds.get() != NULL){
 
@@ -256,9 +256,9 @@ products simulator::simulate(){
     
     diagnostic->init_model(c1.get(),c2.get(),w.get(),snum);
     output.chisqr=diagnostic->get_chisq();
-    counts[0].compute(f1,area,output.dnds[0]);
-    counts[1].compute(f2,area,output.dnds[1]);
-    counts[2].compute(f3,area,output.dnds[2]);
+    counts[0]->compute(f1,area,output.dnds[0]);
+    counts[1]->compute(f2,area,output.dnds[1]);
+    counts[2]->compute(f3,area,output.dnds[2]);
     last_output = output;
     
   }
@@ -372,12 +372,12 @@ bool simulator::save(string outfile){
     newTable->column(colname[2]).write(f3,1);
     newTable->column(colname[3]).write(redshift,1);
     newTable->column(colname[4]).write(luminosity,1);
-    newTable->column(colname[5]).write(counts[0].bins(),1);
-    newTable->column(colname[6]).write(counts[1].bins(),1);
-    newTable->column(colname[7]).write(counts[2].bins(),1);
-    newTable->column(colname[8]).write(counts[0].counts(),1);
-    newTable->column(colname[9]).write(counts[1].counts(),1);
-    newTable->column(colname[10]).write(counts[2].counts(),1);
+    newTable->column(colname[5]).write(counts[0]->bins(),1);
+    newTable->column(colname[6]).write(counts[1]->bins(),1);
+    newTable->column(colname[7]).write(counts[2]->bins(),1);
+    newTable->column(colname[8]).write(counts[0]->counts(),1);
+    newTable->column(colname[9]).write(counts[1]->counts(),1);
+    newTable->column(colname[10]).write(counts[2]->counts(),1);
     newTable->column(colname[11]).write(last_output.dnds[0],1);
     newTable->column(colname[12]).write(last_output.dnds[1],1);
     newTable->column(colname[13]).write(last_output.dnds[2],1);

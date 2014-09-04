@@ -10,6 +10,7 @@
 #include "functions.h"
 #include "constants.h"
 #include "cosmo.h"
+#include "numberCounts.h"
 
 //Storage structure for each individual source
 struct sprop{
@@ -44,7 +45,7 @@ private:
   std::unique_ptr<sed_lib> seds;
   std::unique_ptr<obs_lib> observations;
   std::unique_ptr<hist_lib> diagnostic;
-  std::unique_ptr<numberCounts> counts[3];
+  std::unique_ptr<NumberCounts> counts[3];
   string filters[3];
   double band_errs[3];
   double flux_limits[3];
@@ -53,7 +54,6 @@ private:
   double dz;
   double zmin;
   int nz;
-  int ns;
   string filterFile;
   RandomNumberGenerator rng;
   void initialize_filters();
@@ -63,7 +63,7 @@ private:
   simulator(string filterfile, string obsfile, string sedfile);
   bool load_filter_lib(string file);
   bool load_filter(short filt_id, string name, double error, double flim);
-  void set_size(double area,double dz,double zmin,int nz,int ns);
+  void set_size(double area,double dz,double zmin,int nz);
   void set_color_exp(double val, double zcut=1000);
   void set_lumfunct(lumfunct *lf);
   void set_sed_lib(string sedfile);
