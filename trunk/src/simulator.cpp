@@ -302,10 +302,12 @@ products simulator::simulate(){
     double * c1(new double[snum]);
     double * c2(new double[snum]);
     double * w (new double[snum]);
+    valarray<double> f1;
     for (int i=0;i<snum;i++){
       c1[i] = sources[i].c1;
       c2[i] = sources[i].c2;
       w[i] = sources[i].weight;
+      
     }
     
     diagnostic->init_model(c1,c2,w,snum);
