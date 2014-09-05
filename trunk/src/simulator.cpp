@@ -1,57 +1,23 @@
 #include "simulator.h"
 
-sprop::sprop(double z,double f[],double lum, double w){
-  redshift = z;
-  luminosity = lum;
-  weight = w;
-
-  bool do_colors(true);
-  for (int i=0;i<3;i++){
-    fluxes[i] = f[i];
-    if(f[i] < 0.00000000E0)
-      do_colors = false;
-  }
-  if(do_colors){
-    c1 = get_color(f[2],f[0]);
-    c2 = get_color(f[2],f[1]);
-  }
-  else{
-    c1 = -99.0;
-    c2 = -99.0;
-  }
-}
-
-sprop::sprop(){
-  redshift = -1;
-  luminosity = -1;
-  weight = 0;
-
-  c1 = -99.0;
-  c2 = -99.0;
-}
-
-products::products(int nz, int ns[]) : chisqr(0){
-  dndz.resize(nz);
-  dnds[0].resize(ns[0]);
-  dnds[1].resize(ns[1]);
-  dnds[2].resize(ns[2]);
-}
-
 simulator::simulator() : color_exp(0.0),
 			 area(3.046174e-4), //default to 1sq degree
 			 dz(0.1),
 			 zmin(0.1), 
-			 nz(59) 
+			 nz(59),
+			 filterFile("/usr/local/surveysim/filters/filterlib.txt"), 
+			 obsFile="";
 {
   char * ffile = getenv("FILTERFILE");
   if(ffile != NULL)
     filterFile = static_cast<string>(ffile);
-  else
-    filterFile = "/usr/local/surveysim/filters/filterlib.txt";
 
   filters[0] = "F1";
   filters[1] = "F2";
   filters[2] = "F3";
+
+  axes[0] = ColorF1F3;
+  axes[1] = ColorF2F3;
 }
 
 simulator::simulator(string filterfile, string obsfile, string sedfile) : simulator(){
@@ -80,6 +46,22 @@ bool simulator::load_filter(short filt_id, string name, double error, double fli
     return false;
   }
   return seds->load_filter(filt_id,name);
+}
+
+void simulator::set_diagnostic_xaxis(axis_type option){
+  axes[0] = option;
+  reset_obs();
+}
+
+void simulator::set_diagnostic_yaxis(axis_type option){
+  axes[1] = option;
+  reset_obs();
+}
+
+void simulator::set_diagnostic_axes(axis_type xopt, axis_type yopt){
+  axes[0] = xopt;
+  axes[1] = yopt;
+  reset_obs();
 }
 
 void simulator::set_size(double area,double dz,double zmin,int nz){
@@ -134,6 +116,7 @@ void simulator::initialize_counts(){
   }
 }
 
+
 void simulator::set_sed_lib(string sedfile){
   seds.reset(new sed_lib(sedfile));
   initialize_filters();
@@ -141,24 +124,33 @@ void simulator::set_sed_lib(string sedfile){
 
 
 void simulator::set_obs(string obsfile){
-
-  diagnostic.reset(new hist_lib());
-  observations.reset(new obs_lib(obsfile));
-  
-  double *c1,*c2;
-  int osize = observations->get_snum();
-  observations->get_all_colors(c1,c2);
-  diagnostic->init_obs(c1,c2,osize);
-
-  printf("Getting Filter Information\n");
-  observations->info(filters,flux_limits,band_errs);
-  initialize_filters();
-
-  last_output.chisqr=0;  
-  printf("Initializing Counts\n");
-  initialize_counts();
-
+  if(obsfile != ""){
+    obsFile=obsfile;
+    reset_obs();
+    
+    printf("Getting Filter Information\n");
+    observations->info(filters,flux_limits,band_errs);
+    initialize_filters();
+    
+    last_output.chisqr=0;  
+    printf("Initializing Counts\n");
+    initialize_counts();
+  }
+  else
+    printf("simulator::set_obs Error: tried to set obs_lib with empty file name\n");
 }
+
+ void simulator::reset_obs(){
+   if(obsFile != ""){
+     diagnostic.reset(new hist_lib());
+     observations.reset(new obs_lib(obsfile, axes));
+     
+     double *x,*y;
+     int osize = observations->get_snum();
+     observations->get_all_colors(x,y);
+     diagnostic->init_obs(x,y,osize);
+   }
+ }
 
 products simulator::simulate(){
   sources.clear();

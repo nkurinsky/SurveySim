@@ -11,30 +11,7 @@
 #include "constants.h"
 #include "cosmo.h"
 #include "numberCounts.h"
-
-//Storage structure for each individual source
-struct sprop{
-  //source properties (as determined by distributions)
-  double redshift;
-  double luminosity;
-  double weight;
-  double fluxes[3];
-  double c1,c2;
-  sprop();
-  sprop(double z,double f[],double lum, double w); //constructor initializes variables
-  //as well as automatically computes colors if it is a valid operation
-  friend ostream &operator<<(ostream &out,sprop c);
-};
-
-struct products{
-  double chisqr;
-  valarray<double> dndz;
-  valarray<double> dnds[3];
-  products() : chisqr(0){
-    dndz.resize(1);
-  }
-  products(int nz, int ns[]);
-};
+#include "simulator_utils.h"
 
 class simulator{
 private:
@@ -55,24 +32,30 @@ private:
   double zmin;
   int nz;
   string filterFile;
+  string obsFile;
+  axis_type axes[2];
   RandomNumberGenerator rng;
   void initialize_filters();
   void initialize_counts();
  public:
   simulator();
-  simulator(string filterfile, string obsfile, string sedfile);
+  simulator(string filterfile, string obsfile, string sedfile, axis_type axes[]={ColorF1F3,ColorF2F3});
   bool load_filter_lib(string file);
   bool load_filter(short filt_id, string name, double error, double flim);
+  void set_diagnostic_xaxis(axis_type option);
+  void set_diagnostic_yaxis(axis_type option);
+  void set_diagnostic_axes(axis_type xopt, axis_type yopt);
   void set_size(double area,double dz,double zmin,int nz);
   void set_color_exp(double val, double zcut=1000);
   void set_lumfunct(lumfunct *lf);
   void set_sed_lib(string sedfile);
   void set_obs(string obsfile);
+  void reset_obs();
   void reset();
   products simulate();
   double model_chisq() { return last_output.chisqr; }
   bool save(string outfile);
-  ~simulator();
+  ~simulator();  
 };
 
 #endif

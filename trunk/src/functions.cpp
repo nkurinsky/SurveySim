@@ -1,8 +1,30 @@
 #include "functions.h"
 
 //Computes spectral color in log space from flux and band inputs
-double get_color(double f1,double f2){
+double get_color(const double &f1,const double &f2){
   return log10(f1/f2);
+}
+
+double metric_value(const double& f1,const double &f2,const double &f3,const axis_type &opt){
+
+  switch(opt){
+  ColorF1F3:
+    return get_color(f3,f1);
+  ColorFF2F3:
+    return get_color(f3,f2);
+  ColorF1F2:
+    return get_color(f2,f1);
+  Flux1:
+    return log10(f1);
+  Flux2:
+    return log10(f2);
+  Flux3:
+    return log10(f3);
+  default:
+    printf("Simulator::metric_value Error: Unknown option\n");
+    return -99.0;
+  }
+
 }
 
 string toLower(const string &oldstr){

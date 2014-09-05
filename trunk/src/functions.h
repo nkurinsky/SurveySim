@@ -42,8 +42,19 @@
 
 using namespace std;
 
+enum axis_type{
+  ColorF1F3,
+  ColorF2F3,
+  ColorF1F2,
+  Flux1,
+  Flux2,
+  Flux3
+};
+
 //Generates spectral color of a galaxy from fluxes and bands
-double get_color(double f1,double f2);
+double get_color(const double &f1,const double &f2);
+
+double metric_value(const double& f1,const double &f2,const double &f3,const axis_type &opt);
 
 string toLower(const string &oldstr);
 
