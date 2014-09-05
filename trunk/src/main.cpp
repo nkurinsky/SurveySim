@@ -56,7 +56,7 @@ int main(int argc,char** argv){
   double CEmax = q.colorEvolution[q.max];
   
   //counts
-  string countnames[]= {"dnds250","dnds350","dnds500"};
+  string countnames[]= {"dnds1","dnds2","dnds3"};
   
   lumfunct lf;
   lf.set_params(lpars);
