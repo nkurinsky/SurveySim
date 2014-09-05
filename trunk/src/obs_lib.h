@@ -12,7 +12,7 @@ class obs{
   double fluxes[3];
   double c1,c2;
   obs();
-  obs(double f[]);
+  obs(double f[], axis_type axes[]);
   double get_flux(int band);
   void get_colors(double &c1,double &c2);
   ~obs();
@@ -25,7 +25,7 @@ class obs_lib{
   double ferr[3];
   double flim[3];
  public:
-  obs_lib(string fitsfile);
+  obs_lib(string fitsfile, axis_type axes[]);
   double get_flux(int i,int band);
   void get_colors(int i,double &c1,double &c2);
   void get_all_colors(double* &c1,double* &c2);

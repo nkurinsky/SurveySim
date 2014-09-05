@@ -62,7 +62,7 @@ int main(int argc,char** argv){
   lf.set_params(lpars);
 
   //initialize simulator
-  simulator survey(q.filterfile,q.obsfile,q.sedfile); 
+  simulator survey(q.filterfile,q.obsfile,q.sedfile,q.axes); 
   survey.set_color_exp(CE); //color evolution
   survey.set_lumfunct(&lf);
   

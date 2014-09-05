@@ -6,21 +6,21 @@ simulator::simulator() : color_exp(0.0),
 			 zmin(0.1), 
 			 nz(59),
 			 filterFile("/usr/local/surveysim/filters/filterlib.txt"), 
-			 obsFile="";
-{
+			 obsFile(""){
+  
   char * ffile = getenv("FILTERFILE");
   if(ffile != NULL)
     filterFile = static_cast<string>(ffile);
-
+  
   filters[0] = "F1";
   filters[1] = "F2";
   filters[2] = "F3";
-
+  
   axes[0] = ColorF1F3;
   axes[1] = ColorF2F3;
 }
 
-simulator::simulator(string filterfile, string obsfile, string sedfile) : simulator(){
+simulator::simulator(string filterfile, string obsfile, string sedfile, axis_type axes[]) : simulator(){
  
   printf("Initializing SED Library:\n");
   filterFile = filterfile;
@@ -126,6 +126,7 @@ void simulator::set_sed_lib(string sedfile){
 void simulator::set_obs(string obsfile){
   if(obsfile != ""){
     obsFile=obsfile;
+    printf("Reset Observations\n");
     reset_obs();
     
     printf("Getting Filter Information\n");
@@ -143,7 +144,7 @@ void simulator::set_obs(string obsfile){
  void simulator::reset_obs(){
    if(obsFile != ""){
      diagnostic.reset(new hist_lib());
-     observations.reset(new obs_lib(obsfile, axes));
+     observations.reset(new obs_lib(obsFile, axes));
      
      double *x,*y;
      int osize = observations->get_snum();
@@ -217,7 +218,7 @@ products simulator::simulate(){
 	  
 	  //check for detectability, if "Yes" add to list
 	  if(detected){
-	    temp_src = new sprop(zarray[is],flux_sim,lums[js],1.0);
+	    temp_src = new sprop(zarray[is],flux_sim,lums[js],1.0,axes);
 	    sources.push_back(*temp_src);
 	    output.dndz[is]++; 
 	    delete temp_src;

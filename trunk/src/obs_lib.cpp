@@ -5,13 +5,13 @@ obs::obs(){
   c2 = -99;
 }
 
-obs::obs(double * f){
+obs::obs(double * f, axis_type axes[]){
   for (int i=0;i<3;i++){
     fluxes[i] = f[i];
   }
   
-  c1 = get_color(fluxes[2],fluxes[0]);
-  c2 = get_color(fluxes[2],fluxes[1]);
+  c1 = metric_value(fluxes[0],fluxes[1],fluxes[2],axes[0]);
+  c2 = metric_value(fluxes[0],fluxes[1],fluxes[2],axes[1]);
 }
 
 double obs::get_flux(int band){
@@ -35,7 +35,7 @@ obs::~obs(){
 
 }
 
-obs_lib::obs_lib(string fitsfile){
+obs_lib::obs_lib(string fitsfile, axis_type axes[]){
   //initialize FITS input
   std::auto_ptr<FITS> pInfile(new FITS(fitsfile,Read));
   
@@ -107,11 +107,19 @@ obs_lib::obs_lib(string fitsfile){
     
     observations.reserve(tablesize);
     double fluxes[3];
-    
+    bool accepted;
+
     for (unsigned int i=0;i<tablesize;i++){
-      for (int j=0;j<3;j++)
+      accepted = true;
+      for (int j=0;j<3;j++){
+	if(col[i][j] < flim[j]){
+	  accepted = false;
+	  break;
+	}
 	fluxes[j]=col[j][i];
-      observations.push_back(new obs(fluxes));
+      }
+      if(accepted)
+	observations.push_back(new obs(fluxes,axes));
     }
   }
   catch(FITS::NoSuchHDU){

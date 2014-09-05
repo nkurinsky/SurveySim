@@ -105,6 +105,8 @@ public:
   const short min = 2;
   const short max = 3;
 
+  axis_type axes[2];
+
 private:
   void load();
   

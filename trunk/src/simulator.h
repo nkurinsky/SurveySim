@@ -39,7 +39,7 @@ private:
   void initialize_counts();
  public:
   simulator();
-  simulator(string filterfile, string obsfile, string sedfile, axis_type axes[]={ColorF1F3,ColorF2F3});
+  simulator(string filterfile, string obsfile, string sedfile, axis_type axes[]);
   bool load_filter_lib(string file);
   bool load_filter(short filt_id, string name, double error, double flim);
   void set_diagnostic_xaxis(axis_type option);
