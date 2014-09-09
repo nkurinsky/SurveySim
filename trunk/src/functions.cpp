@@ -1,19 +1,50 @@
 #include "functions.h"
 
-//Computes spectral color in log space from flux and band inputs
-double get_color(const double &f1,const double &f2){
-  return log10(f1/f2);
+axis_type set_axis_type(string &keyvalue){
+  string saxis(toLower(keyvalue));
+  int axOption(static_cast<int>(keyvalue));
+
+  if(saxis == "colorf1f3")
+    axOption = 0;
+  else if(saxis == "colorf2f3")
+    axOption = 1;
+  else if(saxis == "colorf1f2")
+    axOption = 2;
+  else if(saxis == "flux1")
+    axOption = 3;
+  else if(saxis == "flux2")
+    axOption = 4;
+  else if(saxis == "flux3")
+    axOption = 5;
+    
+  switch(axOption){
+  case 0:
+    return ColorF1F3;
+  case 1:
+    return ColorF2F3;
+  case 2:
+    return ColorF1F2;
+  case 3:
+    return Flux1;
+  case 4:
+    return Flux2;
+  case 5:
+    return Flux3;
+  default:
+    printf("set_axis_type: keyvalue \"%s\" invalid\n",keyvalue.c_str());
+    throw(-1);
+  }
 }
 
 double metric_value(const double& f1,const double &f2,const double &f3,const axis_type &opt){
 
   switch(opt){
   case ColorF1F3:
-    return get_color(f3,f1);
+    return log10(f3/f1);
   case ColorF2F3:
-    return get_color(f3,f2);
+    return log10(f3/f2);
   case ColorF1F2:
-    return get_color(f2,f1);
+    return log10(f2/f1);
   case Flux1:
     return log10(f1);
   case Flux2:
@@ -143,6 +174,29 @@ void Configuration::load(){
     exit(1);
   }
   
+  string stemp;
+  try{
+    tab.readKey("AXIS1",stemp);
+    axes[0] = set_axis_type(stemp);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    printf("Keyword \"Axis1\" not specified, defaulting to ColorF1F3");
+  }
+  catch(-1){
+    printf("Value of \"Axis1\" invalid, defaulting to ColorF1F3");
+  }
+  
+  try{
+    tab.readKey("AXIS2",stemp);
+    axes[1] = set_axis_type(stemp);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    printf("Keyword \"Axis2\" not specified, defaulting to ColorF2F3")
+  }
+  catch(-1){
+    printf("Value of \"Axis2\" invalid, defaulting to ColorF2F3");
+  }
+
   //reading primary header from fits file
   CCfits::HDU& tab = pInfile->pHDU();
 

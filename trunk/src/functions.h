@@ -51,8 +51,7 @@ enum axis_type{
   Flux3
 };
 
-//Generates spectral color of a galaxy from fluxes and bands
-double get_color(const double &f1,const double &f2);
+axis_type set_axis_type(string &keyvalue);
 
 double metric_value(const double& f1,const double &f2,const double &f3,const axis_type &opt);
 
