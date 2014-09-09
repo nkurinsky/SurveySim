@@ -2,33 +2,33 @@
 
 axis_type set_axis_type(string &keyvalue){
   string saxis(toLower(keyvalue));
-  int axOption(static_cast<int>(keyvalue));
+  char axOption(saxis[0]);
 
   if(saxis == "colorf1f3")
-    axOption = 0;
+    axOption = '0';
   else if(saxis == "colorf2f3")
-    axOption = 1;
+    axOption = '1';
   else if(saxis == "colorf1f2")
-    axOption = 2;
+    axOption = '2';
   else if(saxis == "flux1")
-    axOption = 3;
+    axOption = '3';
   else if(saxis == "flux2")
-    axOption = 4;
+    axOption = '4';
   else if(saxis == "flux3")
-    axOption = 5;
+    axOption = '5';
     
   switch(axOption){
-  case 0:
+  case '0':
     return ColorF1F3;
-  case 1:
+  case '1':
     return ColorF2F3;
-  case 2:
+  case '2':
     return ColorF1F2;
-  case 3:
+  case '3':
     return Flux1;
-  case 4:
+  case '4':
     return Flux2;
-  case 5:
+  case '5':
     return Flux3;
   default:
     printf("set_axis_type: keyvalue \"%s\" invalid\n",keyvalue.c_str());
@@ -173,7 +173,10 @@ void Configuration::load(){
     printf("Error reading FITS file %s\n",modfile.c_str());
     exit(1);
   }
-  
+
+  //reading primary header from fits file
+  CCfits::HDU& tab = pInfile->pHDU();
+
   string stemp;
   try{
     tab.readKey("AXIS1",stemp);
@@ -182,7 +185,7 @@ void Configuration::load(){
   catch(CCfits::HDU::NoSuchKeyword){
     printf("Keyword \"Axis1\" not specified, defaulting to ColorF1F3");
   }
-  catch(-1){
+  catch(...){
     printf("Value of \"Axis1\" invalid, defaulting to ColorF1F3");
   }
   
@@ -191,14 +194,11 @@ void Configuration::load(){
     axes[1] = set_axis_type(stemp);
   }
   catch(CCfits::HDU::NoSuchKeyword){
-    printf("Keyword \"Axis2\" not specified, defaulting to ColorF2F3")
+    printf("Keyword \"Axis2\" not specified, defaulting to ColorF2F3");
   }
-  catch(-1){
+  catch(...){
     printf("Value of \"Axis2\" invalid, defaulting to ColorF2F3");
   }
-
-  //reading primary header from fits file
-  CCfits::HDU& tab = pInfile->pHDU();
 
   double rtemp;
   //Read in simulation settings
