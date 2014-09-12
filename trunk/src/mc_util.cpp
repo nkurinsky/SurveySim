@@ -322,7 +322,6 @@ bool MCChains::save(string filename, string parnames[]){
   char ctemp[2];
   string cnum;
   
-  printf("Output Columns\n");
   for(int j=0;j<nchains;j++){
     sprintf(ctemp,"%i",j);
     cnum = string(ctemp);
@@ -337,15 +336,10 @@ bool MCChains::save(string filename, string parnames[]){
     colnames[i] = "ACPT"+cnum;
   }
 
-  printf("Making Table\n");
   Table *newTable = pFits->addTable(hname,chainlength[0],colnames,colform,colunits,AsciiTbl);
-  printf("Made Table\n");
 
   int i; //I had to add this here, else wouldn't compile for some reason
   for(i=0;i<tablewidth;i++){
-    if (i != 0)
-      printf(", ");
-    printf("%s",colnames[i].c_str());
     if(i < allwidth){
       valarray_temp = chains[i][domain];
       newTable->column(colnames[i]).write(valarray_temp,1);
@@ -361,7 +355,6 @@ bool MCChains::save(string filename, string parnames[]){
   std::vector<string> colform2(npars,"f5.2");
   hname = "Convergence";
   
-  printf("\nOutput Convergence Columns\n");
   for(i=0;i<npars;i++){
     sprintf(ctemp,"%i",i);
     cnum = string(ctemp);
@@ -371,11 +364,9 @@ bool MCChains::save(string filename, string parnames[]){
   newTable = pFits->addTable(hname,convruns,colnames2,colform2,colunits2,AsciiTbl);
   
   for(i=0;i<npars;i++){
-    printf("%s,\t",colnames2[i].c_str());
     newTable->column(colnames2[i]).write(rvals[i],1);
   }
   
-  printf("\n");
   return true;
 }
 
@@ -422,9 +413,12 @@ bool ResultChain::save(string filename, string resnames[]){
   std::vector<string> colform(tablewidth,"1D");
   std::vector<string> colunit(tablewidth,"");
   
-  colform[1] = "16D";
-  colform[2] = "13D";
-  colform[3] = "10D";
+  char buffer[16];
+  for(int i=1;i<4;i++){
+    sprintf(buffer,"%lu",results[i-1][0].size());
+    string tempstr(buffer);
+    colform[i] = tempstr+"D";
+  }
 
   for(unsigned long i=0;i<results.size();i++)
     colnames[i+1]=resnames[i];
@@ -432,14 +426,10 @@ bool ResultChain::save(string filename, string resnames[]){
   string hname("Results Extension");
   int nrows(chisqrs.size());
 
-  printf("Making Table: %i\n",nrows);
   Table *newTable = pFits->addTable(hname,nrows,colnames,colform,colunit);
-  printf("Made Table\n");
 
   newTable->column(colnames[0]).write(chisqrs,1);
-  printf("%s ",colnames[0].c_str());
   for(i=0;i<results.size();i++){
-    printf("%s ",colnames[i+1].c_str());
     newTable->column(colnames[i+1]).writeArrays(results[i],1);
   }
 

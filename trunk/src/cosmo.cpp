@@ -15,7 +15,7 @@ double lumdist(double zmax) {
       sum+=1/ez;
     } 
     lumdists[zmax] = (DH*(1.0+zmax)*dz)*sum;
-    printf("\tLumdist::z=%lf,dist=%le\n",zmax,lumdists[zmax]);
+    //printf("\tLumdist::z=%lf,dist=%le\n",zmax,lumdists[zmax]);
   }
 
   return lumdists[zmax];

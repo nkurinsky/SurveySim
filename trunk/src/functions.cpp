@@ -183,10 +183,10 @@ void Configuration::load(){
     axes[0] = set_axis_type(stemp);
   }
   catch(CCfits::HDU::NoSuchKeyword){
-    printf("Keyword \"Axis1\" not specified, defaulting to ColorF1F3");
+    printf("Keyword \"Axis1\" not specified, defaulting to ColorF1F3\n");
   }
   catch(...){
-    printf("Value of \"Axis1\" invalid, defaulting to ColorF1F3");
+    printf("Value of \"Axis1\" invalid, defaulting to ColorF1F3\n");
   }
   
   try{
@@ -194,10 +194,10 @@ void Configuration::load(){
     axes[1] = set_axis_type(stemp);
   }
   catch(CCfits::HDU::NoSuchKeyword){
-    printf("Keyword \"Axis2\" not specified, defaulting to ColorF2F3");
+    printf("Keyword \"Axis2\" not specified, defaulting to ColorF2F3\n");
   }
   catch(...){
-    printf("Value of \"Axis2\" invalid, defaulting to ColorF2F3");
+    printf("Value of \"Axis2\" invalid, defaulting to ColorF2F3\n");
   }
 
   double rtemp;

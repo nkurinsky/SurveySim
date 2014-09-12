@@ -37,8 +37,16 @@ obs::~obs(){
 
 obs_lib::obs_lib(string fitsfile, axis_type axes[]){
   //initialize FITS input
-  std::auto_ptr<FITS> pInfile(new FITS(fitsfile,Read));
+  std::auto_ptr<FITS> pInfile;
   
+  try{
+    pInfile.reset(new FITS(fitsfile,Read));
+  }
+  catch(...){
+    printf("Could not open file \"%s\"\n",fitsfile.c_str());
+    exit(1);
+  }
+
   //reading primary header from fits file
   HDU& header = pInfile->pHDU();
   int hdunum(1);
@@ -112,14 +120,15 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[]){
     for (unsigned int i=0;i<tablesize;i++){
       accepted = true;
       for (int j=0;j<3;j++){
-	if(col[i][j] < flim[j]){
+	if(col[j][i] < flim[j]){
 	  accepted = false;
 	  break;
 	}
 	fluxes[j]=col[j][i];
       }
-      if(accepted)
+      if(accepted){
 	observations.push_back(new obs(fluxes,axes));
+      }
     }
   }
   catch(FITS::NoSuchHDU){

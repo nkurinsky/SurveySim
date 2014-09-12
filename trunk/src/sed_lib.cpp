@@ -59,7 +59,6 @@ sed_lib::sed_lib(string fitsfile){
   double temp, scale;
   HDU& header = pInfile->pHDU();
   
-  printf("%s\n","Initialize Luminosities");
   char buffer[10];
   for (unsigned int i=0;i<lnum;i++) {
     std::string a = "ROW";
@@ -243,12 +242,12 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
     
     gsl_integration_qags (&F, bounds[0], bounds[1], 0, SL_INT_PRECISION, SL_INT_SIZE, w, &result, &error); 
     
-    printf("\tConvolve::Init: z=%lf,lum=%i, scale=%le result=%le ",redshift,lum_id,scale,result);
+    //printf("\tConvolve::Init: z=%lf,lum=%i, scale=%le result=%le ",redshift,lum_id,scale,result);
 
     result*=scale;
     fluxes[filter_id][params] = result;
     
-    printf("flux=%le\n",result);
+    //printf("flux=%le\n",result);
   }
 
   if(redshift < color_zcut)

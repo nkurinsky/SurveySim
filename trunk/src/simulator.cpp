@@ -22,13 +22,12 @@ simulator::simulator() : color_exp(0.0),
 
 simulator::simulator(string filterfile, string obsfile, string sedfile, axis_type axes[]) : simulator(){
  
-  printf("Initializing SED Library:\n");
   filterFile = filterfile;
   set_sed_lib(sedfile);
-  printf("Initializing Diagnostic Class and Observation\n");
+  this->axes[0] = axes[0];
+  this->axes[1] = axes[1];
   set_obs(obsfile);
   
-  printf("Simulator Initialized\n");
 }
 
 bool simulator::load_filter_lib(string file){
@@ -90,7 +89,6 @@ void simulator::initialize_filters(){
 
   if((seds.get() != NULL) and (observations.get() != NULL)){
     
-    printf("Initializing Filters\n");
     if(seds->init_filter_lib(filterFile)){
       for(short i=0;i<3;i++)
 	seds->load_filter(i,filters[i]);
@@ -116,42 +114,37 @@ void simulator::initialize_counts(){
   }
 }
 
-
 void simulator::set_sed_lib(string sedfile){
   seds.reset(new sed_lib(sedfile));
   initialize_filters();
 }
 
-
 void simulator::set_obs(string obsfile){
   if(obsfile != ""){
     obsFile=obsfile;
-    printf("Reset Observations\n");
     reset_obs();
     
-    printf("Getting Filter Information\n");
     observations->info(filters,flux_limits,band_errs);
     initialize_filters();
     
     last_output.chisqr=0;  
-    printf("Initializing Counts\n");
     initialize_counts();
   }
   else
     printf("simulator::set_obs Error: tried to set obs_lib with empty file name\n");
 }
 
- void simulator::reset_obs(){
-   if(obsFile != ""){
-     diagnostic.reset(new hist_lib());
-     observations.reset(new obs_lib(obsFile, axes));
-     
-     double *x,*y;
-     int osize = observations->get_snum();
-     observations->get_all_colors(x,y);
-     diagnostic->init_obs(x,y,osize);
-   }
- }
+void simulator::reset_obs(){
+  if(obsFile != ""){
+    diagnostic.reset(new hist_lib());
+    observations.reset(new obs_lib(obsFile, axes));
+    
+    double *x,*y;
+    int osize = observations->get_snum();
+    observations->get_all_colors(x,y);
+    diagnostic->init_obs(x,y,osize);
+  }
+}
 
 products simulator::simulate(){
   sources.clear();
@@ -232,12 +225,12 @@ products simulator::simulate(){
     //*************************************************************************
     
     int snum(sources.size());
-    std::unique_ptr<double[]> c1(new double[snum]);
-    std::unique_ptr<double[]> c2(new double[snum]);
-    std::unique_ptr<double[]> w (new double[snum]);
-    valarray<double> f1(snum,0.0);
-    valarray<double> f2(snum,0.0);
-    valarray<double> f3(snum,0.0);
+    vector<double> c1(snum,0.0);
+    vector<double> c2(snum,0.0);
+    vector<double> w (snum,0.0);
+    valarray<double> f1(0.0,snum);
+    valarray<double> f2(0.0,snum);
+    valarray<double> f3(0.0,snum);
     for (int i=0;i<snum;i++){
       c1[i] = sources[i].c1;
       c2[i] = sources[i].c2;
@@ -247,7 +240,7 @@ products simulator::simulate(){
       f3[i] = sources[i].fluxes[2];
     }
     
-    diagnostic->init_model(c1.get(),c2.get(),w.get(),snum);
+    diagnostic->init_model(c1.data(),c2.data(),w.data(),snum);
     output.chisqr=diagnostic->get_chisq();
     counts[0]->compute(f1,area,output.dnds[0]);
     counts[1]->compute(f2,area,output.dnds[1]);
@@ -256,7 +249,7 @@ products simulator::simulate(){
     
   }
   else{
-    cout << "ERROR: NULL Model Library" << endl;
+    printf("ERROR: NULL Model Library\n");
   }
   return output;
 }
@@ -264,9 +257,7 @@ products simulator::simulate(){
 
 bool simulator::save(string outfile){
   try{
-    printf("\tWriting Diagnostic\n");
     bool opened =  diagnostic->write_fits(outfile);
-    printf("\tDiagnostic Written\n");
     
     if(not opened)
       return opened;
@@ -307,8 +298,6 @@ bool simulator::save(string outfile){
       luminosity[i] = sources[i].luminosity;
     }
     
-    printf("1");
-    
     static std::vector<string> colname(14,"");
     static std::vector<string> colunit(14,"-");
     static std::vector<string> colform(14,"f13.8");
@@ -324,9 +313,9 @@ bool simulator::save(string outfile){
     colname[8] = "obs_dnds1";
     colname[9] = "obs_dnds2";
     colname[10] = "obs_dnds3";
-    colname[11] = "model_dnds1";
-    colname[12] = "model_dnds2";
-    colname[13] = "model_dnds3";
+    colname[11] = "mod_dnds1";
+    colname[12] = "mod_dnds2";
+    colname[13] = "mod_dnds3";
 
     
     colunit[0] = "Jy";
@@ -347,6 +336,9 @@ bool simulator::save(string outfile){
     colform[8] = "e13.5";
     colform[9] = "e13.5";
     colform[10] = "e13.5";
+    colform[11] = "e13.5";
+    colform[12] = "e13.5";
+    colform[13] = "e13.5";
     
     static string hname("Parameter Distributions");
     Table* newTable;
@@ -358,24 +350,23 @@ bool simulator::save(string outfile){
       exit(1);
     }
     
-    printf("2");
-    
     newTable->column(colname[0]).write(f1,1);
     newTable->column(colname[1]).write(f2,1);
     newTable->column(colname[2]).write(f3,1);
     newTable->column(colname[3]).write(redshift,1);
     newTable->column(colname[4]).write(luminosity,1);
+
     newTable->column(colname[5]).write(counts[0]->bins(),1);
     newTable->column(colname[6]).write(counts[1]->bins(),1);
     newTable->column(colname[7]).write(counts[2]->bins(),1);
+
     newTable->column(colname[8]).write(counts[0]->counts(),1);
     newTable->column(colname[9]).write(counts[1]->counts(),1);
     newTable->column(colname[10]).write(counts[2]->counts(),1);
+
     newTable->column(colname[11]).write(last_output.dnds[0],1);
     newTable->column(colname[12]).write(last_output.dnds[1],1);
     newTable->column(colname[13]).write(last_output.dnds[2],1);
-    
-    printf("3\n");
 
   }
   catch(...){
