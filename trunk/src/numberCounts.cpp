@@ -26,10 +26,12 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
     nbins = ceil((_range[1]-_range[0])/_dS);
     _nbins = static_cast<int>(nbins);
     
-    diff = _dS*nbins-(_range[1]-_range[0])/2.0;
-    _range[0] = _range[0] - diff;
-    _range[1] = _range[1] + diff;
-    
+    diff = (_dS*nbins-(_range[1]-_range[0]))/2.0;
+    if(diff > 0){
+      _range[0] = _range[0] - diff;
+      _range[1] = _range[1] + diff;
+    }    
+
     _bin_center.resize(_nbins,0.0);
     _scale_factors.resize(_nbins,1.0);
     for(int i=0.0;i<_nbins;i++){
@@ -61,8 +63,10 @@ void NumberCounts::setName(string &name){
   _name = name;
 }
 
-void NumberCounts::compute(const valarray<double> &fluxes, const double area, valarray<double> &counts){
+void NumberCounts::compute(const valarray<double> &fluxes_nolog, const double area, valarray<double> &counts){
   static int _range_violations(0);
+  
+  valarray<double> fluxes(log10(fluxes_nolog));
   
   if(fluxes.min() < _range[0] or fluxes.max() > _range[1]){
     _range_violations++;
