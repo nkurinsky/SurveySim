@@ -6,7 +6,7 @@ pro plot_counts,filename,bandnum
   Case bandnum of
      1: begin
         xd1 = dists.s1
-        yd1 = dists.dnds1
+        yd1 = dists.mod_dnds1
         gpts = where(yd1 gt 0)
         xd1 = xd1[gpts]/1.d3
         yd1 = yd1[gpts]
@@ -29,7 +29,7 @@ pro plot_counts,filename,bandnum
      end
      2: begin
         xd2 = dists.s2
-        yd2 = dists.dnds2
+        yd2 = dists.mod_dnds2
         gpts = where(yd2 gt 0)
         xd2 = xd2[gpts]/1.d3
         yd2 = yd2[gpts]
@@ -52,7 +52,7 @@ pro plot_counts,filename,bandnum
      end
      3: begin
         xd3 = dists.s3
-        yd3 = dists.dnds3
+        yd3 = dists.mod_dnds3
         gpts = where(yd3 gt 0)
         xd3 = xd3[gpts]/1.d3
         yd3 = yd3[gpts]
