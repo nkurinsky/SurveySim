@@ -36,6 +36,8 @@ function make_info_struct,parnum
         fd1:0L, $
         fd2:0L, $
         fd3:0L, $
+        c1:0L, $
+        c2:0L, $
         t1:0L, $
         fixinfo: make_array(parnum,value=0L), $
         t2:0L, $

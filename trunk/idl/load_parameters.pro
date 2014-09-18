@@ -64,6 +64,7 @@ function load_parameters,saveFile=saveFile
                    surveyData:surveyData,$
                    files:files,$
                    msettings:msettings,$
+                   axes:[0,1], $
                    print:1}
   endelse
 

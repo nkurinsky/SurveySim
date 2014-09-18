@@ -96,6 +96,20 @@ pro SurveySim,savefile=savefile
   widget_control, info.fd2, set_combobox_select=parameters.filters[1].filter_id
   widget_control, info.fd3, set_combobox_select=parameters.filters[2].filter_id
 
+  axis_dialogs = widget_base(obs_row,/column,/base_align_center,/align_bottom)
+  al = widget_label(axis_dialogs,value="Diagnostic Axes")
+
+  axis_opts = ["ColorF1F2","ColorF1F3","ColorF2F3","Log(F1)","Log(F2)","Log(F3)"]
+  info.c1 = widget_combobox(axis_dialogs, $
+                            value=axis_opts, $
+                            uvalue="c1")
+  info.c2 = widget_combobox(axis_dialogs, $
+                            value=axis_opts, $
+                            uvalue="c2")
+
+  widget_control, info.c1, set_combobox_select=parameters.axes[0]
+  widget_control, info.c2, set_combobox_select=parameters.axes[1]
+
   ;Survey Model Parameters
   l1 = widget_label(info.lum_table,value="Survey Model Parameters")
   lumrow = widget_base(info.lum_table,/row,/align_center)
@@ -106,7 +120,7 @@ pro SurveySim,savefile=savefile
                          column_widths=100, row_heights=28, $
                          uvalue='t1',$
                          /editable,alignment=1,$
-                         format='(f5.2)',$
+                         format='(f7.2)',$
                          scr_xsize=374,scr_ysize=36+n_elements(parameters.lumpars.pars)*28)
   
   fixvalues = parameters.lumpars.fixed

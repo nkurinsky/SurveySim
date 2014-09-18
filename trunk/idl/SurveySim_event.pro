@@ -27,7 +27,10 @@ PRO Run_Simulation
         return
      endelse
   endfor
-     
+
+  sxaddpar, hdr, 'AXIS1', parameters.axes[0], 'Diagnositc x-axis'
+  sxaddpar, hdr, 'AXIS2', parameters.axes[1], 'Diagnositc y-axis'     
+
   modfits,obs_fitsfile,0,hdr,exten_no=hnum
   
   ;write model keywords
@@ -106,6 +109,8 @@ PRO SurveySim_event,ev
      'fd1': parameters.filters[0].filter_id = ev.index
      'fd2': parameters.filters[1].filter_id = ev.index
      'fd3': parameters.filters[2].filter_id = ev.index
+     'c1': parameters.axes[0] = ev.index
+     'c2': parameters.axes[1] = ev.index
      't1': begin
         widget_control,info.t1,get_value=temp
         parameters.lumpars[ev.y].pars.(ev.x) = temp[ev.y].(ev.x)
