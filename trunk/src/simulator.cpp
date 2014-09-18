@@ -356,9 +356,13 @@ bool simulator::save(string outfile){
     newTable->column(colname[3]).write(redshift,1);
     newTable->column(colname[4]).write(luminosity,1);
 
-    newTable->column(colname[5]).write(counts[0]->bins(),1);
-    newTable->column(colname[6]).write(counts[1]->bins(),1);
-    newTable->column(colname[7]).write(counts[2]->bins(),1);
+    valarray<double> counts1(pow(10,counts[0]->bins()));
+    valarray<double> counts2(pow(10,counts[1]->bins()));
+    valarray<double> counts3(pow(10,counts[2]->bins()));
+
+    newTable->column(colname[5]).write(counts1,1);
+    newTable->column(colname[6]).write(counts2,1);
+    newTable->column(colname[7]).write(counts3,1);
 
     newTable->column(colname[8]).write(counts[0]->counts(),1);
     newTable->column(colname[9]).write(counts[1]->counts(),1);

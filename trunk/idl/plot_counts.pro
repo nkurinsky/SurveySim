@@ -15,7 +15,8 @@ pro plot_counts,filename,bandnum
            readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
            flux /= 1.d3
            xrange=[min([xd1,flux]),max([xd1,flux])]
-           yrange=[min([yd1,diff_counts,counts.band1.minus])/1.2,max([yd1,diff_counts,counts.band1.plus])*1.2]
+           gpts = where(counts.band1.minus gt 0)
+           yrange=[min([yd1,diff_counts,counts.band1.minus[gpts]])/1.2,max([yd1,diff_counts,counts.band1.plus])*1.2]
            plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
            oploterr,flux,diff_counts,diff_err
            oplot,xd1,yd1,psym=2
@@ -38,7 +39,8 @@ pro plot_counts,filename,bandnum
            readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
            flux /= 1.d3
            xrange=[min([xd2,flux]),max([xd2,flux])]
-           yrange=[min([yd2,diff_counts,counts.band2.minus])/1.2,max([yd2,diff_counts,counts.band2.plus])*1.2]
+           gpts= where(counts.band2.minus gt 0)
+           yrange=[min([yd2,diff_counts,counts.band2.minus[gpts]])/1.2,max([yd2,diff_counts,counts.band2.plus])*1.2]
            plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
            oploterr,flux,diff_counts,diff_err
            oplot,xd2,yd2,psym=2
@@ -61,7 +63,8 @@ pro plot_counts,filename,bandnum
            readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
            flux /= 1.d3
            xrange=[min([xd3,flux]),max([xd3,flux])]
-           yrange=[min([yd3,diff_counts,counts.band3.minus])/1.2,max([yd3,diff_counts,counts.band3.plus])*1.2]
+           gpts= where(counts.band3.minus gt 0)
+           yrange=[min([yd3,diff_counts,counts.band3.minus[gpts]])/1.2,max([yd3,diff_counts,counts.band3.plus])*1.2]
            plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
            oploterr,flux,diff_counts,diff_err
            if(gpts[0] ne -1) then oplot,xd3,yd3,psym=2

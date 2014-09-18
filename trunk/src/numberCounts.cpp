@@ -37,7 +37,7 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
     for(int i=0.0;i<_nbins;i++){
       binlow = static_cast<double>(i)*_dS+_range[0];
       _bin_center[i] = binlow+_dS/2;
-      _scale_factors[i] = pow(pow(10,_bin_center[i]),2.5)/(pow(10,binlow)*(pow(10,_dS)-1));
+      _scale_factors[i] = pow(pow(10,_bin_center[i])/1e3,2.5)/((pow(10,binlow)*(pow(10,_dS)-1))/1e3);
     }
     
     compute(fluxes,area,_counts);
@@ -80,7 +80,7 @@ void NumberCounts::compute(const valarray<double> &fluxes_nolog, const double ar
   counts.resize(_nbins,0.0);
   int j;
   for(unsigned int i = 0; i < fluxes.size(); i++){
-    j = static_cast<int>( ceil( ( log10(fluxes[i]) - _range[0] ) / _dS ) );
+    j = static_cast<int>( ceil((fluxes[i] - _range[0]) / _dS ) );
     if(j >= 0 and j < counts.size())
       counts[j]++;
     else

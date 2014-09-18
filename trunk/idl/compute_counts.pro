@@ -7,8 +7,8 @@ function compute_counts,filename
   minusfrac = alpha
 
   chis = count_dists.chisq
-  gpts = where(chis lt median(chis))
-  count_dists = count_dists[gpts]
+  ;gpts = where(chis lt median(chis))
+  ;count_dists = count_dists[gpts]
   c1=count_dists.(1)
   c2=count_dists.(2)
   c3=count_dists.(3)
