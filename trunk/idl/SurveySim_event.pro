@@ -6,6 +6,7 @@ PRO Run_Simulation
   COMMON simulation_com
 
   save,parameters,filename=parameters.files.savefile
+  axis_opts = ["ColorF1F2","ColorF1F3","ColorF2F3","Flux1","Flux2","Flux3"]
   
   filter_names = filter_list("/usr/local/surveysim/filters/filterlib.txt")
 
@@ -27,9 +28,6 @@ PRO Run_Simulation
         return
      endelse
   endfor
-
-  sxaddpar, hdr, 'AXIS1', parameters.axes[0], 'Diagnositc x-axis'
-  sxaddpar, hdr, 'AXIS2', parameters.axes[1], 'Diagnositc y-axis'     
 
   modfits,obs_fitsfile,0,hdr,exten_no=hnum
   
@@ -62,7 +60,10 @@ PRO Run_Simulation
   sxaddpar,hdr2,'BURNVRUN',parameters.msettings.burn_ratio,'Ratio of normal to burn-in steps'
   sxaddpar,hdr2,'ANN_RNG',parameters.msettings.pct_range,'Range within which to maintain acceptance'
   sxaddpar,hdr2,'PRINT',parameters.print,'Whether to Print Debug MSGs'
-  
+
+  sxaddpar, hdr2, 'AXIS1', axis_opts[parameters.axes[0]], 'Diagnositc x-axis'
+  sxaddpar, hdr2, 'AXIS2', axis_opts[parameters.axes[1]], 'Diagnositc y-axis'
+
   mwrfits,[0],parameters.files.mfile,hdr2,/create
   
                                 ;Run the actual simulation

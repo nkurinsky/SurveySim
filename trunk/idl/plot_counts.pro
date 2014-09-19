@@ -5,12 +5,16 @@ pro plot_counts,filename,bandnum
   
   Case bandnum of
      1: begin
-        xd1 = dists.s1
+        xd = dists.s1
         yd1 = dists.mod_dnds1
+        yd2 = dists.obs_dnds1
         gpts = where(yd1 gt 0)
-        xd1 = xd1[gpts]/1.d3
+        gpts2 = where(yd2 gt 0)
+        xd1 = xd[gpts]/1.d3
         yd1 = yd1[gpts]
-        
+        xd2 = xd[gpts2]/1.d3
+        yd2 = yd2[gpts2]
+
         if( file_test('counts_clements10.dat')) then begin
            readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
            flux /= 1.d3
