@@ -2,7 +2,6 @@ pro plot_counts,filename,bandnum
 
   dists = mrdfits(filename,3,head,/silent)
   count_dists = mrdfits(filename,6,head,/silent)
-  counts = compute_counts(filename)
 
   alpha = 0.159                 ;one std deviation
   plusfrac = (1.0-alpha)
@@ -27,8 +26,8 @@ pro plot_counts,filename,bandnum
      else: print,"Invalid band number "+strtrim(string(bandnum),1)
   endcase
 
-  if((bandnum gt 0) and (bandnum lt 3)) then begin
-     c = count_dists.(bandnum)
+  if((bandnum gt 0) and (bandnum lt 4)) then begin
+     c = count_dists.(bandnum-1)
      csize = n_elements(c[*,0])
      cmedian = make_array(csize,value=0.0)
      cplus = make_array(csize,value=0.0)
@@ -40,7 +39,7 @@ pro plot_counts,filename,bandnum
         dnds = dnds[where(dnds gt 0)]
         pi = plusfrac*n_elements(dnds)
         mi = minusfrac*n_elements(dnds)
-        cmedian[i] = mean(dnds)
+        cmedian[i] = median([dnds])
         cplus[i] = dnds[pi]
         cminus[i] = dnds[mi]
      endfor
