@@ -38,7 +38,7 @@ function compute_counts,filename
      dnds = dnds[where(dnds gt 0)]
      pi = plusfrac*n_elements(dnds)
      mi = minusfrac*n_elements(dnds)
-     counts2.mean[i] = mean(dnds)
+     counts2.median[i] = median(dnds)
      counts2.plus[i] = dnds[pi]
      counts2.minus[i] = dnds[mi]
   endfor

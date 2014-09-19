@@ -1,89 +1,75 @@
 pro plot_counts,filename,bandnum
 
   dists = mrdfits(filename,3,head,/silent)
+  count_dists = mrdfits(filename,6,head,/silent)
   counts = compute_counts(filename)
-  
+
+  alpha = 0.159                 ;one std deviation
+  plusfrac = (1.0-alpha)
+  minusfrac = alpha
+
   Case bandnum of
      1: begin
-        xd = dists.s1
-        yd1 = dists.mod_dnds1
-        yd2 = dists.obs_dnds1
-        gpts = where(yd1 gt 0)
-        gpts2 = where(yd2 gt 0)
-        xd1 = xd[gpts]/1.d3
-        yd1 = yd1[gpts]
-        xd2 = xd[gpts2]/1.d3
-        yd2 = yd2[gpts2]
-
-        if( file_test('counts_clements10.dat')) then begin
-           readcol,'counts_clements10.dat',skipline=2,numline=16,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-           flux /= 1.d3
-           xrange=[min([xd1,flux]),max([xd1,flux])]
-           gpts = where(counts.band1.minus gt 0)
-           yrange=[min([yd1,diff_counts,counts.band1.minus[gpts]])/1.2,max([yd1,diff_counts,counts.band1.plus])*1.2]
-           plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
-           oploterr,flux,diff_counts,diff_err
-           oplot,xd1,yd1,psym=2
-        endif else begin
-           print,'Error: File "counts_clements10.dat" not found'
-           plot,xd1,yd1,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 1 Counts'
-        endelse
-        oplot,xd1,counts.band1.mean,linestyle=2
-        oplot,xd1,counts.band1.plus,linestyle=1
-        oplot,xd1,counts.band1.minus,linestyle=1
+        x = dists.s1
+        ybest = dists.mod_dnds1
+        yobs = dists.obs_dnds1
      end
      2: begin
-        xd2 = dists.s2
-        yd2 = dists.mod_dnds2
-        gpts = where(yd2 gt 0)
-        xd2 = xd2[gpts]/1.d3
-        yd2 = yd2[gpts]
-        
-        if( file_test('counts_clements10.dat')) then begin
-           readcol,'counts_clements10.dat',skipline=19,numline=13,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-           flux /= 1.d3
-           xrange=[min([xd2,flux]),max([xd2,flux])]
-           gpts= where(counts.band2.minus gt 0)
-           yrange=[min([yd2,diff_counts,counts.band2.minus[gpts]])/1.2,max([yd2,diff_counts,counts.band2.plus])*1.2]
-           plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
-           oploterr,flux,diff_counts,diff_err
-           oplot,xd2,yd2,psym=2
-        endif else begin
-           plot,xd2,yd2,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 2 Counts'
-        endelse
-        oplot,xd2,counts.band2.mean,linestyle=2
-        oplot,xd2,counts.band2.plus,linestyle=1
-        oplot,xd2,counts.band2.minus,linestyle=1
-        
+        x = dists.s2
+        ybest = dists.mod_dnds2
+        yobs = dists.obs_dnds2
      end
      3: begin
-        xd3 = dists.s3
-        yd3 = dists.mod_dnds3
-        gpts = where(yd3 gt 0)
-        xd3 = xd3[gpts]/1.d3
-        yd3 = yd3[gpts]
-        
-        if( file_test('counts_clements10.dat')) then begin
-           readcol,'counts_clements10.dat',skipline=33,numline=10,flux,nbin,corr,int_counts,int_err,diff_counts,diff_err,/silent
-           flux /= 1.d3
-           xrange=[min([xd3,flux]),max([xd3,flux])]
-           gpts= where(counts.band3.minus gt 0)
-           yrange=[min([yd3,diff_counts,counts.band3.minus[gpts]])/1.2,max([yd3,diff_counts,counts.band3.plus])*1.2]
-           plot,flux,diff_counts,psym=1,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts',yrange=yrange,xrange=xrange,ystyle=1,xstyle=1
-           oploterr,flux,diff_counts,diff_err
-           if(gpts[0] ne -1) then oplot,xd3,yd3,psym=2
-        endif else if(gpts[0] ne -1) then begin
-           plot,xd3,yd3,psym=2,symsize=2,xtitle=TeXtoIDL('F_{250}[Jy]'),ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'),/xlog,/ylog,title='Band 3 Counts'
-        endif
-        
-        if(gpts[0] ne -1) then begin
-           oplot,xd3,counts.band3.mean,linestyle=2
-           oplot,xd3,counts.band3.plus,linestyle=1
-           oplot,xd3,counts.band3.minus,linestyle=1
-        endif
-
+        x = dists.s3
+        ybest = dists.mod_dnds3
+        yobs = dists.obs_dnds3
      end
      else: print,"Invalid band number "+strtrim(string(bandnum),1)
-     
   endcase
+
+  if((bandnum gt 0) and (bandnum lt 3)) then begin
+     c = count_dists.(bandnum)
+     csize = n_elements(c[*,0])
+     cmedian = make_array(csize,value=0.0)
+     cplus = make_array(csize,value=0.0)
+     cminus = make_array(csize,value=0.0)
+
+     for i=0,csize-1 do begin
+        dnds = c[csize-i-1,*]
+        dnds = dnds[sort(dnds)]
+        dnds = dnds[where(dnds gt 0)]
+        pi = plusfrac*n_elements(dnds)
+        mi = minusfrac*n_elements(dnds)
+        cmedian[i] = mean(dnds)
+        cplus[i] = dnds[pi]
+        cminus[i] = dnds[mi]
+     endfor
+
+     bestpts = where(ybest gt 0)
+     xbest = x[bestpts]/1.d3
+     ybest = ybest[bestpts]
+
+     obspts = where(yobs gt 0)
+     xobs = x[obspts]/1.d3
+     yobs = yobs[obspts]
+
+     minpts = where(cminus gt 0)
+     xstats = x[minpts]/1.d3
+     yminus = cminus[minpts]
+     yplus = cplus[minpts]
+     ymedian = cmedian[minpts]
+     
+     plot,xobs,yobs, $
+          /xlog,/ylog, $
+          psym=2,symsize=2, $
+          xtitle=TeXtoIDL('F_{'+strtrim(string(bandnum),1)+'}[Jy]'), $
+          ytitle=TeXtoIDL('(dN/dS)S^{2.5} [gal ster^{-1} J^{1.5}]'), $
+          title='Band '+strtrim(string(bandnum),1)+' Counts'
+
+     oplot,xbest,ybest,psym=4,symsize=2
+     oplot,xstats,ymedian,linestyle=2
+     oplot,xstats,yplus,linestyle=1
+     oplot,xstats,yminus,linestyle=1
+  endif
+
 end
