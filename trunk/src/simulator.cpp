@@ -30,6 +30,23 @@ simulator::simulator(string filterfile, string obsfile, string sedfile, axis_typ
   
 }
 
+simulator::simulator(const Configuration &config) : simulator(){
+  
+  filterFile = config.filterfile;
+  double tarea(config.areaSteradian());
+
+  area = (tarea > 0) ? ((tarea <= 12.56637) ? tarea : 12.56637) : 3.046174e-4;
+  dz = (config.dz > 0) ? config.dz : 0.1;
+  zmin = (config.zmin > 0.001) ? config.zmin : 0.001;
+  nz = (config.nz > 1) ? config.nz : 50;
+  last_output.dndz.resize(nz);
+    
+  set_sed_lib(config.sedfile);
+  axes[0] = config.axes[0];
+  axes[1] = config.axes[1];
+  set_obs(config.obsfile);
+}
+
 bool simulator::load_filter_lib(string file){
   filterFile = file;
   return seds->init_filter_lib(file);
@@ -70,6 +87,7 @@ void simulator::set_size(double area,double dz,double zmin,int nz){
   this->nz = (nz > 1) ? nz : 50;
 
   last_output.dndz.resize(nz);
+  initialize_counts();
 }
 
 void simulator::set_color_exp(double val, double zcut){

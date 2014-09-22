@@ -147,7 +147,7 @@ void Configuration::print(){
   
 }
 
-double Configuration::areaSteradian(){
+double Configuration::areaSteradian() const{
   return area*pow((M_PI/180.0),2.0);
 }
 

@@ -61,7 +61,7 @@ class Configuration{
 public:
   Configuration(int argc, char *argv[]);
   void print();
-  double areaSteradian();
+  double areaSteradian() const;
   void LFparameters(double lpars[],short type = 0);
   
   string outfile;

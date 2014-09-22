@@ -62,13 +62,9 @@ int main(int argc,char** argv){
   lf.set_params(lpars);
 
   //initialize simulator
-  simulator survey(q.filterfile,q.obsfile,q.sedfile,q.axes); 
+  simulator survey(q); 
   survey.set_color_exp(CE); //color evolution
   survey.set_lumfunct(&lf);
-  
-  //NON GENERAL COUNTS
-  //the flux array is logarithmic in steps of 0.3dex 
-  survey.set_size(q.areaSteradian(),q.dz,q.zmin,q.nz);
   products output;
   
   MCChains mcchain(q.nchain,q.nparams,q.runs,q.conv_step);

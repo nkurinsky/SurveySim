@@ -1,6 +1,6 @@
 #include "numberCounts.h"
 
-NumberCounts::NumberCounts(const string &name) :  _name(name), _initialized(false), _verbose(false){
+NumberCounts::NumberCounts(const string &name) :  _name(name), _initialized(false), _verbose(false), _range_violations(0){
 
 }
 
@@ -15,14 +15,14 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
     double diff,nbins,binlow;
     valarray<double> logf(log10(fluxes));
     
-    _range[0] = logf.min();
-    _range[1] = logf.max();
+    _range[0] = logf.min()-0.3; //accept sources 0.5 times dimmer than minimum
+    _range[1] = logf.max()+1.0; //accept sources 10 times brighter than maximum
     
     N=static_cast<double>(logf.size());
     mean = logf.sum()/N;
     sigma = sqrt((pow(logf-mean,2)).sum()/(N-1.0));
     
-    _dS = 3.49*sigma/pow(N,0.33333333);
+    _dS = 7.0*sigma/pow(N,0.33333333);
     nbins = ceil((_range[1]-_range[0])/_dS);
     _nbins = static_cast<int>(nbins);
     
@@ -64,8 +64,6 @@ void NumberCounts::setName(string &name){
 }
 
 void NumberCounts::compute(const valarray<double> &fluxes_nolog, const double area, valarray<double> &counts){
-  static int _range_violations(0);
-  
   valarray<double> fluxes(log10(fluxes_nolog));
   
   if(fluxes.min() < _range[0] or fluxes.max() > _range[1]){

@@ -36,6 +36,7 @@ private:
   int _nbins;
   bool _initialized;
   bool _verbose;
+  int _range_violations;
 };
 
 #endif

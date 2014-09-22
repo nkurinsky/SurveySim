@@ -39,6 +39,7 @@ private:
   void initialize_counts();
  public:
   simulator();
+  simulator(const Configuration &config);
   simulator(string filterfile, string obsfile, string sedfile, axis_type axes[]);
   bool load_filter_lib(string file);
   bool load_filter(short filt_id, string name, double error, double flim);
