@@ -190,9 +190,6 @@ void Configuration::load(){
     printf("Value of \"Axis1\" invalid, defaulting to ColorF1F3\n");
   }
 
-  printf("Axis Settings:\n");
-  printf("\tAxis 1: %s (%i)\n",stemp.c_str(),axes[0]);
-
   try{
     tab.readKey("AXIS2",stemp);
     axes[1] = set_axis_type(stemp);
@@ -204,8 +201,6 @@ void Configuration::load(){
     printf("Value of \"Axis2\" invalid, defaulting to ColorF2F3\n");
   }
 
-  printf("\tAxis 2: %s (%i)\n",stemp.c_str(),axes[1]);
-
   double rtemp;
   //Read in simulation settings
   tab.readKey("RUNS",rtemp);
@@ -214,6 +209,8 @@ void Configuration::load(){
   tab.readKey("ZMAX",zmax);
   tab.readKey("DZ",dz);
   tab.readKey("AREA",area);
+  //generalize:
+  nsim = 1000;
 
   tab.readKey("NCHAIN",rtemp);
   nchain = static_cast<unsigned long>(rtemp);

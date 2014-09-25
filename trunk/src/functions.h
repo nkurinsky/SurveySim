@@ -83,6 +83,7 @@ public:
   unsigned long conv_step;
   unsigned long burn_num;
   unsigned long nparams;
+  unsigned long nsim;
 
   double area;
   double dz;
