@@ -37,7 +37,7 @@ def plot_counts(filename,bandnum,alpha=0.159):
         if(len(dnds) > 0):
             pi = int(plusfrac*len(dnds))
             mi = int(minusfrac*len(dnds))
-            cmean[i] = np.median(dnds)
+            cmean[i] = np.mean(dnds)
             cplus[i] = dnds[pi]
             cminus[i] = dnds[mi]
     
@@ -58,9 +58,9 @@ def plot_counts(filename,bandnum,alpha=0.159):
     p.clf()
     p.xscale('log')
     p.yscale('log')
-    #p.loglog(xstats,ymean,ls='-',label="median",color="black")
-    #p.loglog(xstats,yplus,ls='--',label="$1\sigma$",color="black")
-    #p.loglog(xstats,yminus,ls='--',color="black")
+    p.loglog(xstats,ymean,ls='-',label="mean",color="black")
+    p.loglog(xstats,yplus,ls='--',label="$1\sigma$",color="black")
+    p.loglog(xstats,yminus,ls='--',color="black")
     p.scatter(xobs,yobs,label="observed",color="blue")
     p.scatter(xbest,ybest,label="model",color="green")
    

@@ -88,7 +88,7 @@ class ResultChain {
  public:
   ResultChain(int num_arrays, int nresults);
   bool add_link(valarray<double> arrays[], double chisqr);
-  bool save(string filename, string resnames[]);
+  bool save(string filename, string resnames[], string hname="Results");
 };
 
 #endif

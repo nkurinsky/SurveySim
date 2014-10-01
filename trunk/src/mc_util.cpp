@@ -396,7 +396,7 @@ bool ResultChain::add_link(valarray<double> arrays[], double chisqr){
   return true;
 }
 
-bool ResultChain::save(string filename, string resnames[]){
+bool ResultChain::save(string filename, string resnames[], string hname){
   using namespace CCfits;
   std::auto_ptr<FITS> pFits(0);
 
@@ -423,7 +423,6 @@ bool ResultChain::save(string filename, string resnames[]){
   for(unsigned long i=0;i<results.size();i++)
     colnames[i+1]=resnames[i];
 
-  string hname("Results Extension");
   int nrows(chisqrs.size());
 
   Table *newTable = pFits->addTable(hname,nrows,colnames,colform,colunit);

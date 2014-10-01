@@ -81,11 +81,12 @@ int main(int argc,char** argv){
   double chi_min=1.0E+4; 
   vector<int>::const_iterator p;
 
+  double *setvars[q.nparams];
+  ParameterSettings pset(q.nparams);
+  
   if(q.nparams > 0){
     double ptemp[q.nchain][q.nparams];
     double pcurrent[q.nchain][q.nparams];
-    double *setvars[q.nparams];
-    ParameterSettings pset(q.nparams);
     
     VERBOSE(printf("Initializing Chains\n"));
     for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
@@ -224,6 +225,14 @@ int main(int argc,char** argv){
   VERBOSE(printf("Saving Initial Survey\n"));
   saved = survey.save(q.outfile);
   for(unsigned long i=1;i<q.nsim;i++){
+
+    //vary according to final results
+    for(pi = 0;pi<q.nparams;pi++)
+      *(setvars[pi]) = rng.gaussian(pset.best[pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
+    
+    lf.set_params(lpars);
+    survey.set_color_exp(CE);
+    
     output=survey.simulate();
     if(output.chisqr < tchi_min){
       tchi_min = output.chisqr;
@@ -243,10 +252,10 @@ int main(int argc,char** argv){
   
   VERBOSE(printf("Saving Chains\n"));
   saved &= mcchain.save(q.outfile,parnames.get());
-  VERBOSE(printf("Saving Counts\n"));
-  saved &= counts.save(q.outfile,countnames);
+  //VERBOSE(printf("Saving Counts\n"));
+  //saved &= counts.save(q.outfile,countnames);
   VERBOSE(printf("Saving Final Counts\n"));
-  saved &= final_counts.save(q.outfile,countnames);
+  saved &= final_counts.save(q.outfile,countnames,"Counts Monte Carlo");
 
   saved ? printf("Save Successful") : printf("Save Failed");
   printf("\nFitting Complete\n\n");
