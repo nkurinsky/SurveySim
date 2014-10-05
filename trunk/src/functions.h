@@ -36,6 +36,12 @@
 // - for scientific constants
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_const_mksa.h>
+// - for multivarite normal
+#include <gsl/gsl_sf_gamma.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_linalg.h>
 
 #define LUMPARS 7
 #define SDEG_PER_STER 3282.8
@@ -52,6 +58,7 @@ enum axis_type{
 };
 
 axis_type set_axis_type(string &keyvalue);
+string get_axis_type(axis_type opt);
 
 double metric_value(const double& f1,const double &f2,const double &f3,const axis_type &opt);
 
@@ -108,8 +115,8 @@ public:
   axis_type axes[2];
 
 private:
-  void load();
-  
+void load();
+
 };
 
 class RandomNumberGenerator{
@@ -117,6 +124,7 @@ public:
   RandomNumberGenerator();
   ~RandomNumberGenerator();
   double gaussian(double mean, double sigma, double min, double max);
+  void gaussian_mv(const vector<double> &mean, const vector<vector<double> > &covar, const vector<double> &min, const vector<double> &max, vector<double> &result);
   double flat(double min, double max);
 private:
   const gsl_rng_type *T;

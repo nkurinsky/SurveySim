@@ -2,39 +2,43 @@
 
 axis_type set_axis_type(string &keyvalue){
   string saxis(toLower(keyvalue));
-  int axOption(-1);
-  printf("\t%s\t",keyvalue.c_str());
 
   if(saxis == "colorf1f3")
-    axOption = 0;
-  else if(saxis == "colorf2f3")
-    axOption = 1;
-  else if(saxis == "colorf1f2")
-    axOption = 2;
-  else if(saxis == "flux1")
-    axOption = 3;
-  else if(saxis == "flux2")
-    axOption = 4;
-  else if(saxis == "flux3")
-    axOption = 5;
-    
-  switch(axOption){
-  case 0:
     return ColorF1F3;
-  case 1:
+  else if(saxis == "colorf2f3")
     return ColorF2F3;
-  case 2:
+  else if(saxis == "colorf1f2")
     return ColorF1F2;
-  case 3:
+  else if(saxis == "flux1")
     return Flux1;
-  case 4:
+  else if(saxis == "flux2")
     return Flux2;
-  case 5:
+  else if(saxis == "flux3")
     return Flux3;
-  default:
+  else{
     printf("set_axis_type: keyvalue \"%s\" invalid\n",keyvalue.c_str());
     throw(-1);
+  }    
+}
+
+string get_axis_type(axis_type opt){
+  switch(opt){
+  case ColorF1F3:
+    return "ColorF1F3";
+  case ColorF2F3:
+    return "ColorF2F3";
+  case ColorF1F2:
+    return "ColorF1F2";
+  case Flux1:
+    return "Flux1";
+  case Flux2:
+    return "Flux2";
+  case Flux3:
+    return "Flux3";
+  default:
+    printf("get_axis_type: option %i invalid\n",opt);
   }
+  return "";
 }
 
 double metric_value(const double& f1,const double &f2,const double &f3,const axis_type &opt){
@@ -287,4 +291,57 @@ double RandomNumberGenerator::gaussian(double mean, double sigma, double min, do
 
 double RandomNumberGenerator::flat(double min, double max){
   return gsl_ran_flat(r,min,max);
+}
+
+void RandomNumberGenerator::gaussian_mv(const vector<double> &mean, const vector<vector<double> > &covar, const vector<double> &min, const vector<double> &max, vector<double> &result){
+  
+  /* multivariate normal distribution random number generator */
+  /*
+   *	n	dimension of the random vetor
+   *	mean	vector of means of size n
+   *	var	variance matrix of dimension n x n
+   *	result	output variable with a sigle random vector normal distribution generation
+   */
+  int k;
+  int n=mean.size();
+  gsl_matrix *_covar = gsl_matrix_alloc(covar.size(),covar[0].size());
+  gsl_vector *_result = gsl_vector_calloc(mean.size());
+  gsl_vector *_mean = gsl_vector_calloc(mean.size());
+  result.resize(mean.size());
+
+  for(k=0;k<n;k++){
+    for(int j=0;j<n;j++){
+      gsl_matrix_set(_covar,k,j,covar[k][j]);
+    }
+    gsl_vector_set(_mean, k, mean[k]);
+  }
+
+  gsl_linalg_cholesky_decomp(_covar);
+  
+  bool in_range;
+  do{
+    for(k=0; k<n; k++)
+      gsl_vector_set( _result, k, gsl_ran_ugaussian(r) );
+    
+    gsl_blas_dtrmv(CblasLower, CblasNoTrans, CblasNonUnit, _covar, _result);
+    gsl_vector_add(_result,_mean);
+    
+    in_range = true;
+    for(k=0; k<n; k++){
+      if(gsl_vector_get(_result, k) < min[k] or gsl_vector_get(_result, k) > max[k]){
+	in_range = false;
+	k=n+1;
+      }
+    }
+  }while(not in_range);
+
+    for(k=0; k<n; k++){
+      result[k] = gsl_vector_get(_result, k);
+    }
+
+  gsl_matrix_free(_covar);
+  gsl_vector_free(_result);
+  gsl_vector_free(_mean);
+  
+  return;
 }

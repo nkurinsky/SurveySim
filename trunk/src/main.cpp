@@ -31,13 +31,15 @@
 using namespace std; 
 
 int main(int argc,char** argv){
-  
-  printf("\nFitting Code Compiled: %s\n\n",__DATE__);
-  
+  printf("\n");
+
   Configuration q(argc,argv);
+  VERBOSE(printf("Fitting Code Compiled: %s\n\n",__DATE__));
   VERBOSE(q.print());
   RandomNumberGenerator rng;
   
+  printf("Axis 1: %s\nAxis 2: %s\n",get_axis_type(q.axes[0]).c_str(),get_axis_type(q.axes[1]).c_str());
+
   //general variable declarations
   bool accept,saved;
   unsigned long i,m;
@@ -86,6 +88,7 @@ int main(int argc,char** argv){
   
   if(q.nparams > 0){
     double ptemp[q.nchain][q.nparams];
+    vector<double > means(q.nparams);
     double pcurrent[q.nchain][q.nparams];
     
     VERBOSE(printf("Initializing Chains\n"));
@@ -110,9 +113,15 @@ int main(int argc,char** argv){
     
     for (i=0;i<q.burn_num;i++){
       for (m=0;m<q.nchain;m++){
-	
-	for(pi = 0;pi<q.nparams;pi++)
-	  *(setvars[pi]) = ptemp[m][pi] = rng.gaussian(pcurrent[m][pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
+
+	vector<double> results;
+	for(pi=0;pi<q.nparams;pi++)
+	  means[pi] = pcurrent[m][pi];
+	rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+	for(pi = 0;pi<q.nparams;pi++){
+	  //*(setvars[pi]) = ptemp[m][pi] = rng.gaussian(pcurrent[m][pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
+	  *(setvars[pi]) = ptemp[m][pi] = results[pi];
+	}
 	
 	VERBOSE(printf("%lu %lu -",(i+1),(m+1)));
 	for(pi=0;pi<LUMPARS;pi++)
@@ -143,10 +152,18 @@ int main(int argc,char** argv){
       }
       
       if(((i+1) % q.burn_step) == 0){
-	printf("\nAcceptance: %5.1lf%%\n",metrop.acceptance_rate()*100.0);
+	printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature());
+	printf("Covariance Matrix:\n");
+	for(int pi=0;pi<pset.covar.size();pi++){
+	  printf("\t[");
+	  for(int pj=0;pj<pset.covar[pi].size();pj++)
+	    printf("%6.2lf ",pset.covar[pi][pj]);
+	  printf("]\n");
+	}
 	if(not metrop.anneal())
 	  i = q.runs;
 	burnchain.get_stdev(pset.sigma.data());
+	burnchain.get_covariance(pset.covar);
       }
     }
     
@@ -161,10 +178,16 @@ int main(int argc,char** argv){
     
     for (i=0;i<q.runs;i++){
       for (m=0;m<q.nchain;m++){
-	
+
+	vector<double> results;
 	for(pi = 0;pi<q.nparams;pi++)
-	  *(setvars[pi]) = ptemp[m][pi] = rng.gaussian(pcurrent[m][pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
-	
+	  means[pi] = pcurrent[m][pi];
+	rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+	for(pi = 0;pi<q.nparams;pi++){
+	  //*(setvars[pi]) = ptemp[m][pi] = rng.gaussian(pcurrent[m][pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
+	  *(setvars[pi]) = ptemp[m][pi] = results[pi];
+	}
+		
 	VERBOSE(printf("%lu %lu -",(i+1),(m+1)));
 	for(pi=0;pi<q.nparams;pi++)
 	  VERBOSE(printf(" %lf",ptemp[m][pi]));
@@ -196,6 +219,7 @@ int main(int argc,char** argv){
 	if (i < q.burn_num)
 	  metrop.anneal();
 	mcchain.get_stdev(pset.sigma.data());
+	mcchain.get_covariance(pset.covar);
 	if(mcchain.converged()){
 	  printf("Chains Converged!\n");
 	  i = q.runs;}
@@ -216,6 +240,14 @@ int main(int argc,char** argv){
       survey.set_color_exp(pset.best[q.cind]);
       printf("CEXP : %lf +\\- %lf\n",pset.best[pi],pset.sigma[pi]);
     }  
+    printf("\nCovariance Matrix:\n");
+    for(int pi=0;pi<pset.covar.size();pi++){
+      printf("\t[");
+      for(int pj=0;pj<pset.covar[pi].size();pj++)
+	printf("%6.2lf ",pset.covar[pi][pj]);
+      printf("]\n");
+    }
+    
     printf("Final Acceptance Rate: %lf%%\n",metrop.mean_acceptance()*100);
   }
 
@@ -224,11 +256,20 @@ int main(int argc,char** argv){
   double tchi_min = output.chisqr;
   VERBOSE(printf("Saving Initial Survey\n"));
   saved = survey.save(q.outfile);
+
+  vector<double> results,means(q.nparams);
+  for(pi = 0;pi<q.nparams;pi++)
+    means[pi] = pset.best[pi];
+  
   for(unsigned long i=1;i<q.nsim;i++){
 
     //vary according to final results
-    for(pi = 0;pi<q.nparams;pi++)
-      *(setvars[pi]) = rng.gaussian(pset.best[pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
+
+    rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+    for(pi = 0;pi<q.nparams;pi++){
+      //*(setvars[pi]) = rng.gaussian(pset.best[pi],pset.sigma[pi],pset.min[pi],pset.max[pi]);
+      *(setvars[pi]) = results[pi];
+    }
     
     lf.set_params(lpars);
     survey.set_color_exp(CE);
@@ -253,7 +294,7 @@ int main(int argc,char** argv){
   VERBOSE(printf("Saving Chains\n"));
   saved &= mcchain.save(q.outfile,parnames.get());
   //VERBOSE(printf("Saving Counts\n"));
-  //saved &= counts.save(q.outfile,countnames);
+  saved &= counts.save(q.outfile,countnames);
   VERBOSE(printf("Saving Final Counts\n"));
   saved &= final_counts.save(q.outfile,countnames,"Counts Monte Carlo");
 

@@ -12,6 +12,9 @@ ParameterSettings::ParameterSettings(size_t nparams){
   min.resize(nparams);
   max.resize(nparams);
   sigma.resize(nparams);
+  covar.resize(nparams);
+  for(int i=0;i<nparams;i++)
+    covar[i].resize(nparams,0);
   best.resize(nparams);
 }
 
@@ -20,6 +23,7 @@ void ParameterSettings::set(short pnum, double Minimum, double Maximum, double s
     min[pnum] = Minimum;
     max[pnum] = Maximum;
     sigma[pnum] = standardDeviation;
+    covar[pnum][pnum] = pow(standardDeviation,2);
     best[pnum] = bestValue;
   }
   else
@@ -108,6 +112,10 @@ bool MetropSampler::anneal(){
   }
   else
     return false;
+}
+
+double MetropSampler::temperature() const{
+  return tscale*temp;
 }
 
 void MetropSampler::reset(){
@@ -217,6 +225,45 @@ void MCChains::get_fit_results(double pars[], double sigma[]){
 void MCChains::get_stdev(double sigma[]){
   double pars[npars];
   get_fit_results(pars,sigma);
+}
+
+void MCChains::get_covariance(vector<vector<double> > &covar){
+  vector<vector<double> > values;
+  double mean;
+  unsigned long size;
+  
+  covar.resize(npars);
+  values.resize(npars);
+  for(int i=0;i<npars;i++){
+    covar[i].resize(npars);
+  }
+
+  for(int i=0;i<npars;i++){
+    mean = 0.0;
+    values[i].clear();
+    for(int j=0;j<nchains;j++){
+      size = chainlength[j];
+      for(unsigned long k = size/2; k < size; k++){
+	values[i].push_back(chains[j*chainwidth+i][k]);
+	mean += values[i].back();
+      }
+    }
+    mean /= static_cast<double>(values[i].size());
+    for(vector<double>::iterator val = values[i].begin(); val != values[i].end(); val++){
+      *val = *val-mean;
+    }
+  }
+
+  for(int i=0;i<npars;i++){
+    for(int j=0;j<npars;j++){
+      covar[i][j] = 0.0;
+      for(int k=0;k<values[i].size();k++)
+	covar[i][j] += values[i][k]*values[j][k];
+      covar[i][j] /= static_cast<double>(values[i].size()-1);
+    }
+  }
+
+  return;
 }
 
 bool MCChains::set_constraints(double Rmax, double alpha){

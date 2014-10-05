@@ -15,12 +15,13 @@
 #define RECENT_NUM 100
 
 class ParameterSettings{
- public:
+public:
   ParameterSettings(size_t nparams);
   void set(short pnum, double Minimum, double Maximum, double standardDeviation, double bestValue);
   vector<double> min;
   vector<double> max;
   vector<double> sigma;
+  vector<vector<double> > covar;
   vector<double> best;
 };
 
@@ -47,6 +48,7 @@ class MetropSampler {
   double mean_acceptance();
   double acceptance_rate();
   bool anneal();
+  double temperature() const;
   void reset();
   ~MetropSampler();
 };
@@ -74,6 +76,7 @@ class MCChains {
   void get_best_link(double pars[], double chisqr);
   void get_fit_results(double pars[], double sigma[]);
   void get_stdev(double sigma[]);
+  void get_covariance(vector<vector<double> > &covar);
   bool set_constraints(double Rmax, double alpha);
   bool converged();
   bool save(string filename, string parnames[]);
