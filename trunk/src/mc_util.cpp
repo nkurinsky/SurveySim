@@ -103,15 +103,12 @@ double MetropSampler::acceptance_rate(){
 
 bool MetropSampler::anneal(){
   double rate = acceptance_rate();
-  if(rate > (ideal_acceptance + accept_buffer)){
-    temp--;
-    return true;}
-  else if (rate < (ideal_acceptance - accept_buffer)){
-    temp++;
+  if((rate > (ideal_acceptance + accept_buffer)) or (rate < (ideal_acceptance - accept_buffer))){
+    temp *= (1+0.5*(ideal_acceptance - rate)); //basic steepest descent learning, somewhat idealized
     return true;
   }
-  else
-    return false;
+
+  return false;
 }
 
 double MetropSampler::temperature() const{
