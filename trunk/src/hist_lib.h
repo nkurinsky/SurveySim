@@ -22,8 +22,10 @@ class hist_lib{
   double ** obs_hist;
   double ** comparison_hist;
   //properties of the histograms, set internally
-  double range[2];
-  double binsize;
+  double xrange[2];
+  double yrange[2];
+  double xbinsize;
+  double ybinsize;
   double chisq;
   int xysize;
   int osize,msize;
@@ -42,7 +44,7 @@ class hist_lib{
   ~hist_lib();
  private:
   //functions which produce histograms
-  double ** get_hist(double c1[],double c2[],int cnum,double range[]); //compute histogram, fitting binsize
+  double ** get_hist(double c1[],double c2[],int cnum); //compute histogram, fitting binsize
   double ** compute_hist(double c1[],double c2[],double weights[],int cnum); //compute histogram for given inputs
   double fit_err();
   double poiss_err(int x);

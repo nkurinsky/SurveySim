@@ -83,54 +83,6 @@ def showresults(): #read-in the results from output.fits and show plots
     a3.set_ylabel('(dN/dS)*S^2.5')
     a3.set_xlim(20,1000)
     a3.set_ylim(200,200000)
-    cfile=open(codedir+'/IDL/counts_clements10.dat','r')
-#    flux250=np.empty([15],dtype=float)
-    flux250=[]
-    dnds250=[]
-    dnds_err250=[]
-    ind=0
-    for line in cfile:
-        if((ind >= 2) and (ind <=17)):
-            line=line.strip()
-            columns=line.split()
-#            flux250[ind-2]=columns[0]
-#            dnds250[ind-2]=columns[5]
-#            dnds_err250[ind-2]=columns[6]
-            flux250.append(columns[0])
-            dnds250.append(columns[5])
-            dnds_err250.append(columns[6])
-            #print flux[ind],dnds[ind]
-        ind=ind+1
-#    counts=cfile.read()
-#    print counts.shape
-    flux250=np.asarray(flux250,dtype=float)
-    dnds250=np.asarray(dnds250,dtype=float)
-    dnds_err250=np.asarray(dnds_err250,dtype=float)
-    plt.errorbar(flux250,dnds250,dnds_err250,capsize=0,ls='none',marker='o',color='black',elinewidth=2)
-    cfile.close()
-
-    fbins=flux250
-    dnds_sim=fbins*0.0
-    ind=0
-    for fbin in fbins:
-        if(ind < 15):
-            a=find((sim_srcs_f1 <=fbins[ind]))
-            tmp=sim_srcs_f1[a]
-            b=find(tmp > fbins[ind+1])
-            tmp=fbins[ind+1]
-            ds=fbins[ind]-fbins[ind+1]
-            dnds_sim[ind]=(tmp**(2.5))*len(b)/(ds*area[0])
-            #print fbins[ind],len(b),dnds_sim[ind]
-        ind=ind+1
-    plt.scatter(fbins,dnds_sim,color='black')
-
-#    a3=fig.add_subplot(2,3,3)
-#    a3.set_xlabel('x')
-#    a3.set_ylabel('y')
-    #plot(x,y)
-#    a3.set_xlim(0,2)
-#    a3.set_ylim(-2, 2)
-#    a3.set_aspect('equal', 'datalim')
 
     a4=fig.add_subplot(2,3,4) 
     imgplot=plt.imshow(img1)

@@ -4,39 +4,18 @@ hist_lib::hist_lib(){
   model_hist = NULL;
   obs_hist = NULL;
   comparison_hist = NULL;
-  range[0] = -1;
-  range[1] = -1;
-  binsize = -1;
+  xrange[0] = -1;
+  xrange[1] = -1;
+  xbinsize = -1;
+  yrange[0] = -1;
+  yrange[1] = -1;
+  ybinsize = -1;
   xysize = -1;
 }
 
-hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size){
-  static double temp_range[2];
-  static double x,y;
-
-  //set the range to the absolute extremes of the color arrays
-  x = gsl_stats_min(obs_c1,H_STRIDE,obs_size);
-  y = gsl_stats_min(obs_c2,H_STRIDE,obs_size);
-  if (x <= y)
-    temp_range[0] = x;
-  else
-    temp_range[0] = y;
-
-  x = gsl_stats_max(obs_c1,H_STRIDE,obs_size);
-  y = gsl_stats_max(obs_c2,H_STRIDE,obs_size);
-  if (x >= y)
-    temp_range[1] = x;
-  else
-    temp_range[1] = y;
-
+hist_lib::hist_lib(double obs_c1[],double obs_c2[],int obs_size) : hist_lib(){
   //create histogram for observation and store it
-  obs_hist = get_hist(obs_c1,obs_c2,obs_size,temp_range);
-
-  //initialize to null to indicate that it has yet to be constructed
-  model_hist = NULL;
-  comparison_hist = NULL;
-  osize = obs_size;
-  msize = -1;
+  init_obs(obs_c1,obs_c2,obs_size);
 }
 
 void hist_lib::init_obs(double c1[],double c2[],int size){
@@ -53,26 +32,9 @@ void hist_lib::init_obs(double c1[],double c2[],int size){
     delete[] obs_hist;
     obs_hist = NULL;
   }
-  static double temp_range[2];
-  static double x,y;
-  
-  //set the range to the absolute extremes of the color arrays
-  x = gsl_stats_min(c1,H_STRIDE,size);
-  y = gsl_stats_min(c2,H_STRIDE,size);
-  if (x <= y)
-    temp_range[0] = x;
-  else
-    temp_range[0] = y;
-  
-  x = gsl_stats_max(c1,H_STRIDE,size);
-  y = gsl_stats_max(c2,H_STRIDE,size);
-  if (x >= y)
-    temp_range[1] = x;
-  else
-    temp_range[1] = y;
   
   //create and store histogram
-  obs_hist = get_hist(c1,c2,size,temp_range);
+  obs_hist = get_hist(c1,c2,size);
   osize = size;
 
   if(comparison_hist != NULL){
@@ -153,9 +115,12 @@ bool hist_lib::write_fits(string filename){
   }
 
   pFits->pHDU().addKey("DIM",xysize,"Side length of square histogram area"); 
-  pFits->pHDU().addKey("H_MIN",range[0],"Minimum Histogram Bin Value");
-  pFits->pHDU().addKey("H_MAX",range[1],"Maximum Histogram Bin Value");
-  pFits->pHDU().addKey("BINSIZE",binsize,"Histogram bin size");
+  pFits->pHDU().addKey("H_MIN_X",xrange[0],"Minimum Histogram Bin Value");
+  pFits->pHDU().addKey("H_MAX_X",xrange[1],"Maximum Histogram Bin Value");
+  pFits->pHDU().addKey("H_MIN_Y",yrange[0],"Minimum Histogram Bin Value");
+  pFits->pHDU().addKey("H_MAX_Y",yrange[1],"Maximum Histogram Bin Value");
+  pFits->pHDU().addKey("BINSIZE_X",xbinsize,"Histogram bin size");
+  pFits->pHDU().addKey("BINSIZE_Y",ybinsize,"Histogram bin size");
   pFits->pHDU().addKey("FITSTAT",chisq,"Fitting Statistic");
 
   pFits->pHDU().write(1,nelements,comparison_1d);
@@ -190,25 +155,36 @@ hist_lib::~hist_lib(){
   }
 }
 
-double ** hist_lib::get_hist(double c1[],double c2[],int cnum,double inp_range[]){
-  static double ** temp;
-  static double sd1,sd2;
+double ** hist_lib::get_hist(double c1[],double c2[],int cnum){
+  double ** temp;
+  double sd1,sd2;
+  double xbins,ybins;
+
+  //set the range to the absolute extremes of the color arrays
+  xrange[0] = floor(gsl_stats_min(c1,H_STRIDE,cnum));
+  yrange[0] = floor(gsl_stats_min(c2,H_STRIDE,cnum));
+
+  xrange[1] = ceil(gsl_stats_max(c1,H_STRIDE,cnum));
+  yrange[1] = ceil(gsl_stats_max(c2,H_STRIDE,cnum));
+
   sd1 = gsl_stats_sd(c1,H_STRIDE,cnum);
   sd2 = gsl_stats_sd(c2,H_STRIDE,cnum);
 
   //compute binsize from Scott 1979 formalism (binsize=3.49*sd*n^(-1/3))
-  if (sd1 >= sd2)
-    binsize = 3.49*sd1/pow(cnum,0.33333);
-  else
-    binsize = 3.49*sd2/pow(cnum,0.33333);
+  xbinsize = 3.49*sd1/pow(cnum,0.33333);
+  ybinsize = 3.49*sd2/pow(cnum,0.33333);
 
-  range[0] = inp_range[0];
-  range[1] = inp_range[1];
-  static double rdiff; 
-  rdiff = (range[1]-range[0]);
-  xysize = ceil(rdiff/binsize); //ensures that range is whole multiple of binsize
-  range[1] = range[0]+xysize*binsize; //recompute upper bound
-  
+  //find number of bins for computed binsize, rounding down
+  xbins = floor((xrange[1]-xrange[0])/xbinsize);
+  ybins = floor((yrange[1]-yrange[0])/ybinsize);
+
+  //sticking to an isotropic metric, we pick the smaller bin number
+  xysize = (xbins > ybins) ? ybins : xbins;
+
+  //recompute binsize accordingly
+  xbinsize = (xrange[1]-xrange[0])/xysize;
+  ybinsize = (yrange[1]-yrange[0])/xysize;
+
   double weights[cnum];
   for (int i=0;i<cnum;i++)
     weights[i] = 1.0;
@@ -238,9 +214,9 @@ double ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cn
   ypt = 0;
   exc = 0;
   for (int i=0;i<cnum;i++){
-    if((c1[i] >= range[0]) and (c1[i] < range[1]) and (c2[i] >= range[0]) and (c2[i] < range[1])){
-      xpt = int((c1[i]-range[0])/binsize);
-      ypt = int((c2[i]-range[0])/binsize);
+    if((c1[i] >= xrange[0]) and (c1[i] < xrange[1]) and (c2[i] >= yrange[0]) and (c2[i] < yrange[1])){
+      xpt = static_cast<int>(floor(((c1[i]-xrange[0])/xbinsize)));
+      ypt = static_cast<int>(floor(((c2[i]-yrange[0])/ybinsize)));
       retvals[xpt][ypt]+= weights[i];
     }
     else

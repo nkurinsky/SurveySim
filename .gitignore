@@ -13,3 +13,5 @@ trunk/config.log
 trunk/config.status
 
 *.DS*
+
+Python/*.pyc
