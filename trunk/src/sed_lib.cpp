@@ -145,7 +145,7 @@ double sed_lib::get_flux(double lum, double band, double redshift){
   return -1;
 }
 
-double sed_lib::get_filter_flux(double lum, double redshift, short filter_id){
+double sed_lib::get_filter_flux(double lum, double redshift, short sedtype, short filter_id){
 
   static int i = 0;
 
@@ -161,7 +161,7 @@ double sed_lib::get_filter_flux(double lum, double redshift, short filter_id){
     if (filters.init()){
       if((filter_id >= 0) and (filter_id < 3) and (filters.get(filter_id).low() < filters.get(filter_id).high())){
 	if((filters.get(filter_id).low() >= brange[0]) and (filters.get(filter_id).high() <= brange[1]))
-	  return convolve_filter(i,redshift,filter_id);
+	  return convolve_filter(i,redshift,sedtype,filter_id);
 	else{
 	  printf("%s\n%s\n","ERROR: Filter out of model range.","Check that the obs bands are within range and unit consistent");
 	}
@@ -219,7 +219,7 @@ sed_lib::~sed_lib(){
   delete[] lums;
 }
 
-double sed_lib::convolve_filter(short lum_id, double redshift, short filter_id){
+double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, short filter_id){
 
   static map<tuple<short,double>,double > fluxes[3];
   tuple<short,double> params (lum_id,redshift);

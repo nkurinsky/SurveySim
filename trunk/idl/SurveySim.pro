@@ -7,7 +7,7 @@ COMMON simulation_com,info,parameters
 @SurveySimIncludes
 @SurveySim_event
 
-pro SurveySim,savefile=savefile
+pro SurveySim,params=paramfile
 
   COMMON simulation_com,info,parameters
   
@@ -18,8 +18,8 @@ pro SurveySim,savefile=savefile
   ;the INFO structure holds the key widget control parameters as well as 
   ;the basic simulation settings
   ;------------------------------------------------------------------
-  if(keyword_set(savefile)) then begin
-     temp=load_parameters(savefile)
+  if(keyword_set(params)) then begin
+     temp=load_parameters(savefile=paramfile)
   endif else begin
      temp=load_parameters()
   endelse
@@ -29,7 +29,6 @@ pro SurveySim,savefile=savefile
   ;====================================================================
   ; Colors
   ;--------------------------------------------------------------------
-
   loadct,3,/silent
   tvlct,red,green,blue,/get
   info.ncolors=!d.TABLE_SIZE
@@ -184,3 +183,4 @@ pro SurveySim,savefile=savefile
   plot_seds
   
 END
+

@@ -1,8 +1,9 @@
 function load_parameters,saveFile=saveFile
   
   if( not keyword_set(saveFile)) then begin
-     spawn,'echo $HOME',home
-     saveFile=home+'/.SurveySimParams.save'
+     spawn,'pwd',wd
+     saveFile=wd+'/.SurveySimParams.save'
+     ;saveFile='SurveySimParams.save'
   endif
   
   if(file_test(saveFile)) then begin

@@ -4,8 +4,8 @@ print("Welcome to SurveySim");
 print("a MCMC-based galaxy evolution fitter and simulator");
 
 import os
-import sys
-sys.path.append("./functions")
+#import sys
+#sys.path.append("./functions")
 
 import time
 import pyfits as fits
@@ -15,17 +15,19 @@ import img_scale
 from pylab import *
 import math
 
-codedir=os.getcwd();
-codedir=codedir[:len(codedir)-7]
+#codedir=os.getcwd();
+#codedir=codedir[:len(codedir)-7]
+codedir='/Users/annie/students/noah_kurinsky/code/SurveySim/trunk/'
 #if want to be able to run this from wherever, should simply change the codedir 
-sedfile=codedir+'/IDL/sf_templates.fits'
-modelfile=codedir+'/IDL/model.fits'
-obsfile=codedir+'/IDL/observation.fits'
-outfile=codedir+'/Python/output.fits'
+sedfile=codedir+'templates/sf_templates.fits'
+modelfile=codedir+'model/model.fits'
+obsfile=codedir+'obs/observation.fits'
+outfile=codedir+'output/output.fits'
 
+fitcode=codedir+'src/fitter'
 def runcode():
     print("Runnning fitter code....")
-    os.system("fitter"+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
+    os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
 
 def showresults(): #read-in the results from output.fits and show plots
     print("Showing results....")

@@ -180,16 +180,15 @@ products simulator::simulate(){
     double dl = seds->get_dl();
     static long nsrcs;
     double lums[lnum];
-    double zarray[nz];    
+    double zarray[nz];
+    double fagn;
+    short sedtype; // this holds the id of the SED type 
     
     seds->get_lums(lums);
     
     //=========================================================================
     // for each L-z depending on the number of sources, sample the SED and get the appropriate fluxes
     //*************************************************************************
-    
-    //previous approach was round to nearest template value.
-    // We interpolate here, in future will convolve filter
  
     static double flux_sim[3], flux_raw[3];
     static sprop *temp_src;
@@ -205,7 +204,9 @@ products simulator::simulate(){
 
       jsmin = 0;
       for (js=0;js<lnum;js++){
-	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],0);
+       	fagn=fagns->get_agn_frac(lums[js],zarray[is]);
+	sedtype=0; //placeholder for now will determine depending on AGN fraction per L-z bin
+	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],sedtype,0);
 	if(flux_sim[0]>=flux_limits[0]){
 	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
 	  js = lnum; //break out of loop
@@ -217,7 +218,7 @@ products simulator::simulate(){
 	//source number is dn/(dldv)*Dv*Dl
 	nsrcs = long(dl*vol*lf->get_nsrcs(zarray[is],lums[js]));
 	for (int i=0;i<3;i++){
-	  flux_raw[i] = seds->get_filter_flux(lums[js],zarray[is],i);
+	  flux_raw[i] = seds->get_filter_flux(lums[js],zarray[is],sedtype,i);
 	}
 	for (src_iter=0;src_iter<nsrcs;src_iter++){
 	  detected = true;

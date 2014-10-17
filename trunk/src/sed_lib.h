@@ -28,8 +28,6 @@ class sed{
   ~sed();
 };
 
-//eventually, multiple SEDs per luminosity will be used in 
-//specified porportions. Currently, one SED per luminosity
 class sed_lib{
  private:
   std::vector<sed*> seds;
@@ -43,7 +41,7 @@ class sed_lib{
   double color_zcut;
   double color_evolution;
   filter_lib filters;
-  double convolve_filter(short lum_id, double redshift, short filter_id);
+  double convolve_filter(short lum_id, double redshift, short sedtype, short filter_id);
   friend double flux_yield(double wavelength, void * params);
   gsl_integration_workspace *w;
  public:
@@ -51,7 +49,7 @@ class sed_lib{
   bool init_filter_lib(string file);
   bool load_filter(short filter_id, string name);
   double get_flux(double lum, double redshift, double band);
-  double get_filter_flux(double lum, double redshift, short filter_id);
+  double get_filter_flux(double lum, double redshift, short sedtype, short filter_id);
   void set_color_evolution(double exp, double zcut=1000);
   int get_lnum(){
     return lnum;}
