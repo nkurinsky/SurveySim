@@ -16,15 +16,14 @@ from pylab import *
 import math
 
 #codedir=os.getcwd();
-#codedir=codedir[:len(codedir)-7]
-codedir='/Users/annie/students/noah_kurinsky/code/SurveySim/trunk/'
-#if want to be able to run this from wherever, should simply change the codedir 
+codedir='/Users/annie/students/noah_kurinsky/SurveySim/trunk/'
 sedfile=codedir+'templates/sf_templates.fits'
+dmodelfile=codedir+'model/default_model.fits'
 modelfile=codedir+'model/model.fits'
 obsfile=codedir+'obs/observation.fits'
 outfile=codedir+'output/output.fits'
-
 fitcode=codedir+'src/fitter'
+
 def runcode():
     print("Runnning fitter code....")
     os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
@@ -42,13 +41,7 @@ def showresults(): #read-in the results from output.fits and show plots
     #the field names are f1,f2,f3,z,m,lum,c7,p0,p1
     sim_srcs_zs=sim_srcs_table_data.field('z')
     sim_srcs_f1=sim_srcs_table_data.field('f1')
-#    mctable=hdulist[3]#.columns #MCMC chain
-#    mctable.columns
-#    mctable.shape
-    #cols=hdulist[4].columns
-#    partable=hdulist[4].data #parameters table
-#    print mctable.shape,partable.shape
-#    print model_ccd.dtype.name
+
     img1=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
     img2=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
     img3=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
@@ -127,17 +120,94 @@ value_initial=[-2.20,10.14,0.50,3.00,-4.50,4.50,2.00,0.0]
 value_min=[-3.00,9.00,0.00,0.00,-8.00,3.00,0.00,0.0]
 value_max=[-1.00,11.00,2.00,5.00,-1.00,6.00,0.00,1.0]
 value_fix=[1,1,1,1,0,0,1,1]
-#not sure why we need this here, I feel that the sigma of the proposal distribution shouldn't be user controllable
-value_dp=[0.0,0.0,0.0,0.0,0.3,0.1,0.0,0.0]
 
 #initialize survey parameters
 area=[4.0,4.0,4.0]
 band=['Band1','Band2','Band3']
-filter_choices=['None','PACS_100','PACS_160','SPIRE_250','SPIRE_350','SPIRE_500']
 flim=[25.0,20.0,15.0]
+f_id=[0,0,0] #placeholder for the filter ids (from filter_choices)
 
-def update_mfile(modelfile):
+#read-in values if model.fits exists
+if os.path.isfile(modelfile): # and os.access(modelfile,os.R.OK):
+    mfile=fits.open(modelfile)
+    mhdr=mfile[0].header
+    value_initial[0]=mhdr['PHI0']
+    band[0]=mhdr['Band_1']
+    band[1]=mhdr['Band_2']
+    band[2]=mhdr['Band_3']
+    area[0]=mhdr['AREA']
+    mfile.close()
+
+#====================================================================================
+#read-in filter transmission curves
+#use the FSPS filter set
+#------------------------------------------------------------------------------------
+with open (codedir+'filters/FILTER_LIST','r') as f: 
+    flines=f.readlines()
+
+filter_id,filter_choices=[],[]
+
+for fline in flines:
+    if fline.strip():
+        ncol=len(fline.split())
+        if 3<ncol<6:
+            tmp1,tmp2,tmp3,tmp4=fline.split()[0:4]
+            if (tmp4 != '(from') and (tmp2 != '2MASS') and (tmp2 != 'Steidel') and (tmp2 != 'Stromgren') and (tmp2 != 'Idealized') and (tmp2 != 'SCUBA') and (tmp2 != 'JWST') :
+                filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3+'_'+tmp4)
+            else:
+                filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3)
+        if ncol >= 6:
+            tmp1,tmp2,tmp3,tmp4,tmp5=fline.split()[0:5]
+            if (tmp4 != '(from') and (tmp3 != 'IRAC') and (tmp3 != 'WFC3') and (tmp2 != '2MASS') and (tmp2 != 'Steidel') and (tmp2 != 'Stromgren') and (tmp2 != 'Idealized') and (tmp2 != 'SCUBA') and (tmp2 != 'JWST') :
+                filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3+'_'+tmp4)
+            else:
+                if (tmp3 != 'IRAC') and (tmp3 != 'WFC3'):
+                    filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3)
+            if (tmp3 == 'IRAC') or (tmp3 == 'WFC3'):
+                filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3+'_'+tmp5)
+        if ncol == 3:
+            tmp1,tmp2,tmp3=fline.split()[0:3]
+            filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3)
+#-----------------------------------------------------------------------------------------
+
+def update_mfile(modelfile,f_id):
     hdu1=fits.open(modelfile,mode='update') 
+    hdu1.info()
+#read-in filter transmission curves for selected bands
+    with open (codedir+'filters/allfilters.dat','r') as f: 
+        flines=f.readlines()
+
+    fcount=-1
+    lam1,lam2,lam3,trans1,trans2,trans3=[],[],[],[],[],[]
+    for fline in flines:
+        if fline.strip():
+            ncol=len(fline.split())
+            if ncol > 2:
+                fcount=fcount+1
+            if ncol == 2:
+                if fcount == f_id[0]: 
+                    tmp1,tmp2=fline.split()[0:2]
+                    lam1.append(float(tmp1)),trans1.append(float(tmp2))
+                if fcount == f_id[1]:
+                    tmp1,tmp2=fline.split()[0:2]
+                    lam2.append(float(tmp1)),trans2.append(float(tmp2))
+                if fcount == f_id[2]:
+                    tmp1,tmp2=fline.split()[0:2]
+                    lam3.append(float(tmp1)),trans3.append(float(tmp2))
+                        
+    col1=fits.Column(name='lambda1',format='F',array=lam1)
+    col2=fits.Column(name='transmission1',format='F',array=trans1)
+    col3=fits.Column(name='lambda2',format='F',array=lam2)
+    col4=fits.Column(name='transmission2',format='F',array=trans2)
+    col5=fits.Column(name='lambda3',format='F',array=lam3)
+    col6=fits.Column(name='transmission3',format='F',array=trans3)
+
+    cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
+    tbhdu=fits.new_table(cols)
+
+    hdu1.append(tbhdu)
+#    hdu1.writeto('temp.fits')
+
     hdr=hdu1[0].header #the header associated with extension=0
 
     #create/update luminosity function parameters in model file header
@@ -145,80 +215,79 @@ def update_mfile(modelfile):
     hdr.set('PHI0_FIX',value_fix[0],'Fix Phi0 (Y=1/N=0)')
     hdr.set('PHI0_MIN',value_min[0],'Minimum Phi0 value')
     hdr.set('PHI0_MAX',value_max[0],'Maximum Phi0 value')
-    hdr.set('PHI0_DP',value_dp[0],'sigma phi0')
     
     hdr.set('L0',value_initial[1],'Luminosity Function knee')
     hdr.set('L0_FIX',value_fix[1],'Fix L0 (Y=1/N=0)')
     hdr.set('L0_MIN',value_min[1],'Minimum L0 value')
     hdr.set('L0_MAX',value_max[1],'Maximum L0 value')
-    hdr.set('L0_DP',value_dp[0],'sigma L0')
  
     hdr.set('ALPHA',value_initial[2],'Luminosity Function upper slope')
     hdr.set('ALPHA_FI',value_fix[2],'Fix alpha (Y=1/N=0)')
     hdr.set('ALPHA_MI',value_min[2],'Minimum alpha value')
     hdr.set('ALPHA_MA',value_max[2],'Maximum alpha value')
-    hdr.set('ALPHA_DP',value_dp[2],'sigma alpha')
 
     hdr.set('BETA',value_initial[3],'Luminosity Function lower slope')
     hdr.set('BETA_FIX',value_fix[3],'Fix beta (Y=1/N=0)')
     hdr.set('BETA_MIN',value_min[3],'Minimum beta value')
     hdr.set('BETA_MAX',value_max[3],'Maximum beta value')
-    hdr.set('BETA_DP',value_dp[3],'sigma beta')
 
     hdr.set('P',value_initial[4],'LF density evolution parameter')
     hdr.set('P_FIX',value_fix[4],'Fix p (Y=1/N=0)')
     hdr.set('P_MIN',value_min[4],'Minimum p value')
     hdr.set('P_MAX',value_max[4],'Maximum p value')
-    hdr.set('P_DP',value_dp[4],'sigma p')
 
     hdr.set('Q',value_initial[5],'LF luminosity evolution parameter')
     hdr.set('Q_FIX',value_fix[5],'Fix q (Y=1/N=0)')
     hdr.set('Q_MIN',value_min[5],'Minimum q value')
     hdr.set('Q_MAX',value_max[5],'Maximum q value')
-    hdr.set('Q_DP',value_dp[5],'sigma q')
     
     hdr.set('ZCUT',value_initial[6],'LF evolution redshift cutoff')
     hdr.set('ZCUT_FIX',value_fix[6],'Fix zcut (Y=1/N=0)')
     hdr.set('ZCUT_MIN',value_min[6],'Minimum zcut value')
     hdr.set('ZCUT_MAX',value_max[6],'Maximum zcut value')
-    hdr.set('ZCUT_DP',value_max[6],'sigma zcut')
 
     hdr.set('CEXP',value_initial[6],'Color evolution term')
     hdr.set('CEXP_FIX',value_fix[6],'Fix cexp (Y=1/N=0)')
     hdr.set('CEXP_MIN',value_min[6],'Minimum cexp value')
     hdr.set('CEXP_MAX',value_max[6],'Maximum cexp value')
-    hdr.set('CEXP_DP',value_dp[6],'sigma cexp')
 
 #====================================================================
 # Survey properties 
 #--------------------------------------------------------------------   
     hdr.set('AREA',area[0],'Observed Solid Angle of survey')
+    hdr.set('Axis1','ColorF1F2','Diagnostic x-axis')
+    hdr.set('Axis2','Flux3','Diagnostic y-axis')
     hdr.set('Band_1',band[0],'1st filter name')
     hdr.set('Band_2',band[1],'2nd filter name')
     hdr.set('Band_3',band[2],'3rd filter name')
     hdr.set('Fluxlim1',flim[0],'1st band flux limit')
     hdr.set('Fluxlim2',flim[1],'2nd band flux limit')
     hdr.set('Fluxlim3',flim[2],'3rd band flux limit')
+
+#====================================================================
+# Code settings
 #---------------------------------------------------------------------  
-    #these aren't currently user controllable in widget, but can change them right here at own risk  
-    hdr.set('ZMIN',0.0,'Simulation minimum redshift')
+    hdr.set('ZMIN',0.01,'Simulation minimum redshift')
     hdr.set('ZMAX',5.0,'Simulation maximum redshift')
-    hdr.set('DZ',0.1,'Redshift Bin Width')
-    hdr.set('RUNS',1.e3,'Number of runs')
+    hdr.set('DZ',0.05,'Redshift Bin Width')
+    hdr.set('RUNS',1.e4,'Number of runs')
 
     hdr.set('NCHAIN',5,'Chain Number')
-    hdr.set('TMAX',20.0,'Starting Anneal Temperature')
+    hdr.set('TMAX',100.0,'Starting Anneal Temperature')
     hdr.set('ANN_PCT',0.25,'Ideal acceptance Percentage')
-    hdr.set('ANN_RNG',0.05,'Range from ideal within which to maintainacceptance')
-    hdr.set('CONV_CON',0.5,'Convergence confidence interval') #was 0.05 but having trouble converging so set to 0.5 just for now
+    hdr.set('ANN_RNG',0.05,'Range to maintain acceptance')
+    hdr.set('CONV_CON',0.05,'Convergence confidence interval') #was 0.05 but having trouble converging so set to 0.5 just for now
     hdr.set('CONV_RMA',1.05,'Convergence Rmax Criterion')
-    hdr.set('CONV_STE',20,'Iterations between convergence checks')
-    hdr.set('BURN_STE',10,'Iterations between anneal calls in burn-in')
+    hdr.set('CONV_STE',20,'Steps btw convergence checks')
+    hdr.set('BURN_STE',10,'Steps btw anneal calls in burn-in')
     hdr.set('BURNVRUN',10,'Ratio of normal to burn-in steps')
-    hdr.set('PRINT',1,'Whether to Print Debug MSGs (1=verbose,0=silent)')
+    hdr.set('PRINT',1,'Print Debug MSGs (1=verbose,0=silent)')
 
     hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
+    hdu1.flush() #actually update the model file
     hdu1.close
+    return
+#-----------------------------------------------------------------------------
 
 #this is all to do with the GUI where the user is allowed to change the model parameter values etc
 if (mdefaults == 'y'):
@@ -277,9 +346,7 @@ if (mdefaults == 'y'):
    # label=Label(labelframe2,text="Area [sqdeg]/wavelength [um]/Flux limit [mJy]",width=50);
     label=Label(labelframe2,text="Filter/Area [sqdeg]/Flux limit [mJy]",width=50);
     label.pack();
-    fields2='Band 1','Band 2','Band 3'
-#just placeholder, don't actually want to label the rows here
-    #fields2='1,2,3'
+    fields2=band[0],band[1],band[2]
 
     def fetch(entries):
         for entry in entries:
@@ -294,12 +361,12 @@ if (mdefaults == 'y'):
     db1=StringVar()
     db2=StringVar()
     db3=StringVar()
+
     def makeform2(labelframe2, fields2):
         entries2 = []
         ind=0;
         for field in fields2:
             row = Frame(labelframe2)
- #           lab = Label(row, width=10, text=field, anchor='w')
             lab = Label(row, width=10, anchor='w')
             row.pack(side=TOP, padx=2, pady=5)
             lab.pack(side=LEFT)
@@ -332,8 +399,8 @@ if (mdefaults == 'y'):
             ind=ind+1;
         return entries2
 
-    def callback():
-        print("Updating parameter values...")
+    def callback(event=None):
+        print("Updating model file...")
         ind=0
         for field in fields:
             value_initial[ind]=v_init[ind].get()
@@ -344,17 +411,20 @@ if (mdefaults == 'y'):
         band[0]=db1.get()
         band[1]=db2.get()
         band[2]=db3.get()
+        if band[0] != 'Band1':
+            f_id=[filter_choices.index(band[0]),filter_choices.index(band[1]),filter_choices.index(band[2])]
         flim[0]=f1.get()
         flim[1]=f2.get()
         flim[2]=f3.get()
-        update_mfile(modelfile)
+        update_mfile(modelfile,f_id)
+        return
 
     if __name__ == '__main__':
         ents = makeform(labelframe, fields)
         root.bind('<Return>', partial(fetch, ents))
         ents2 = makeform2(labelframe2, fields2)
         root.bind('<Return>', partial(fetch, ents2))
-        b1 = Button(labelframe2, text='Update',command=callback)
+        b1 = Button(labelframe2, text='Update',command=lambda:callback())
         b1.pack(side=LEFT,padx=5,pady=5)
         b2 = Button(labelframe2, text='Run',command=runcode)
         b2.pack(side=LEFT,padx=5,pady=5)

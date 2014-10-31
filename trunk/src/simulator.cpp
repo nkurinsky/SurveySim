@@ -5,12 +5,12 @@ simulator::simulator() : color_exp(0.0),
 			 dz(0.1),
 			 zmin(0.1), 
 			 nz(59),
-			 filterFile("/usr/local/surveysim/filters/filterlib.txt"), 
+			 //filterFile("/usr/local/surveysim/filters/filterlib.txt"), 
 			 obsFile(""){
   
-  char * ffile = getenv("FILTERFILE");
-  if(ffile != NULL)
-    filterFile = static_cast<string>(ffile);
+  //char * ffile = getenv("FILTERFILE");
+  //if(ffile != NULL)
+  //  filterFile = static_cast<string>(ffile);
   
   filters[0] = "F1";
   filters[1] = "F2";
@@ -20,9 +20,9 @@ simulator::simulator() : color_exp(0.0),
   axes[1] = ColorF2F3;
 }
 
-simulator::simulator(string filterfile, string obsfile, string sedfile, axis_type axes[]) : simulator(){
+simulator::simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]) : simulator(){
  
-  filterFile = filterfile;
+  modelFile = modelfile;
   set_sed_lib(sedfile);
   this->axes[0] = axes[0];
   this->axes[1] = axes[1];
@@ -32,7 +32,7 @@ simulator::simulator(string filterfile, string obsfile, string sedfile, axis_typ
 
 simulator::simulator(const Configuration &config) : simulator(){
   
-  filterFile = config.filterfile;
+  //modelFile = config.modelfile;
   double tarea(config.areaSteradian());
 
   area = (tarea > 0) ? ((tarea <= 12.56637) ? tarea : 12.56637) : 3.046174e-4;
