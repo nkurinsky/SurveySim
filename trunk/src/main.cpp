@@ -1,13 +1,9 @@
 //****************************************************************************
-// written by Anna Sajina and Noah Kurinsky, 2012
-// updated by Noah Kurinsky 10/13
-// The purpose of this program is to read-in the parameters set in the idl 
-// wrapper (simulation.pro) and to use MCMC to determine the best-fit set of 
-// parameters. 
-// Specifically it runs through a number of iterations (runs) in each stage 
-// calling on simulator.cpp to compute the chi2 for a given set of parameters
-// then the metrop algorithm is invoked to decide whether or not a given trial 
-// run is accepted. If so it is added to a chain of mcmc values.
+// SurveySim
+//.............................................................................
+// written by Noah Kurinsky and Anna Sajina
+// last modified Anna Sajina November 1st, 2014
+// The purpose of this program is to use MCMC to determine the luminosity function evolution and redshift distribution based on infrared survey data -- the details of the input observations as well as default model parameters are passed to this program via a series of fits files (model.fits, observations.fits, sed_templates.fits) which are set using either idl (SurveySim.pro) or python (SurveySim.py). 
 //****************************************************************************
 
 #include "simulator.h"

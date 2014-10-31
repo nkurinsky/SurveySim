@@ -1,33 +1,5 @@
 #include "lumfunct.h" //See this header for more information on the following funcitons
 
-// void lumfunct::set_phi0(double val){
-//   phi0=val;
-// }
-
-// void lumfunct::set_L0(double val){
-//   L0=val;
-// }
-
-// void lumfunct::set_alpha(double val){
-//   alpha=val;
-// }
-
-// void lumfunct::set_beta(double val){
-//   beta=val;
-// }
-
-// void lumfunct::set_p(double val){
-//   p=val;
-// }
-
-// void lumfunct::set_q(double val){
-//   q=val;
-// }
-
-// void lumfunct::set_zmax(double val){
-//   zmax=val;
-// }
-
 void lumfunct::get_params(double lpars[]){
   lpars[0] = phi0;
   lpars[1] = L0;
@@ -49,7 +21,7 @@ void lumfunct::set_params(double lpars[]){
 }
 
 //this function returns the number of sources (per Mpc^3) for a given L-z pair
-//this is the main function which needs to be changed to change the lumfunct
+//this is the main function which would needs to be changed in order to change the adopted luminosity function
 double lumfunct::get_nsrcs(double redshift,double lum){
   double nsrcs;
   double t1,t2;

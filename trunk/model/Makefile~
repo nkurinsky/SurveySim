@@ -1,0 +1,1 @@
+LIBS = -lCCFits -lcfitsio -lgsl -lgslcblas -lm -lm -lgslcblas -lgsl -lcfitsio -lCCFits
