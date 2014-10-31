@@ -1,1 +1,0 @@
-void 	read (std::vector< S > &vals, long first, long last)
