@@ -34,6 +34,8 @@ class sed_lib{
   double *lums;
   unsigned int lnum;
   unsigned int bandnum;
+  unsigned int znum;
+  unsigned int tnum;
   gsl_interp_accel *acc;
   gsl_spline *spline;
   double brange[2];
