@@ -5,12 +5,7 @@ simulator::simulator() : color_exp(0.0),
 			 dz(0.1),
 			 zmin(0.1), 
 			 nz(59),
-			 //filterFile("/usr/local/surveysim/filters/filterlib.txt"), 
 			 obsFile(""){
-  
-  //char * ffile = getenv("FILTERFILE");
-  //if(ffile != NULL)
-  //  filterFile = static_cast<string>(ffile);
   
   filters[0] = "F1";
   filters[1] = "F2";
@@ -31,8 +26,7 @@ simulator::simulator(string modelfile, string obsfile, string sedfile, axis_type
 }
 
 simulator::simulator(const Configuration &config) : simulator(){
-  
-  //modelFile = config.modelfile;
+  modelFile = config.modelfile;
   double tarea(config.areaSteradian());
 
   area = (tarea > 0) ? ((tarea <= 12.56637) ? tarea : 12.56637) : 3.046174e-4;
@@ -47,21 +41,9 @@ simulator::simulator(const Configuration &config) : simulator(){
   set_obs(config.obsfile);
 }
 
-bool simulator::load_filter_lib(string file){
+bool simulator::load_filters(string file){
   filterFile = file;
-  return seds->init_filter_lib(file);
-}
-
-bool simulator::load_filter(short filt_id, string name, double error, double flim){
-  if((filt_id < 3) and (filt_id >= 0)){
-    band_errs[filt_id] = error;
-    flux_limits[filt_id] = flim;
-  }
-  else{
-    printf("ERROR: Invalid filt_id\n");
-    return false;
-  }
-  return seds->load_filter(filt_id,name);
+  return seds->load_filters(file);
 }
 
 void simulator::set_diagnostic_xaxis(axis_type option){
@@ -105,12 +87,8 @@ void simulator::set_lumfunct(lumfunct *lf){
 
 void simulator::initialize_filters(){
 
-  if((seds.get() != NULL) and (observations.get() != NULL)){
-    
-    if(seds->init_filter_lib(filterFile)){
-      for(short i=0;i<3;i++)
-	seds->load_filter(i,filters[i]);
-    }
+  if((seds.get() != NULL) and (observations.get() != NULL)){    
+    seds->load_filters(modelFile)
   }
   
 }

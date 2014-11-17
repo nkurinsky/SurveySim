@@ -43,15 +43,12 @@ class filter{
 class filter_lib{
  public:
   filter_lib();
-  filter_lib(string ffilename);
+  filter_lib(string fitsfile);
   bool init(){
     return initialized;}
-  bool load_library(string ffilename);
-  bool load_filter(short num, string fname);
+  bool load_filters(string fitsfile);
   filter& get(short num);
-  void print();
  private:
-  vector<filter_info> library;
   filter filters[3];
   filter dummy;
   bool initialized;

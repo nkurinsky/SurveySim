@@ -134,7 +134,7 @@ filter_lib::filter_lib(){
   initialized = false;
 }
 
-filter_lib::filter_lib(string ffilename){
+filter_lib::filter_lib(string fitsfile){
   if(load_library(ffilename)){
     initialized = true;
   }
@@ -144,137 +144,39 @@ filter_lib::filter_lib(string ffilename){
   }
 }
 
-bool filter_lib::load_library(string ffilename){
-  
-  if(initialized){
-    library.clear();
-    initialized = false;
+bool filter_lib::load_filters(string fitsfile){
+
+  std::unique_ptr<CCfits::FITS> pInfile;
+  try{
+    pInfile.reset(new CCfits::FITS(modfile,CCfits::Read,true));
+  }
+  catch(...){
+    printf("Error reading FITS file %s\n",modfile.c_str());
+    exit(1);
   }
 
-  bool invalid_name = false;
-  char buffer[256], name[256], info[256];
-  double scale_exp, dlambda, dresponse;
-  filter_info temp;
-  int matchnum;
-  int bad = 0;
-
-  long linenumber=0;
-  
-  FILE *infile;
-  infile = fopen(ffilename.c_str(),"r");
-  if(infile != NULL){
-    while(!feof(infile)){
-      //read operations, line by line
-      if(fgets(buffer,255,infile) != NULL){
-	linenumber++;
-	switch(buffer[0]){
-	case EOF:
-	case '\n':
-	case '#':
-	  break;
-	case '>':
-	  //if vectors not empty, finalize previous filter
-	  if(temp.band.size() != 0){
-	    library.push_back(temp);
-	    temp.band.clear();
-	    temp.transmission.clear();
-	  }
-	  
-	  //new filter
-	  if(invalid_name){
-	    printf("Discarded %i lines after bad filter initializer\n",bad);
-	    invalid_name = false;
-	    bad = 0;
-	  }
-	  
-	  scale_exp = 0;
-	  matchnum = sscanf(buffer," > %s %lf %s", name, &scale_exp, info);	  
-	  
-	  switch(matchnum){
-	  case 0:
-	    printf("Warning: Invalid value detected in filter library file \"%s\" at line %li, discarding line\n", ffilename.c_str(),linenumber);
-	    invalid_name = true;
-	    break;
-	  case 1:
-	    temp.info = "";
-	    temp.scale = 1;
-	    break;
-	  case 2:
-	    temp.name = toLower(static_cast<string>(name));
-	    if(scale_exp != 0){
-	      temp.scale = pow(10,scale_exp);
-	      temp.info = "";
-	    }
-	    else{
-	      temp.info = (string) info;
-	      temp.scale = 1;
-	    }
-	    break;
-	  default: //3 or more (could never be more)
-	    temp.name = toLower(static_cast<string>(name));
-	    temp.scale = pow(10,scale_exp);
-	    temp.info = static_cast<string>(info);
-	    break;
-	  }
-	  break;
-	default:
-	  if(invalid_name){
-	    bad++;
-	    break;
-	  }
-	  
-	  matchnum = sscanf(buffer," %lf %lf",&dlambda,&dresponse);
-	  if((dlambda < 0) or (matchnum != 2))
-	    printf("Warning: Invalid value detected in filter library file \"%s\" at line %li, discarding line\n", ffilename.c_str(),linenumber);
-	  else{
-	    if(dresponse < 0)
-	      dresponse = 0;
-	    temp.band.push_back(dlambda*temp.scale);
-	    temp.transmission.push_back(dresponse);
-	  }
-	}
-      }
-    }
-
-    //finalize previous filter
-    if(temp.band.size() != 0)
-      library.push_back(temp);
-
-    fclose(infile);
-    initialized = true;
-    return true;
+  CCfits::ExtHDU& filters = pInfile->extension(1);
+  int ntcols = filters.numCols();
+  if(ntcols != 6){
+    printf("Wrong number of filters included (need 3):");
+    exit(1);
   }
-  else{
-    printf("ERROR: Could not read filter library file \"%s\"\n",ffilename.c_str());
-    return false;
-  }
-}
 
-bool filter_lib::load_filter(short num, string fname){
-  int found=-1;
-  string fSearchName(toLower(fname));
+  vector<double> band;
+  vector<double> transmission;
+  long tablelength = filters.rows();
   
-  if(initialized){
-    if ((num >=0) and (num <3)){
-      for(int i=0;i<library.size();i++){
-	if(library[i].name == fSearchName){
-	  found = i;
-	  i = library.size();
-	}
-      }
-      if (found != -1)
-	return filters[num].load(fname,library[found].band, library[found].transmission);
-      else{
-	printf("Error: Filter \"%s\" not found in library\n",fname.c_str());
+  for(int i=1;i<7;i+=2){
+    filters.column(i).read(band,1,tablelength);
+    filters.column(i+1).read(transmission,1,tablelength);
+      if(not filters[num].load(fname,band,transmission) ){
+	printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str());
 	exit(1);
       }
-    }
-    else
-      printf("Error: Invalid filter number %i\n",num);
   }
-  else printf("Error: library not initialized\n");
 
-  return false;
+  initialized = true;
+  return true;
 }
 
 filter& filter_lib::get(short num){
@@ -285,10 +187,4 @@ filter& filter_lib::get(short num){
     printf("ERROR: Invalid filter number (%i)\n",num);
     return dummy;
   }
-}
-
-void filter_lib::print(){
-  printf("Number of Filters in Library: %lu\nFilter List:\n",library.size());
-  for(unsigned long i=0;i<library.size();i++)
-    printf("\t%16s\t%6.3lf\t%s\n",library[i].name.c_str(),library[i].scale,library[i].info.c_str());
 }

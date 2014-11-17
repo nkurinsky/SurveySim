@@ -75,7 +75,6 @@ public:
   string obsfile;
   string modfile;
   string sedfile;
-  string filterfile;
   
   bool vary_cexp;
   bool oprint;

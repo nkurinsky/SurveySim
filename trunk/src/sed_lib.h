@@ -6,6 +6,7 @@
 #include "functions.h"
 #include "filters.h"
 #include "cosmo.h"
+#include "alg_lib/interpolation.h"
 #include <map>
 #include <tuple>
 
@@ -36,8 +37,11 @@ class sed_lib{
   unsigned int bandnum;
   unsigned int znum;
   unsigned int tnum;
+  //for interpolation
   gsl_interp_accel *acc;
   gsl_spline *spline;
+  // new structures
+  spline3dinterpolant 3Dspline;
   double brange[2];
   double color_exp;
   double color_zcut;
@@ -48,8 +52,7 @@ class sed_lib{
   gsl_integration_workspace *w;
  public:
   sed_lib(string fitsfile);
-  bool init_filter_lib(string file);
-  bool load_filter(short filter_id, string name);
+  bool load_filters(string fitsfile);
   double get_flux(double lum, double redshift, double band);
   double get_filter_flux(double lum, double redshift, short sedtype, short filter_id);
   void set_color_evolution(double exp, double zcut=1000);

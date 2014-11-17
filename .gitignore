@@ -2,6 +2,7 @@ trunk/src/*.o
 trunk/src/Makefile
 trunk/src/fitter
 trunk/src/.deps
+trunk/src/alg_lib/.deps
 trunk/Makefile
 trunk/obs/Makefile
 trunk/filters/Makefile

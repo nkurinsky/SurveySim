@@ -77,12 +77,6 @@ Configuration::Configuration(int argc, char *argv[]){
     exit(1);
   }
   
-  //  char * ffile = getenv("FILTERFILE");
-  //if(ffile != NULL)
-  //  filterfile = static_cast<string>(ffile);
-  //else
-  //  filterfile = "/usr/local/surveysim/filters/filterlib.txt";
-
   //File names passed in by Widget
   obsfile = argv[1];
   modfile = argv[2];
@@ -109,7 +103,6 @@ void Configuration::print(){
   printf("  Main Settings:  %s\n",modfile.c_str());
   printf("  SED library:    %s\n",sedfile.c_str());
   printf("  Observations:   %s\n",obsfile.c_str());
-  printf("  Filter library: %s\n",filterfile.c_str());
 
   printf("\nMCMC Settings:\n");
   printf("  Chain Number         : %lu\n", nchain);
@@ -267,20 +260,6 @@ void Configuration::load(){
     vary_cexp = false;
   
   burn_num = runs/burn_ratio;
-
- //=================================================================  
-  //Read-in filter transmission curves
-  //-----------------------------------------------------------------
-  // first read-in table extension
-  CCfits::ExtHDU& filters = pInfile->extension(1);
-  int ntcols;
-  ntcols=filters.numCols();
-  if(ntcols != 6){
-    printf("Wrong number of filters included (need 3):");
-    exit(1);
-  }
-  //filters.column hold the lambda and transmission curves for the 3 filters (note had to change the original pInfile declaration above to "true").
-         
 }
 
 RandomNumberGenerator::RandomNumberGenerator(){

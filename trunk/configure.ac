@@ -14,6 +14,7 @@ AM_INIT_AUTOMAKE
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_RANLIB
 
 # Checks for libraries.
 LIBS="-lm -lgslcblas -lgsl -lcfitsio -lCCFits"
@@ -42,5 +43,5 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_CHECK_FUNCS([floor pow sqrt])
 
-AC_CONFIG_FILES([Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile idl/Makefile lib_aux/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile idl/Makefile lib_aux/Makefile src/alg_lib/Makefile])
 AC_OUTPUT
