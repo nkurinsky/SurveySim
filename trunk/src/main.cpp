@@ -30,10 +30,11 @@ int main(int argc,char** argv){
   printf("\n");
 
   Configuration q(argc,argv);
+
   VERBOSE(printf("Fitting Code Compiled: %s\n\n",__DATE__));
   VERBOSE(q.print());
   RandomNumberGenerator rng;
-  
+
   printf("Axis 1: %s\nAxis 2: %s\n",get_axis_type(q.axes[0]).c_str(),get_axis_type(q.axes[1]).c_str());
 
   //general variable declarations
@@ -59,12 +60,14 @@ int main(int argc,char** argv){
   lumfunct lf;
   lf.set_params(lpars);
 
+  printf("hi 2");
+
   //initialize simulator
   simulator survey(q); 
   survey.set_color_exp(CE); //color evolution
   survey.set_lumfunct(&lf);
   products output;
-  
+
   MCChains mcchain(q.nchain,q.nparams,q.runs,q.conv_step);
   MCChains burnchain(q.nchain,q.nparams,q.runs,q.conv_step);
   mcchain.set_constraints(q.rmax,q.a_ci);
