@@ -6,7 +6,7 @@
 #include "functions.h"
 #include "filters.h"
 #include "cosmo.h"
-#include "alg_lib/interpolation.h"
+#include "interpolation.h"
 #include <map>
 #include <tuple>
 
@@ -41,7 +41,7 @@ class sed_lib{
   gsl_interp_accel *acc;
   gsl_spline *spline;
   // new structures
-  spline3dinterpolant 3Dspline;
+  //spline3dinterpolant 3Dspline;
   double brange[2];
   double color_exp;
   double color_zcut;
