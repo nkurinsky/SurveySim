@@ -16,13 +16,14 @@ from pylab import *
 import math
 
 #codedir=os.getcwd();
-codedir='/Users/annie/students/noah_kurinsky/SurveySim/trunk/'
+#codedir='/Users/annie/students/noah_kurinsky/SurveySim/trunk/'
+codedir='/Users/noah/SurveySim/trunk/'
 sedfile=codedir+'templates/sf_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
 modelfile=codedir+'model/model.fits'
 obsfile=codedir+'obs/observation.fits'
 outfile=codedir+'output/output.fits'
-fitcode=codedir+'src/fitter'
+fitcode='fitter'
 
 def runcode():
     print("Runnning fitter code....")
@@ -256,7 +257,7 @@ def update_mfile(modelfile,f_id):
 #--------------------------------------------------------------------   
     hdr.set('AREA',area[0],'Observed Solid Angle of survey')
     hdr.set('Axis1','ColorF1F2','Diagnostic x-axis')
-    hdr.set('Axis2','Flux3','Diagnostic y-axis')
+    hdr.set('Axis2','Flux1','Diagnostic y-axis')
     hdr.set('Band_1',band[0],'1st filter name')
     hdr.set('Band_2',band[1],'2nd filter name')
     hdr.set('Band_3',band[2],'3rd filter name')
