@@ -26,7 +26,7 @@ simulator::simulator(string modelfile, string obsfile, string sedfile, axis_type
 }
 
 simulator::simulator(const Configuration &config) : simulator(){
-  modelFile = config.modelfile;
+  modelFile = config.modfile;
   double tarea(config.areaSteradian());
 
   area = (tarea > 0) ? ((tarea <= 12.56637) ? tarea : 12.56637) : 3.046174e-4;
@@ -42,7 +42,6 @@ simulator::simulator(const Configuration &config) : simulator(){
 }
 
 bool simulator::load_filters(string file){
-  filterFile = file;
   return seds->load_filters(file);
 }
 
@@ -88,7 +87,7 @@ void simulator::set_lumfunct(lumfunct *lf){
 void simulator::initialize_filters(){
 
   if((seds.get() != NULL) and (observations.get() != NULL)){    
-    seds->load_filters(modelFile)
+    seds->load_filters(modelFile);
   }
   
 }

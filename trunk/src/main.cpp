@@ -60,8 +60,6 @@ int main(int argc,char** argv){
   lumfunct lf;
   lf.set_params(lpars);
 
-  printf("hi 2");
-
   //initialize simulator
   simulator survey(q); 
   survey.set_color_exp(CE); //color evolution

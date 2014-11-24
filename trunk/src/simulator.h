@@ -34,6 +34,7 @@ private:
   double zmin;
   int nz;
   string obsFile;
+  string modelFile;
   axis_type axes[2];
   RandomNumberGenerator rng;
   void initialize_filters();
@@ -42,8 +43,7 @@ private:
   simulator();
   simulator(const Configuration &config);
   simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]);
-  //bool load_filter_lib(string file);
-  bool load_filter(short filt_id, string name, double error, double flim);
+  bool load_filters(string file);
   void set_diagnostic_xaxis(axis_type option);
   void set_diagnostic_yaxis(axis_type option);
   void set_diagnostic_axes(axis_type xopt, axis_type yopt);

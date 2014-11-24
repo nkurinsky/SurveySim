@@ -135,11 +135,11 @@ filter_lib::filter_lib(){
 }
 
 filter_lib::filter_lib(string fitsfile){
-  if(load_library(ffilename)){
+  if(load_filters(fitsfile)){
     initialized = true;
   }
   else{
-    printf("ERROR: file \"%s\" not read successfully, library not initialized\n",ffilename.c_str());
+    printf("ERROR: file \"%s\" not read successfully, library not initialized\n",fitsfile.c_str());
     initialized = false;
   }
 }
@@ -148,13 +148,14 @@ bool filter_lib::load_filters(string fitsfile){
 
   std::unique_ptr<CCfits::FITS> pInfile;
   try{
-    pInfile.reset(new CCfits::FITS(modfile,CCfits::Read,true));
+    pInfile.reset(new CCfits::FITS(fitsfile,CCfits::Read,true));
   }
   catch(...){
-    printf("Error reading FITS file %s\n",modfile.c_str());
+    printf("Error reading FITS file %s\n",fitsfile.c_str());
     exit(1);
   }
 
+  CCfits::HDU& head = pInfile->pHDU();
   CCfits::ExtHDU& filters = pInfile->extension(1);
   int ntcols = filters.numCols();
   if(ntcols != 6){
@@ -166,13 +167,50 @@ bool filter_lib::load_filters(string fitsfile){
   vector<double> transmission;
   long tablelength = filters.rows();
   
+  string bands[] = {"BAND_1","BAND_2","BAND_3"};
+  for(int i=0;i<3;i++){
+    try{
+      string stemp;
+      head.readKey(bands[i],stemp);
+      bands[i] = stemp;
+    }
+    catch(...){
+      printf("Error reading keyword \"%s\", defaulting to standard label\n",bands[i].c_str());
+    }
+  }
+
+  double scale = -10;
+  try{
+    double dtemp;
+    head.readKey("LSCALE", dtemp);
+    scale = dtemp;
+  }
+  catch(...){
+    printf("Error reading keyword \"LSCALE\", defaulting to Angstroms\n");
+  }
+  double exp_scale = pow(10,scale);
+
+  double nullvalue=-1;
   for(int i=1;i<7;i+=2){
-    filters.column(i).read(band,1,tablelength);
+    filters.column(i).read(band,1,tablelength,&nullvalue);
     filters.column(i+1).read(transmission,1,tablelength);
-      if(not filters[num].load(fname,band,transmission) ){
-	printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str());
-	exit(1);
+    int num = floor(i/2);
+    int newlength=tablelength;
+    if(band.back() <= 0.0){
+      while(band.back() <= 0.0){
+	band.pop_back();
+	transmission.pop_back();
       }
+      newlength = band.size();      
+    }
+    for(int j=0;j<band.size();j++){
+      band[j]*=exp_scale;
+    }
+    printf("Loaded Filter: %f -> %f\n",band.front(),band.back());
+    if(not this->filters[num].load(bands[num],band,transmission) ){
+      printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str());
+      exit(1);
+    }
   }
 
   initialized = true;

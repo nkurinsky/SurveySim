@@ -107,18 +107,14 @@ sed_lib::sed_lib(string fitsfile){
   delete pInfile;
 }
 
-bool sed_lib::init_filter_lib(string file){
+bool sed_lib::load_filters(string file){
   
-  if(filters.load_library(file)){
+  if(filters.load_filters(file)){
     w = gsl_integration_workspace_alloc(SL_INT_SIZE);
     return true;
   }
   
   return false;
-}
-
-bool sed_lib::load_filter(short filter_id, string name){
-  return filters.load_filter(filter_id,name);
 }
 
 //needs to interpolate to correct luminosity 
