@@ -100,7 +100,7 @@ endfor
 ;----------------------------------------------------------------------------
 
 nz=3 ;z=0 (the Rieke templates),z=1 (or rather some appropriate bin), and z=2 (again some bin)
-nsed=4 ;assume at least 3 choices of SED per L-z bin (potentially 2 SF (or 1 SF, 1 composite) and 2 types of AGN (more or less obscured)
+nsed=4 ;assume at least 4 choices of SED per L-z bin (potentially 2 SF (or 1 SF, 1 composite) and 2 types of AGN (more or less obscured)
 templates=fltarr(nlam,ntmpl,nz,nsed)
 for i=0,ntmpl-1 do begin
    for j=0,nz-1 do begin
