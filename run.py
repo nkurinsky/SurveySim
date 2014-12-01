@@ -14,7 +14,7 @@ sys.path.append(pydir)
 sedfile=codedir+'templates/sf_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
 modelfile=codedir+'model/model.fits'
-obsfile=codedir+'obs/observation.fits'
+obsfile=codedir+'obs/wise.fits'
 outfile=codedir+'output/output.fits'
 fitcode='fitter'
 
@@ -175,8 +175,8 @@ for fline in flines:
 #-----------------------------------------------------------------------------------------
 
 def update_mfile(modelfile,f_id):
-    hdu1=fits.open(modelfile,mode='update') 
-    hdu1.info()
+    hdulist=fits.open(modelfile)
+    
 #read-in filter transmission curves for selected bands
     with open (codedir+'filters/allfilters.dat','r') as f: 
         flines=f.readlines()
@@ -209,10 +209,7 @@ def update_mfile(modelfile,f_id):
     cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
     tbhdu=fits.new_table(cols)
 
-    hdu1.append(tbhdu)
-#    hdu1.writeto('temp.fits')
-
-    hdr=hdu1[0].header #the header associated with extension=0
+    hdr=hdulist[0].header #the header associated with extension=0
 
     #create/update luminosity function parameters in model file header
     hdr.set('PHI0',value_initial[0],'Luminosity Function Normalization')
@@ -288,8 +285,16 @@ def update_mfile(modelfile,f_id):
     hdr.set('PRINT',1,'Print Debug MSGs (1=verbose,0=silent)')
 
     hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
-    hdu1.flush() #actually update the model file
-    hdu1.close
+    hdulist.close
+
+#    hdulist.flush() #actually update the model file
+    thdulist=fits.HDUList([hdulist[0],tbhdu])
+    if(os.path.isfile(modelfile)):
+           print 'Replacing existing model file....'
+           os.remove(modelfile)
+           thdulist.writeto(modelfile);
+    else:
+           thdulist.writeto(modelfile);
     return
 #-----------------------------------------------------------------------------
 
@@ -404,7 +409,7 @@ if (mdefaults == 'y'):
         return entries2
 
     def callback(event=None):
-        print("Updating model file...")
+        #print("Updating model file...")
         ind=0
         for field in fields:
             value_initial[ind]=v_init[ind].get()

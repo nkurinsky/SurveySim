@@ -1,13 +1,41 @@
-pro update_wise
+pro convert_wise_catalog
 
-data=mrdfits('test/test.fits')
-help,data,/struct
-f1=data[0,*]
-f2=data[1,*]
-f3=data[2,*]
-f4=data[3,*]
-print,min(f1),min(f2),min(f3),min(f4)
-plot,f1,f2,psym=3,/xlog,/ylog
+file='test.tbl'
+;mvega and emvega are vega magnitudes with their errors for the 4 wise bands
+readcol, path+file, id, ra,dec, mvega1, emvega1, mvega2, emvega2, mvega3, emvega3, mvega4, emvega4, format='A,D,D,D,D,D,D,D,D,D,D', skipline=17, /silent
+n=n_elements(id)
+;Convert from vega magnitudes to fluxes in mJy for the 4 WISE bands
+flux1=1.0E3*10.0^((8.9-(mvega1+2.683))/2.5)
+eflux1=flux1*abs((1-10.^(-0.4*emvega1)))
+;flux1u=1.0E3*10.0^((8.9-(mvega1+emvega1+2.683))/2.5)
+;flux1b=1.0E3*10.0^((8.9-(mvega1-emvega1+2.683))/2.5)
+
+flux2=1.0E3*10.0^((8.9-(mvega2+2.683))/2.5)
+eflux2=flux2*abs((1-10.^(-0.4*emvega2)))
+;flux2u=1.0E3*10.0^((8.9-(mvega2+emvega2+2.683))/2.5)
+;flux2b=1.0E3*10.0^((8.9-(mvega2-emvega2+2.683))/2.5)
+
+flux3=1.0E3*10.0^((8.9-(mvega3+2.683))/2.5)
+eflux3=flux3*abs((1-10.^(-0.4*emvega3)))
+;flux3u=1.0E3*10.0^((8.9-(mvega3+emvega3+2.683))/2.5)
+;flux3b=1.0E3*10.0^((8.9-(mvega3-emvega3+2.683))/2.5)
+
+flux4=1.0E3*10.0^((8.9-(mvega4+2.683))/2.5)
+eflux4=flux4*abs((1-10.^(-0.4*emvega4)))
+;flux4u=1.0E3*10.0^((8.9-(mvega4+emvega4+2.683))/2.5)
+;flux4b=1.0E3*10.0^((8.9-(mvega4-emvega4+2.683))/2.5)
+
+;write into fits files
+nbands=4 ;number of wise bands
+wave=dblarr(nbands)
+wave[0]=3.4 ;in microns
+wave[1]=4.6
+wave[2]=12.0
+wave[3]=22.0
+
+
+print,min(flux1),min(flux2),min(flux3),min(flux4)
+plot,flux1,flux2,psym=3,/xlog,/ylog
 header=headfits('test/test.fits')
 
 fxbhmake,bhdr,176,'Data'

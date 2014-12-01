@@ -82,8 +82,8 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[]){
       }
       try{table.readKey("F"+num+"FILT",filter[i]);}
       catch(HDU::NoSuchKeyword){
-	printf("Keyword F%sFILT missing from header (%s)\n",num.c_str(),fitsfile.c_str());
-	exit(1);
+      	printf("Keyword F%sFILT missing from header (%s)\n",num.c_str(),fitsfile.c_str());
+      	exit(1);
       }
       try{table.readKey("F"+num+"ERR",ferr[i]);}
       catch(HDU::NoSuchKeyword){
