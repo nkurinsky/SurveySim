@@ -11,7 +11,7 @@ pydir=os.getcwd()+'/Python/';
 #ensure this is in the path
 sys.path.append(pydir)
 
-sedfile=codedir+'templates/sf_templates.fits'
+sedfile=codedir+'templates/my_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
 modelfile=codedir+'model/model.fits'
 obsfile=codedir+'obs/wise.fits'
