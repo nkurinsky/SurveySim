@@ -98,6 +98,11 @@ def showresults(): #read-in the results from output.fits and show plots
     plt.show()
     return
 
+if(len(sys.argv) > 1):
+    if sys.argv[1] == "-r":
+        runcode()
+        quit()
+
 defaults=raw_input("Do you wish to see/edit the default file settings (y/n)?");
 if (defaults == 'y'):
     print("The SED templates are defined in:");

@@ -1,24 +1,71 @@
 #include "sed_lib.h"
 
 sed::sed(){
-  fluxes = NULL;
   interp_init = false;
+  zdim=false;
 }
 
-sed::sed(double * f,double *bands, int bnum){
-  fluxes = new double[bnum];
-  for (int i=0;i<bnum;i++){
-    fluxes[i] = f[i];}
-
+sed::sed(double * f,double *bands, int bnum) : sed(){
+  
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline,bnum);
-  gsl_spline_init(spline,bands,fluxes,bnum);
+  gsl_spline_init(spline,bands,f,bnum);
+  
+  brange[0] = f[0];
+  brange[1] = f[bnum-1];
+  
   interp_init = true;
 }
 
-double sed::get_flux(double band){
-  if (interp_init)
-    return gsl_spline_eval(spline,band,acc);
+sed::sed(double * f,double *bands, int bnum, double *z, int znum) : sed(){
+  
+  alglib::real_1d_array bs;
+  alglib::real_1d_array zs;
+  alglib::real_1d_array fs;
+  
+  bs.setcontent(bnum,bands);
+  zs.setcontent(znum,z);
+  fs.setcontent(bnum*znum,f);
+
+  try{
+  alglib::spline2dbuildbilinearv(bs,bnum,zs,znum,fs,1,s);
+  }catch(alglib::ap_error e){
+    printf("ERROR: Failed to create interpolation for SED\n");
+    printf("error msg: %s\n", e.msg.c_str());
+    exit(1);
+  }  
+
+  brange[0] = bands[0];
+  brange[1] = bands[bnum-1];
+  zrange[0] = z[0];
+  zrange[1] = z[znum-1];
+  
+  zdim=true;
+  interp_init = true;
+}
+
+double sed::get_flux(double band, double redshift){
+  if (interp_init){
+    double x_em = (band/(1+redshift));
+    double z = redshift;
+    if ((x_em < brange[0]) or (x_em > brange[1])){
+      printf("ERROR: emitted lambda %f out of range %f -> %f\n",x_em,brange[0],brange[1]);
+      exit(1);
+    }
+    if (z < zrange[0]){
+      z = zrange[0];
+    }
+    else if(z > zrange[1]){
+      z = zrange[1];
+    }
+    
+    if(zdim){
+      return alglib::spline2dcalc(s,x_em,z);
+    }
+    else{
+      return gsl_spline_eval(spline,x_em,acc);
+    }
+  }
   else{
     printf("%s \n","ERROR: SED Model Not Initialized");
     return -1;
@@ -26,18 +73,19 @@ double sed::get_flux(double band){
 }
 
 sed::~sed(){
-  if(interp_init){
+  if(interp_init and not zdim){
     gsl_spline_free(spline);
     gsl_interp_accel_free(acc);
   }
-  if (fluxes != NULL)
-    delete [] fluxes;
 }
 
 sed_lib::sed_lib(string fitsfile){
 
+  redshiftq=false;
+  typeq=false;
+
   color_exp = 0;
-  color_zcut=0;
+  color_zcut = 0;
   color_evolution = 1;
   
   double *bands;
@@ -50,12 +98,29 @@ sed_lib::sed_lib(string fitsfile){
 
   bandnum = image.axis(0);
   lnum = image.axis(1)-1; //since the first row here is the lambda array
+  int axnum = image.axes();
+
+  znum=tnum=1;
+  if(axnum >= 3){
+    redshiftq=true;
+    znum = image.axis(2);
+    printf("Detected SED redshift dimension, length %i\n",znum);
+    if(axnum >= 4){
+      typeq=true;
+      tnum = image.axis(3);
+      printf("Detected SED type dimension, length %i\n",tnum);
+    }
+  }
+  else{
+    printf("Redshift independent templates, will use default color evolution\n");
+  }
+
   lums = new double[lnum];
   double inds[lnum];
-  seds.reserve(lnum);
+  seds.reserve(lnum*tnum);
   bands = new double[bandnum];
 
- //read in the total IR luminosities associated with the different z=0 SED templates
+  //read in the total IR luminosities associated with the different z=0 SED templates
   double temp, scale;
   HDU& header = pInfile->pHDU();
   
@@ -84,7 +149,7 @@ sed_lib::sed_lib(string fitsfile){
   spline = gsl_spline_alloc(gsl_interp_cspline,lnum);
   gsl_spline_init(spline,lums,inds,lnum);
   
-  double fluxes[bandnum];
+  double fluxes[bandnum*znum];
   sed *new_sed;
   
   for (unsigned int fi=0;fi<bandnum;fi++){
@@ -94,11 +159,36 @@ sed_lib::sed_lib(string fitsfile){
   brange[0] = bands[0];
   brange[1] = bands[bandnum-1];
   
-  for (unsigned int fj=1;fj<(lnum+1);fj++){
-    for (unsigned int fi=0;fi<bandnum;fi++)
-      fluxes[fi]=contents[fi+bandnum*fj];
-    new_sed = new sed(fluxes,bands,bandnum);
-    seds.push_back(new_sed);
+  double zs[znum];
+  if(znum > 1){
+    for (unsigned int i=0;i<znum;i++) {
+      std::string a = "Z";
+      sprintf(buffer,"%i",i);
+      a.append(buffer);
+      try{header.readKey(a,temp);}
+      catch(HDU::NoSuchKeyword){
+	printf("Keyword %s missing from header (%s)\n",a.c_str(),fitsfile.c_str());
+	exit(1);
+      }
+      zs[i] = temp;
+    }
+  }
+  else
+    zs[0]=0.0;
+
+  for(unsigned int ft=0; ft < tnum; ft++){
+    for (unsigned int fj=1;fj<(lnum+1);fj++){
+      for(unsigned int fz=0; fz < znum; fz++){
+	for (unsigned int fi=0;fi<bandnum;fi++){
+	  fluxes[fi+fz*bandnum]=contents[fi+bandnum*(fj+znum*(fz+tnum*ft))];
+	}
+      }
+      if(znum > 1)
+	new_sed = new sed(fluxes,bands,bandnum,zs,znum);
+      else
+	new_sed = new sed(fluxes,bands,bandnum);
+      seds.push_back(new_sed);
+    }
   }
 
   color_exp = 0;
@@ -120,7 +210,7 @@ bool sed_lib::load_filters(string file){
 //needs to interpolate to correct luminosity 
 //rounds to nearest template, in future may average/interp
 //make sure lums sorted in order!!! currently an assumption
-double sed_lib::get_flux(double lum, double band, double redshift){
+double sed_lib::get_flux(double lum, double band, short sedtype, double redshift){
   static int i = 0;
   i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
   if (i < 0)
@@ -144,6 +234,11 @@ double sed_lib::get_flux(double lum, double band, double redshift){
 double sed_lib::get_filter_flux(double lum, double redshift, short sedtype, short filter_id){
 
   static int i = 0;
+
+  if((sedtype < 0) or (sedtype >= tnum)){
+    printf("ERROR: Invalid sedtype \"%i\" out of possible range (0,%i)\n",sedtype,tnum);
+    return -1;
+  }
 
   //determine which model to use; pick that closer to 'lum' called
   i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
@@ -217,16 +312,15 @@ sed_lib::~sed_lib(){
 
 double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, short filter_id){
 
-  static map<tuple<short,double>,double > fluxes[3];
-  tuple<short,double> params (lum_id,redshift);
-
+  static map<tuple<short,short,double>,double > fluxes[3];
+  tuple<short,short,double> params (lum_id,sedtype,redshift);
+  
   //we use a map here to ensure that a given redshift/SED/filter combination is only convolved once; we recompute color evolution every time as this may change in fitting, while filters/SEDs are static.
   if(fluxes[filter_id].count(params) == 0){
-
     double scale,result,error;
     double bounds[2];
     gsl_function F;
-    flux_yield_params p(seds[lum_id],&filters.get(filter_id),redshift);
+    flux_yield_params p(seds[lum_id+lnum*sedtype],&filters.get(filter_id),redshift);
     F.function = &flux_yield;
     F.params = &p;
 
@@ -240,22 +334,21 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, sh
 
     result*=scale;
     fluxes[filter_id][params] = result;
+    printf("-\n");
   }
-
+  
   if(redshift < color_zcut)
     return fluxes[filter_id][params]*pow((1.0+redshift),color_exp);
-
+  
   return fluxes[filter_id][params]*color_evolution;
 }
 
 double flux_yield (double x, void * params) {
   flux_yield_params *p = (flux_yield_params*) params;
   double z = (p->z);
-  double x_em = (x/(1+z));
-  
-  double flux = (p->SED->get_flux(x_em));
+  double flux = (p->SED->get_flux(x,z));
   double transmission = (p->FILT->transmission(x));
-
+  
   return flux*transmission;
 }
 
