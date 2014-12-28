@@ -325,9 +325,8 @@ void sed_lib::initialize_filter_fluxes(){
 	  printf("=");
 	  fs[li+zi*lnum]=convolve_filter(li,zs[zi],type,filter);
 	}
-	printf("]\t");
       }
-      printf("Building Spline...");
+      printf("\rBuilding Spline...                                                         ");
       try{
 	alglib::spline2dbuildbilinearv(ls,lnum,
 				       zs,interp_znum,
@@ -335,14 +334,14 @@ void sed_lib::initialize_filter_fluxes(){
 				       flux_interpolator[type*FILTER_NUM+filter]);
       }
       catch(alglib::ap_error e){
-	printf("ERROR: Failed to create interpolation for Filter Convolution\n");
+	printf("\nERROR: Failed to create interpolation for Filter Convolution\n");
 	printf("error msg: %s\n", e.msg.c_str());
 	exit(1);
       }  
-      printf("Success\n");
     }
   }
 
+  printf("\rBuilt Spline Interpolation for Fluxes                                           \n");
   interp_init=true;
 }
 
@@ -397,7 +396,6 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, sh
 
     result*=scale;
     fluxes[filter_id][params] = result;
-    printf("-\n");
   }
   
   return fluxes[filter_id][params];
