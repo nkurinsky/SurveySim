@@ -109,8 +109,9 @@ void simulator::initialize_counts(){
   }
 }
 
+
 void simulator::set_sed_lib(string sedfile){
-  seds.reset(new sed_lib(sedfile));
+  seds.reset(new sed_lib(sedfile, nz, zmin, dz));
   initialize_filters();
 }
 

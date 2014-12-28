@@ -79,14 +79,19 @@ sed::~sed(){
   }
 }
 
-sed_lib::sed_lib(string fitsfile){
+sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
 
   redshiftq=false;
   typeq=false;
+  interp_init=false;
 
   color_exp = 0;
   color_zcut = 0;
   color_evolution = 1;
+
+  interp_znum=nz;
+  interp_zmin=zmin;
+  interp_dz=dz;
   
   double *bands;
   FITS *pInfile;  
@@ -219,7 +224,7 @@ double sed_lib::get_flux(double lum, double band, short sedtype, double redshift
     i = int(lnum)-1;
   if (seds[i] != NULL){
     if((band >= brange[0]) and (band <= brange[1]))
-      return seds[i]->get_flux(band);
+      return seds[i]->get_flux(band,redshift);
     else{
       printf("%s\n%s\n","ERROR: Band out of model range.","Check that the obs bands are within range and unit consistent");
     }
@@ -233,43 +238,23 @@ double sed_lib::get_flux(double lum, double band, short sedtype, double redshift
 
 double sed_lib::get_filter_flux(double lum, double redshift, short sedtype, short filter_id){
 
-  static int i = 0;
-
   if((sedtype < 0) or (sedtype >= tnum)){
     printf("ERROR: Invalid sedtype \"%i\" out of possible range (0,%i)\n",sedtype,tnum);
     return -1;
   }
-
-  //determine which model to use; pick that closer to 'lum' called
-  i = int(floor(0.5+ gsl_spline_eval(spline,lum,acc)));
-  
-  if (i < 0)
-    i = 0;
-  else if (i >= int(lnum))
-    i = int(lnum)-1;
-  
-  if (seds[i] != NULL){
-    if (filters.init()){
-      if((filter_id >= 0) and (filter_id < 3) and (filters.get(filter_id).low() < filters.get(filter_id).high())){
-	if((filters.get(filter_id).low() >= brange[0]) and (filters.get(filter_id).high() <= brange[1]))
-	  return convolve_filter(i,redshift,sedtype,filter_id);
-	else{
-	  printf("%s\n%s\n","ERROR: Filter out of model range.","Check that the obs bands are within range and unit consistent");
-	}
-      }
-      else{
-	printf("%s %i %s\n","ERROR: Filter number",filter_id,"invalid, 0-2 acceptable, or filter unititialized.");
-      }
-    }
-    else{
-      printf("%s %i \n","ERROR: Filter library not initialized!!!",i);
-    }
+  else if((filter_id < 0) or (filter_id > 2)){
+    printf("ERROR: Filter number %i invalid, 0-2 acceptable.\n",filter_id);  
+    return -1;
   }
-  else{
-    printf("%s %i \n","ERROR: Unitialized Model Called!!!",i);
-  } 
-
-  return -1;
+  else if (not filters.init()){
+    printf("ERROR: Filter library not initialized!!!\n");
+    return -1;
+  }
+   
+  if(not interp_init)
+    initialize_filter_fluxes();
+  
+  return interpolate_flux(lum,redshift,sedtype,filter_id);
 }
 
 void sed_lib::set_color_evolution(double exp, double zcut){
@@ -310,11 +295,89 @@ sed_lib::~sed_lib(){
   delete[] lums;
 }
 
+void sed_lib::initialize_filter_fluxes(){
+  flux_interpolator.resize(FILTER_NUM*tnum);
+  
+  alglib::real_1d_array ls;
+  alglib::real_1d_array zs;
+  alglib::real_1d_array fs;
+
+  ls.setcontent(lnum,lums);
+  zs.setlength(interp_znum);
+  for(int zi=0;zi<interp_znum;zi++)
+    zs[zi] = static_cast<double>(zi)*interp_dz+interp_zmin;
+  fs.setlength(lnum*interp_znum);
+  
+  string clearprogress="[";
+  for(int li=0;li<lnum;li++){
+    clearprogress.append("");
+  }
+  clearprogress.append("]");
+
+  printf("Initializing Filter Flux Interpolation\n");
+  for (int type=0;type<tnum;type++){
+    for (int filter=0;filter<3;filter++){
+      
+      for(int zi=0;zi<interp_znum;zi++){  
+	printf("\rType: %i\tFilter: %i\tZ: %lf - %s",type,filter,zs[zi],clearprogress.c_str());
+	printf("\rType: %i\tFilter: %i\tZ: %lf - [",type,filter,zs[zi]);
+	for(int li=0;li<lnum;li++){
+	  printf("=");
+	  fs[li+zi*lnum]=convolve_filter(li,zs[zi],type,filter);
+	}
+	printf("]\t");
+      }
+      printf("Building Spline...");
+      try{
+	alglib::spline2dbuildbilinearv(ls,lnum,
+				       zs,interp_znum,
+				       fs,1,
+				       flux_interpolator[type*FILTER_NUM+filter]);
+      }
+      catch(alglib::ap_error e){
+	printf("ERROR: Failed to create interpolation for Filter Convolution\n");
+	printf("error msg: %s\n", e.msg.c_str());
+	exit(1);
+      }  
+      printf("Success\n");
+    }
+  }
+
+  interp_init=true;
+}
+
+double sed_lib::interpolate_flux(double lum, double redshift, short sedtype, short filter_id){
+  double retval(-1);
+  try{
+    retval =  alglib::spline2dcalc(flux_interpolator[sedtype*FILTER_NUM+filter_id],lum,redshift);
+    
+    if(redshift < color_zcut)
+      retval *= pow((1.0+redshift),color_exp);
+    else
+      retval *= color_evolution;
+  }
+  catch(alglib::ap_error e){
+    printf("ERROR: Failed to interpolate for z=%lf, lum=%lf, sed=%i, filter=%i\n",redshift,lum,sedtype,filter_id);
+    printf("error msg: %s\n", e.msg.c_str());
+  }
+  return retval;
+}
+
 double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, short filter_id){
 
   static map<tuple<short,short,double>,double > fluxes[3];
   tuple<short,short,double> params (lum_id,sedtype,redshift);
-  
+
+  if(filters.get(filter_id).low() >= filters.get(filter_id).high()){
+    printf("ERROR: Filter %i unititialized.\n",filter_id);
+    return -1;
+  }
+
+  if((filters.get(filter_id).low() < brange[0]) or (filters.get(filter_id).high() > brange[1])){
+    printf("ERROR: Filter out of model range.\nCheck that the obs bands are within range and unit consistent\n");
+    return -1;
+  }
+
   //we use a map here to ensure that a given redshift/SED/filter combination is only convolved once; we recompute color evolution every time as this may change in fitting, while filters/SEDs are static.
   if(fluxes[filter_id].count(params) == 0){
     double scale,result,error;
@@ -337,10 +400,7 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, sh
     printf("-\n");
   }
   
-  if(redshift < color_zcut)
-    return fluxes[filter_id][params]*pow((1.0+redshift),color_exp);
-  
-  return fluxes[filter_id][params]*color_evolution;
+  return fluxes[filter_id][params];
 }
 
 double flux_yield (double x, void * params) {
