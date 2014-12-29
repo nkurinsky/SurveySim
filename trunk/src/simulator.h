@@ -39,6 +39,9 @@ private:
   RandomNumberGenerator rng;
   void initialize_filters();
   void initialize_counts();
+  long num_sources(double z, double l);
+  double random_z(double zmin, double zmax);
+  double random_l(double lmin, double lmax);
  public:
   simulator();
   simulator(const Configuration &config);
