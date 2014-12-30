@@ -109,6 +109,39 @@ void simulator::initialize_counts(){
   }
 }
 
+long simulator::num_sources(double z, double l, double dl){
+  
+  //minimum and maximum
+  double zval[2]={z,z+dz};
+  double lval[2]={l-dl/2.0,l+dl/2.0};
+
+  //source number is integral(dn/(dldv)*(dv/dz),dl,dz)
+  double nsrcs = 0.0;
+  for(int i=0;i<2;i++){
+    for(int j=0;j<2;j++){
+      nsrcs += lf->get_nsrcs(zval[j],lval[i])*dvdz(zval[j],area);
+    }
+  }
+  nsrcs*=0.25*dl*dz;
+  
+  long retval=static_cast<long>(floor(nsrcs));
+  double p_extra_source = nsrcs-floor(nsrcs);
+  
+  if ((p_extra_source > 0.0) and (p_extra_source < 1.0) and (p_extra_source > rng.flat(0,1))){
+    retval++;
+  }
+  else if (p_extra_source < 0.0){
+    printf("ERROR: val-floor less than 0!\n");
+    exit(1);
+  }
+  else if (p_extra_source > 1.0){
+    printf("ERROR: val-floor greater than 1!\n");
+    exit(1);
+  }
+  
+  return retval;
+}
+
 
 void simulator::set_sed_lib(string sedfile){
   seds.reset(new sed_lib(sedfile, nz, zmin, dz));
@@ -149,105 +182,114 @@ products simulator::simulate(){
 	      static_cast<int>(counts[2]->bins().size())};
   products output(nz,ns);
   
-  if(seds.get() != NULL){
+  if(seds.get() == NULL){
+    printf("ERROR: NULL Model Library\n");
+    return output;
+  }
+  
+  static int is,js,jsmin;
+  
+  int lnum = seds->get_lnum();
+  double dl = seds->get_dl();
+  static long nsrcs;
+  double lums[lnum];
+  double zarray[nz];
+  double fagn;
+  short sedtype; // this holds the id of the SED type 
+  
+  seds->get_lums(lums);
+  
+  //=========================================================================
+  // for each L-z depending on the number of sources, sample the SED and get 
+  // the appropriate fluxes
+  //*************************************************************************
+  
+  static double flux_sim[3], flux_raw[3];
+  static sprop *temp_src;
+  static int src_iter;
+  static bool detected = true;    
 
-    static int is,js,jsmin;
-    static double tmpz,vol;
+  static double tL,tZ;
+  
+  //NOTE templates are given in W/Hz
+  for (is=0;is<nz;is++){
 
-    int lnum = seds->get_lnum();
-    double dl = seds->get_dl();
-    static long nsrcs;
-    double lums[lnum];
-    double zarray[nz];
-    double fagn;
-    short sedtype; // this holds the id of the SED type 
+    zarray[is]=(is)*dz+zmin;    
     
-    seds->get_lums(lums);
-    
-    //=========================================================================
-    // for each L-z depending on the number of sources, sample the SED and get the appropriate fluxes
-    //*************************************************************************
- 
-    static double flux_sim[3], flux_raw[3];
-    static sprop *temp_src;
-    static int src_iter;
-    static bool detected = true;    
-
-    //NOTE templates are given in W/Hz
-    for (is=0;is<nz;is++){
-      zarray[is]=(is)*dz+zmin;
-
-      tmpz=zarray[is]+dz/2.0;
-      vol=(dvdz(tmpz,area)*dz);
-
-      jsmin = 0;
-      for (js=0;js<lnum;js++){
-       	fagn=fagns->get_agn_frac(lums[js],zarray[is]);
-	sedtype=0; //placeholder for now will determine depending on AGN fraction per L-z bin
-	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],sedtype,0);
-	if(flux_sim[0]>=flux_limits[0]){
-	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
-	  js = lnum; //break out of loop
-	};
+    jsmin = 0;
+    for (js=0;js<lnum;js++){
+      fagn=fagns->get_agn_frac(lums[js],zarray[is]);
+      sedtype=0; //placeholder for now will determine depending on AGN fraction per L-z bin
+      flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],sedtype,0);
+      if(flux_sim[0]>=flux_limits[0]){
+	jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
+	js = lnum; //break out of loop
       };
-      //printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
+    };
+    
+    for (js=jsmin;js<lnum;js++){
+      nsrcs = num_sources(zarray[is],lums[js],dl);
       
-      for (js=jsmin;js<lnum;js++){
-	//source number is dn/(dldv)*Dv*Dl
-	nsrcs = long(dl*vol*lf->get_nsrcs(zarray[is],lums[js]));
+      for (src_iter=0;src_iter<nsrcs;src_iter++){
+	detected = true;
+
+	if(js == 0)
+	  tL=rng.flat(lums[js],lums[js]+dl/2.0);
+	else if (js == lnum-1)
+	  tL=rng.flat(lums[js]-dl/2.0,lums[js]);
+	else
+	  tL=rng.flat(lums[js]-dl/2.0,lums[js]+dl/2.0);
+	
+	tZ=rng.flat(zarray[is],zarray[is]+dz);
+
 	for (int i=0;i<3;i++){
-	  flux_raw[i] = seds->get_filter_flux(lums[js],zarray[is],sedtype,i);
+	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
 	}
-	for (src_iter=0;src_iter<nsrcs;src_iter++){
-	  detected = true;
-	  for (int i=0;i<3;i++){
-	    flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
-	    if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
-	      detected = false;
-	  }
-	  
-	  //check for detectability, if "Yes" add to list
-	  if(detected){
-	    temp_src = new sprop(zarray[is],flux_sim,lums[js],1.0,axes);
-	    sources.push_back(*temp_src);
-	    output.dndz[is]++; 
-	    delete temp_src;
-	  }
+
+	for (int i=0;i<3;i++){
+	  flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
+	  if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
+	    detected = false;
+	}
+	
+	//check for detectability, if "Yes" add to list
+	if(detected){
+	  temp_src = new sprop(tZ,flux_sim,tL,1.0,axes);
+	  sources.push_back(*temp_src);
+	  output.dndz[is]++; 
+	  delete temp_src;
 	}
       }
     }
-     
-    //=========================================================================
-    // generate diagnostic color-color plots
-    //*************************************************************************
-    
-    int snum(sources.size());
-    vector<double> c1(snum,0.0);
-    vector<double> c2(snum,0.0);
-    vector<double> w (snum,0.0);
-    valarray<double> f1(0.0,snum);
-    valarray<double> f2(0.0,snum);
-    valarray<double> f3(0.0,snum);
-    for (int i=0;i<snum;i++){
-      c1[i] = sources[i].c1;
-      c2[i] = sources[i].c2;
-      w[i] = sources[i].weight;
-      f1[i] = sources[i].fluxes[0];
-      f2[i] = sources[i].fluxes[1];
-      f3[i] = sources[i].fluxes[2];
-    }
-    
-    diagnostic->init_model(c1.data(),c2.data(),w.data(),snum);
-    output.chisqr=diagnostic->get_chisq();
-    counts[0]->compute(f1,area,output.dnds[0]);
-    counts[1]->compute(f2,area,output.dnds[1]);
-    counts[2]->compute(f3,area,output.dnds[2]);
-    last_output = output;
-    
   }
-  else{
-    printf("ERROR: NULL Model Library\n");
+  
+  //=========================================================================
+  // generate diagnostic color-color plots
+  //*************************************************************************
+  
+  int snum(sources.size());
+  vector<double> c1(snum,0.0);
+  vector<double> c2(snum,0.0);
+  vector<double> w (snum,0.0);
+  valarray<double> f1(0.0,snum);
+  valarray<double> f2(0.0,snum);
+  valarray<double> f3(0.0,snum);
+  for (int i=0;i<snum;i++){
+    c1[i] = sources[i].c1;
+    c2[i] = sources[i].c2;
+    w[i] = sources[i].weight;
+    f1[i] = sources[i].fluxes[0];
+    f2[i] = sources[i].fluxes[1];
+    f3[i] = sources[i].fluxes[2];
   }
+  
+  diagnostic->init_model(c1.data(),c2.data(),w.data(),snum);
+  output.chisqr=diagnostic->get_chisq();
+  counts[0]->compute(f1,area,output.dnds[0]);
+  counts[1]->compute(f2,area,output.dnds[1]);
+  counts[2]->compute(f3,area,output.dnds[2]);
+  last_output = output;
+  
   return output;
 }
 
