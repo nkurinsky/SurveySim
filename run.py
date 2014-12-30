@@ -40,11 +40,27 @@ def showresults(): #read-in the results from output.fits and show plots
     model_ccd=hdulist[1].data #model color-color distribution
     obs_ccd=hdulist[2].data #observations color-color distribution
     res_ccd=hdulist[0].data #residual color-color distribution
-    sim_srcs_table=hdulist[3]# the table with simulated source properties
-    sim_srcs_table_data=hdulist[3].data
+    
+    params=hdulist[3].data
+    chain=hdulist[4].data
+    conv=hdulist[5].data
+    res=hdulist[6].data
+
+    counts=hdulist[7].data
+    #dnds1=counts.
+#read-in the simulated source list
+    srcs_hdr=hdulist[3].header
+    srcs_data=hdulist[3].data
+    #f1=src
+    #sim_srcs_table=hdulist[3]# the table with simulated source properties
+    #sim_srcs_data=hdulist[3].data
     #the field names are f1,f2,f3,z,m,lum,c7,p0,p1
-    sim_srcs_zs=sim_srcs_table_data.field('z')
-    sim_srcs_f1=sim_srcs_table_data.field('f1')
+    sim_srcs_zs=srcs_data.field('z')
+    sim_srcs_f1=srcs_data.field('f1')
+
+    chain=hdulist[4].data
+    p_c1=chain.field('P0')
+    q_c1=chain.field('Q0')
 
     img1=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
     img2=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
@@ -57,13 +73,17 @@ def showresults(): #read-in the results from output.fits and show plots
     #make actual figure
     fig=plt.figure()
     a1=fig.add_subplot(2,3,1)
-    a1.set_title('Luminosity function')
-    a1.set_xlabel('log(L)')
-    a1.set_ylabel('phi [Mpc^-3]')
-    a1.set_xlim(8, 13)
-    a1.set_ylim(10.**(-6),10.**(-1))
-    a1.set_xscale('linear')
-    a1.set_yscale('log')
+#    a1.set_title('Luminosity function')
+#    a1.set_xlabel('log(L)')
+#    a1.set_ylabel('phi [Mpc^-3]')
+#    a1.set_xlim(8, 13)
+#    a1.set_ylim(10.**(-6),10.**(-1))
+    a1.plot(p_c1,q_c1,'k.')
+    a1.set_xlabel('P')
+    a1.axis([value_min[4],value_max[4],value_min[5],value_max[5]])
+    a1.set_ylabel('Q')
+    #a1.set_xscale('linear')
+    #a1.set_yscale('log')
 
     a2=fig.add_subplot(2,3,2)
     a2.set_title('Redshifts')
@@ -95,6 +115,37 @@ def showresults(): #read-in the results from output.fits and show plots
     imgplot=plt.imshow(img3)
     a6.set_title('Residual')
 
+    plt.tight_layout()
+    plt.show()
+    return
+
+def mcmcdiag(): #show chain behavior
+    print("MCMC diagnostics....")
+    hdulist=fits.open(outfile)
+#all the extensions headers here are identical -- apply to ccd images
+    hdr=hdulist[0].header #the header associated with extension=0
+
+#    params=hdulist[3].data
+    chain=hdulist[4].data
+    chi2_c1=chain.field('CHISQ0')
+    chi2_c2=chain.field('CHISQ1')
+    chi2_c3=chain.field('CHISQ2')
+    chi2_c4=chain.field('CHISQ3')
+    chi2_c5=chain.field('CHISQ4')
+
+    csize=size(chi2_c1)
+    print csize
+    a=np.arange(csize)
+#    conv=hdulist[5].data
+#    res=hdulist[6].data
+#    help chain
+    plt.plot(a,chi2_c1,'r-',lw=2)
+    plt.xlabel('step')
+    plt.ylabel('chi2')
+    plt.plot(a,chi2_c2,'k-',lw=0.7,color='0.5')
+    plt.plot(a,chi2_c3,'k-',lw=0.7,color='0.5')
+    plt.plot(a,chi2_c4,'k-',lw=0.7,color='0.5')
+    plt.plot(a,chi2_c5,'k-',lw=0.7,color='0.5')
     plt.show()
     return
 
@@ -444,8 +495,10 @@ if (mdefaults == 'y'):
         b2.pack(side=LEFT,padx=5,pady=5)
         b3 = Button(labelframe2, text='Show results',command=showresults)
         b3.pack(side=LEFT,padx=5,pady=5)
-        b4 = Button(labelframe2, text='Quit', command=root.quit)
-        b4.pack(side=LEFT, padx=5, pady=5)
+        b4 = Button(labelframe2, text='MCMC diagnostics',command=mcmcdiag)
+        b4.pack(side=LEFT,padx=5,pady=5)
+        b5 = Button(labelframe2, text='Quit', command=root.destroy)
+        b5.pack(side=LEFT, padx=5, pady=5)
         root.mainloop() 
 
 #in case don't want to see GUI, use command line to run the code and display results
