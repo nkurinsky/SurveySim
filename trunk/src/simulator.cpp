@@ -109,11 +109,11 @@ void simulator::initialize_counts(){
   }
 }
 
-long simulator::num_sources(double zmin, double dz, double lmid, double dl){
+long simulator::num_sources(double z, double l, double dl){
   
   //minimum and maximum
-  double zval[3]={zmin,,zmin+dz};
-  double lval[3]={lmid-dl/2.0,lmid+dl/2.0};
+  double zval[2]={z,z+dz};
+  double lval[2]={l-dl/2.0,l+dl/2.0};
 
   //source number is integral(dn/(dldv)*(dv/dz),dl,dz)
   double nsrcs = 0.0;
@@ -125,7 +125,7 @@ long simulator::num_sources(double zmin, double dz, double lmid, double dl){
   nsrcs*=0.25*dl*dz;
   
   long retval=static_cast<long>(floor(nsrcs));
-  double p_extra_source = nsrcsc-floor(nsrcs);
+  double p_extra_source = nsrcs-floor(nsrcs);
   
   if ((p_extra_source > 0.0) and (p_extra_source < 1.0) and (p_extra_source > rng.flat(0,1))){
     retval++;
@@ -142,14 +142,6 @@ long simulator::num_sources(double zmin, double dz, double lmid, double dl){
   return retval;
 }
 
-double simulator::random_z(double zmin, double zmax){
-
-  
-}
-
-double simulator::random_l(double lmin, double lmax){
-
-}
 
 void simulator::set_sed_lib(string sedfile){
   seds.reset(new sed_lib(sedfile, nz, zmin, dz));
@@ -196,7 +188,6 @@ products simulator::simulate(){
   }
   
   static int is,js,jsmin;
-  static double tmpz,vol;
   
   int lnum = seds->get_lnum();
   double dl = seds->get_dl();
@@ -217,13 +208,13 @@ products simulator::simulate(){
   static sprop *temp_src;
   static int src_iter;
   static bool detected = true;    
+
+  static double tL,tZ;
   
   //NOTE templates are given in W/Hz
   for (is=0;is<nz;is++){
-    zarray[is]=(is)*dz+zmin;
-    
-    tmpz=zarray[is]+dz/2.0;
-    vol=(dvdz(tmpz,area)*dz);
+
+    zarray[is]=(is)*dz+zmin;    
     
     jsmin = 0;
     for (js=0;js<lnum;js++){
@@ -235,16 +226,26 @@ products simulator::simulate(){
 	js = lnum; //break out of loop
       };
     };
-    //printf("Z: %f, Lmin: %f\n",zarray[is],lums[jsmin]);
     
     for (js=jsmin;js<lnum;js++){
-      //source number is dn/(dldv)*Dv*Dl
-      nsrcs = long(dl*vol*lf->get_nsrcs(zarray[is],lums[js]));
-      for (int i=0;i<3;i++){
-	flux_raw[i] = seds->get_filter_flux(lums[js],zarray[is],sedtype,i);
-      }
+      nsrcs = num_sources(zarray[is],lums[js],dl);
+      
       for (src_iter=0;src_iter<nsrcs;src_iter++){
 	detected = true;
+
+	if(js == 0)
+	  tL=rng.flat(lums[js],lums[js]+dl/2.0);
+	else if (js == lnum-1)
+	  tL=rng.flat(lums[js]-dl/2.0,lums[js]);
+	else
+	  tL=rng.flat(lums[js]-dl/2.0,lums[js]+dl/2.0);
+	
+	tZ=rng.flat(zarray[is],zarray[is]+dz);
+
+	for (int i=0;i<3;i++){
+	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
+	}
+
 	for (int i=0;i<3;i++){
 	  flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
 	  if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
@@ -253,7 +254,7 @@ products simulator::simulate(){
 	
 	//check for detectability, if "Yes" add to list
 	if(detected){
-	  temp_src = new sprop(zarray[is],flux_sim,lums[js],1.0,axes);
+	  temp_src = new sprop(tZ,flux_sim,tL,1.0,axes);
 	  sources.push_back(*temp_src);
 	  output.dndz[is]++; 
 	  delete temp_src;
