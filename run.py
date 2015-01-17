@@ -11,6 +11,8 @@ pydir=os.getcwd()+'/Python/';
 #ensure this is in the path
 sys.path.append(pydir)
 
+#initialize datafiles
+fields_files='Survey data','SEDtemplates'
 sedfile=codedir+'templates/my_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
 modelfile=codedir+'model/model.fits'
@@ -25,8 +27,6 @@ import numpy as np
 import img_scale
 from pylab import *
 import math
-
-
 
 def runcode():
     print("Runnning fitter code....")
@@ -58,6 +58,18 @@ def showresults(): #read-in the results from output.fits and show plots
     sim_srcs_zs=srcs_data.field('z')
     sim_srcs_f1=srcs_data.field('f1')
 
+#seems like these might be in Jy rather than mJy is that right?
+    sim_srcs_f1=sim_srcs_f1*1000.0 #turn into mJy
+    fbins=np.logspace(0,3,num=20,base=10)
+    ds=(fbins[1]-fbins[0])*fbins
+    counts1,bin_edges=np.histogram(sim_srcs_f1,bins=fbins)
+    ds1=ds[0:18]
+    counts=counts1 #[:,0]/ds1[:,0] #*pow(fbins,2.5)
+    for i in range(counts1.shape[0]):
+        counts[i]=(counts1[i]/ds[i])*(bin_edges[i]**2.5)
+    print bin_edges
+    print counts
+
     chain=hdulist[4].data
     p_c1=chain.field('P0')
     q_c1=chain.field('Q0')
@@ -71,19 +83,12 @@ def showresults(): #read-in the results from output.fits and show plots
     img3[:,:]=img_scale.linear(res_ccd,scale_min=0,scale_max=100.0)
 
     #make actual figure
-    fig=plt.figure()
+    fig=plt.figure(1)
     a1=fig.add_subplot(2,3,1)
-#    a1.set_title('Luminosity function')
-#    a1.set_xlabel('log(L)')
-#    a1.set_ylabel('phi [Mpc^-3]')
-#    a1.set_xlim(8, 13)
-#    a1.set_ylim(10.**(-6),10.**(-1))
     a1.plot(p_c1,q_c1,'k.')
     a1.set_xlabel('P')
     a1.axis([value_min[4],value_max[4],value_min[5],value_max[5]])
     a1.set_ylabel('Q')
-    #a1.set_xscale('linear')
-    #a1.set_yscale('log')
 
     a2=fig.add_subplot(2,3,2)
     a2.set_title('Redshifts')
@@ -95,13 +100,17 @@ def showresults(): #read-in the results from output.fits and show plots
     a2.set_xlim(0, 5)
 
     a3=fig.add_subplot(2,3,3)
-    a3.set_title('250um counts')
+    a3.set_title('Counts')
     a3.set_xscale('log')
     a3.set_yscale('log')
+    
+    nbins=size(counts)
+    bins=bin_edges[0:nbins]
+    plt.plot(bins,counts,'+')
     a3.set_xlabel('S [mJy]')
     a3.set_ylabel('(dN/dS)*S^2.5')
     a3.set_xlim(20,1000)
-    a3.set_ylim(200,200000)
+    a3.set_ylim(200,8000000)
 
     a4=fig.add_subplot(2,3,4) 
     imgplot=plt.imshow(img1)
@@ -115,8 +124,8 @@ def showresults(): #read-in the results from output.fits and show plots
     imgplot=plt.imshow(img3)
     a6.set_title('Residual')
 
-    plt.tight_layout()
-    plt.show()
+    plt.tight_layout(1)
+    plt.show(1)
     return
 
 def mcmcdiag(): #show chain behavior
@@ -124,8 +133,6 @@ def mcmcdiag(): #show chain behavior
     hdulist=fits.open(outfile)
 #all the extensions headers here are identical -- apply to ccd images
     hdr=hdulist[0].header #the header associated with extension=0
-
-#    params=hdulist[3].data
     chain=hdulist[4].data
     chi2_c1=chain.field('CHISQ0')
     chi2_c2=chain.field('CHISQ1')
@@ -134,11 +141,8 @@ def mcmcdiag(): #show chain behavior
     chi2_c5=chain.field('CHISQ4')
 
     csize=size(chi2_c1)
-    print csize
     a=np.arange(csize)
-#    conv=hdulist[5].data
-#    res=hdulist[6].data
-#    help chain
+    plt.figure(2)
     plt.plot(a,chi2_c1,'r-',lw=2)
     plt.xlabel('step')
     plt.ylabel('chi2')
@@ -146,7 +150,7 @@ def mcmcdiag(): #show chain behavior
     plt.plot(a,chi2_c3,'k-',lw=0.7,color='0.5')
     plt.plot(a,chi2_c4,'k-',lw=0.7,color='0.5')
     plt.plot(a,chi2_c5,'k-',lw=0.7,color='0.5')
-    plt.show()
+    plt.show(2)
     return
 
 if(len(sys.argv) > 1):
@@ -172,7 +176,7 @@ if (defaults == 'y'):
     if(change == 'n'):
         outfile=raw_input("New output file:");
 
-mdefaults=raw_input("Do you wish to see/edit the default model settings (y/n)?");
+mdefaults=raw_input("Do you wish to see/edit the default settings (y/n)?");
 
 #initialize luminosity function parameters
 fields='Phi_0','Lstar_0','alpha','beta','p','q','zcut','c_evol'
@@ -343,7 +347,6 @@ def update_mfile(modelfile,f_id):
     hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
     hdulist.close
 
-#    hdulist.flush() #actually update the model file
     thdulist=fits.HDUList([hdulist[0],tbhdu])
     if(os.path.isfile(modelfile)):
            print 'Replacing existing model file....'
@@ -353,14 +356,18 @@ def update_mfile(modelfile,f_id):
            thdulist.writeto(modelfile);
     return
 #-----------------------------------------------------------------------------
-
-#this is all to do with the GUI where the user is allowed to change the model parameter values etc
+#Launch the GUI where the user is allowed to change the model parameter values etc
 if (mdefaults == 'y'):
     import Tkinter
     from functools import partial
     from Tkinter import *
     root=Tk();
     root.title("SurveySim")
+    labelframe0 = LabelFrame(root, text="Data files",width=50);
+    labelframe0.pack(fill="both",expand="yes");
+    #label=Label(labelframe0,text='Filename',width=50);
+    #label.pack();
+
     labelframe = LabelFrame(root, text="Luminosity Function Parameters",width=50);
     labelframe.pack(fill="both", expand="yes");
     label=Label(labelframe,text="Initial value/Minimum/Maximum/Fixed",width=50);
@@ -372,6 +379,22 @@ if (mdefaults == 'y'):
     v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
 
     defband=[StringVar(),StringVar(),StringVar()]
+
+    def makeform0(labelframe0,fields_files):
+        entries_files = []
+        ind=0;
+        for field0 in fields_files:
+            row=Frame(labelframe0)
+            lab=Label(row,width=10,text=field0,anchor='w')
+            row.pack(side=TOP,padx=2,pady=5)
+            lab.pack(side=LEFT)
+            print obsfile
+            print sedfile
+            file1=Entry(row,textvariable=obsfile)
+            file1.pack(side=RIGHT)
+            entries_files.append((field0,file1))
+            ind=ind+1
+        return entries_files
 
     def makeform(labelframe, fields):
         entries = []
@@ -408,7 +431,6 @@ if (mdefaults == 'y'):
         
     labelframe2 = LabelFrame(root, text="Survey properties",width=50);
     labelframe2.pack(fill="both", expand="yes");
-   # label=Label(labelframe2,text="Area [sqdeg]/wavelength [um]/Flux limit [mJy]",width=50);
     label=Label(labelframe2,text="Filter/Area [sqdeg]/Flux limit [mJy]",width=50);
     label.pack();
     fields2=band[0],band[1],band[2]
@@ -485,6 +507,8 @@ if (mdefaults == 'y'):
         return
 
     if __name__ == '__main__':
+        ents_files = makeform0(labelframe0,fields_files)
+        root.bind('<Return>',partial(fetch,ents_files))
         ents = makeform(labelframe, fields)
         root.bind('<Return>', partial(fetch, ents))
         ents2 = makeform2(labelframe2, fields2)
