@@ -12,11 +12,12 @@ pydir=os.getcwd()+'/Python/';
 sys.path.append(pydir)
 
 #initialize datafiles
-fields_files='Survey data','SEDtemplates'
-sedfile=codedir+'templates/my_templates.fits'
+seddir=codedir+'templates/'
+sedfile=seddir+'my_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
 modelfile=codedir+'model/model.fits'
-obsfile=codedir+'obs/wise.fits'
+obsdir=codedir+'obs/'
+obsfile=obsdir+'wise.fits'
 outfile=codedir+'output/output.fits'
 fitcode='fitter'
 
@@ -28,9 +29,6 @@ import img_scale
 from pylab import *
 import math
 
-def runcode():
-    print("Runnning fitter code....")
-    os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
 
 def showresults(): #read-in the results from output.fits and show plots
     print("Showing results....")
@@ -153,28 +151,25 @@ def mcmcdiag(): #show chain behavior
     plt.show(2)
     return
 
-if(len(sys.argv) > 1):
-    if sys.argv[1] == "-r":
-        runcode()
-        quit()
-
-defaults=raw_input("Do you wish to see/edit the default file settings (y/n)?");
-if (defaults == 'y'):
-    print("The SED templates are defined in:");
-    print sedfile;
-    change=raw_input("Accept (y/n)?")
-    if(change == 'n'):
-        sedfile=raw_input("New SED template file:");
-    print("The observations to be fit are defined in:");
-    print obsfile;
-    change=raw_input("Accept (y/n)?")
-    if(change == 'n'):
-        obsfile=raw_input("New observations file:");
-    print("The output is defined in:");
-    print outfile;
-    change=raw_input("Accept (y/n)?")
-    if(change == 'n'):
-        outfile=raw_input("New output file:");
+#OUTDATED code to change data/model/output filenames
+#----------------------------------------------------
+#defaults=raw_input("Do you wish to see/edit the default file settings (y/n)?");
+#if (defaults == 'y'):
+#    print("The SED templates are defined in:");
+#    print sedfile;
+#    change=raw_input("Accept (y/n)?")
+#    if(change == 'n'):
+#        sedfile=raw_input("New SED template file:");
+#    print("The observations to be fit are defined in:");
+#    print obsfile;
+#    change=raw_input("Accept (y/n)?")
+#    if(change == 'n'):
+#        obsfile=raw_input("New observations file:");
+#    print("The output is defined in:");
+#    print outfile;
+#    change=raw_input("Accept (y/n)?")
+#    if(change == 'n'):
+#        outfile=raw_input("New output file:");
 
 mdefaults=raw_input("Do you wish to see/edit the default settings (y/n)?");
 
@@ -189,7 +184,7 @@ value_fix=[1,1,1,1,0,0,1,1]
 area=[4.0,4.0,4.0]
 band=['Band1','Band2','Band3']
 flim=[25.0,20.0,15.0]
-f_id=[0,0,0] #placeholder for the filter ids (from filter_choices)
+f_id=[0,0,0] #placeholder for the filter ids
 
 #read-in values if model.fits exists
 if os.path.isfile(modelfile): # and os.access(modelfile,os.R.OK):
@@ -355,6 +350,13 @@ def update_mfile(modelfile,f_id):
     else:
            thdulist.writeto(modelfile);
     return
+
+def runcode():
+    print("Runnning fitter code....")
+    obsfile=obsfile_set.get()
+    sedfile=sedfile_set.get()
+    os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
+
 #-----------------------------------------------------------------------------
 #Launch the GUI where the user is allowed to change the model parameter values etc
 if (mdefaults == 'y'):
@@ -362,15 +364,17 @@ if (mdefaults == 'y'):
     from functools import partial
     from Tkinter import *
     root=Tk();
+    #basic GUI framework
     root.title("SurveySim")
     labelframe0 = LabelFrame(root, text="Data files",width=50);
     labelframe0.pack(fill="both",expand="yes");
-    #label=Label(labelframe0,text='Filename',width=50);
-    #label.pack();
-
     labelframe = LabelFrame(root, text="Luminosity Function Parameters",width=50);
     labelframe.pack(fill="both", expand="yes");
     label=Label(labelframe,text="Initial value/Minimum/Maximum/Fixed",width=50);
+    label.pack();
+    labelframe2 = LabelFrame(root, text="Survey properties",width=50);
+    labelframe2.pack(fill="both", expand="yes");
+    label=Label(labelframe2,text="Filter/Area [sqdeg]/Flux limit [mJy]",width=50);
     label.pack();
 
     v_fixed=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
@@ -380,6 +384,11 @@ if (mdefaults == 'y'):
 
     defband=[StringVar(),StringVar(),StringVar()]
 
+    obsfile_set=StringVar()
+    sedfile_set=StringVar()
+
+    fields_files='Survey data','SEDs'
+
     def makeform0(labelframe0,fields_files):
         entries_files = []
         ind=0;
@@ -388,10 +397,24 @@ if (mdefaults == 'y'):
             lab=Label(row,width=10,text=field0,anchor='w')
             row.pack(side=TOP,padx=2,pady=5)
             lab.pack(side=LEFT)
-            print obsfile
-            print sedfile
-            file1=Entry(row,textvariable=obsfile)
-            file1.pack(side=RIGHT)
+            if (ind == 0):
+                obsfiles=[]
+                for file in os.listdir(obsdir):
+                    if file.endswith(".fits"):
+                        obsfiles.append(obsdir+file)
+                file1=Entry(row,textvariable=obsfile)
+                option1=OptionMenu(row,obsfile_set,*obsfiles)
+                option1.pack(side='left',padx=10,pady=0)
+            if (ind == 1):
+                sedfiles=[]
+                for file in os.listdir(seddir):
+                    if file.endswith(".fits"):
+                        sedfiles.append(seddir+file)
+                file1=Entry(row,textvariable=sedfile)
+                option2=OptionMenu(row,sedfile_set,*sedfiles)
+                option2.pack(side='left',padx=10,pady=0)
+            obsfile_set.set(obsfile)
+            sedfile_set.set(sedfile)
             entries_files.append((field0,file1))
             ind=ind+1
         return entries_files
@@ -429,10 +452,6 @@ if (mdefaults == 'y'):
             ind=ind+1;
         return entries
         
-    labelframe2 = LabelFrame(root, text="Survey properties",width=50);
-    labelframe2.pack(fill="both", expand="yes");
-    label=Label(labelframe2,text="Filter/Area [sqdeg]/Flux limit [mJy]",width=50);
-    label.pack();
     fields2=band[0],band[1],band[2]
 
     def fetch(entries):
@@ -460,16 +479,15 @@ if (mdefaults == 'y'):
             if(ind == 0):
                 ent0_1 = Entry(row,textvar=f1)
                 option1=OptionMenu(row,db1,*filter_choices)
-                option1.pack(side='left',padx=10,pady=10)
-                db1.set(band[0])
+                option1.pack(side='left',padx=10,pady=0)
             if(ind == 1):
                 ent0_1 = Entry(row,textvar=f2) 
                 option2=OptionMenu(row,db2,*filter_choices)
-                option2.pack(side='left',padx=10,pady=10)
+                option2.pack(side='left',padx=10,pady=0)
             if(ind == 2):
                 ent0_1 = Entry(row,textvar=f3)
                 option3=OptionMenu(row,db3,*filter_choices)
-                option3.pack(side='left',padx=10,pady=10)
+                option3.pack(side='left',padx=10,pady=0)
             ent0_1.pack(side=RIGHT) 
             db1.set(band[0])
             db2.set(band[1])
@@ -495,6 +513,8 @@ if (mdefaults == 'y'):
             value_max[ind]=v_max[ind].get()
             value_fix[ind]=v_fixed[ind].get()
             ind=ind+1
+        #obsfile=obsfile_set.get()
+        #sedfile=sedfile_set.get()
         band[0]=db1.get()
         band[1]=db2.get()
         band[2]=db3.get()
@@ -504,7 +524,7 @@ if (mdefaults == 'y'):
         flim[1]=f2.get()
         flim[2]=f3.get()
         update_mfile(modelfile,f_id)
-        return
+        return obsfile,sedfile
 
     if __name__ == '__main__':
         ents_files = makeform0(labelframe0,fields_files)
@@ -515,7 +535,7 @@ if (mdefaults == 'y'):
         root.bind('<Return>', partial(fetch, ents2))
         b1 = Button(labelframe2, text='Update',command=lambda:callback())
         b1.pack(side=LEFT,padx=5,pady=5)
-        b2 = Button(labelframe2, text='Run',command=runcode)
+        b2 = Button(labelframe2, text='Run',command=lambda:runcode())
         b2.pack(side=LEFT,padx=5,pady=5)
         b3 = Button(labelframe2, text='Show results',command=showresults)
         b3.pack(side=LEFT,padx=5,pady=5)
@@ -530,3 +550,4 @@ if (mdefaults == 'n'):
     torun=raw_input("Run code (y/n)?");
     if (torun == 'y'):
         runcode()
+
