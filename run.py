@@ -171,7 +171,8 @@ def mcmcdiag(): #show chain behavior
 #    if(change == 'n'):
 #        outfile=raw_input("New output file:");
 
-mdefaults=raw_input("Do you wish to see/edit the default settings (y/n)?");
+#mdefaults=raw_input("Do you wish to see/edit the default settings (y/n)?");
+mdefaults="y"
 
 #initialize luminosity function parameters
 fields='Phi_0','Lstar_0','alpha','beta','p','q','zcut','c_evol'
@@ -254,12 +255,12 @@ def update_mfile(modelfile,f_id):
                     tmp1,tmp2=fline.split()[0:2]
                     lam3.append(float(tmp1)),trans3.append(float(tmp2))
                         
-    col1=fits.Column(name='lambda1',format='F',array=lam1)
-    col2=fits.Column(name='transmission1',format='F',array=trans1)
-    col3=fits.Column(name='lambda2',format='F',array=lam2)
-    col4=fits.Column(name='transmission2',format='F',array=trans2)
-    col5=fits.Column(name='lambda3',format='F',array=lam3)
-    col6=fits.Column(name='transmission3',format='F',array=trans3)
+    col1=fits.Column(name='lambda1',format='FLOAT',array=lam1)
+    col2=fits.Column(name='transmission1',format='FLOAT',array=trans1)
+    col3=fits.Column(name='lambda2',format='FLOAT',array=lam2)
+    col4=fits.Column(name='transmission2',format='FLOAT',array=trans2)
+    col5=fits.Column(name='lambda3',format='FLOAT',array=lam3)
+    col6=fits.Column(name='transmission3',format='FLOAT',array=trans3)
 
     cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
     tbhdu=fits.new_table(cols)
