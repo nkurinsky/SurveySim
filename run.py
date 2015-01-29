@@ -1,46 +1,38 @@
 #!/usr/bin/env python
 
+print("Welcome to SurveySim");
+print("a MCMC-based galaxy evolution fitter and simulator");
+
 import os
 import sys
+
+codedir=os.getcwd()+'/trunk/';
+pydir=os.getcwd()+'/Python/';
+#ensure this is in the path
+sys.path.append(pydir)
+
+#initialize datafiles
+seddir=codedir+'templates/'
+sedfile=seddir+'my_templates.fits'
+dmodelfile=codedir+'model/default_model.fits'
+modelfile=codedir+'model/model.fits'
+obsdir=codedir+'obs/'
+obsfile=obsdir+'wise.fits'
+outfile=codedir+'output/output.fits'
+fitcode='fitter'
+
 import time
 import pyfits as fits
 import matplotlib.pyplot as plt
 import numpy as np
+import img_scale
 from pylab import *
 import math
-import pickle
 
-pydir=os.getcwd()+'/Python/';
-sys.path.append(pydir)
-import img_scale
-
-print("Welcome to SurveySim");
-print("a MCMC-based galaxy evolution fitter and simulator");
-
-codedir=os.getcwd()+'/trunk/';
-picklefile=os.getcwd()+'/last.save'
-#ensure this is in the path
-
-
-if(os.path.exists(picklefile)):
-    files = pickle.load( open( picklefile, "rb" ) )
-else:
-    files={
-    "sed":codedir+'templates/my_templates.fits',
-    "dmodel":codedir+'model/default_model.fits',
-    "model":codedir+'model/model.fits',
-    "obs":codedir+'obs/wise.fits',
-    "out":codedir+'output/output.fits'}
-
-fitcode='fitter'
-
-def runcode():
-    print("Runnning fitter code....")
-    os.system(fitcode+' '+files["obs"]+' '+files["model"]+' '+files["sed"]+' '+files["out"])
 
 def showresults(): #read-in the results from output.fits and show plots
     print("Showing results....")
-    hdulist=fits.open(files["out"])
+    hdulist=fits.open(outfile)
 #all the extensions headers here are identical -- apply to ccd images
     hdr=hdulist[0].header #the header associated with extension=0
     model_ccd=hdulist[1].data #model color-color distribution
@@ -64,6 +56,18 @@ def showresults(): #read-in the results from output.fits and show plots
     sim_srcs_zs=srcs_data.field('z')
     sim_srcs_f1=srcs_data.field('f1')
 
+#seems like these might be in Jy rather than mJy is that right?
+    sim_srcs_f1=sim_srcs_f1*1000.0 #turn into mJy
+    fbins=np.logspace(0,3,num=20,base=10)
+    ds=(fbins[1]-fbins[0])*fbins
+    counts1,bin_edges=np.histogram(sim_srcs_f1,bins=fbins)
+    ds1=ds[0:18]
+    counts=counts1 #[:,0]/ds1[:,0] #*pow(fbins,2.5)
+    for i in range(counts1.shape[0]):
+        counts[i]=(counts1[i]/ds[i])*(bin_edges[i]**2.5)
+    print bin_edges
+    print counts
+
     chain=hdulist[4].data
     p_c1=chain.field('P0')
     q_c1=chain.field('Q0')
@@ -77,19 +81,12 @@ def showresults(): #read-in the results from output.fits and show plots
     img3[:,:]=img_scale.linear(res_ccd,scale_min=0,scale_max=100.0)
 
     #make actual figure
-    fig=plt.figure()
+    fig=plt.figure(1)
     a1=fig.add_subplot(2,3,1)
-#    a1.set_title('Luminosity function')
-#    a1.set_xlabel('log(L)')
-#    a1.set_ylabel('phi [Mpc^-3]')
-#    a1.set_xlim(8, 13)
-#    a1.set_ylim(10.**(-6),10.**(-1))
     a1.plot(p_c1,q_c1,'k.')
     a1.set_xlabel('P')
     a1.axis([value_min[4],value_max[4],value_min[5],value_max[5]])
     a1.set_ylabel('Q')
-    #a1.set_xscale('linear')
-    #a1.set_yscale('log')
 
     a2=fig.add_subplot(2,3,2)
     a2.set_title('Redshifts')
@@ -101,13 +98,17 @@ def showresults(): #read-in the results from output.fits and show plots
     a2.set_xlim(0, 5)
 
     a3=fig.add_subplot(2,3,3)
-    a3.set_title('250um counts')
+    a3.set_title('Counts')
     a3.set_xscale('log')
     a3.set_yscale('log')
+    
+    nbins=size(counts)
+    bins=bin_edges[0:nbins]
+    plt.plot(bins,counts,'+')
     a3.set_xlabel('S [mJy]')
     a3.set_ylabel('(dN/dS)*S^2.5')
     a3.set_xlim(20,1000)
-    a3.set_ylim(200,200000)
+    a3.set_ylim(200,8000000)
 
     a4=fig.add_subplot(2,3,4) 
     imgplot=plt.imshow(img1)
@@ -121,17 +122,15 @@ def showresults(): #read-in the results from output.fits and show plots
     imgplot=plt.imshow(img3)
     a6.set_title('Residual')
 
-    plt.tight_layout()
-    plt.show()
+    plt.tight_layout(1)
+    plt.show(1)
     return
 
 def mcmcdiag(): #show chain behavior
     print("MCMC diagnostics....")
-    hdulist=fits.open(files["out"])
+    hdulist=fits.open(outfile)
 #all the extensions headers here are identical -- apply to ccd images
     hdr=hdulist[0].header #the header associated with extension=0
-
-#    params=hdulist[3].data
     chain=hdulist[4].data
     chi2_c1=chain.field('CHISQ0')
     chi2_c2=chain.field('CHISQ1')
@@ -140,11 +139,8 @@ def mcmcdiag(): #show chain behavior
     chi2_c5=chain.field('CHISQ4')
 
     csize=size(chi2_c1)
-    print csize
     a=np.arange(csize)
-#    conv=hdulist[5].data
-#    res=hdulist[6].data
-#    help chain
+    plt.figure(2)
     plt.plot(a,chi2_c1,'r-',lw=2)
     plt.xlabel('step')
     plt.ylabel('chi2')
@@ -152,35 +148,30 @@ def mcmcdiag(): #show chain behavior
     plt.plot(a,chi2_c3,'k-',lw=0.7,color='0.5')
     plt.plot(a,chi2_c4,'k-',lw=0.7,color='0.5')
     plt.plot(a,chi2_c5,'k-',lw=0.7,color='0.5')
-    plt.show()
+    plt.show(2)
     return
 
-if(len(sys.argv) > 1):
-    if sys.argv[1] == "-r":
-        runcode()
-        quit()
+#OUTDATED code to change data/model/output filenames
+#----------------------------------------------------
+#defaults=raw_input("Do you wish to see/edit the default file settings (y/n)?");
+#if (defaults == 'y'):
+#    print("The SED templates are defined in:");
+#    print sedfile;
+#    change=raw_input("Accept (y/n)?")
+#    if(change == 'n'):
+#        sedfile=raw_input("New SED template file:");
+#    print("The observations to be fit are defined in:");
+#    print obsfile;
+#    change=raw_input("Accept (y/n)?")
+#    if(change == 'n'):
+#        obsfile=raw_input("New observations file:");
+#    print("The output is defined in:");
+#    print outfile;
+#    change=raw_input("Accept (y/n)?")
+#    if(change == 'n'):
+#        outfile=raw_input("New output file:");
 
-defaults=raw_input("Do you wish to see/edit the default file settings (y/n)?");
-if (defaults == 'y'):
-    print("The SED templates are defined in:");
-    print files["sed"];
-    change=raw_input("Accept (y/n)?")
-    if(change == 'n'):
-        files["sed"]=raw_input("New SED template file:");
-    print("The observations to be fit are defined in:");
-    print files["obs"];
-    change=raw_input("Accept (y/n)?")
-    if(change == 'n'):
-        files["obs"]=raw_input("New observations file:");
-    print("The output is defined in:");
-    print files["out"];
-    change=raw_input("Accept (y/n)?")
-    if(change == 'n'):
-        files["out"]=raw_input("New output file:");
-
-pickle.dump( files, open( picklefile, "wb" ) )
-
-mdefaults=raw_input("Do you wish to see/edit the default model settings (y/n)?");
+mdefaults=raw_input("Do you wish to see/edit the default settings (y/n)?");
 
 #initialize luminosity function parameters
 fields='Phi_0','Lstar_0','alpha','beta','p','q','zcut','c_evol'
@@ -193,11 +184,11 @@ value_fix=[1,1,1,1,0,0,1,1]
 area=[4.0,4.0,4.0]
 band=['Band1','Band2','Band3']
 flim=[25.0,20.0,15.0]
-f_id=[0,0,0] #placeholder for the filter ids (from filter_choices)
+f_id=[0,0,0] #placeholder for the filter ids
 
 #read-in values if model.fits exists
-if os.path.isfile(files["model"]): # and os.access(files["model"],os.R.OK):
-    mfile=fits.open(files["model"])
+if os.path.isfile(modelfile): # and os.access(modelfile,os.R.OK):
+    mfile=fits.open(modelfile)
     mhdr=mfile[0].header
     value_initial[0]=mhdr['PHI0']
     band[0]=mhdr['Band_1']
@@ -263,12 +254,12 @@ def update_mfile(modelfile,f_id):
                     tmp1,tmp2=fline.split()[0:2]
                     lam3.append(float(tmp1)),trans3.append(float(tmp2))
                         
-    col1=fits.Column(name='lambda1', format="FLOAT",array=lam1)
-    col2=fits.Column(name='transmission1', format="FLOAT",array=trans1)
-    col3=fits.Column(name='lambda2',format="FLOAT",array=lam2)
-    col4=fits.Column(name='transmission2',format="FLOAT",array=trans2)
-    col5=fits.Column(name='lambda3',format="FLOAT",array=lam3)
-    col6=fits.Column(name='transmission3',format="FLOAT",array=trans3)
+    col1=fits.Column(name='lambda1',format='F',array=lam1)
+    col2=fits.Column(name='transmission1',format='F',array=trans1)
+    col3=fits.Column(name='lambda2',format='F',array=lam2)
+    col4=fits.Column(name='transmission2',format='F',array=trans2)
+    col5=fits.Column(name='lambda3',format='F',array=lam3)
+    col6=fits.Column(name='transmission3',format='F',array=trans3)
 
     cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
     tbhdu=fits.new_table(cols)
@@ -351,7 +342,6 @@ def update_mfile(modelfile,f_id):
     hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
     hdulist.close
 
-#    hdulist.flush() #actually update the model file
     thdulist=fits.HDUList([hdulist[0],tbhdu])
     if(os.path.isfile(modelfile)):
            print 'Replacing existing model file....'
@@ -360,18 +350,31 @@ def update_mfile(modelfile,f_id):
     else:
            thdulist.writeto(modelfile);
     return
-#-----------------------------------------------------------------------------
 
-#this is all to do with the GUI where the user is allowed to change the model parameter values etc
+def runcode():
+    print("Runnning fitter code....")
+    obsfile=obsfile_set.get()
+    sedfile=sedfile_set.get()
+    os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
+
+#-----------------------------------------------------------------------------
+#Launch the GUI where the user is allowed to change the model parameter values etc
 if (mdefaults == 'y'):
     import Tkinter
     from functools import partial
     from Tkinter import *
     root=Tk();
+    #basic GUI framework
     root.title("SurveySim")
+    labelframe0 = LabelFrame(root, text="Data files",width=50);
+    labelframe0.pack(fill="both",expand="yes");
     labelframe = LabelFrame(root, text="Luminosity Function Parameters",width=50);
     labelframe.pack(fill="both", expand="yes");
     label=Label(labelframe,text="Initial value/Minimum/Maximum/Fixed",width=50);
+    label.pack();
+    labelframe2 = LabelFrame(root, text="Survey properties",width=50);
+    labelframe2.pack(fill="both", expand="yes");
+    label=Label(labelframe2,text="Filter/Area [sqdeg]/Flux limit [mJy]",width=50);
     label.pack();
 
     v_fixed=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
@@ -380,6 +383,41 @@ if (mdefaults == 'y'):
     v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
 
     defband=[StringVar(),StringVar(),StringVar()]
+
+    obsfile_set=StringVar()
+    sedfile_set=StringVar()
+
+    fields_files='Survey data','SEDs'
+
+    def makeform0(labelframe0,fields_files):
+        entries_files = []
+        ind=0;
+        for field0 in fields_files:
+            row=Frame(labelframe0)
+            lab=Label(row,width=10,text=field0,anchor='w')
+            row.pack(side=TOP,padx=2,pady=5)
+            lab.pack(side=LEFT)
+            if (ind == 0):
+                obsfiles=[]
+                for file in os.listdir(obsdir):
+                    if file.endswith(".fits"):
+                        obsfiles.append(obsdir+file)
+                file1=Entry(row,textvariable=obsfile)
+                option1=OptionMenu(row,obsfile_set,*obsfiles)
+                option1.pack(side='left',padx=10,pady=0)
+            if (ind == 1):
+                sedfiles=[]
+                for file in os.listdir(seddir):
+                    if file.endswith(".fits"):
+                        sedfiles.append(seddir+file)
+                file1=Entry(row,textvariable=sedfile)
+                option2=OptionMenu(row,sedfile_set,*sedfiles)
+                option2.pack(side='left',padx=10,pady=0)
+            obsfile_set.set(obsfile)
+            sedfile_set.set(sedfile)
+            entries_files.append((field0,file1))
+            ind=ind+1
+        return entries_files
 
     def makeform(labelframe, fields):
         entries = []
@@ -414,11 +452,6 @@ if (mdefaults == 'y'):
             ind=ind+1;
         return entries
         
-    labelframe2 = LabelFrame(root, text="Survey properties",width=50);
-    labelframe2.pack(fill="both", expand="yes");
-   # label=Label(labelframe2,text="Area [sqdeg]/wavelength [um]/Flux limit [mJy]",width=50);
-    label=Label(labelframe2,text="Filter/Area [sqdeg]/Flux limit [mJy]",width=50);
-    label.pack();
     fields2=band[0],band[1],band[2]
 
     def fetch(entries):
@@ -446,16 +479,15 @@ if (mdefaults == 'y'):
             if(ind == 0):
                 ent0_1 = Entry(row,textvar=f1)
                 option1=OptionMenu(row,db1,*filter_choices)
-                option1.pack(side='left',padx=10,pady=10)
-                db1.set(band[0])
+                option1.pack(side='left',padx=10,pady=0)
             if(ind == 1):
                 ent0_1 = Entry(row,textvar=f2) 
                 option2=OptionMenu(row,db2,*filter_choices)
-                option2.pack(side='left',padx=10,pady=10)
+                option2.pack(side='left',padx=10,pady=0)
             if(ind == 2):
                 ent0_1 = Entry(row,textvar=f3)
                 option3=OptionMenu(row,db3,*filter_choices)
-                option3.pack(side='left',padx=10,pady=10)
+                option3.pack(side='left',padx=10,pady=0)
             ent0_1.pack(side=RIGHT) 
             db1.set(band[0])
             db2.set(band[1])
@@ -481,6 +513,8 @@ if (mdefaults == 'y'):
             value_max[ind]=v_max[ind].get()
             value_fix[ind]=v_fixed[ind].get()
             ind=ind+1
+        #obsfile=obsfile_set.get()
+        #sedfile=sedfile_set.get()
         band[0]=db1.get()
         band[1]=db2.get()
         band[2]=db3.get()
@@ -489,17 +523,19 @@ if (mdefaults == 'y'):
         flim[0]=f1.get()
         flim[1]=f2.get()
         flim[2]=f3.get()
-        update_mfile(files["model"],f_id)
-        return
+        update_mfile(modelfile,f_id)
+        return obsfile,sedfile
 
     if __name__ == '__main__':
+        ents_files = makeform0(labelframe0,fields_files)
+        root.bind('<Return>',partial(fetch,ents_files))
         ents = makeform(labelframe, fields)
         root.bind('<Return>', partial(fetch, ents))
         ents2 = makeform2(labelframe2, fields2)
         root.bind('<Return>', partial(fetch, ents2))
         b1 = Button(labelframe2, text='Update',command=lambda:callback())
         b1.pack(side=LEFT,padx=5,pady=5)
-        b2 = Button(labelframe2, text='Run',command=runcode)
+        b2 = Button(labelframe2, text='Run',command=lambda:runcode())
         b2.pack(side=LEFT,padx=5,pady=5)
         b3 = Button(labelframe2, text='Show results',command=showresults)
         b3.pack(side=LEFT,padx=5,pady=5)
@@ -514,3 +550,4 @@ if (mdefaults == 'n'):
     torun=raw_input("Run code (y/n)?");
     if (torun == 'y'):
         runcode()
+
