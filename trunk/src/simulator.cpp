@@ -389,27 +389,33 @@ bool simulator::save(string outfile){
       exit(1);
     }
     
-    newTable->column(colname[0]).write(f1,1);
-    newTable->column(colname[1]).write(f2,1);
-    newTable->column(colname[2]).write(f3,1);
-    newTable->column(colname[3]).write(redshift,1);
-    newTable->column(colname[4]).write(luminosity,1);
-
-    valarray<double> counts1(pow(10,counts[0]->bins()));
-    valarray<double> counts2(pow(10,counts[1]->bins()));
-    valarray<double> counts3(pow(10,counts[2]->bins()));
-
-    newTable->column(colname[5]).write(counts1,1);
-    newTable->column(colname[6]).write(counts2,1);
-    newTable->column(colname[7]).write(counts3,1);
-
-    newTable->column(colname[8]).write(counts[0]->counts(),1);
-    newTable->column(colname[9]).write(counts[1]->counts(),1);
-    newTable->column(colname[10]).write(counts[2]->counts(),1);
-
-    newTable->column(colname[11]).write(last_output.dnds[0],1);
-    newTable->column(colname[12]).write(last_output.dnds[1],1);
-    newTable->column(colname[13]).write(last_output.dnds[2],1);
+    try{
+      newTable->column(colname[0]).write(f1,1);
+      newTable->column(colname[1]).write(f2,1);
+      newTable->column(colname[2]).write(f3,1);
+      newTable->column(colname[3]).write(redshift,1);
+      newTable->column(colname[4]).write(luminosity,1);
+      
+      valarray<double> counts1(pow(10,counts[0]->bins()));
+      valarray<double> counts2(pow(10,counts[1]->bins()));
+      valarray<double> counts3(pow(10,counts[2]->bins()));
+      
+      newTable->column(colname[5]).write(counts1,1);
+      newTable->column(colname[6]).write(counts2,1);
+      newTable->column(colname[7]).write(counts3,1);
+      
+      newTable->column(colname[8]).write(counts[0]->counts(),1);
+      newTable->column(colname[9]).write(counts[1]->counts(),1);
+      newTable->column(colname[10]).write(counts[2]->counts(),1);
+      
+      newTable->column(colname[11]).write(last_output.dnds[0],1);
+      newTable->column(colname[12]).write(last_output.dnds[1],1);
+      newTable->column(colname[13]).write(last_output.dnds[2],1);
+    }
+    catch(...){
+      printf("Caught Save Error: Column Write\n");
+      exit(1);
+    }
 
   }
   catch(...){
