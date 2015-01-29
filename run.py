@@ -1,40 +1,46 @@
 #!/usr/bin/env python
 
-print("Welcome to SurveySim");
-print("a MCMC-based galaxy evolution fitter and simulator");
-
 import os
 import sys
-
-codedir=os.getcwd()+'/trunk/';
-pydir=os.getcwd()+'/Python/';
-#ensure this is in the path
-sys.path.append(pydir)
-
-sedfile=codedir+'templates/my_templates.fits'
-dmodelfile=codedir+'model/default_model.fits'
-modelfile=codedir+'model/model.fits'
-obsfile=codedir+'obs/wise.fits'
-outfile=codedir+'output/output.fits'
-fitcode='fitter'
-
 import time
 import pyfits as fits
 import matplotlib.pyplot as plt
 import numpy as np
-import img_scale
 from pylab import *
 import math
+import pickle
+
+pydir=os.getcwd()+'/Python/';
+sys.path.append(pydir)
+import img_scale
+
+print("Welcome to SurveySim");
+print("a MCMC-based galaxy evolution fitter and simulator");
+
+codedir=os.getcwd()+'/trunk/';
+picklefile=os.getcwd()+'/last.save'
+#ensure this is in the path
 
 
+if(os.path.exists(picklefile)):
+    files = pickle.load( open( picklefile, "rb" ) )
+else:
+    files={
+    "sed":codedir+'templates/my_templates.fits',
+    "dmodel":codedir+'model/default_model.fits',
+    "model":codedir+'model/model.fits',
+    "obs":codedir+'obs/wise.fits',
+    "out":codedir+'output/output.fits'}
+
+fitcode='fitter'
 
 def runcode():
     print("Runnning fitter code....")
-    os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
+    os.system(fitcode+' '+files["obs"]+' '+files["model"]+' '+files["sed"]+' '+files["out"])
 
 def showresults(): #read-in the results from output.fits and show plots
     print("Showing results....")
-    hdulist=fits.open(outfile)
+    hdulist=fits.open(files["out"])
 #all the extensions headers here are identical -- apply to ccd images
     hdr=hdulist[0].header #the header associated with extension=0
     model_ccd=hdulist[1].data #model color-color distribution
@@ -121,7 +127,7 @@ def showresults(): #read-in the results from output.fits and show plots
 
 def mcmcdiag(): #show chain behavior
     print("MCMC diagnostics....")
-    hdulist=fits.open(outfile)
+    hdulist=fits.open(files["out"])
 #all the extensions headers here are identical -- apply to ccd images
     hdr=hdulist[0].header #the header associated with extension=0
 
@@ -157,20 +163,22 @@ if(len(sys.argv) > 1):
 defaults=raw_input("Do you wish to see/edit the default file settings (y/n)?");
 if (defaults == 'y'):
     print("The SED templates are defined in:");
-    print sedfile;
+    print files["sed"];
     change=raw_input("Accept (y/n)?")
     if(change == 'n'):
-        sedfile=raw_input("New SED template file:");
+        files["sed"]=raw_input("New SED template file:");
     print("The observations to be fit are defined in:");
-    print obsfile;
+    print files["obs"];
     change=raw_input("Accept (y/n)?")
     if(change == 'n'):
-        obsfile=raw_input("New observations file:");
+        files["obs"]=raw_input("New observations file:");
     print("The output is defined in:");
-    print outfile;
+    print files["out"];
     change=raw_input("Accept (y/n)?")
     if(change == 'n'):
-        outfile=raw_input("New output file:");
+        files["out"]=raw_input("New output file:");
+
+pickle.dump( files, open( picklefile, "wb" ) )
 
 mdefaults=raw_input("Do you wish to see/edit the default model settings (y/n)?");
 
@@ -188,8 +196,8 @@ flim=[25.0,20.0,15.0]
 f_id=[0,0,0] #placeholder for the filter ids (from filter_choices)
 
 #read-in values if model.fits exists
-if os.path.isfile(modelfile): # and os.access(modelfile,os.R.OK):
-    mfile=fits.open(modelfile)
+if os.path.isfile(files["model"]): # and os.access(files["model"],os.R.OK):
+    mfile=fits.open(files["model"])
     mhdr=mfile[0].header
     value_initial[0]=mhdr['PHI0']
     band[0]=mhdr['Band_1']
@@ -255,12 +263,12 @@ def update_mfile(modelfile,f_id):
                     tmp1,tmp2=fline.split()[0:2]
                     lam3.append(float(tmp1)),trans3.append(float(tmp2))
                         
-    col1=fits.Column(name='lambda1',format='F',array=lam1)
-    col2=fits.Column(name='transmission1',format='F',array=trans1)
-    col3=fits.Column(name='lambda2',format='F',array=lam2)
-    col4=fits.Column(name='transmission2',format='F',array=trans2)
-    col5=fits.Column(name='lambda3',format='F',array=lam3)
-    col6=fits.Column(name='transmission3',format='F',array=trans3)
+    col1=fits.Column(name='lambda1', format="FLOAT",array=lam1)
+    col2=fits.Column(name='transmission1', format="FLOAT",array=trans1)
+    col3=fits.Column(name='lambda2',format="FLOAT",array=lam2)
+    col4=fits.Column(name='transmission2',format="FLOAT",array=trans2)
+    col5=fits.Column(name='lambda3',format="FLOAT",array=lam3)
+    col6=fits.Column(name='transmission3',format="FLOAT",array=trans3)
 
     cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
     tbhdu=fits.new_table(cols)
@@ -481,7 +489,7 @@ if (mdefaults == 'y'):
         flim[0]=f1.get()
         flim[1]=f2.get()
         flim[2]=f3.get()
-        update_mfile(modelfile,f_id)
+        update_mfile(files["model"],f_id)
         return
 
     if __name__ == '__main__':
