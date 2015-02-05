@@ -13,6 +13,7 @@
 #include <deque>
 
 #define RECENT_NUM 100
+#define LEARNING_RATE 0.05
 
 class ParameterSettings{
 public:

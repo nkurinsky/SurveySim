@@ -15,6 +15,8 @@
 #define SL_INT_PRECISION 1E-2
 #define FILTER_NUM 3
 
+#define DEBUG 1
+
 using namespace CCfits;
 
 class sed{

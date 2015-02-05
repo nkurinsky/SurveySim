@@ -314,6 +314,8 @@ void sed_lib::initialize_filter_fluxes(){
   }
   clearprogress.append("]");
 
+  FILE *fp = fopen("fluxes.txt","w+");
+
   printf("Initializing Filter Flux Interpolation\n");
   for (int type=0;type<tnum;type++){
     for (int filter=0;filter<3;filter++){
@@ -324,6 +326,8 @@ void sed_lib::initialize_filter_fluxes(){
 	for(int li=0;li<lnum;li++){
 	  printf("=");
 	  fs[li+zi*lnum]=convolve_filter(li,zs[zi],type,filter);
+	  if(DEBUG == 1)
+	    fprintf(fp,"%i %f %i %i %g\n",li,zs[zi],type,filter,fs[li+zi*lnum]);
 	}
       }
       printf("\rBuilding Spline...                                                         ");
@@ -340,6 +344,8 @@ void sed_lib::initialize_filter_fluxes(){
       }  
     }
   }
+
+  fclose(fp);
 
   printf("\rBuilt Spline Interpolation for Fluxes                                           \n");
   interp_init=true;

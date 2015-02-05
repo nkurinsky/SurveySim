@@ -104,7 +104,7 @@ double MetropSampler::acceptance_rate(){
 bool MetropSampler::anneal(){
   double rate = acceptance_rate();
   if((rate > (ideal_acceptance + accept_buffer)) or (rate < (ideal_acceptance - accept_buffer))){
-    temp *= (1+0.5*(ideal_acceptance - rate)); //basic steepest descent learning, somewhat idealized
+    temp *= (1+LEARNING_RATE*(ideal_acceptance - rate)); //basic steepest descent learning, somewhat idealized
     return true;
   }
 
