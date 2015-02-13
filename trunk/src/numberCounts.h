@@ -3,6 +3,8 @@
 #ifndef NUMBERCOUNTS_H
 #define NUMBERCOUNTS_H
 
+#define EMPTYBIN 1e-10
+
 #include "functions.h"
 #include <valarray>
 

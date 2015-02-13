@@ -75,7 +75,7 @@ void NumberCounts::compute(const valarray<double> &fluxes_nolog, const double ar
     }
   }
   
-  counts.resize(_nbins,0.0);
+  counts.resize(_nbins,EMPTYBIN);
   int j;
   for(unsigned int i = 0; i < fluxes.size(); i++){
     j = static_cast<int>( ceil((fluxes[i] - _range[0]) / _dS ) );

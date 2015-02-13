@@ -11,8 +11,8 @@ sed::sed(double * f,double *bands, int bnum) : sed(){
   spline = gsl_spline_alloc(gsl_interp_cspline,bnum);
   gsl_spline_init(spline,bands,f,bnum);
   
-  brange[0] = f[0];
-  brange[1] = f[bnum-1];
+  brange[0] = bands[0];
+  brange[1] = bands[bnum-1];
   
   interp_init = true;
 }
