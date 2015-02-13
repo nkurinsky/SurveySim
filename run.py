@@ -256,6 +256,8 @@ class SurveySimGUI:
 
 #variables to hold MCMC settings values
         self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),IntVar()]
+        self.settings_on='no'
+
         self.master=master
         master.title("SurveySim")
         self.labelframe_top = LabelFrame(master, text="Data files",width=50);
@@ -385,7 +387,17 @@ class SurveySimGUI:
         band[1]=self.db2.get()
         band[2]=self.db3.get()
 
-        print s_set[5].get()
+#update MCMC settings
+        if(self.settings_on == 'yes'): #to ensure that this is run only if the settings were touched
+            zmin=self.settings.s_set[0].get()
+            zmax=self.settings.s_set[1].get()
+            dz=self.settings.s_set[2].get()
+            runs=self.settings.s_set[3].get()
+            nchain=self.settings.s_set[4].get()
+            tmax=self.settings.s_set[5].get()
+            mesprint=self.settings.s_set[6].get()
+
+        print tmax #just checking
         if (band[0] != 'Band1'):
             f_id=[filter_choices.index(band[0]),filter_choices.index(band[1]),filter_choices.index(band[2])]
         flim[0]=self.f1.get()
@@ -397,6 +409,7 @@ class SurveySimGUI:
 
     def settings(self):
         self.settings = SettingsWindow()
+        self.settings_on='yes'
 
     def showresults(self): #read-in the results from output.fits and show plots
         print("Showing results....")
