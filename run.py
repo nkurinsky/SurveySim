@@ -4,6 +4,11 @@
 import os
 import sys
 
+codedir=os.getcwd()+'/trunk/';
+pydir=os.getcwd()+'/Python/';
+#ensure this is in the path
+sys.path.append(pydir)
+
 import time
 import pyfits as fits
 import matplotlib.pyplot as plt
@@ -12,6 +17,7 @@ import img_scale
 from pylab import *
 import math
 from functools import partial
+import Tkinter as tk
 from Tkinter import *
 
 #=================================================================================
@@ -19,11 +25,6 @@ from Tkinter import *
 #---------------------------------------------------------------------------------
 print("Welcome to SurveySim");
 print("a MCMC-based galaxy evolution fitter and simulator");
-
-codedir=os.getcwd()+'/trunk/';
-pydir=os.getcwd()+'/Python/';
-#ensure this is in the path
-sys.path.append(pydir)
 
 #GUI top frame
 fields_files='Survey data','SEDs'
@@ -53,7 +54,7 @@ f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
 
 #initialize MCMC settings parameters
-fields3='zmin','zmax','dz','tmax'
+fields3='zmin','zmax','dz','Runs','Nchain','Tmax','Verbose(1/0)'
 zmin=0.01 #Simulation minimum redshift
 zmax=5.0 #Simulation maximum redshift
 dz=0.05 #Redshift Bin Width
@@ -252,9 +253,9 @@ class SurveySimGUI:
         self.db2=StringVar()
         self.db3=StringVar()
         self.defband=[StringVar(),StringVar(),StringVar()]
-        #variables to hold MCMC settings values
-        self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
 
+#variables to hold MCMC settings values
+        self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),IntVar()]
         self.master=master
         master.title("SurveySim")
         self.labelframe_top = LabelFrame(master, text="Data files",width=50);
@@ -383,6 +384,8 @@ class SurveySimGUI:
         band[0]=self.db1.get()
         band[1]=self.db2.get()
         band[2]=self.db3.get()
+
+        print s_set[5].get()
         if (band[0] != 'Band1'):
             f_id=[filter_choices.index(band[0]),filter_choices.index(band[1]),filter_choices.index(band[2])]
         flim[0]=self.f1.get()
@@ -393,26 +396,7 @@ class SurveySimGUI:
         return obsfile,sedfile
 
     def settings(self):
-        self.newWindow=TopLevel(self.master)
-        self.app=SettingsWindow(self.newWindow)
-
-        ind=0;
-        for field3_i in fields3:
-            row = Frame(self.app)
-            lab = Label(row, width=10, text=field3_i,anchor='w')
-            row.pack(side=TOP, padx=2, pady=5)
-            lab.pack(side=LEFT)
-            e = Entry(row,textvariable=self.s_set[ind])
-            e.pack(side=RIGHT)
-            if(ind == 0): 
-                self.s_set[ind].set(zmin)
-            if(ind == 1):
-                self.s_set[ind].set(zmax)
-            if(ind == 2):
-                self.s_set[ind].set(dz)
-            if(ind == 3):
-                self.s_set[ind].set(tmax)
-            ind=ind+1;
+        self.settings = SettingsWindow()
 
     def showresults(self): #read-in the results from output.fits and show plots
         print("Showing results....")
@@ -450,8 +434,8 @@ class SurveySimGUI:
         for i in range(counts1.shape[0]):
             counts[i]=(counts1[i]/ds[i])*(bin_edges[i]**2.5)
             
-        print bin_edges
-        print counts
+ #       print bin_edges
+ #       print counts
 
         chain=hdulist[4].data
         p_c1=chain.field('P0')
@@ -545,11 +529,39 @@ class SurveySimGUI:
     def quit(self):
         self.master.destroy()
 
-class SettingsWindow:
-    def __init__(self, master):
-        self.master = master
-        self.frame2 = Frame(self.master)
-        self.frame2.pack()
+class SettingsWindow(Frame):     
+    def __init__(self):
+        new =tk.Frame.__init__(self)
+        new = Toplevel(self)
+        new.title("MCMC Settings")
+
+        #variables to hold MCMC settings values
+        self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),IntVar()]
+
+        ind=0;
+        for field3_i in fields3:
+            row = Frame(new)
+            lab = Label(row, width=10, text=field3_i,anchor='w')
+            row.pack(side=TOP, padx=2, pady=5)
+            lab.pack(side=LEFT)
+            e = Entry(row,textvariable=self.s_set[ind])
+            e.pack(side=RIGHT)
+            if(ind == 0): 
+                self.s_set[ind].set(zmin)
+            if(ind == 1):
+                self.s_set[ind].set(zmax)
+            if(ind == 2):
+                self.s_set[ind].set(dz)
+            if(ind == 3):
+                self.s_set[ind].set(runs)
+            if(ind == 4):
+                self.s_set[ind].set(nchain)
+            if(ind == 5):
+                self.s_set[ind].set(tmax)
+            if(ind == 6):
+                self.s_set[ind].set(mesprint)
+            ind=ind+1;
+
 
 def main():
     root=Tk()   
