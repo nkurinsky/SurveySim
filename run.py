@@ -111,128 +111,7 @@ for fline in flines:
             filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3)
 #-----------------------------------------------------------------------------------------
 
-def update_mfile(modelfile,f_id):
-    hdulist=fits.open(modelfile)
-    
-#read-in filter transmission curves for selected bands
-    with open (codedir+'filters/allfilters.dat','r') as f: 
-        flines=f.readlines()
 
-    fcount=-1
-    lam1,lam2,lam3,trans1,trans2,trans3=[],[],[],[],[],[]
-    for fline in flines:
-        if fline.strip():
-            ncol=len(fline.split())
-            if ncol > 2:
-                fcount=fcount+1
-            if ncol == 2:
-                if fcount == f_id[0]: 
-                    tmp1,tmp2=fline.split()[0:2]
-                    lam1.append(float(tmp1)),trans1.append(float(tmp2))
-                if fcount == f_id[1]:
-                    tmp1,tmp2=fline.split()[0:2]
-                    lam2.append(float(tmp1)),trans2.append(float(tmp2))
-                if fcount == f_id[2]:
-                    tmp1,tmp2=fline.split()[0:2]
-                    lam3.append(float(tmp1)),trans3.append(float(tmp2))
-                        
-    col1=fits.Column(name='lambda1',format='FLOAT',array=lam1)
-    col2=fits.Column(name='transmission1',format='FLOAT',array=trans1)
-    col3=fits.Column(name='lambda2',format='FLOAT',array=lam2)
-    col4=fits.Column(name='transmission2',format='FLOAT',array=trans2)
-    col5=fits.Column(name='lambda3',format='FLOAT',array=lam3)
-    col6=fits.Column(name='transmission3',format='FLOAT',array=trans3)
-
-    cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
-    tbhdu=fits.new_table(cols)
-
-    hdr=hdulist[0].header #the header associated with extension=0
-
-    #create/update luminosity function parameters in model file header
-    hdr.set('PHI0',value_initial[0],'Luminosity Function Normalization')
-    hdr.set('PHI0_FIX',value_fix[0],'Fix Phi0 (Y=1/N=0)')
-    hdr.set('PHI0_MIN',value_min[0],'Minimum Phi0 value')
-    hdr.set('PHI0_MAX',value_max[0],'Maximum Phi0 value')
-    
-    hdr.set('L0',value_initial[1],'Luminosity Function knee')
-    hdr.set('L0_FIX',value_fix[1],'Fix L0 (Y=1/N=0)')
-    hdr.set('L0_MIN',value_min[1],'Minimum L0 value')
-    hdr.set('L0_MAX',value_max[1],'Maximum L0 value')
- 
-    hdr.set('ALPHA',value_initial[2],'Luminosity Function upper slope')
-    hdr.set('ALPHA_FI',value_fix[2],'Fix alpha (Y=1/N=0)')
-    hdr.set('ALPHA_MI',value_min[2],'Minimum alpha value')
-    hdr.set('ALPHA_MA',value_max[2],'Maximum alpha value')
-
-    hdr.set('BETA',value_initial[3],'Luminosity Function lower slope')
-    hdr.set('BETA_FIX',value_fix[3],'Fix beta (Y=1/N=0)')
-    hdr.set('BETA_MIN',value_min[3],'Minimum beta value')
-    hdr.set('BETA_MAX',value_max[3],'Maximum beta value')
-
-    hdr.set('P',value_initial[4],'LF density evolution parameter')
-    hdr.set('P_FIX',value_fix[4],'Fix p (Y=1/N=0)')
-    hdr.set('P_MIN',value_min[4],'Minimum p value')
-    hdr.set('P_MAX',value_max[4],'Maximum p value')
-
-    hdr.set('Q',value_initial[5],'LF luminosity evolution parameter')
-    hdr.set('Q_FIX',value_fix[5],'Fix q (Y=1/N=0)')
-    hdr.set('Q_MIN',value_min[5],'Minimum q value')
-    hdr.set('Q_MAX',value_max[5],'Maximum q value')
-    
-    hdr.set('ZCUT',value_initial[6],'LF evolution redshift cutoff')
-    hdr.set('ZCUT_FIX',value_fix[6],'Fix zcut (Y=1/N=0)')
-    hdr.set('ZCUT_MIN',value_min[6],'Minimum zcut value')
-    hdr.set('ZCUT_MAX',value_max[6],'Maximum zcut value')
-
-    hdr.set('CEXP',value_initial[6],'Color evolution term')
-    hdr.set('CEXP_FIX',value_fix[6],'Fix cexp (Y=1/N=0)')
-    hdr.set('CEXP_MIN',value_min[6],'Minimum cexp value')
-    hdr.set('CEXP_MAX',value_max[6],'Maximum cexp value')
-
-#====================================================================
-# Survey properties 
-#--------------------------------------------------------------------   
-    hdr.set('AREA',area[0],'Observed Solid Angle of survey')
-    hdr.set('Axis1','ColorF1F2','Diagnostic x-axis')
-    hdr.set('Axis2','Flux1','Diagnostic y-axis')
-    hdr.set('Band_1',band[0],'1st filter name')
-    hdr.set('Band_2',band[1],'2nd filter name')
-    hdr.set('Band_3',band[2],'3rd filter name')
-    hdr.set('Fluxlim1',flim[0],'1st band flux limit')
-    hdr.set('Fluxlim2',flim[1],'2nd band flux limit')
-    hdr.set('Fluxlim3',flim[2],'3rd band flux limit')
-
-#====================================================================
-# Code settings
-#---------------------------------------------------------------------  
-    hdr.set('ZMIN',zmin,'Simulation minimum redshift')
-    hdr.set('ZMAX',zmax,'Simulation maximum redshift')
-    hdr.set('DZ',dz,'Redshift Bin Width')
-    hdr.set('RUNS',runs,'Number of runs')
-
-    hdr.set('NCHAIN',nchain,'Chain Number')
-    hdr.set('TMAX',tmax,'Starting Anneal Temperature')
-    hdr.set('ANN_PCT',ann_pct,'Ideal acceptance Percentage')
-    hdr.set('ANN_RNG',ann_rng,'Range to maintain acceptance')
-    hdr.set('CONV_CON',conv_con,'Convergence confidence interval') #was 0.05 but having trouble converging so set to 0.5 just for now
-    hdr.set('CONV_RMA',conv_rma,'Convergence Rmax Criterion')
-    hdr.set('CONV_STE',conv_ste,'Steps btw convergence checks')
-    hdr.set('BURN_STE',burn_ste,'Steps btw anneal calls in burn-in')
-    hdr.set('BURNVRUN',burnvrun,'Ratio of normal to burn-in steps')
-    hdr.set('PRINT',mesprint,'Print Debug MSGs (1=verbose,0=silent)')
-
-    hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
-    hdulist.close
-
-    thdulist=fits.HDUList([hdulist[0],tbhdu])
-    if(os.path.isfile(modelfile)):
-           print 'Replacing existing model file....'
-           os.remove(modelfile)
-           thdulist.writeto(modelfile);
-    else:
-           print 'Writing a new model file....'
-           thdulist.writeto(modelfile);
-    return
 
 #==========================================================================================
 #the GUI definition
@@ -240,7 +119,7 @@ def update_mfile(modelfile,f_id):
 class SurveySimGUI:
     def __init__(self, master):
         #local variables to hold the entries in the GUI
-        self.v_fixed=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
+        self.v_fixed=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar()]
         self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
         self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
         self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
@@ -253,30 +132,28 @@ class SurveySimGUI:
         self.db2=StringVar()
         self.db3=StringVar()
         self.defband=[StringVar(),StringVar(),StringVar()]
-
-#variables to hold MCMC settings values
-        self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),IntVar()]
-        self.settings_on='no'
+        self.settings_on='no' #a switch to say whether or not the SettingsWindow was used
 
         self.master=master
         master.title("SurveySim")
-        self.labelframe_top = LabelFrame(master, text="Data files",width=50);
-        self.labelframe_top.pack(fill="both",expand="yes");
-        self.label_top=Label(self.labelframe_top,text=" ",width=50);
-        self.label_top.pack();
+        self.labelframe_top = LabelFrame(master, text="Data files",bg='grey')
+        self.labelframe_top.pack(fill="both",expand="yes")
+        self.label_top=Label(self.labelframe_top,text=" ") 
+        self.label_top.pack(side=RIGHT)
 
-        self.labelframe_middle = LabelFrame(master, text="Luminosity Function Parameters",width=50);
-        self.labelframe_middle.pack(fill="both", expand="yes");
-        self.label_middle=Label(self.labelframe_middle,text="Initial value/Minimum/Maximum/Fixed",width=50);
-        self.label_middle.pack();
+        self.labelframe_middle = LabelFrame(master, text="Luminosity Function Parameters",bg='light blue') 
+        self.labelframe_middle.pack(side=LEFT) #fill="both", expand="yes")
+        self.label_middle=Label(self.labelframe_middle,text="Initial/Min/Max/Fix")
+        self.label_middle.pack()
 
-        self.labelframe_bottom = LabelFrame(master, text="Survey properties",width=50);
-        self.labelframe_bottom.pack(fill="both", expand="yes");
-        self.label=Label(self.labelframe_bottom,text="Filter/Area [sqdeg]/Flux limit [mJy]",width=50);
+        self.labelframe_bottom = LabelFrame(master, text="Survey properties",bg='pink') 
+        self.labelframe_bottom.pack() #fill="both", expand="yes",side=RIGHT);
+        self.label=Label(self.labelframe_bottom,text="Filter/Area [sqdeg]/Flux limit [mJy]",bg='pink') 
         self.label.pack();
 
 #the GUI buttons
-        self.settings_button = Button(master, text='Settings',command=self.settings)
+       # photo = PhotoImage(file=pydir+"red-gear.gif") 
+        self.settings_button = Button(master,text='Settings',command=self.settings)
         self.settings_button.pack(side=LEFT,padx=5,pady=5)
         self.update_button = Button(master, text='Update',command=self.callback)
         self.update_button.pack(side=LEFT,padx=5,pady=5)
@@ -293,9 +170,9 @@ class SurveySimGUI:
         ind=0;
         for field0 in fields_files:
             row=Frame(self.labelframe_top)
-            lab=Label(row,width=10,text=field0,anchor='w')
-            row.pack(side=TOP,padx=2,pady=5)
+            lab=Label(row,text=field0)
             lab.pack(side=LEFT)
+            row.pack(side=TOP,padx=1,pady=5)
             if (ind == 0):
                 obsfiles=[]
                 for file in os.listdir(obsdir):
@@ -320,24 +197,25 @@ class SurveySimGUI:
         ind=0;
         for field in fields_lf:
             row = Frame(self.labelframe_middle)
-            lab = Label(row, width=10, text=field, anchor='w')
-            row.pack(side=TOP, padx=2, pady=5)
+            lab = Label(row, width=6, text=field, anchor='w')
+            #lab.grid(row=ind,column=0)
+            row.pack(side=TOP, padx=1, pady=5)
             lab.pack(side=LEFT)
 
-            ent0 = Entry(row,textvariable=self.v_fixed[ind])
+            ent0 = Entry(row,textvariable=self.v_fixed[ind],width=1)
             ent0.pack(side=RIGHT)
             self.v_fixed[ind].set(value_fix[ind])
             ent0.pack(side=RIGHT) 
 
-            ent1 = Entry(row,textvariable=self.v_max[ind])
+            ent1 = Entry(row,textvariable=self.v_max[ind],width=5)
             ent1.pack(side=RIGHT)
             self.v_max[ind].set(value_max[ind])
 
-            ent2 = Entry(row,textvariable=self.v_min[ind])
+            ent2 = Entry(row,textvariable=self.v_min[ind],width=5)
             ent2.pack(side=RIGHT)
             self.v_min[ind].set(value_min[ind])
 
-            ent3 = Entry(row,textvariable=self.v_init[ind])
+            ent3 = Entry(row,textvariable=self.v_init[ind],width=5)
             ent3.pack(side=RIGHT)
             self.v_init[ind].set(value_initial[ind])
             ind=ind+1;
@@ -347,20 +225,20 @@ class SurveySimGUI:
         for field in fields_bands:
             row = Frame(self.labelframe_bottom)
             lab = Label(row, width=10, anchor='w')
-            row.pack(side=TOP, padx=2, pady=5)
+            row.pack(side=TOP, padx=1, pady=5)
             lab.pack(side=LEFT)
             if(ind == 0):
-                ent0_1 = Entry(row,textvar=self.f1)
+                ent0_1 = Entry(row,textvar=self.f1,width=5)
                 option1=OptionMenu(row,self.db1,*filter_choices)
-                option1.pack(side='left',padx=10,pady=0)
+                option1.pack(side='left',padx=5,pady=0)
             if(ind == 1):
-                ent0_1 = Entry(row,textvar=self.f2) 
+                ent0_1 = Entry(row,textvar=self.f2,width=5) 
                 option2=OptionMenu(row,self.db2,*filter_choices)
-                option2.pack(side='left',padx=10,pady=0)
+                option2.pack(side='left',padx=5,pady=0)
             if(ind == 2):
-                ent0_1 = Entry(row,textvar=self.f3)
+                ent0_1 = Entry(row,textvar=self.f3,width=5)
                 option3=OptionMenu(row,self.db3,*filter_choices)
-                option3.pack(side='left',padx=10,pady=0)
+                option3.pack(side='left',padx=5,pady=0)
             ent0_1.pack(side=RIGHT) 
             self.db1.set(band[0])
             self.db2.set(band[1])
@@ -368,7 +246,7 @@ class SurveySimGUI:
             self.f1.set(flim[0])
             self.f2.set(flim[1])
             self.f3.set(flim[2])
-            ent2_1 = Entry(row)
+            ent2_1 = Entry(row,width=5)
             ent2_1.insert(10,area[ind])
             ent2_1.pack(side=RIGHT) 
             ind=ind+1;
@@ -387,25 +265,14 @@ class SurveySimGUI:
         band[1]=self.db2.get()
         band[2]=self.db3.get()
 
-#update MCMC settings
-        if(self.settings_on == 'yes'): #to ensure that this is run only if the settings were touched
-            zmin=self.settings.s_set[0].get()
-            zmax=self.settings.s_set[1].get()
-            dz=self.settings.s_set[2].get()
-            runs=self.settings.s_set[3].get()
-            nchain=self.settings.s_set[4].get()
-            tmax=self.settings.s_set[5].get()
-            mesprint=self.settings.s_set[6].get()
-
-        print tmax #just checking
         if (band[0] != 'Band1'):
             f_id=[filter_choices.index(band[0]),filter_choices.index(band[1]),filter_choices.index(band[2])]
         flim[0]=self.f1.get()
         flim[1]=self.f2.get()
         flim[2]=self.f3.get()
 
-        update_mfile(modelfile,f_id)
-        return obsfile,sedfile
+        self.update_mfile()
+        #return obsfile,sedfile
 
     def settings(self):
         self.settings = SettingsWindow()
@@ -532,6 +399,138 @@ class SurveySimGUI:
         plt.plot(a,chi2_c5,'k-',lw=0.7,color='0.5')
         plt.show(2)
         return
+
+    def update_mfile(self):
+        #update MCMC settings
+        if(self.settings_on == 'yes'): #to ensure that this is run only if the settings were touched
+            zmin=self.settings.s_set[0].get()
+            zmax=self.settings.s_set[1].get()
+            dz=self.settings.s_set[2].get()
+            runs=self.settings.s_set[3].get()
+            nchain=self.settings.s_set[4].get()
+            tmax=self.settings.s_set[5].get()
+            mesprint=self.settings.s_set[6].get()
+
+        hdulist=fits.open(modelfile)
+    
+#read-in filter transmission curves for selected bands
+        with open (codedir+'filters/allfilters.dat','r') as f: 
+            flines=f.readlines()
+
+        fcount=-1
+        lam1,lam2,lam3,trans1,trans2,trans3=[],[],[],[],[],[]
+        for fline in flines:
+            if fline.strip():
+                ncol=len(fline.split())
+                if ncol > 2:
+                    fcount=fcount+1
+                if ncol == 2:
+                    if fcount == f_id[0]: 
+                        tmp1,tmp2=fline.split()[0:2]
+                        lam1.append(float(tmp1)),trans1.append(float(tmp2))
+                    if fcount == f_id[1]:
+                        tmp1,tmp2=fline.split()[0:2]
+                        lam2.append(float(tmp1)),trans2.append(float(tmp2))
+                    if fcount == f_id[2]:
+                        tmp1,tmp2=fline.split()[0:2]
+                        lam3.append(float(tmp1)),trans3.append(float(tmp2))
+                        
+        col1=fits.Column(name='lambda1',format='FLOAT',array=lam1)
+        col2=fits.Column(name='transmission1',format='FLOAT',array=trans1)
+        col3=fits.Column(name='lambda2',format='FLOAT',array=lam2)
+        col4=fits.Column(name='transmission2',format='FLOAT',array=trans2)
+        col5=fits.Column(name='lambda3',format='FLOAT',array=lam3)
+        col6=fits.Column(name='transmission3',format='FLOAT',array=trans3)
+
+        cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
+        tbhdu=fits.new_table(cols)
+
+        hdr=hdulist[0].header #the header associated with extension=0
+
+    #create/update luminosity function parameters in model file header
+        hdr.set('PHI0',value_initial[0],'Luminosity Function Normalization')
+        hdr.set('PHI0_FIX',value_fix[0],'Fix Phi0 (Y=1/N=0)')
+        hdr.set('PHI0_MIN',value_min[0],'Minimum Phi0 value')
+        hdr.set('PHI0_MAX',value_max[0],'Maximum Phi0 value')
+    
+        hdr.set('L0',value_initial[1],'Luminosity Function knee')
+        hdr.set('L0_FIX',value_fix[1],'Fix L0 (Y=1/N=0)')
+        hdr.set('L0_MIN',value_min[1],'Minimum L0 value')
+        hdr.set('L0_MAX',value_max[1],'Maximum L0 value')
+ 
+        hdr.set('ALPHA',value_initial[2],'Luminosity Function upper slope')
+        hdr.set('ALPHA_FI',value_fix[2],'Fix alpha (Y=1/N=0)')
+        hdr.set('ALPHA_MI',value_min[2],'Minimum alpha value')
+        hdr.set('ALPHA_MA',value_max[2],'Maximum alpha value')
+
+        hdr.set('BETA',value_initial[3],'Luminosity Function lower slope')
+        hdr.set('BETA_FIX',value_fix[3],'Fix beta (Y=1/N=0)')
+        hdr.set('BETA_MIN',value_min[3],'Minimum beta value')
+        hdr.set('BETA_MAX',value_max[3],'Maximum beta value')
+
+        hdr.set('P',value_initial[4],'LF density evolution parameter')
+        hdr.set('P_FIX',value_fix[4],'Fix p (Y=1/N=0)')
+        hdr.set('P_MIN',value_min[4],'Minimum p value')
+        hdr.set('P_MAX',value_max[4],'Maximum p value')
+
+        hdr.set('Q',value_initial[5],'LF luminosity evolution parameter')
+        hdr.set('Q_FIX',value_fix[5],'Fix q (Y=1/N=0)')
+        hdr.set('Q_MIN',value_min[5],'Minimum q value')
+        hdr.set('Q_MAX',value_max[5],'Maximum q value')
+    
+        hdr.set('ZCUT',value_initial[6],'LF evolution redshift cutoff')
+        hdr.set('ZCUT_FIX',value_fix[6],'Fix zcut (Y=1/N=0)')
+        hdr.set('ZCUT_MIN',value_min[6],'Minimum zcut value')
+        hdr.set('ZCUT_MAX',value_max[6],'Maximum zcut value')
+
+        hdr.set('CEXP',value_initial[6],'Color evolution term')
+        hdr.set('CEXP_FIX',value_fix[6],'Fix cexp (Y=1/N=0)')
+        hdr.set('CEXP_MIN',value_min[6],'Minimum cexp value')
+        hdr.set('CEXP_MAX',value_max[6],'Maximum cexp value')
+
+#====================================================================
+# Survey properties 
+#--------------------------------------------------------------------   
+        hdr.set('AREA',area[0],'Observed Solid Angle of survey')
+        hdr.set('Axis1','ColorF1F2','Diagnostic x-axis')
+        hdr.set('Axis2','Flux1','Diagnostic y-axis')
+        hdr.set('Band_1',band[0],'1st filter name')
+        hdr.set('Band_2',band[1],'2nd filter name')
+        hdr.set('Band_3',band[2],'3rd filter name')
+        hdr.set('Fluxlim1',flim[0],'1st band flux limit')
+        hdr.set('Fluxlim2',flim[1],'2nd band flux limit')
+        hdr.set('Fluxlim3',flim[2],'3rd band flux limit')
+
+#====================================================================
+# Code settings
+#---------------------------------------------------------------------  
+        hdr.set('ZMIN',zmin,'Simulation minimum redshift')
+        hdr.set('ZMAX',zmax,'Simulation maximum redshift')
+        hdr.set('DZ',dz,'Redshift Bin Width')
+        hdr.set('RUNS',runs,'Number of runs')
+
+        hdr.set('NCHAIN',nchain,'Chain Number')
+        hdr.set('TMAX',tmax,'Starting Anneal Temperature')
+        hdr.set('ANN_PCT',ann_pct,'Ideal acceptance Percentage')
+        hdr.set('ANN_RNG',ann_rng,'Range to maintain acceptance')
+        hdr.set('CONV_CON',conv_con,'Convergence confidence interval') 
+        hdr.set('CONV_RMA',conv_rma,'Convergence Rmax Criterion')
+        hdr.set('CONV_STE',conv_ste,'Steps btw convergence checks')
+        hdr.set('BURN_STE',burn_ste,'Steps btw anneal calls in burn-in')
+        hdr.set('BURNVRUN',burnvrun,'Ratio of normal to burn-in steps')
+        hdr.set('PRINT',mesprint,'Print Debug MSGs (1=verbose,0=silent)')
+
+        hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
+        hdulist.close
+
+        thdulist=fits.HDUList([hdulist[0],tbhdu])
+        if(os.path.isfile(modelfile)):
+            print 'Replacing existing model file....'
+            os.remove(modelfile)
+            thdulist.writeto(modelfile);
+        else:
+            print 'Writing a new model file....'
+            thdulist.writeto(modelfile);
 
     def runcode(self):
         print("Runnning fitter code....")
