@@ -19,53 +19,73 @@ ntmpl=tmp[2]
 
 lums=[9.75,10.00,10.25,10.50,10.75,11.00,11.25,11.50,11.75,12.00,12.25,12.50,12.75,13.00]
 nlum=ntmpl-1
+print,'Number of templates Rieke',nlum
 ;============================================================================
 ;check templates
 ;----------------------------------------------------------------------------
 
-templ1=rieke_templ[*,10]
+templ1=rieke_templ[*,1]
 
-plot,lambda,templ1,/xlog,/ylog,xtitle='lambda [microns]',ytitle='L_nu [W/Hz]',xrange=[0.1,5.d5]
+plot,lambda,templ1,/xlog,/ylog,xtitle='lambda [microns]',ytitle='L_nu [W/Hz]',xrange=[0.1,5.d5],yrange=[1d20,1d28],ystyle=1
+
+oplot,lambda,templ1,color=red
+
+templ10=rieke_templ[*,10]
+oplot,lambda,templ10,color=blue
 
 ;need to stick a stellar component to these SF templates
 readcol,'/Users/annie/code/idl/auxdata/swire/M82_template_norm.sed',lam_m82,flam_m82,format='f,f'
 
 lam_m82=lam_m82/1.d4 ;convert to microns from Angstroms
-diff=abs(lam_m82-lambda[0])
+nonzero=where(templ1 gt 0)
+diff=abs(lam_m82-lambda[nonzero[0]])
 stitch=where(diff eq min(diff))
-print,lambda[0],lam_m82[stitch]
+print,'lambda stitch at: ',lambda[nonzero[0]],lam_m82[stitch]
 
 fnu_m82=(flam_m82*lam_m82^2.)
-print,templ1[0],fnu_m82[stitch]
-scale=templ1[0]/fnu_m82[stitch]
+;print,templ1[nonzero[0]],fnu_m82[stitch]
+scale=templ1[nonzero[0]]/fnu_m82[stitch]
 fnu_m82_scaled=scale#fnu_m82
-oplot,lam_m82,fnu_m82_scaled,color=red
+oplot,lam_m82[0:stitch-1],fnu_m82_scaled[0:stitch-1],color=red
 
-;dlambda=lambda-shift(lambda,1) ;microns
-;dnu=(dlambda*(3.d8/lambda^2.))*1.d6 ;to get it to Hz
+nonzero=where(templ10 gt 0)
+diff=abs(lam_m82-lambda[nonzero[0]])
+stitch=where(diff eq min(diff))
+scale=templ10[nonzero[0]]/fnu_m82[stitch]
+fnu_m82_scaled=scale#fnu_m82
+oplot,lam_m82[0:stitch-1],fnu_m82_scaled[0:stitch-1],color=blue
 
-lambda_new=[lam_m82[0:stitch-1],lambda]
+lambda_nonzero=lambda[nonzero[0]:n_elements(lambda)-1]
+lambda_new=[lam_m82[0:stitch-1],lambda_nonzero]
 nlam=n_elements(lambda_new)
 dlambda=lambda_new-shift(lambda_new,1) ;in microns
 dnu=(dlambda*(3.d8/lambda_new^2.))*1.d6 ;to get it to Hz
 
 rieke_templ_new=fltarr(n_elements(lambda_new),ntmpl)
-help,rieke_templ
 
 rieke_templ_new[*,0]=lambda_new 
 for itempl=1,ntmpl-1 do begin
-   scale=rieke_templ[*,itempl]/fnu_m82[stitch]
+   tmp_templ=rieke_templ[*,itempl]
+   nonzero=where(tmp_templ gt 0)
+   diff=abs(lam_m82-lambda[nonzero[0]])
+   stitch=where(diff eq min(diff))
+   lambda_nonzero=lambda[nonzero[0]:n_elements(lambda)-1]
+   lambda_tmp=[lam_m82[0:stitch-1],lambda_nonzero]
+   scale=tmp_templ[nonzero[0]]/fnu_m82[stitch]
    fnu_m82_scaled=scale#fnu_m82
-   rieke_templ_new[*,itempl]=[fnu_m82_scaled[0:stitch-1],templ1]
+   tmp_templ_nonzero=tmp_templ[nonzero[0]:n_elements(tmp_templ)-1]
+   tmp_new=[fnu_m82_scaled[0:stitch-1],tmp_templ_nonzero]
+   rieke_templ_new[*,itempl]=interpol(tmp_new,lambda_tmp,lambda_new)
 endfor
 
-templ1_new=rieke_templ_new[*,10]
-oplot,lambda_new,templ1_new,color=blue
+;templ1_new=rieke_templ_new[*,10]
+;oplot,lambda_new,rieke_templ_new[*,1],color=red
+;oplot,lambda_new,rieke_templ_new[*,10],color=blue
 
 ;Rieke et al. 2009, use L_TIR which is 5-1000um
 gpts=where((lambda_new ge 5.0) and (lambda_new lt 1000.0))
-lum1=alog10(total(templ1_new[gpts]*dnu[gpts])/3.846d26)
-print,lum1 ;here I am getting luminosities that are close to but not exactly as given for the templates (vary by +/-0.13), not sure why the difference really
+;lum1=alog10(total(templ1_new[gpts]*dnu[gpts])/3.846d26)
+;print,lum1 ;here I am getting luminosities that are close to but not exactly as given for the templates (vary by +/-0.13), not sure why the difference really
 
 ;============================================================================
 ;read-in new templates and cast in appropriate format
@@ -166,6 +186,7 @@ for i=0,ntmpl-1 do begin
    endfor
 endfor
 
+;oplot,lambda_new,templates[*,1,1,1]
 ;modify the header
 my_header=old_header
 writefits,'my_templates.fits',templates,my_header
