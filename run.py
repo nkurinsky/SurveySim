@@ -55,12 +55,12 @@ fields_bands=band[0],band[1],band[2]
 
 #initialize MCMC settings parameters
 fields3='zmin','zmax','dz','Runs','Nchain','Tmax','Verbose(1/0)'
-zmin=0.01 #Simulation minimum redshift
-zmax=5.0 #Simulation maximum redshift
-dz=0.05 #Redshift Bin Width
-runs=1.e4 #Number of runs
-nchain=5 #Chain Number
-tmax=100.0 #Starting Anneal Temperature
+zmin1=0.01 #Simulation minimum redshift
+zmax1=5.0 #Simulation maximum redshift
+dz1=0.05 #Redshift Bin Width
+runs1=1.e4 #Number of runs
+nchain1=5 #Chain Number
+tmax1=100.0 #Starting Anneal Temperature
 ann_pct=0.25 #Ideal acceptance Percentage
 ann_rng=0.05 #Range to maintain acceptance
 conv_con=0.05 #Convergence confidence interval
@@ -68,7 +68,7 @@ conv_rma=1.05 #Convergence Rmax Criterion
 conv_ste=20 #Steps btw convergence checks
 burn_ste=10 #Steps btw anneal calls in burn-in
 burnvrun=10 #Ratio of normal to burn-in steps
-mesprint=1 #Print Debug MSGs (1=verbose,0=silent)')
+mesprint1=1 #Print Debug MSGs (1=verbose,0=silent)')
 
 #read-in values if model.fits exists
 if os.path.isfile(modelfile): # and os.access(modelfile,os.R.OK):
@@ -138,12 +138,12 @@ class SurveySimGUI:
         master.title("SurveySim")
         self.labelframe_top = LabelFrame(master, text="Data files",bg='grey')
         self.labelframe_top.pack(fill="both",expand="yes")
-        self.label_top=Label(self.labelframe_top,text=" ") 
+        self.label_top=Label(self.labelframe_top,text=" ",bg='grey') 
         self.label_top.pack(side=RIGHT)
 
         self.labelframe_middle = LabelFrame(master, text="Luminosity Function Parameters",bg='light blue') 
         self.labelframe_middle.pack(side=LEFT) #fill="both", expand="yes")
-        self.label_middle=Label(self.labelframe_middle,text="Initial/Min/Max/Fix")
+        self.label_middle=Label(self.labelframe_middle,text="Initial/Min/Max/Fix",bg='light blue')
         self.label_middle.pack()
 
         self.labelframe_bottom = LabelFrame(master, text="Survey properties",bg='pink') 
@@ -155,7 +155,7 @@ class SurveySimGUI:
        # photo = PhotoImage(file=pydir+"red-gear.gif") 
         self.settings_button = Button(master,text='Settings',command=self.settings)
         self.settings_button.pack(side=LEFT,padx=5,pady=5)
-        self.update_button = Button(master, text='Update',command=self.callback)
+        self.update_button = Button(master, text='Update',command=self.update_mfile)
         self.update_button.pack(side=LEFT,padx=5,pady=5)
         self.run_button = Button(master, text='Run',command=self.runcode)
         self.run_button.pack(side=LEFT,padx=5,pady=5)
@@ -169,8 +169,8 @@ class SurveySimGUI:
 # Top frame
         ind=0;
         for field0 in fields_files:
-            row=Frame(self.labelframe_top)
-            lab=Label(row,text=field0)
+            row=Frame(self.labelframe_top,bg='grey')
+            lab=Label(row,text=field0,bg='grey')
             lab.pack(side=LEFT)
             row.pack(side=TOP,padx=1,pady=5)
             if (ind == 0):
@@ -196,10 +196,10 @@ class SurveySimGUI:
 #  Middle frame
         ind=0;
         for field in fields_lf:
-            row = Frame(self.labelframe_middle)
-            lab = Label(row, width=6, text=field, anchor='w')
+            row = Frame(self.labelframe_middle,bg='light blue')
+            lab = Label(row, width=6, text=field, anchor='w',bg='light blue')
             #lab.grid(row=ind,column=0)
-            row.pack(side=TOP, padx=1, pady=5)
+            row.pack(side=TOP) #, padx=1, pady=5)
             lab.pack(side=LEFT)
 
             ent0 = Entry(row,textvariable=self.v_fixed[ind],width=1)
@@ -223,10 +223,8 @@ class SurveySimGUI:
 # Bottom frame
         ind=0;
         for field in fields_bands:
-            row = Frame(self.labelframe_bottom)
-            lab = Label(row, width=10, anchor='w')
+            row = Frame(self.labelframe_bottom,bg='pink')
             row.pack(side=TOP, padx=1, pady=5)
-            lab.pack(side=LEFT)
             if(ind == 0):
                 ent0_1 = Entry(row,textvar=self.f1,width=5)
                 option1=OptionMenu(row,self.db1,*filter_choices)
@@ -250,29 +248,6 @@ class SurveySimGUI:
             ent2_1.insert(10,area[ind])
             ent2_1.pack(side=RIGHT) 
             ind=ind+1;
-
-    def callback(self):
-        ind=0
-        for field in fields_lf:
-            value_initial[ind]=self.v_init[ind].get()
-            value_min[ind]=self.v_min[ind].get()
-            value_max[ind]=self.v_max[ind].get()
-            value_fix[ind]=self.v_fixed[ind].get()
-            ind=ind+1
-        obsfile=self.obsfile_set.get()
-        sedfile=self.sedfile_set.get()
-        band[0]=self.db1.get()
-        band[1]=self.db2.get()
-        band[2]=self.db3.get()
-
-        if (band[0] != 'Band1'):
-            f_id=[filter_choices.index(band[0]),filter_choices.index(band[1]),filter_choices.index(band[2])]
-        flim[0]=self.f1.get()
-        flim[1]=self.f2.get()
-        flim[2]=self.f3.get()
-
-        self.update_mfile()
-        #return obsfile,sedfile
 
     def settings(self):
         self.settings = SettingsWindow()
@@ -310,12 +285,9 @@ class SurveySimGUI:
         ds=(fbins[1]-fbins[0])*fbins
         counts1,bin_edges=np.histogram(sim_srcs_f1,bins=fbins)
         ds1=ds[0:18]
-        counts=counts1 #[:,0]/ds1[:,0] #*pow(fbins,2.5)
+        counts=counts1
         for i in range(counts1.shape[0]):
             counts[i]=(counts1[i]/ds[i])*(bin_edges[i]**2.5)
-            
- #       print bin_edges
- #       print counts
 
         chain=hdulist[4].data
         p_c1=chain.field('P0')
@@ -401,6 +373,14 @@ class SurveySimGUI:
         return
 
     def update_mfile(self):
+        ind=0
+        for field in fields_lf:
+            value_initial[ind]=self.v_init[ind].get()
+            value_min[ind]=self.v_min[ind].get()
+            value_max[ind]=self.v_max[ind].get()
+            value_fix[ind]=self.v_fixed[ind].get()
+            ind=ind+1
+
         #update MCMC settings
         if(self.settings_on == 'yes'): #to ensure that this is run only if the settings were touched
             zmin=self.settings.s_set[0].get()
@@ -410,6 +390,25 @@ class SurveySimGUI:
             nchain=self.settings.s_set[4].get()
             tmax=self.settings.s_set[5].get()
             mesprint=self.settings.s_set[6].get()
+        if(self.settings_on == 'no'):
+            zmin=zmin1
+            zmax=zmax1
+            dz=dz1
+            runs=runs1
+            nchain=nchain1
+            tmax=tmax1
+            mesprint=mesprint1
+
+        band[0]=self.db1.get()
+        band[1]=self.db2.get()
+        band[2]=self.db3.get()
+
+        if (band[0] != 'Band1'):
+            f_id=[filter_choices.index(band[0]),filter_choices.index(band[1]),filter_choices.index(band[2])]
+
+        flim[0]=self.f1.get()
+        flim[1]=self.f2.get()
+        flim[2]=self.f3.get()
 
         hdulist=fits.open(modelfile)
     
@@ -559,19 +558,19 @@ class SettingsWindow(Frame):
             e = Entry(row,textvariable=self.s_set[ind])
             e.pack(side=RIGHT)
             if(ind == 0): 
-                self.s_set[ind].set(zmin)
+                self.s_set[ind].set(zmin1)
             if(ind == 1):
-                self.s_set[ind].set(zmax)
+                self.s_set[ind].set(zmax1)
             if(ind == 2):
-                self.s_set[ind].set(dz)
+                self.s_set[ind].set(dz1)
             if(ind == 3):
-                self.s_set[ind].set(runs)
+                self.s_set[ind].set(runs1)
             if(ind == 4):
-                self.s_set[ind].set(nchain)
+                self.s_set[ind].set(nchain1)
             if(ind == 5):
-                self.s_set[ind].set(tmax)
+                self.s_set[ind].set(tmax1)
             if(ind == 6):
-                self.s_set[ind].set(mesprint)
+                self.s_set[ind].set(mesprint1)
             ind=ind+1;
 
 
