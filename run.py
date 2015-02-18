@@ -263,31 +263,56 @@ class SurveySimGUI:
         res_ccd=hdulist[0].data #residual color-color distribution
     
         params=hdulist[3].data
-        chain=hdulist[4].data
+        dists=hdulist[4].data
         conv=hdulist[5].data
-        res=hdulist[6].data
+        count_dists=hdulist[6].data
+#        res=hdulist[6].data.dnds1
+#        print res #,/struct
 
-        counts=hdulist[7].data
-    #dnds1=counts.
-#read-in the simulated source list
-        srcs_hdr=hdulist[3].header
-        srcs_data=hdulist[3].data
-    #f1=src
-    #sim_srcs_table=hdulist[3]# the table with simulated source properties
-    #sim_srcs_data=hdulist[3].data
-    #the field names are f1,f2,f3,z,m,lum,c7,p0,p1
-        sim_srcs_zs=srcs_data.field('z')
-        sim_srcs_f1=srcs_data.field('f1')
+        #dns1=hdulist[7].data.dnds1
+        #c_shape=dnds1.shape(hdulist[7].data.dnds1)
+        #dnds1_mean=np.mean(self.dnds1)
+        #print c_shape
 
-#seems like these might be in Jy rather than mJy is that right?
-        sim_srcs_f1=sim_srcs_f1*1000.0 #turn into mJy
-        fbins=np.logspace(0,3,num=20,base=10)
-        ds=(fbins[1]-fbins[0])*fbins
-        counts1,bin_edges=np.histogram(sim_srcs_f1,bins=fbins)
-        ds1=ds[0:18]
-        counts=counts1
-        for i in range(counts1.shape[0]):
-            counts[i]=(counts1[i]/ds[i])*(bin_edges[i]**2.5)
+#    #dnds1=counts.
+##read-in the simulated source list
+#        srcs_hdr=hdulist[3].header
+        dists=hdulist[3].data # the table with simulated source properties
+#    #the field names are f1,f2,f3,z,m,lum,c7,p0,p1
+        sim_srcs_zs=dists.field('z')
+        sim_srcs_f1=dists.field('f1')
+
+## Read-in counts
+        import counts
+        res1=counts.counts(outfile,1)
+        xbest1=res1[0]
+        ybest1=res1[1]
+        xobs1=res1[2]
+        yobs1=res1[3]
+        xstats1=res1[4]
+        yminus1=res1[5]
+        yplus1=res1[6]
+        ymean1=res1[7]
+
+        res2=counts.counts(outfile,2)
+        xbest2=res2[0]
+        ybest2=res2[1]
+        xobs2=res2[2]
+        yobs2=res2[3]
+        xstats2=res2[4]
+        yminus2=res2[5]
+        yplus2=res2[6]
+        ymean2=res2[7]
+
+        res3=counts.counts(outfile,3)
+        xbest3=res3[0]
+        ybest3=res3[1]
+        xobs3=res3[2]
+        yobs3=res3[3]
+        xstats3=res3[4]
+        yminus3=res3[5]
+        yplus3=res3[6]
+        ymean3=res3[7]
 
         chain=hdulist[4].data
         p_c1=chain.field('P0')
@@ -303,13 +328,13 @@ class SurveySimGUI:
 
     #make actual figure
         fig=plt.figure(1)
-        a1=fig.add_subplot(2,3,1)
+        a1=fig.add_subplot(3,3,1)
         a1.plot(p_c1,q_c1,'k.')
         a1.set_xlabel('P')
         a1.axis([value_min[4],value_max[4],value_min[5],value_max[5]])
         a1.set_ylabel('Q')
 
-        a2=fig.add_subplot(2,3,2)
+        a2=fig.add_subplot(3,3,2)
         a2.set_title('Redshifts')
         zbins=range(25)
         zbins=np.divide(zbins,5.0)
@@ -318,28 +343,51 @@ class SurveySimGUI:
         a2.set_ylabel('N(z)')
         a2.set_xlim(0, 5)
 
-        a3=fig.add_subplot(2,3,3)
-        a3.set_title('Counts')
+        a3=fig.add_subplot(3,3,4)
+        a3.set_title(band[0])
         a3.set_xscale('log')
         a3.set_yscale('log')
-    
-        nbins=size(counts)
-        bins=bin_edges[0:nbins]
-        plt.plot(bins,counts,'+')
+
+        a3.fill_between(xstats1,yminus1,yplus1,color='grey')
+        a3.scatter(xobs1,yobs1,label="observed",color="red")
+        a3.scatter(xbest1,ybest1,label="model",color="black")
+
         a3.set_xlabel('S [mJy]')
         a3.set_ylabel('(dN/dS)*S^2.5')
-        a3.set_xlim(20,1000)
-        a3.set_ylim(200,8000000)
 
-        a4=fig.add_subplot(2,3,4) 
+        a4=fig.add_subplot(3,3,5)
+        a4.set_title(band[1])
+        a4.set_xscale('log')
+        a4.set_yscale('log')
+
+        a4.fill_between(xstats2,yminus2,yplus2,color='grey')
+        a4.scatter(xobs2,yobs2,label="observed",color="red")
+        a4.scatter(xbest2,ybest2,label="model",color="black")
+
+        a4.set_xlabel('S [mJy]')
+        a4.set_ylabel('(dN/dS)*S^2.5')
+
+        a5=fig.add_subplot(3,3,6)
+        a5.set_title(band[2])
+        a5.set_xscale('log')
+        a5.set_yscale('log')
+
+        a5.fill_between(xstats3,yminus3,yplus3,color='grey')
+        a5.scatter(xobs3,yobs3,label="observed",color="red")
+        a5.scatter(xbest3,ybest3,label="model",color="black")
+
+        a5.set_xlabel('S [mJy]')
+        a5.set_ylabel('(dN/dS)*S^2.5')
+
+        a4=fig.add_subplot(3,3,7) 
         imgplot=plt.imshow(img1)
         a4.set_title('Model')
 
-        a5=fig.add_subplot(2,3,5)
+        a5=fig.add_subplot(3,3,8)
         imgplot=plt.imshow(img2)
         a5.set_title('Observations')
 
-        a6=fig.add_subplot(2,3,6)
+        a6=fig.add_subplot(3,3,9)
         imgplot=plt.imshow(img3)
         a6.set_title('Residual')
 

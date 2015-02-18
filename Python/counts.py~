@@ -1,9 +1,7 @@
-import pyfits as pf
 import numpy as np
-import matplotlib.pyplot as p
 
-def plot_counts(filename,bandnum,alpha=0.159):
-    print 'Making counts plots: '
+def counts(filename,bandnum):
+    alpha=0.159
     hdus = pf.open(filename)
     dists = hdus[3].data
     count_dists = hdus[6].data
@@ -42,35 +40,17 @@ def plot_counts(filename,bandnum,alpha=0.159):
             cminus[i] = dnds[mi]
     
     bestpts = np.where(ybest > 0)
-    xbest = x[bestpts[0]]/1e3
+    xbest = x[bestpts[0]]#/1e3
     ybest = ybest[bestpts[0]]
     
     obspts = np.where(yobs > 0)
-    xobs = x[obspts[0]]/1e3
+    xobs = x[obspts[0]]#/1e3
     yobs = yobs[obspts[0]]
     
     minpts = np.where(cminus > 0)
-    xstats = x[minpts[0]]/1e3
+    xstats = x[minpts[0]]#/1e3
     yminus = cminus[minpts[0]]
     yplus = cplus[minpts[0]]
     ymean = cmean[minpts[0]]
     
-    p.clf()
-    p.xscale('log')
-    p.yscale('log')
-    p.loglog(xstats,ymean,ls='-',label="mean",color="black")
-    p.loglog(xstats,yplus,ls='--',label="$1\sigma$",color="black")
-    p.loglog(xstats,yminus,ls='--',color="black")
-    p.scatter(xobs,yobs,label="observed",color="blue")
-    p.scatter(xbest,ybest,label="model",color="green")
-   
-    p.legend()
-    
-    p.xlabel("F"+b+" [Jy]")
-    p.ylabel("$(dN/dS)S^{2.5} [gal\  ster^{-1} J^{1.5}]$")
-    return(p)
-
-def all():
-    for i in range(1,4):
-        p = plot_counts("output.fits",i)
-        p.savefig("band"+str(i)+".png")
+    return xbest,ybest,xobs,yobs,xstats,yminus,yplus,ymean
