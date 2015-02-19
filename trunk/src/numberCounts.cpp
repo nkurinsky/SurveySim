@@ -68,10 +68,11 @@ void NumberCounts::compute(const valarray<double> &fluxes_nolog, const double ar
   
   if(fluxes.min() < _range[0] or fluxes.max() > _range[1]){
     _range_violations++;
-    if(_verbose or _range_violations == 1){
-      printf("NumberCounts::compute Warning: Input fluxes exceed counts histogram range\n");
-      if(not _verbose)
-	printf("NumberCounts::compute \tFurther Warnings will be Suppressed\n");
+    if(_verbose and _range_violations == 1){
+      printf("NumberCounts::compute: Input fluxes exceed counts histogram range\n");
+      printf("NumberCounts::compute:      Further Warnings will be Suppressed\n");
+      printf("NumberCounts::compute:      Range is set by observations, most likely this is due\n");
+      printf("NumberCounts::compute:      to bright low-redshift sources or sparse observations\n");
     }
   }
   

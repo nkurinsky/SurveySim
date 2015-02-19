@@ -32,8 +32,7 @@ bool filter::load(string filtername, vector<double> band, vector<double> transmi
   if(band.size() < 2){
     printf("Error: Not enough valid lines in filter file, filter not initialized\n");
     return false;
-  }
-  
+  }  
   if(band.size() != transmission.size()){
     printf("Error: Filter file improperly formatted (different number of wavelength and response values), filter not initialized\n");
     return false;
@@ -182,7 +181,7 @@ bool filter_lib::load_filters(string fitsfile){
   double scale = -10;
   try{
     double dtemp;
-    head.readKey("LSCALE", dtemp);
+    filters.readKey("LSCALE", dtemp);
     scale = dtemp;
   }
   catch(...){
@@ -206,7 +205,7 @@ bool filter_lib::load_filters(string fitsfile){
     for(int j=0;j<band.size();j++){
       band[j]*=exp_scale;
     }
-    printf("Loaded Filter: %f -> %f\n",band.front(),band.back());
+    printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m)\n",num+1,band.front(),band.back());
     if(not this->filters[num].load(bands[num],band,transmission) ){
       printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str());
       exit(1);
