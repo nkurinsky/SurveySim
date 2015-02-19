@@ -491,6 +491,8 @@ class SurveySimGUI:
 
         cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
         tbhdu=fits.new_table(cols)
+        tbhdr=tbhdu.header
+        tbhdr.set('LSCALE',-10,"Wavelength of Filter Lambda")
 
         hdr=hdulist[0].header #the header associated with extension=0
 
