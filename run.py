@@ -263,24 +263,16 @@ class SurveySimGUI:
         res_ccd=hdulist[0].data #residual color-color distribution
     
         params=hdulist[3].data
-        dists=hdulist[4].data
-        conv=hdulist[5].data
-        count_dists=hdulist[6].data
-#        res=hdulist[6].data.dnds1
-#        print res #,/struct
 
-        #dns1=hdulist[7].data.dnds1
-        #c_shape=dnds1.shape(hdulist[7].data.dnds1)
-        #dnds1_mean=np.mean(self.dnds1)
-        #print c_shape
+# The Chain values of p and q
+        chain=hdulist[4].data
+        p_c1=chain.field('P0')
+        q_c1=chain.field('Q0')
 
-#    #dnds1=counts.
-##read-in the simulated source list
-#        srcs_hdr=hdulist[3].header
+# Redshift distribution 
         dists=hdulist[3].data # the table with simulated source properties
 #    #the field names are f1,f2,f3,z,m,lum,c7,p0,p1
         sim_srcs_zs=dists.field('z')
-        sim_srcs_f1=dists.field('f1')
 
 ## Read-in counts
         import counts
@@ -314,10 +306,6 @@ class SurveySimGUI:
         yplus3=res3[6]
         ymean3=res3[7]
 
-        chain=hdulist[4].data
-        p_c1=chain.field('P0')
-        q_c1=chain.field('Q0')
-
         img1=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
         img2=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
         img3=np.zeros((model_ccd.shape[0],model_ccd.shape[1]),dtype=float)
@@ -331,7 +319,7 @@ class SurveySimGUI:
         a1=fig.add_subplot(3,3,1)
         a1.plot(p_c1,q_c1,'k.')
         a1.set_xlabel('P')
-        a1.axis([value_min[4],value_max[4],value_min[5],value_max[5]])
+        a1.axis([0.8*min(p_c1),1.2*max(p_c1),0.8*min(q_c1),1.2*max(q_c1)])
         a1.set_ylabel('Q')
 
         a2=fig.add_subplot(3,3,2)
