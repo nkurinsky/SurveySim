@@ -1,6 +1,13 @@
 #include "agn_frac.h"
-#include "lumfunc.h"
+#include "lumfunct.h"
 
+void agn_frac::set_lumfunct(lumfunct *lf){
+  if(lf != NULL){
+    this->lf = lf;
+  }
+  else
+    cout << "ERROR: NULL Pointer Passed to Simulator" << endl;
+}
 //Fraction of galaxies as a function of luminosity and redshift that are AGN (note ALL AGN including obscured and unobscured, can try to sub-divide at some future point.
 double agn_frac::get_agn_frac(double lum, double redshift){
 
@@ -29,33 +36,33 @@ double agn_frac::get_agn_frac2(double lum, double redshift, int agntype){
     float phistar,lstar0,gamma1,gamma2,k1,k2,k3;
     
     if (agntype == 0){
-        phistar=-4.75
-        gamma1=1.07
-        gamma2=2.48
-        lstar0=31.92
-        k1=1.05
-        k2=-4.71
-        k3=-0.034
+      phistar=-4.75;
+      gamma1=1.07;
+      gamma2=2.48;
+      lstar0=31.92;
+      k1=1.05;
+      k2=-4.71;
+      k3=-0.034;
     }
 
     if (agntype == 1){
-        phitstar=-5.18
-        gamma1=0.25
-        gamma2=2.68
-        lstar0=31.99
-        k1=0.537
-        k2=-5.48
-        k3=0.768
+      phistar=-5.18;
+      gamma1=0.25;
+      gamma2=2.68;
+      lstar0=31.99;
+      k1=0.537;
+      k2=-5.48;
+      k3=0.768;
     }
     
     if (agntype == 2){
-        phistar=-4.98
-        gamma1=1.09
-        gamma2=2.61
-        lstar0=31.91
-        k1=1.165
-        k2=-4.45
-        k3=-0.23
+      phistar=-4.98;
+      gamma1=1.09;
+      gamma2=2.61;
+      lstar0=31.91;
+      k1=1.165;
+      k2=-4.45;
+      k3=-0.23;
     }
     
     float eps=log10((1+redshift)/(1+2.5));
@@ -68,7 +75,8 @@ double agn_frac::get_agn_frac2(double lum, double redshift, int agntype){
     float denom=pow(pow(10,lum5um)/pow(10,lstar),gamma1)+pow(pow(10,lum5um)/pow(10,lstar),gamma2);
     float phi=pow(10,phistar)/denom;
     
-    float phi_all=get_nsrcs(redshift,lum);
+    float phi_all;
+    phi_all = lf->get_nsrcs(redshift,lum);
     
     //the AGN fraction is the ratio of AGN Luminosity Function computed here and the overall luminosity function (from lumfunc.cpp)
     return pow(10,(phi-phi_all));
