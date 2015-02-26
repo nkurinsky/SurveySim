@@ -198,6 +198,15 @@ void Configuration::load(){
     printf("Value of \"Axis2\" invalid, defaulting to ColorF2F3\n");
   }
 
+  //Read-in survey settings
+  //tab.readKey("limits1",limits[0]);
+  //tab.readKey("limits2",limits[1]);
+  //tab.readKey("limits3",limits[2]);
+
+  //tab.readKey("units1",units[0]);
+  //tab.readKey("units2",units[1]);
+  //tab.readKey("units3",units[2]);
+
   double rtemp;
   //Read in simulation settings
   tab.readKey("RUNS",rtemp);

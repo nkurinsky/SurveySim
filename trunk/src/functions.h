@@ -101,6 +101,8 @@ public:
   double tscale;
   double idealpct;
   double annrng;
+  //  double limits[3];
+  // double units[3];
   
   vector<int> param_inds;
   double LFParameters[LUMPARS][4];

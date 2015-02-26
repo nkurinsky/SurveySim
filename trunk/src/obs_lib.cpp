@@ -95,23 +95,25 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[]){
     unsigned long tablesize(table.rows());
     valarray<valarray<double> > col(valarray<double>(tablesize),6);
     string unit;
+    zp[0]=8.9;
+    zp[1]=8.9;
+    zp[2]=8.9;
+
     for(int i=0;i<6;i++){
       try{
 	unit = table.column(column[i]).unit();
 	table.column(column[i]).read(col[i],1,tablesize);
 	if(unit == "Jy")
 	  col[i] *= 1e3; //convert to mJy
+	if(unit == "mag") //works for AB magnitudes only, should consider including Vega and appropriate zero points
+	  if(i < 3) col[i] = 1e3*pow(10,0.4*(zp[i]-col[i])); //convert to mJy
+	  if(i >= 3) col[i] = 1e3*pow(10,0.4*(zp[i-3]-col[i])); //convert to mJy
       }
       catch(Table::NoSuchColumn){
 	printf("Column %s does not exist in %s\n",column[i].c_str(),fitsfile.c_str());
 	exit(1);
       }
     }
-    
-    //errors are (were) mean of observation errors
-    //for(int i=0;i<3;i++){
-    //  ferr[i] = col[i+3].sum()/tablesize;
-    //}
     
     observations.reserve(tablesize);
     double fluxes[3];

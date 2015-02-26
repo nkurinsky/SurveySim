@@ -24,6 +24,7 @@ class obs_lib{
   string filter[3];
   double ferr[3];
   double flim[3];
+  double zp[3]; //zero points for magnitude-flux conversions
  public:
   obs_lib(string fitsfile, axis_type axes[]);
   double get_flux(int i,int band);

@@ -47,8 +47,11 @@ value_max=[-1.00,11.00,2.00,5.00,-1.00,6.00,0.00,1.0]
 value_fix=[1,1,1,1,0,0,1,1]
 
 #initialize survey parameters (GUI bottom frame)
+axes='ColF1F2','Flux1'
+
 area=[4.0,4.0,4.0]
 band=['Band1','Band2','Band3']
+band_units=['mJy','mJy','mJy']
 flim=[25.0,20.0,15.0]
 f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
@@ -75,6 +78,8 @@ if os.path.isfile(modelfile): # and os.access(modelfile,os.R.OK):
     mfile=fits.open(modelfile)
     mhdr=mfile[0].header
     value_initial[0]=mhdr['PHI0']
+#axes[0]=mhdr['AXIS1']
+#    axes[1]=mhdr['AXIS2']
     band[0]=mhdr['Band_1']
     band[1]=mhdr['Band_2']
     band[2]=mhdr['Band_3']
@@ -125,12 +130,10 @@ class SurveySimGUI:
         self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
         self.obsfile_set=StringVar()
         self.sedfile_set=StringVar()
-        self.f1=DoubleVar()
-        self.f2=DoubleVar()
-        self.f3=DoubleVar()
-        self.db1=StringVar()
-        self.db2=StringVar()
-        self.db3=StringVar()
+        self.fitaxes=[StringVar(),StringVar()]
+        self.limits=[DoubleVar(),DoubleVar(),DoubleVar()]
+        self.units=[StringVar(),StringVar(),StringVar()]
+        self.bands=[StringVar(),StringVar(),StringVar()]
         self.defband=[StringVar(),StringVar(),StringVar()]
         self.settings_on='no' #a switch to say whether or not the SettingsWindow was used
 
@@ -146,27 +149,34 @@ class SurveySimGUI:
         self.label_middle=Label(self.labelframe_middle,text="Initial/Min/Max/Fix",bg='light blue')
         self.label_middle.pack()
 
-        self.labelframe_bottom = LabelFrame(master, text="Survey properties",bg='pink') 
-        self.labelframe_bottom.pack() #fill="both", expand="yes",side=RIGHT);
-        self.label=Label(self.labelframe_bottom,text="Filter/Area [sqdeg]/Flux limit [mJy]",bg='pink') 
+        self.labelframe_bottom = LabelFrame(master, text="Survey fitting properties",bg='pink') 
+        self.labelframe_bottom.pack(side=LEFT,fill="y") #fill="both", expand="yes",side=RIGHT);
+        #self.labelframe_bottom.grid(row=1,column=1,sticky=N)
+        self.label=Label(self.labelframe_bottom,text="Filter/Area [sqdeg]",bg='pink') 
         self.label.pack();
+
+        self.labelframe_seds=LabelFrame(master,text="SEDs",bg='green')
 
 #the GUI buttons
        # photo = PhotoImage(file=pydir+"red-gear.gif") 
-        self.settings_button = Button(master,text='Settings',command=self.settings)
+        self.labelframe_buttons=LabelFrame(master)
+        self.labelframe_buttons.pack(side=BOTTOM)
+        row=Frame(self.labelframe_buttons)
+        row.pack(side=LEFT)
+        self.settings_button = Button(row,text='Settings',command=self.settings)
         self.settings_button.pack(side=LEFT,padx=5,pady=5)
-        self.update_button = Button(master, text='Update',command=self.update_mfile)
+        self.update_button = Button(self.labelframe_buttons, text='Update',command=self.update_mfile)
         self.update_button.pack(side=LEFT,padx=5,pady=5)
-        self.run_button = Button(master, text='Run',command=self.runcode)
+        self.run_button = Button(self.labelframe_buttons, text='Run',command=self.runcode)
         self.run_button.pack(side=LEFT,padx=5,pady=5)
-        self.results_button = Button(master, text='Show results',command=self.showresults)
+        self.results_button = Button(self.labelframe_buttons, text='Show results',command=self.showresults)
         self.results_button.pack(side=LEFT,padx=5,pady=5)
-        self.mcmc_button = Button(master, text='MCMC diagnostics',command=self.mcmcdiag)
+        self.mcmc_button = Button(self.labelframe_buttons, text='MCMC diagnostics',command=self.mcmcdiag)
         self.mcmc_button.pack(side=LEFT,padx=5,pady=5)
-        self.quit_button = Button(master, text='Quit', command=self.quit)
+        self.quit_button = Button(self.labelframe_buttons, text='Quit', command=self.quit)
         self.quit_button.pack(side=LEFT, padx=5, pady=5)
 
-# Top frame
+# Data files frame
         ind=0;
         for field0 in fields_files:
             row=Frame(self.labelframe_top,bg='grey')
@@ -180,7 +190,7 @@ class SurveySimGUI:
                         obsfiles.append(obsdir+file)
                 file1=Entry(row,textvariable=obsfile)
                 option1=OptionMenu(row,self.obsfile_set,*obsfiles)
-                option1.pack(side='left',padx=10,pady=0)
+                option1.pack(side='left',padx=0,pady=0)
             if (ind == 1):
                 sedfiles=[]
                 for file in os.listdir(seddir):
@@ -188,12 +198,12 @@ class SurveySimGUI:
                         sedfiles.append(seddir+file)
                 file1=Entry(row,textvariable=sedfile)
                 option2=OptionMenu(row,self.sedfile_set,*sedfiles)
-                option2.pack(side='left',padx=10,pady=0)
+                option2.pack(side='left',padx=0,pady=0)
             self.obsfile_set.set(obsfile)
             self.sedfile_set.set(sedfile)
             ind=ind+1
 
-#  Middle frame
+#  LF frame
         ind=0;
         for field in fields_lf:
             row = Frame(self.labelframe_middle,bg='light blue')
@@ -220,34 +230,44 @@ class SurveySimGUI:
             self.v_init[ind].set(value_initial[ind])
             ind=ind+1;
         
-# Bottom frame
+# Survey frame
         ind=0;
         for field in fields_bands:
             row = Frame(self.labelframe_bottom,bg='pink')
             row.pack(side=TOP, padx=1, pady=5)
-            if(ind == 0):
-                ent0_1 = Entry(row,textvar=self.f1,width=5)
-                option1=OptionMenu(row,self.db1,*filter_choices)
-                option1.pack(side='left',padx=5,pady=0)
-            if(ind == 1):
-                ent0_1 = Entry(row,textvar=self.f2,width=5) 
-                option2=OptionMenu(row,self.db2,*filter_choices)
-                option2.pack(side='left',padx=5,pady=0)
-            if(ind == 2):
-                ent0_1 = Entry(row,textvar=self.f3,width=5)
-                option3=OptionMenu(row,self.db3,*filter_choices)
-                option3.pack(side='left',padx=5,pady=0)
-            ent0_1.pack(side=RIGHT) 
-            self.db1.set(band[0])
-            self.db2.set(band[1])
-            self.db3.set(band[2])
-            self.f1.set(flim[0])
-            self.f2.set(flim[1])
-            self.f3.set(flim[2])
+#            ent0_1=Entry(row,textvar=self.limits[ind],width=5)
+#            ent1_1=Entry(row,textvar=self.units[ind],width=5)
+            option1=OptionMenu(row,self.bands[ind],*filter_choices)
+            option1.pack(side='left',padx=5,pady=0)
+#            ent0_1.pack(side=LEFT) 
+#            ent1_1.pack(side=RIGHT)
+
+            self.bands[0].set(band[0])
+            self.bands[1].set(band[1])
+            self.bands[2].set(band[2])
+#            self.limits[0].set(flim[0])
+#            self.limits[1].set(flim[1])
+#            self.limits[2].set(flim[2])
+#            self.units[0].set(band_units[0])
+#            self.units[1].set(band_units[1])
+#            self.units[2].set(band_units[2])
             ent2_1 = Entry(row,width=5)
             ent2_1.insert(10,area[ind])
             ent2_1.pack(side=RIGHT) 
             ind=ind+1;
+
+        row=Frame(self.labelframe_bottom,bg='pink')
+        row.pack(side=TOP,padx=1,pady=5)
+        lab = Label(row, width=6, text='AXIS1=', anchor='w',bg='pink')
+        lab.pack(side=LEFT,padx=1,pady=5)
+        ent2_1=Entry(row,textvar=self.fitaxes[0],width=6)
+        ent2_1.pack(side=LEFT)
+        lab = Label(row, width=6, text='AXIS2=', anchor='w',bg='pink')
+        lab.pack(side=LEFT,padx=1,pady=5)
+        ent3_1=Entry(row,textvar=self.fitaxes[1],width=6)
+        ent3_1.pack(side=LEFT)
+        self.fitaxes[0].set(axes[0])
+        self.fitaxes[1].set(axes[1])
 
     def settings(self):
         self.settings = SettingsWindow()
@@ -369,14 +389,20 @@ class SurveySimGUI:
 
         a4=fig.add_subplot(3,3,7) 
         imgplot=plt.imshow(img1)
+        a4.set_xlabel(axes[0])
+        a4.set_ylabel(axes[1])
         a4.set_title('Model')
 
         a5=fig.add_subplot(3,3,8)
         imgplot=plt.imshow(img2)
+        a5.set_xlabel(axes[0])
+        a5.set_ylabel(axes[1])
         a5.set_title('Observations')
 
         a6=fig.add_subplot(3,3,9)
         imgplot=plt.imshow(img3)
+        a6.set_xlabel(axes[0])
+        a6.set_ylabel(axes[1])
         a6.set_title('Residual')
 
         plt.tight_layout(1)
@@ -417,7 +443,14 @@ class SurveySimGUI:
             value_fix[ind]=self.v_fixed[ind].get()
             ind=ind+1
 
-        #update MCMC settings
+        ind=0
+        for field in fields_bands:
+            band[ind]=self.bands[ind].get()
+            flim[ind]=self.limits[ind].get()
+            band_units[ind]=self.units[ind].get()
+            ind=ind+1
+
+        #Update MCMC settings
         if(self.settings_on == 'yes'): #to ensure that this is run only if the settings were touched
             zmin=self.settings.s_set[0].get()
             zmax=self.settings.s_set[1].get()
@@ -435,16 +468,8 @@ class SurveySimGUI:
             tmax=tmax1
             mesprint=mesprint1
 
-        band[0]=self.db1.get()
-        band[1]=self.db2.get()
-        band[2]=self.db3.get()
-
         if (band[0] != 'Band1'):
             f_id=[filter_choices.index(band[0]),filter_choices.index(band[1]),filter_choices.index(band[2])]
-
-        flim[0]=self.f1.get()
-        flim[1]=self.f2.get()
-        flim[2]=self.f3.get()
 
         hdulist=fits.open(modelfile)
     
@@ -534,9 +559,16 @@ class SurveySimGUI:
         hdr.set('Band_1',band[0],'1st filter name')
         hdr.set('Band_2',band[1],'2nd filter name')
         hdr.set('Band_3',band[2],'3rd filter name')
-        hdr.set('Fluxlim1',flim[0],'1st band flux limit')
-        hdr.set('Fluxlim2',flim[1],'2nd band flux limit')
-        hdr.set('Fluxlim3',flim[2],'3rd band flux limit')
+
+        hdr.set('AXIS1',axes[0],'1st axis to be fit')
+        hdr.set('AXIS2',axes[1],'2nd axis to be fit')
+#it appears that these are not actually being used at all, as are read from the obsfile
+#        hdr.set('units1',band_units[0],'[mJy/ABmag]')
+#        hdr.set('units2',band_units[1],'[mJy/ABmag]')
+#        hdr.set('units3',band_units[2],'[mJy/ABmag]')
+#        hdr.set('limit1',flim[0],'flux/magnitude limit')
+#        hdr.set('limit2',flim[1],'flux/magnitude limit')
+#        hdr.set('limit3',flim[2],'flux/magnitude limit')
 
 #====================================================================
 # Code settings
