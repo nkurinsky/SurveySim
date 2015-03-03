@@ -19,6 +19,7 @@ import math
 from functools import partial
 import Tkinter as tk
 from Tkinter import *
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 #=================================================================================
 #SurveySim settings
@@ -47,7 +48,7 @@ value_max=[-1.00,11.00,2.00,5.00,-1.00,6.00,0.00,1.0]
 value_fix=[1,1,1,1,0,0,1,1]
 
 #initialize survey parameters (GUI bottom frame)
-axes='ColF1F2','Flux1'
+axes='ColorF1F2','Flux1'
 
 area=[4.0,4.0,4.0]
 band=['Band1','Band2','Band3']
@@ -140,27 +141,24 @@ class SurveySimGUI:
         self.master=master
         master.title("SurveySim")
         self.labelframe_top = LabelFrame(master, text="Data files",bg='grey')
-        self.labelframe_top.pack(fill="both",expand="yes")
-        self.label_top=Label(self.labelframe_top,text=" ",bg='grey') 
-        self.label_top.pack(side=RIGHT)
+        self.labelframe_top.grid(columnspan=3,sticky=W+E)
 
-        self.labelframe_middle = LabelFrame(master, text="Luminosity Function Parameters",bg='light blue') 
-        self.labelframe_middle.pack(side=LEFT) #fill="both", expand="yes")
-        self.label_middle=Label(self.labelframe_middle,text="Initial/Min/Max/Fix",bg='light blue')
-        self.label_middle.pack()
+        self.labelframe_lf = LabelFrame(master, text="Luminosity Function Parameters",bg='light blue') 
+        self.labelframe_lf.grid(column=0,row=1,rowspan=2)
+        self.label_lf=Label(self.labelframe_lf,text="Initial/Min/Max/Fix",bg='light blue')
+        self.label_lf.grid(in_=self.labelframe_lf,row=1,column=1)
 
-        self.labelframe_bottom = LabelFrame(master, text="Survey fitting properties",bg='pink') 
-        self.labelframe_bottom.pack(side=LEFT,fill="y") #fill="both", expand="yes",side=RIGHT);
-        #self.labelframe_bottom.grid(row=1,column=1,sticky=N)
-        self.label=Label(self.labelframe_bottom,text="Filter/Area [sqdeg]",bg='pink') 
-        self.label.pack();
+        self.labelframe_survey = LabelFrame(master, text="Survey fitting properties",bg='pink') 
+        self.labelframe_survey.grid(column=1,row=1,sticky=W+N+S)
+        self.label_survey=Label(self.labelframe_survey,text="Filter/Area [sqdeg]",bg='pink') 
+        self.label_survey.grid(in_=self.labelframe_survey,row=1,column=1)
 
         self.labelframe_seds=LabelFrame(master,text="SEDs",bg='green')
+        self.labelframe_seds.grid(column=2,row=1)
 
 #the GUI buttons
-       # photo = PhotoImage(file=pydir+"red-gear.gif") 
         self.labelframe_buttons=LabelFrame(master)
-        self.labelframe_buttons.pack(side=BOTTOM)
+        self.labelframe_buttons.grid(column=1,columnspan=2,row=2,sticky=S+E+W)
         row=Frame(self.labelframe_buttons)
         row.pack(side=LEFT)
         self.settings_button = Button(row,text='Settings',command=self.settings)
@@ -206,68 +204,75 @@ class SurveySimGUI:
 #  LF frame
         ind=0;
         for field in fields_lf:
-            row = Frame(self.labelframe_middle,bg='light blue')
-            lab = Label(row, width=6, text=field, anchor='w',bg='light blue')
-            #lab.grid(row=ind,column=0)
-            row.pack(side=TOP) #, padx=1, pady=5)
-            lab.pack(side=LEFT)
+            lab = Label(self.labelframe_lf, text=field,bg='light blue')
+            lab.grid(in_=self.labelframe_lf,row=ind+2,column=0)
 
-            ent0 = Entry(row,textvariable=self.v_fixed[ind],width=1)
-            ent0.pack(side=RIGHT)
-            self.v_fixed[ind].set(value_fix[ind])
-            ent0.pack(side=RIGHT) 
-
-            ent1 = Entry(row,textvariable=self.v_max[ind],width=5)
-            ent1.pack(side=RIGHT)
-            self.v_max[ind].set(value_max[ind])
-
-            ent2 = Entry(row,textvariable=self.v_min[ind],width=5)
-            ent2.pack(side=RIGHT)
-            self.v_min[ind].set(value_min[ind])
-
-            ent3 = Entry(row,textvariable=self.v_init[ind],width=5)
-            ent3.pack(side=RIGHT)
+            ent3 = Entry(self.labelframe_lf,textvariable=self.v_init[ind],width=5)
             self.v_init[ind].set(value_initial[ind])
+            ent3.grid(in_=self.labelframe_lf,row=ind+2,column=1)
+
+            ent2 = Entry(self.labelframe_lf,textvariable=self.v_min[ind],width=5)
+            self.v_min[ind].set(value_min[ind])
+            ent2.grid(in_=self.labelframe_lf,row=ind+2,column=2)
+
+            ent1 = Entry(self.labelframe_lf,textvariable=self.v_max[ind],width=5)
+            self.v_max[ind].set(value_max[ind])
+            ent1.grid(in_=self.labelframe_lf,row=ind+2,column=3)
+
+            ent0 = Entry(self.labelframe_lf,textvariable=self.v_fixed[ind],width=1)
+            self.v_fixed[ind].set(value_fix[ind])
+            ent0.grid(in_=self.labelframe_lf,row=ind+2,column=4)
             ind=ind+1;
         
 # Survey frame
         ind=0;
         for field in fields_bands:
-            row = Frame(self.labelframe_bottom,bg='pink')
-            row.pack(side=TOP, padx=1, pady=5)
-#            ent0_1=Entry(row,textvar=self.limits[ind],width=5)
-#            ent1_1=Entry(row,textvar=self.units[ind],width=5)
-            option1=OptionMenu(row,self.bands[ind],*filter_choices)
-            option1.pack(side='left',padx=5,pady=0)
-#            ent0_1.pack(side=LEFT) 
-#            ent1_1.pack(side=RIGHT)
+#            row = Frame(self.labelframe_survey,bg='pink')
+#            row.pack(side=TOP, padx=1, pady=5)
+##            ent0_1=Entry(row,textvar=self.limits[ind],width=5)
+##            ent1_1=Entry(row,textvar=self.units[ind],width=5)
+            option1=OptionMenu(self.labelframe_survey,self.bands[ind],*filter_choices)
 
+#            option1.pack(side='left',padx=5,pady=0)
+##            ent0_1.pack(side=LEFT) 
+##            ent1_1.pack(side=RIGHT)
             self.bands[0].set(band[0])
             self.bands[1].set(band[1])
             self.bands[2].set(band[2])
-#            self.limits[0].set(flim[0])
-#            self.limits[1].set(flim[1])
-#            self.limits[2].set(flim[2])
-#            self.units[0].set(band_units[0])
-#            self.units[1].set(band_units[1])
-#            self.units[2].set(band_units[2])
-            ent2_1 = Entry(row,width=5)
+            option1.grid(in_=self.labelframe_survey,row=ind+2,column=0,columnspan=3)
+##            self.limits[0].set(flim[0])
+##            self.limits[1].set(flim[1])
+##            self.limits[2].set(flim[2])
+##            self.units[0].set(band_units[0])
+##            self.units[1].set(band_units[1])
+##            self.units[2].set(band_units[2])
+            ent2_1 = Entry(self.labelframe_survey,width=5)
             ent2_1.insert(10,area[ind])
-            ent2_1.pack(side=RIGHT) 
+            ent2_1.grid(in_=self.labelframe_survey,column=3,row=ind+2) 
             ind=ind+1;
 
-        row=Frame(self.labelframe_bottom,bg='pink')
-        row.pack(side=TOP,padx=1,pady=5)
-        lab = Label(row, width=6, text='AXIS1=', anchor='w',bg='pink')
-        lab.pack(side=LEFT,padx=1,pady=5)
-        ent2_1=Entry(row,textvar=self.fitaxes[0],width=6)
-        ent2_1.pack(side=LEFT)
-        lab = Label(row, width=6, text='AXIS2=', anchor='w',bg='pink')
-        lab.pack(side=LEFT,padx=1,pady=5)
-        ent3_1=Entry(row,textvar=self.fitaxes[1],width=6)
-        ent3_1.pack(side=LEFT)
+        lab = Label(self.labelframe_survey, width=6, text='AXIS1=', anchor='w',bg='pink')
+        lab.grid(in_=self.labelframe_survey,row=ind+2,column=0,pady=2)
+        ent2_1=Entry(self.labelframe_survey,textvar=self.fitaxes[0],width=8)
         self.fitaxes[0].set(axes[0])
+        ent2_1.grid(in_=self.labelframe_survey,row=ind+2,column=1,pady=2)
+
+        lab = Label(self.labelframe_survey, width=6, text='AXIS2=', anchor='w',bg='pink')
+        lab.grid(in_=self.labelframe_survey,row=ind+2,column=2,pady=2)
+        ent3_1=Entry(self.labelframe_survey,textvar=self.fitaxes[1],width=8)
         self.fitaxes[1].set(axes[1])
+        ent3_1.grid(in_=self.labelframe_survey,row=ind+2,column=3,pady=2)
+
+#Plot_SED_templates frame
+        fig=plt.Figure(figsize=(3.5,2.5)) #,dpi=100, facecolor='w')
+        x = np.arange(0, 2*np.pi, 0.01)        # x-array
+        canvas = FigureCanvasTkAgg(fig, master=self.labelframe_seds)
+        canvas.get_tk_widget().grid(in_=self.labelframe_seds,column=0,row=0,sticky=N+S)
+        ax = fig.add_subplot(111)
+        res=self.read_seds
+        print res
+        ax.plot(x, np.sin(x))
+        plt.show()
 
     def settings(self):
         self.settings = SettingsWindow()
@@ -600,6 +605,18 @@ class SurveySimGUI:
         else:
             print 'Writing a new model file....'
             thdulist.writeto(modelfile);
+
+    def read_seds(self):
+        sedfile=self.sedfile_set.get()
+        sfile=fits.open(sedfile)
+        shdr=sfile[0].header
+        tbdata=sfile[1].data #the first extension contains the data
+        lam1=tbdata[0:]
+        fnu1=tbdata[1:]
+        print lam1
+        sfile.close()
+        return [lam1,fnu1]
+
 
     def runcode(self):
         print("Runnning fitter code....")

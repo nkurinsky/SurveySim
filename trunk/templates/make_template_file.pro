@@ -1,4 +1,4 @@
-pro make_template_file
+ pro make_template_file
 
 data=LoadData(2)
 red=GetColor('Red',5)
