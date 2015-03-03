@@ -131,6 +131,7 @@ class SurveySimGUI:
         self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
         self.obsfile_set=StringVar()
         self.sedfile_set=StringVar()
+        self.area=DoubleVar()
         self.fitaxes=[StringVar(),StringVar()]
         self.limits=[DoubleVar(),DoubleVar(),DoubleVar()]
         self.units=[StringVar(),StringVar(),StringVar()]
@@ -232,7 +233,6 @@ class SurveySimGUI:
 ##            ent0_1=Entry(row,textvar=self.limits[ind],width=5)
 ##            ent1_1=Entry(row,textvar=self.units[ind],width=5)
             option1=OptionMenu(self.labelframe_survey,self.bands[ind],*filter_choices)
-
 #            option1.pack(side='left',padx=5,pady=0)
 ##            ent0_1.pack(side=LEFT) 
 ##            ent1_1.pack(side=RIGHT)
@@ -246,33 +246,53 @@ class SurveySimGUI:
 ##            self.units[0].set(band_units[0])
 ##            self.units[1].set(band_units[1])
 ##            self.units[2].set(band_units[2])
-            ent2_1 = Entry(self.labelframe_survey,width=5)
-            ent2_1.insert(10,area[ind])
-            ent2_1.grid(in_=self.labelframe_survey,column=3,row=ind+2) 
+#            ent2_1 = Entry(self.labelframe_survey,width=5)
+#            ent2_1.insert(10,area[ind])
+#            ent2_1.grid(in_=self.labelframe_survey,column=3,row=ind+2) 
             ind=ind+1;
 
-        lab = Label(self.labelframe_survey, width=6, text='AXIS1=', anchor='w',bg='pink')
+        lab = Label(self.labelframe_survey, width=10, text='Area[sq.deg.]=', anchor='w',bg='pink')
         lab.grid(in_=self.labelframe_survey,row=ind+2,column=0,pady=2)
+        ent2_0=Entry(self.labelframe_survey,textvar=self.area,width=8)
+        self.area.set(area[0])
+        ent2_0.grid(in_=self.labelframe_survey,row=ind+2,column=1,pady=2)
+
+
+        lab = Label(self.labelframe_survey, width=6, text='AXIS1=', anchor='w',bg='pink')
+        lab.grid(in_=self.labelframe_survey,row=ind+3,column=0,pady=2)
         ent2_1=Entry(self.labelframe_survey,textvar=self.fitaxes[0],width=8)
         self.fitaxes[0].set(axes[0])
-        ent2_1.grid(in_=self.labelframe_survey,row=ind+2,column=1,pady=2)
+        ent2_1.grid(in_=self.labelframe_survey,row=ind+3,column=1,pady=2)
 
         lab = Label(self.labelframe_survey, width=6, text='AXIS2=', anchor='w',bg='pink')
-        lab.grid(in_=self.labelframe_survey,row=ind+2,column=2,pady=2)
+        lab.grid(in_=self.labelframe_survey,row=ind+3,column=2,pady=2)
         ent3_1=Entry(self.labelframe_survey,textvar=self.fitaxes[1],width=8)
         self.fitaxes[1].set(axes[1])
-        ent3_1.grid(in_=self.labelframe_survey,row=ind+2,column=3,pady=2)
+        ent3_1.grid(in_=self.labelframe_survey,row=ind+3,column=3,pady=2)
 
 #Plot_SED_templates frame
-        fig=plt.Figure(figsize=(3.5,2.5)) #,dpi=100, facecolor='w')
+#        self.plot_seds
+        fig=plt.Figure(figsize=(4,3)) #,dpi=100, facecolor='w')
         x = np.arange(0, 2*np.pi, 0.01)        # x-array
         canvas = FigureCanvasTkAgg(fig, master=self.labelframe_seds)
         canvas.get_tk_widget().grid(in_=self.labelframe_seds,column=0,row=0,sticky=N+S)
         ax = fig.add_subplot(111)
-        res=self.read_seds
-        print res
-        ax.plot(x, np.sin(x))
-        plt.show()
+        sfile=fits.open(self.sedfile_set.get())
+        shdr=sfile[0].header
+        nlam=shdr["NAXIS1"]
+        ntmp=shdr["NAXIS2"]
+        seds=sfile[0].data #the first extension contains the data
+        lam=seds[0,0,0,]
+        for i in range(1,ntmp):
+            fnu=seds[0,0,i,]
+            ax.plot(lam,fnu)
+
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.set_xlabel('wavelength [um]')
+        ax.set_ylabel('Fnu [W/Hz]')
+        show()
+        sfile.close()
 
     def settings(self):
         self.settings = SettingsWindow()
@@ -606,16 +626,29 @@ class SurveySimGUI:
             print 'Writing a new model file....'
             thdulist.writeto(modelfile);
 
-    def read_seds(self):
+    def plot_seds(self):
+        fig=plt.Figure(figsize=(3.5,2.5)) #,dpi=100, facecolor='w')
+        x = np.arange(0, 2*np.pi, 0.01)        # x-array
+        canvas = FigureCanvasTkAgg(fig, master=self.labelframe_seds)
+        canvas.get_tk_widget().grid(in_=self.labelframe_seds,column=0,row=0,sticky=N+S)
+        ax = fig.add_subplot(111)
         sedfile=self.sedfile_set.get()
         sfile=fits.open(sedfile)
         shdr=sfile[0].header
-        tbdata=sfile[1].data #the first extension contains the data
-        lam1=tbdata[0:]
-        fnu1=tbdata[1:]
-        print lam1
+        seds=sfile[0].data #the first extension contains the data
+        lam=seds[0,0,0,]
+        fnu1=seds[0,0,1,]
+        for i in range(1,ntmp):
+            fnu=seds[0,0,i,]
+            ax.plot(lam,fnu)
+
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.set_xlabel('wavelength [um]')
+        ax.set_ylabel('Fnu [W/Hz]')
+        show()
         sfile.close()
-        return [lam1,fnu1]
+        return
 
 
     def runcode(self):
