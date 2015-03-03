@@ -58,7 +58,7 @@ f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
 
 #initialize MCMC settings parameters
-fields3='zmin','zmax','dz','Runs','Nchain','Tmax','Verbose(1/0)'
+fields3='zmin','zmax','dz','Runs','Nchain','Tmax','conv_conf','conv_rmax','conv_step','Verbose(1/0)'
 zmin1=0.01 #Simulation minimum redshift
 zmax1=5.0 #Simulation maximum redshift
 dz1=0.05 #Redshift Bin Width
@@ -67,9 +67,9 @@ nchain1=5 #Chain Number
 tmax1=100.0 #Starting Anneal Temperature
 ann_pct=0.25 #Ideal acceptance Percentage
 ann_rng=0.05 #Range to maintain acceptance
-conv_con=0.05 #Convergence confidence interval
-conv_rma=1.05 #Convergence Rmax Criterion
-conv_ste=20 #Steps btw convergence checks
+conv_con1=0.05 #Convergence confidence interval
+conv_rma1=1.05 #Convergence Rmax Criterion
+conv_ste1=20 #Steps btw convergence checks
 burn_ste=10 #Steps btw anneal calls in burn-in
 burnvrun=10 #Ratio of normal to burn-in steps
 mesprint1=1 #Print Debug MSGs (1=verbose,0=silent)')
@@ -77,6 +77,17 @@ mesprint1=1 #Print Debug MSGs (1=verbose,0=silent)')
 #read-in values if model.fits exists
 if os.path.isfile(modelfile): # and os.access(modelfile,os.R.OK):
     mfile=fits.open(modelfile)
+    mhdr=mfile[0].header
+    value_initial[0]=mhdr['PHI0']
+#axes[0]=mhdr['AXIS1']
+#    axes[1]=mhdr['AXIS2']
+    band[0]=mhdr['Band_1']
+    band[1]=mhdr['Band_2']
+    band[2]=mhdr['Band_3']
+    area[0]=mhdr['AREA']
+    mfile.close()
+else:
+    mfile=fits.open(dmodelfile)
     mhdr=mfile[0].header
     value_initial[0]=mhdr['PHI0']
 #axes[0]=mhdr['AXIS1']
@@ -483,7 +494,10 @@ class SurveySimGUI:
             runs=self.settings.s_set[3].get()
             nchain=self.settings.s_set[4].get()
             tmax=self.settings.s_set[5].get()
-            mesprint=self.settings.s_set[6].get()
+            conv_con=self.settings.s_set[6].get()
+            conv_rma=self.settings.s_set[7].get()
+            conv_ste=self.settings.s_set[8].get()
+            mesprint=self.settings.s_set[9].get()
         if(self.settings_on == 'no'):
             zmin=zmin1
             zmax=zmax1
@@ -667,7 +681,7 @@ class SettingsWindow(Frame):
         new.title("MCMC Settings")
 
         #variables to hold MCMC settings values
-        self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),IntVar()]
+        self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),IntVar()]
 
         ind=0;
         for field3_i in fields3:
@@ -690,6 +704,12 @@ class SettingsWindow(Frame):
             if(ind == 5):
                 self.s_set[ind].set(tmax1)
             if(ind == 6):
+                self.s_set[ind].set(conv_con1)
+            if(ind == 7):
+                self.s_set[ind].set(conv_rma1)
+            if(ind == 8):
+                self.s_set[ind].set(conv_ste1)
+            if(ind == 9):
                 self.s_set[ind].set(mesprint1)
             ind=ind+1;
 
