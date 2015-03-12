@@ -50,10 +50,21 @@ value_fix=[1,1,1,1,0,0,1,1]
 #initialize survey parameters (GUI bottom frame)
 axes='ColorF1F2','Flux1'
 
-area=[4.0,4.0,4.0]
+area=[4.0]
 band=['Band1','Band2','Band3']
 band_units=['mJy','mJy','mJy']
-flim=[25.0,20.0,15.0]
+flim=[0.0,0.0,0.0]
+
+#read these from the default obsfile and then update as needed 
+ofile=fits.open(obsfile)
+ohdr=ofile[1].header
+band_units[0]=ohdr["TUNIT1"]
+band_units[1]=ohdr["TUNIT2"]
+band_units[2]=ohdr["TUNIT3"]
+flim[0]=ohdr["F1MIN"]
+flim[1]=ohdr["F2MIN"]
+flim[2]=ohdr["F3MIN"]
+
 f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
 
@@ -142,6 +153,7 @@ class SurveySimGUI:
         self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
         self.obsfile_set=StringVar()
         self.sedfile_set=StringVar()
+        self.colsel=StringVar()
         self.area=DoubleVar()
         self.fitaxes=[StringVar(),StringVar()]
         self.limits=[DoubleVar(),DoubleVar(),DoubleVar()]
@@ -162,7 +174,7 @@ class SurveySimGUI:
 
         self.labelframe_survey = LabelFrame(master, text="Survey fitting properties",bg='pink') 
         self.labelframe_survey.grid(column=1,row=1,sticky=W+N+S)
-        self.label_survey=Label(self.labelframe_survey,text="Filter/Area [sqdeg]",bg='pink') 
+        self.label_survey=Label(self.labelframe_survey,text="Filter/Limit/Units",bg='pink') 
         self.label_survey.grid(in_=self.labelframe_survey,row=1,column=1)
 
         self.labelframe_seds=LabelFrame(master,text="SEDs",bg='green')
@@ -239,47 +251,48 @@ class SurveySimGUI:
 # Survey frame
         ind=0;
         for field in fields_bands:
-#            row = Frame(self.labelframe_survey,bg='pink')
-#            row.pack(side=TOP, padx=1, pady=5)
-##            ent0_1=Entry(row,textvar=self.limits[ind],width=5)
-##            ent1_1=Entry(row,textvar=self.units[ind],width=5)
             option1=OptionMenu(self.labelframe_survey,self.bands[ind],*filter_choices)
-#            option1.pack(side='left',padx=5,pady=0)
-##            ent0_1.pack(side=LEFT) 
-##            ent1_1.pack(side=RIGHT)
             self.bands[0].set(band[0])
             self.bands[1].set(band[1])
             self.bands[2].set(band[2])
-            option1.grid(in_=self.labelframe_survey,row=ind+2,column=0,columnspan=3)
-##            self.limits[0].set(flim[0])
-##            self.limits[1].set(flim[1])
-##            self.limits[2].set(flim[2])
-##            self.units[0].set(band_units[0])
-##            self.units[1].set(band_units[1])
-##            self.units[2].set(band_units[2])
-#            ent2_1 = Entry(self.labelframe_survey,width=5)
-#            ent2_1.insert(10,area[ind])
-#            ent2_1.grid(in_=self.labelframe_survey,column=3,row=ind+2) 
+            option1.grid(in_=self.labelframe_survey,row=ind+2,column=0)
+            ent0_1=Entry(self.labelframe_survey,textvar=self.limits[ind],width=5)
+            ent1_1=Entry(self.labelframe_survey,textvar=self.units[ind],width=5)
+            self.limits[0].set(flim[0])
+            self.limits[1].set(flim[1])
+            self.limits[2].set(flim[2])
+            self.units[0].set(band_units[0])
+            self.units[1].set(band_units[1])
+            self.units[2].set(band_units[2])
+            ent0_1.grid(in_=self.labelframe_survey,row=ind+2,column=1)
+            ent1_1.grid(in_=self.labelframe_survey,row=ind+2,column=2)
             ind=ind+1;
 
+        lab = Label(self.labelframe_survey, width=10, text='Color cut:', anchor='w',bg='pink')
+        lab.grid(in_=self.labelframe_survey,row=ind+2,column=0)
+        ent2_0=Entry(self.labelframe_survey,textvar=self.colsel,width=8)
+        self.colsel.set('None')
+        ent2_0.grid(in_=self.labelframe_survey,row=ind+2,column=1,pady=2)
+        self.info_button = Button(self.labelframe_survey, text='?',command=self.colsel_info)
+        self.info_button.grid(row=ind+2,column=2)
+
         lab = Label(self.labelframe_survey, width=10, text='Area[sq.deg.]=', anchor='w',bg='pink')
-        lab.grid(in_=self.labelframe_survey,row=ind+2,column=0,pady=2)
+        lab.grid(in_=self.labelframe_survey,row=ind+3,column=0,pady=2)
         ent2_0=Entry(self.labelframe_survey,textvar=self.area,width=8)
         self.area.set(area[0])
-        ent2_0.grid(in_=self.labelframe_survey,row=ind+2,column=1,pady=2)
-
+        ent2_0.grid(in_=self.labelframe_survey,row=ind+3,column=1,pady=2)
 
         lab = Label(self.labelframe_survey, width=6, text='AXIS1=', anchor='w',bg='pink')
-        lab.grid(in_=self.labelframe_survey,row=ind+3,column=0,pady=2)
+        lab.grid(in_=self.labelframe_survey,row=ind+4,column=0,pady=2)
         ent2_1=Entry(self.labelframe_survey,textvar=self.fitaxes[0],width=8)
         self.fitaxes[0].set(axes[0])
-        ent2_1.grid(in_=self.labelframe_survey,row=ind+3,column=1,pady=2)
+        ent2_1.grid(in_=self.labelframe_survey,row=ind+4,column=1,pady=2)
 
         lab = Label(self.labelframe_survey, width=6, text='AXIS2=', anchor='w',bg='pink')
-        lab.grid(in_=self.labelframe_survey,row=ind+3,column=2,pady=2)
+        lab.grid(in_=self.labelframe_survey,row=ind+5,column=0,pady=2)
         ent3_1=Entry(self.labelframe_survey,textvar=self.fitaxes[1],width=8)
         self.fitaxes[1].set(axes[1])
-        ent3_1.grid(in_=self.labelframe_survey,row=ind+3,column=3,pady=2)
+        ent3_1.grid(in_=self.labelframe_survey,row=ind+5,column=1,pady=2)
 
 #Plot_SED_templates frame
 #        self.plot_seds
@@ -304,6 +317,9 @@ class SurveySimGUI:
         ax.set_ylabel('Fnu [W/Hz]')
         show()
         sfile.close()
+
+    def colsel_info(self):
+        self.colselinfo = ColInfoWindow()
 
     def settings(self):
         self.settings = SettingsWindow()
@@ -505,6 +521,9 @@ class SurveySimGUI:
             runs=runs1
             nchain=nchain1
             tmax=tmax1
+            conv_con=conv_con1
+            conv_ste=conv_ste1
+            conv_rma=conv_rma1
             mesprint=mesprint1
 
         if (band[0] != 'Band1'):
@@ -592,22 +611,21 @@ class SurveySimGUI:
 #====================================================================
 # Survey properties 
 #--------------------------------------------------------------------   
-        hdr.set('AREA',area[0],'Observed Solid Angle of survey')
-        hdr.set('Axis1','ColorF1F2','Diagnostic x-axis')
-        hdr.set('Axis2','Flux1','Diagnostic y-axis')
+        hdr.set('AREA',self.area.get(),'Solid Angle of survey [sq.deg.]')
+        hdr.set('COLSEL',self.colsel.get(),'Survey color cut')
+        hdr.set('AXIS1',self.fitaxes[0].get(),'1st axis to be fit')
+        hdr.set('AXIS2',self.fitaxes[1].get(),'2nd axis to be fit')
         hdr.set('Band_1',band[0],'1st filter name')
         hdr.set('Band_2',band[1],'2nd filter name')
         hdr.set('Band_3',band[2],'3rd filter name')
 
-        hdr.set('AXIS1',axes[0],'1st axis to be fit')
-        hdr.set('AXIS2',axes[1],'2nd axis to be fit')
 #it appears that these are not actually being used at all, as are read from the obsfile
-#        hdr.set('units1',band_units[0],'[mJy/ABmag]')
-#        hdr.set('units2',band_units[1],'[mJy/ABmag]')
-#        hdr.set('units3',band_units[2],'[mJy/ABmag]')
-#        hdr.set('limit1',flim[0],'flux/magnitude limit')
-#        hdr.set('limit2',flim[1],'flux/magnitude limit')
-#        hdr.set('limit3',flim[2],'flux/magnitude limit')
+        hdr.set('units1',band_units[0],'[mJy/ABmag]')
+        hdr.set('units2',band_units[1],'[mJy/ABmag]')
+        hdr.set('units3',band_units[2],'[mJy/ABmag]')
+        hdr.set('limit1',flim[0],'flux/magnitude limit')
+        hdr.set('limit2',flim[1],'flux/magnitude limit')
+        hdr.set('limit3',flim[2],'flux/magnitude limit')
 
 #====================================================================
 # Code settings
@@ -641,7 +659,7 @@ class SurveySimGUI:
             thdulist.writeto(modelfile);
 
     def plot_seds(self):
-        fig=plt.Figure(figsize=(3.5,2.5)) #,dpi=100, facecolor='w')
+        fig=plt.Figure(figsize=(3.0,2.0)) #,dpi=100, facecolor='w')
         x = np.arange(0, 2*np.pi, 0.01)        # x-array
         canvas = FigureCanvasTkAgg(fig, master=self.labelframe_seds)
         canvas.get_tk_widget().grid(in_=self.labelframe_seds,column=0,row=0,sticky=N+S)
@@ -673,6 +691,16 @@ class SurveySimGUI:
 
     def quit(self):
         self.master.destroy()
+
+class ColInfoWindow(Frame):     
+    def __init__(self):
+        popup =tk.Frame.__init__(self)
+        popup = Toplevel(self)
+        about_message='E.g.: mag1-mag2>2 [AB]  or    colF1F2>2         [Fnu spectral index]'
+        msg = Message(popup, text=about_message,width=160)
+        msg.pack()
+        button = Button(popup, text="Okay", command=popup.destroy)
+        button.pack()
 
 class SettingsWindow(Frame):     
     def __init__(self):

@@ -194,7 +194,7 @@ products simulator::simulate(){
   static long nsrcs;
   double lums[lnum];
   double zarray[nz];
-  double fagn;
+  double fagn,random_sed;
   short sedtype; // this holds the id of the SED type 
   
   seds->get_lums(lums);
@@ -219,7 +219,9 @@ products simulator::simulate(){
     jsmin = 0;
     for (js=0;js<lnum;js++){
       fagn=fagns->get_agn_frac(lums[js],zarray[is]);
-      sedtype=0; //placeholder for now will determine depending on AGN fraction per L-z bin
+      random_sed=rng.flat(0,1);
+      if(random_sed > fagn) sedtype=0;
+      if(random_sed <= fagn) sedtype=1;
       flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],sedtype,0);
       if(flux_sim[0]>=flux_limits[0]){
 	jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise

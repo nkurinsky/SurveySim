@@ -189,6 +189,13 @@ endfor
 ;oplot,lambda_new,templates[*,1,1,1]
 ;modify the header
 my_header=old_header
+;note these are placeholders, need to be sorted out exactly -- plus
+;                                                              these
+;are ranges rather than fixed points
+SXADDPAR, my_header, 'Z0', 0,'lowest redshift template'
+SXADDPAR, my_header, 'Z1', 1,'middle redshift template'
+SXADDPAR, my_header, 'Z2', 2,'highest redshift template'
+
 writefits,'my_templates.fits',templates,my_header
 skiptoend:
 
