@@ -15,15 +15,15 @@ simulator::simulator() : color_exp(0.0),
   axes[1] = ColorF2F3;
 }
 
-simulator::simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]) : simulator(){
+//simulator::simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]) : simulator(){
  
-  modelFile = modelfile;
-  set_sed_lib(sedfile);
-  this->axes[0] = axes[0];
-  this->axes[1] = axes[1];
-  set_obs(obsfile);
+//  modelFile = modelfile;
+//  set_sed_lib(sedfile);
+//  this->axes[0] = axes[0];
+//  this->axes[1] = axes[1];
+//  set_obs(obsfile);
   
-}
+//}
 
 simulator::simulator(const Configuration &config) : simulator(){
   modelFile = config.modfile;

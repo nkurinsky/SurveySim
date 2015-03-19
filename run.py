@@ -75,7 +75,7 @@ zmax1=5.0 #Simulation maximum redshift
 dz1=0.05 #Redshift Bin Width
 runs1=1.e4 #Number of runs
 nchain1=5 #Chain Number
-tmax1=100.0 #Starting Anneal Temperature
+tmax1=10.0 #Starting Anneal Temperature
 ann_pct=0.25 #Ideal acceptance Percentage
 ann_rng=0.05 #Range to maintain acceptance
 conv_con1=0.05 #Convergence confidence interval
@@ -626,7 +626,7 @@ class SurveySimGUI:
         hdr.set('limit1',flim[0],'flux/magnitude limit')
         hdr.set('limit2',flim[1],'flux/magnitude limit')
         hdr.set('limit3',flim[2],'flux/magnitude limit')
-
+        
 #====================================================================
 # Code settings
 #---------------------------------------------------------------------  

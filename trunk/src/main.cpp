@@ -2,8 +2,7 @@
 // SurveySim
 //.............................................................................
 // written by Noah Kurinsky and Anna Sajina
-// last modified Anna Sajina November 1st, 2014
-// The purpose of this program is to use MCMC to determine the luminosity function evolution and redshift distribution based on infrared survey data -- the details of the input observations as well as default model parameters are passed to this program via a series of fits files (model.fits, observations.fits, sed_templates.fits) which are set using either idl (SurveySim.pro) or python (SurveySim.py). 
+// The purpose of this program is to use MCMC to determine the luminosity function evolution and redshift distribution based on infrared survey data -- the details of the input observations as well as default model parameters are passed to this program via a series of fits files (model.fits, observations.fits, templates.fits) which are set using either idl (SurveySim.pro) or python (SurveySim.py). 
 //****************************************************************************
 
 #include "simulator.h"

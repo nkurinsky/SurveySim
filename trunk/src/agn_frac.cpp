@@ -75,10 +75,15 @@ double agn_frac::get_agn_frac2(double lum, double redshift, int agntype){
     float denom=pow(pow(10,lum5um)/pow(10,lstar),gamma1)+pow(pow(10,lum5um)/pow(10,lstar),gamma2);
     float phi=pow(10,phistar)/denom;
     
-    float phi_all;
+    float phi_all,fagn;
     phi_all = lf->get_nsrcs(redshift,lum);
     
-    //the AGN fraction is the ratio of AGN Luminosity Function computed here and the overall luminosity function (from lumfunc.cpp)
-    return pow(10,(phi-phi_all));
+    //the AGN fraction is the ratio of AGN Luminosity Function computed here and the overall luminosity function (from lumfunc.cpp), ensure that this does not exceed 100%
+
+    fagn=pow(10,(phi-phi_all));
+    if (fagn > 1)
+      fagn=1.0;
+
+    return fagn;
     
 }
