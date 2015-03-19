@@ -21,8 +21,8 @@ struct filter_info{
 class filter{
  public:
   filter();
-  filter(string filtername, vector<double> band, vector<double> transmission);
-  bool load(string filtername, vector<double> band, vector<double> transmission);
+  filter(string filtername, vector<double> band, vector<double> transmission,int logflag);
+  bool load(string filtername, vector<double> band, vector<double> transmission,int logflag);
   double transmission(double wavelength);
   double low();
   double high();
@@ -42,11 +42,12 @@ class filter{
 
 class filter_lib{
  public:
+  int logflag;
   filter_lib();
-  filter_lib(string fitsfile);
+  filter_lib(string fitsfile,int logflag);
   bool init(){
     return initialized;}
-  bool load_filters(string fitsfile);
+  bool load_filters(string fitsfile,int logflag);
   filter& get(short num);
  private:
   filter filters[3];

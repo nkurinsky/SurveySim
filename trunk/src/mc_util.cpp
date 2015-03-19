@@ -37,7 +37,7 @@ int dcomp(const void * a,const void * b){
   else return 0;
 }
 
-MetropSampler::MetropSampler(int nchains, double maxTemp, double tempScale, double idealpct, double acpt_buf){
+MetropSampler::MetropSampler(int nchains, double maxTemp, double tempScale, double idealpct, double acpt_buf,int logflag){
   this->nchains = nchains;
   accept_total = new long[nchains];
   iteration_total = new long[nchains];

@@ -46,6 +46,10 @@
 #define LUMPARS 7
 #define SDEG_PER_STER 3282.8
 
+#define LOG_CRITICAL(ARG) (logflag == 1 ? ARG : printf(""))
+#define LOG_INFO(ARG) (logflag == 2 ? ARG : printf(""))
+#define LOG_DEBUG(ARG) (logflag == 3 ? ARG : printf(""))
+
 using namespace std;
 
 enum axis_type{
@@ -57,8 +61,19 @@ enum axis_type{
   Flux3
 };
 
+enum colsel_type{
+  None,
+  mag1_mag2,
+  ColF1F2,
+  ColF1F3,
+  ColF2F3
+};
+
 axis_type set_axis_type(string &keyvalue);
 string get_axis_type(axis_type opt);
+
+colsel_type set_colsel_type(string &keyvalue);
+string get_colsel_type(axis_type opt);
 
 double metric_value(const double& f1,const double &f2,const double &f3,const axis_type &opt);
 
@@ -77,7 +92,7 @@ public:
   string sedfile;
   
   bool vary_cexp;
-  bool oprint;
+  int oprint;
 
   int nz;
   int ns;
@@ -92,6 +107,10 @@ public:
   unsigned long nsim;
 
   double area;
+  double limits[3];
+  double units[3];
+  string colsel;
+
   double dz;
   double zmax;
   double zmin;
@@ -101,9 +120,7 @@ public:
   double tscale;
   double idealpct;
   double annrng;
-  //  double limits[3];
-  // double units[3];
-  
+
   vector<int> param_inds;
   double LFParameters[LUMPARS][4];
   double colorEvolution[4];

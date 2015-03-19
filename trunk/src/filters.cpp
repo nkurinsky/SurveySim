@@ -14,7 +14,7 @@ filter::filter(){
   spline=NULL;
 }
 
-filter::filter(string filtername, vector<double> band, vector<double> transmission){
+filter::filter(string filtername, vector<double> band, vector<double> transmission,int logflag){
   name="NULL";
   init=false;
   filter_size=0;
@@ -22,19 +22,19 @@ filter::filter(string filtername, vector<double> band, vector<double> transmissi
   response=NULL;
   acc=NULL;
   spline=NULL;
-  load(filtername,band,transmission);
+  load(filtername,band,transmission,logflag);
 }
 
-bool filter::load(string filtername, vector<double> band, vector<double> transmission){
+bool filter::load(string filtername, vector<double> band, vector<double> transmission, int logflag){
   
   double width = 0;
   
   if(band.size() < 2){
-    printf("Error: Not enough valid lines in filter file, filter not initialized\n");
+    LOG_CRITICAL(printf("Error: Not enough valid lines in filter file, filter not initialized\n"));
     return false;
   }  
   if(band.size() != transmission.size()){
-    printf("Error: Filter file improperly formatted (different number of wavelength and response values), filter not initialized\n");
+    LOG_CRITICAL(printf("Error: Filter file improperly formatted (different number of wavelength and response values), filter not initialized\n"));
     return false;
   }
   
@@ -133,8 +133,8 @@ filter_lib::filter_lib(){
   initialized = false;
 }
 
-filter_lib::filter_lib(string fitsfile){
-  if(load_filters(fitsfile)){
+filter_lib::filter_lib(string fitsfile,int logflag){
+  if(load_filters(fitsfile,logflag)){
     initialized = true;
   }
   else{
@@ -143,7 +143,7 @@ filter_lib::filter_lib(string fitsfile){
   }
 }
 
-bool filter_lib::load_filters(string fitsfile){
+bool filter_lib::load_filters(string fitsfile,int logflag){
 
   std::unique_ptr<CCfits::FITS> pInfile;
   try{
@@ -174,7 +174,7 @@ bool filter_lib::load_filters(string fitsfile){
       bands[i] = stemp;
     }
     catch(...){
-      printf("Error reading keyword \"%s\", defaulting to standard label\n",bands[i].c_str());
+      LOG_CRITICAL(printf("Error reading keyword \"%s\", defaulting to standard label\n",bands[i].c_str()));
     }
   }
 
@@ -185,7 +185,7 @@ bool filter_lib::load_filters(string fitsfile){
     scale = dtemp;
   }
   catch(...){
-    printf("Error reading keyword \"LSCALE\", defaulting to Angstroms\n");
+    LOG_CRITICAL(printf("Error reading keyword \"LSCALE\", defaulting to Angstroms\n"));
   }
   double exp_scale = pow(10,scale);
 
@@ -205,9 +205,9 @@ bool filter_lib::load_filters(string fitsfile){
     for(int j=0;j<band.size();j++){
       band[j]*=exp_scale;
     }
-    printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m)\n",num+1,band.front(),band.back());
-    if(not this->filters[num].load(bands[num],band,transmission) ){
-      printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str());
+    LOG_INFO(printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m)\n",num+1,band.front(),band.back()));
+    if(not this->filters[num].load(bands[num],band,transmission,logflag) ){
+      LOG_CRITICAL(printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str()));
       exit(1);
     }
   }
@@ -221,7 +221,7 @@ filter& filter_lib::get(short num){
     return filters[num];
   }
   else{
-    printf("ERROR: Invalid filter number (%i)\n",num);
+    LOG_CRITICAL(printf("ERROR: Invalid filter number (%i)\n",num));
     return dummy;
   }
 }

@@ -15,7 +15,9 @@
 #define SL_INT_PRECISION 1E-2
 #define FILTER_NUM 3
 
-#define DEBUG 1
+//#define LOG_CRITICAL(ARG) (logflag == 1 ? ARG : printf(""))
+//#define LOG_INFO(ARG) (logflag == 2 ? ARG : printf(""))
+//#define LOG_DEBUG(ARG) (logflag == 3 ? ARG : printf(""))
 
 using namespace CCfits;
 
@@ -51,6 +53,7 @@ class sed_lib{
   vector<alglib::spline2dinterpolant> flux_interpolator;
   bool interp_init;
   int interp_znum;
+  int logflag;
   double interp_zmin;
   double interp_dz;
   //SEDs and evolution
@@ -60,14 +63,14 @@ class sed_lib{
   double color_evolution;
   //filter convolution and interpolation (for speed)
   filter_lib filters;
-  void initialize_filter_fluxes();
+  void initialize_filter_fluxes(int logflag);
   double interpolate_flux(double lum, double redshift, short sedtype, short filter_id);
   double convolve_filter(short lum_id, double redshift, short sedtype, short filter_id);
   friend double flux_yield(double wavelength, void * params);
   gsl_integration_workspace *w;
  public:
   sed_lib(string fitsfile, int nz, double zmin, double dz);
-  bool load_filters(string fitsfile);
+  bool load_filters(string fitsfile,int logflag);
   double get_flux(double lum, double redshift, short sedtype, double band);
   double get_filter_flux(double lum, double redshift, short sedtype, short filter_id);
   void set_color_evolution(double exp, double zcut=1000);

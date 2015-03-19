@@ -33,18 +33,19 @@ private:
   double dz;
   double zmin;
   int nz;
+  int logflag;
   string obsFile;
   string modelFile;
   axis_type axes[2];
   RandomNumberGenerator rng;
-  void initialize_filters();
+  void initialize_filters(int logflag);
   void initialize_counts();
   long num_sources(double z, double l, double dl);
  public:
-  simulator();
+  //simulator();
   simulator(const Configuration &config);
   simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]);
-  bool load_filters(string file);
+  bool load_filters(string file,int logflag);
   void set_diagnostic_xaxis(axis_type option);
   void set_diagnostic_yaxis(axis_type option);
   void set_diagnostic_axes(axis_type xopt, axis_type yopt);

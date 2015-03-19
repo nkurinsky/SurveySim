@@ -109,15 +109,15 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
   if(axnum >= 3){
     redshiftq=true;
     znum = image.axis(2);
-    printf("Detected SED redshift dimension, length %i\n",znum);
+    LOG_DEBUG(printf("Detected SED redshift dimension, length %i\n",znum));
     if(axnum >= 4){
       typeq=true;
       tnum = image.axis(3);
-      printf("Detected SED type dimension, length %i\n",tnum);
+      LOG_DEBUG(printf("Detected SED type dimension, length %i\n",tnum));
     }
   }
   else{
-    printf("Redshift independent templates, will use default color evolution\n");
+    //LOG_INF0(printf("Redshift independent templates, will use default color evolution\n"));
   }
 
   lums = new double[lnum];
@@ -202,9 +202,10 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
   delete pInfile;
 }
 
-bool sed_lib::load_filters(string file){
+bool sed_lib::load_filters(string file,int lflag_tmp){
   
-  if(filters.load_filters(file)){
+  if(filters.load_filters(file,lflag_tmp)){
+    logflag=lflag_tmp;
     w = gsl_integration_workspace_alloc(SL_INT_SIZE);
     return true;
   }
@@ -226,11 +227,11 @@ double sed_lib::get_flux(double lum, double band, short sedtype, double redshift
     if((band >= brange[0]) and (band <= brange[1]))
       return seds[i]->get_flux(band,redshift);
     else{
-      printf("%s\n%s\n","ERROR: Band out of model range.","Check that the obs bands are within range and unit consistent");
+      LOG_CRITICAL(printf("%s\n%s\n","ERROR: Band out of model range.","Check that the obs bands are within range and unit consistent"));
     }
   }
   else{
-    printf("%s %i \n","ERROR: Unitialized Model Called!!!",i);
+    LOG_CRITICAL(printf("%s %i \n","ERROR: Unitialized Model Called!!!",i));
   }
   
   return -1;
@@ -252,7 +253,7 @@ double sed_lib::get_filter_flux(double lum, double redshift, short sedtype, shor
   }
    
   if(not interp_init)
-    initialize_filter_fluxes();
+    initialize_filter_fluxes(logflag);
   
   return interpolate_flux(lum,redshift,sedtype,filter_id);
 }
@@ -295,7 +296,7 @@ sed_lib::~sed_lib(){
   delete[] lums;
 }
 
-void sed_lib::initialize_filter_fluxes(){
+void sed_lib::initialize_filter_fluxes(int logflag){
   flux_interpolator.resize(FILTER_NUM*tnum);
   
   alglib::real_1d_array ls;
@@ -314,23 +315,22 @@ void sed_lib::initialize_filter_fluxes(){
   }
   clearprogress.append("]");
 
-  FILE *fp = fopen("fluxes.txt","w+");
+//  FILE *fp = fopen("fluxes.txt","w+");
 
-  printf("Initializing Filter Flux Interpolation\n");
+  //printf("Initializing Filter Flux Interpolation\n");
   for (int type=0;type<tnum;type++){
     for (int filter=0;filter<3;filter++){
       
       for(int zi=0;zi<interp_znum;zi++){  
-	printf("\rType: %i\tFilter: %i\tZ: %lf - %s",type,filter,zs[zi],clearprogress.c_str());
-	printf("\rType: %i\tFilter: %i\tZ: %lf - [",type,filter,zs[zi]);
+	//printf("\rType: %i\tFilter: %i\tZ: %lf - %s",type,filter,zs[zi],clearprogress.c_str());
+	//printf("\rType: %i\tFilter: %i\tZ: %lf - [",type,filter,zs[zi]);
 	for(int li=0;li<lnum;li++){
-	  printf("=");
+	  //printf("=");
 	  fs[li+zi*lnum]=convolve_filter(li,zs[zi],type,filter);
-	  if(DEBUG == 1)
-	    fprintf(fp,"%i %f %i %i %g\n",li,zs[zi],type,filter,fs[li+zi*lnum]);
+	  //fprintf(fp,"%i %f %i %i %g\n",li,zs[zi],type,filter,fs[li+zi*lnum]));
 	}
       }
-      printf("\rBuilding Spline...                                                         ");
+      LOG_DEBUG(printf("\rBuilding Spline...                                                         "));
       try{
 	alglib::spline2dbuildbilinearv(ls,lnum,
 				       zs,interp_znum,
@@ -342,13 +342,13 @@ void sed_lib::initialize_filter_fluxes(){
 	printf("error msg: %s\n", e.msg.c_str());
 	exit(1);
       }  
+      }
     }
-  }
 
-  fclose(fp);
+//  fclose(fp);
 
-  printf("\rBuilt Spline Interpolation for Fluxes                                           \n");
-  interp_init=true;
+    LOG_INFO(printf("\rBuilt Spline Interpolation for Filter Fluxes                                           \n"));
+    interp_init=true;
 }
 
 double sed_lib::interpolate_flux(double lum, double redshift, short sedtype, short filter_id){
@@ -374,12 +374,12 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, sh
   tuple<short,short,double> params (lum_id,sedtype,redshift);
 
   if(filters.get(filter_id).low() >= filters.get(filter_id).high()){
-    printf("ERROR: Filter %i unititialized.\n",filter_id);
+    LOG_CRITICAL(printf("ERROR: Filter %i unititialized.\n",filter_id));
     return -1;
   }
 
   if((filters.get(filter_id).low() < brange[0]) or (filters.get(filter_id).high() > brange[1])){
-    printf("ERROR: Filter out of model range.\nCheck that the obs bands are within range and unit consistent\n");
+    LOG_CRITICAL(printf("ERROR: Filter out of model range.\nCheck that the obs bands are within range and unit consistent\n"));
     return -1;
   }
 

@@ -43,7 +43,8 @@ class MetropSampler {
   unsigned long recent_num;
   RandomNumberGenerator rng;
  public:
-  MetropSampler(int nchains,double maxTemp, double tempScale, double idealpct, double acpt_buf);
+  int logflag;
+  MetropSampler(int nchains,double maxTemp, double tempScale, double idealpct, double acpt_buf,int logflag);
   bool accept(int chainnum, double trial);
   double acceptance(int chainnum);
   double mean_acceptance();

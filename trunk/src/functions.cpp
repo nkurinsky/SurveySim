@@ -1,5 +1,24 @@
 #include "functions.h"
 
+colsel_type set_colsel_type(string &keyvalue){
+  string scolsel(toLower(keyvalue));
+
+  if(scolsel == "None")
+    return None;
+  else if(scolsel == "mag1_mag2")
+    return mag1_mag2;
+  else if(scolsel == "ColF1F2")
+    return ColF1F2;
+  else if(scolsel == "ColF1F3")
+    return ColF1F3;
+  else if(scolsel == "ColF2F3")
+    return ColF2F3;
+  else{
+    printf("set_colsel_type: keyvalue \"%s\" invalid\n",keyvalue.c_str());
+  throw(-1);
+  }
+}
+
 axis_type set_axis_type(string &keyvalue){
   string saxis(toLower(keyvalue));
 
@@ -37,6 +56,24 @@ string get_axis_type(axis_type opt){
     return "Flux3";
   default:
     printf("get_axis_type: option %i invalid\n",opt);
+  }
+  return "";
+}
+
+string get_colsel_type(colsel_type  opt){
+  switch(opt){
+  case None:
+    return "None";
+  case mag1_mag2:
+    return "mag1_mag2";
+  case ColF1F2:
+    return "ColF1F2";
+  case ColF1F3:
+    return "ColF1F3";
+  case ColF2F3:
+    return "ColF2F3";
+  default:
+    printf("get_colsel_type: option %i invalid\n",opt);
   }
   return "";
 }
@@ -198,10 +235,21 @@ void Configuration::load(){
     printf("Value of \"Axis2\" invalid, defaulting to ColorF2F3\n");
   }
 
+  try{
+    tab.readKey("COLSEL",stemp);
+    colsel = set_axis_type(stemp);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    printf("Keyword \"COLSEL\" not specified, defaulting to None\n");
+  }
+  catch(...){
+    printf("Value of \"COLSEL\" invalid, defaulting to None\n");
+  }
+
   //Read-in survey settings
-  //tab.readKey("limits1",limits[0]);
-  //tab.readKey("limits2",limits[1]);
-  //tab.readKey("limits3",limits[2]);
+  // tab.readKey("limit1",limits[0]);
+  //tab.readKey("limit2",limits[1]);
+  //tab.readKey("limit3",limits[2]);
 
   //tab.readKey("units1",units[0]);
   //tab.readKey("units2",units[1]);
@@ -233,7 +281,7 @@ void Configuration::load(){
   tab.readKey("CONV_RMA",rmax);
   tab.readKey("CONV_CON",a_ci);
   tab.readKey("PRINT",rtemp);
-  oprint = rtemp == 0.0 ? true : false;
+  oprint = rtemp; // == 0.0 ? true : false;
 
   //compute redshift bin number from FITS values
   nz = (zmax-zmin)/dz;
@@ -346,3 +394,4 @@ void RandomNumberGenerator::gaussian_mv(const vector<double> &mean, const vector
   
   return;
 }
+

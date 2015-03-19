@@ -83,7 +83,7 @@ conv_rma1=1.05 #Convergence Rmax Criterion
 conv_ste1=20 #Steps btw convergence checks
 burn_ste=10 #Steps btw anneal calls in burn-in
 burnvrun=10 #Ratio of normal to burn-in steps
-mesprint1=1 #Print Debug MSGs (1=verbose,0=silent)')
+mesprint1=1 #Print Debug MSGs (0=silent,1=critical, 2=info,3=debug)')
 
 #read-in values if model.fits exists
 if os.path.isfile(modelfile): # and os.access(modelfile,os.R.OK):
@@ -644,7 +644,7 @@ class SurveySimGUI:
         hdr.set('CONV_STE',conv_ste,'Steps btw convergence checks')
         hdr.set('BURN_STE',burn_ste,'Steps btw anneal calls in burn-in')
         hdr.set('BURNVRUN',burnvrun,'Ratio of normal to burn-in steps')
-        hdr.set('PRINT',mesprint,'Print Debug MSGs (1=verbose,0=silent)')
+        hdr.set('PRINT',mesprint,'Print Debug MSGs (0=silent,1=critical,2=info,3=debug)')
 
         hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
         hdulist.close

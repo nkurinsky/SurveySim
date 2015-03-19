@@ -1,19 +1,19 @@
 #include "simulator.h"
 
-simulator::simulator() : color_exp(0.0),
-			 area(3.046174e-4), //default to 1sq degree
-			 dz(0.1),
-			 zmin(0.1), 
-			 nz(59),
-			 obsFile(""){
+//simulator::simulator() : color_exp(0.0),
+//			 area(3.046174e-4), //default to 1sq degree
+//			 dz(0.1),
+//			 zmin(0.1), 
+//			 nz(59),
+//			 obsFile(""){
   
-  filters[0] = "F1";
-  filters[1] = "F2";
-  filters[2] = "F3";
+//  filters[0] = "F1";
+//  filters[1] = "F2";
+//  filters[2] = "F3";
   
-  axes[0] = ColorF1F3;
-  axes[1] = ColorF2F3;
-}
+//  axes[0] = ColorF1F3;
+//  axes[1] = ColorF2F3;
+//}
 
 //simulator::simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]) : simulator(){
  
@@ -25,7 +25,10 @@ simulator::simulator() : color_exp(0.0),
   
 //}
 
-simulator::simulator(const Configuration &config) : simulator(){
+//Lets assume we always have configuration so no need to have a "default" mode
+simulator::simulator(const Configuration &config){// : simulator(){
+  logflag=config.oprint;
+
   modelFile = config.modfile;
   double tarea(config.areaSteradian());
 
@@ -41,8 +44,8 @@ simulator::simulator(const Configuration &config) : simulator(){
   set_obs(config.obsfile);
 }
 
-bool simulator::load_filters(string file){
-  return seds->load_filters(file);
+bool simulator::load_filters(string file,int logflag){
+  return seds->load_filters(file,logflag);
 }
 
 void simulator::set_diagnostic_xaxis(axis_type option){
@@ -84,10 +87,10 @@ void simulator::set_lumfunct(lumfunct *lf){
     cout << "ERROR: NULL Pointer Passed to Simulator" << endl;
 }
 
-void simulator::initialize_filters(){
+void simulator::initialize_filters(int logflag){
 
   if((seds.get() != NULL) and (observations.get() != NULL)){    
-    seds->load_filters(modelFile);
+    seds->load_filters(modelFile,logflag);
   }
   
 }
@@ -131,11 +134,11 @@ long simulator::num_sources(double z, double l, double dl){
     retval++;
   }
   else if (p_extra_source < 0.0){
-    printf("ERROR: val-floor less than 0!\n");
+    LOG_CRITICAL(printf("ERROR: val-floor less than 0!\n"));
     exit(1);
   }
   else if (p_extra_source > 1.0){
-    printf("ERROR: val-floor greater than 1!\n");
+    LOG_CRITICAL(printf("ERROR: val-floor greater than 1!\n"));
     exit(1);
   }
   
@@ -145,7 +148,7 @@ long simulator::num_sources(double z, double l, double dl){
 
 void simulator::set_sed_lib(string sedfile){
   seds.reset(new sed_lib(sedfile, nz, zmin, dz));
-  initialize_filters();
+  initialize_filters(logflag);
 }
 
 void simulator::set_obs(string obsfile){
@@ -154,13 +157,13 @@ void simulator::set_obs(string obsfile){
     reset_obs();
     
     observations->info(filters,flux_limits,band_errs);
-    initialize_filters();
+    initialize_filters(logflag);
     
     last_output.chisqr=0;  
     initialize_counts();
   }
   else
-    printf("simulator::set_obs Error: tried to set obs_lib with empty file name\n");
+    LOG_CRITICAL(printf("simulator::set_obs Error: tried to set obs_lib with empty file name\n"));
 }
 
 void simulator::reset_obs(){
@@ -183,7 +186,7 @@ products simulator::simulate(){
   products output(nz,ns);
   
   if(seds.get() == NULL){
-    printf("ERROR: NULL Model Library\n");
+    LOG_CRITICAL(printf("ERROR: NULL Model Library\n"));
     return output;
   }
   
@@ -328,7 +331,7 @@ bool simulator::save(string outfile){
     pFits->pHDU().addKey("CEXP",color_exp,"Color Evolution Param");
     
     unsigned long size = sources.size();
-    printf("%s %lu\n","Sources Being Saved: ",size);
+    LOG_INFO(printf("%s %lu\n","Sources Being Saved: ",size));
     
     valarray<double> f1(size),f2(size),f3(size),luminosity(size),redshift(size);
     for(unsigned long i=0;i<size;i++){
