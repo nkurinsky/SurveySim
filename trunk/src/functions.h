@@ -46,8 +46,8 @@
 #define LUMPARS 7
 #define SDEG_PER_STER 3282.8
 
-#define LOG_CRITICAL(ARG) (logflag == 1 ? ARG : printf(""))
-#define LOG_INFO(ARG) (logflag == 2 ? ARG : printf(""))
+#define LOG_CRITICAL(ARG) (logflag >= 1 ? ARG : printf(""))
+#define LOG_INFO(ARG) (logflag >= 2 ? ARG : printf(""))
 #define LOG_DEBUG(ARG) (logflag == 3 ? ARG : printf(""))
 
 using namespace std;
