@@ -26,7 +26,7 @@
 //}
 
 //Lets assume we always have configuration so no need to have a "default" mode
-simulator::simulator(const Configuration &config){// : simulator(){
+simulator::simulator(const Configuration &config,bool simflag){// : simulator(){
   logflag=config.oprint;
 
   modelFile = config.modfile;
@@ -48,15 +48,15 @@ bool simulator::load_filters(string file,int logflag){
   return seds->load_filters(file,logflag);
 }
 
-void simulator::set_diagnostic_xaxis(axis_type option){
-  axes[0] = option;
-  reset_obs();
-}
+//void simulator::set_diagnostic_xaxis(axis_type option){
+//  axes[0] = option;
+//  reset_obs();
+//}
 
-void simulator::set_diagnostic_yaxis(axis_type option){
-  axes[1] = option;
-  reset_obs();
-}
+//void simulator::set_diagnostic_yaxis(axis_type option){
+//  axes[1] = option;
+//  reset_obs();
+//}
 
 void simulator::set_diagnostic_axes(axis_type xopt, axis_type yopt){
   axes[0] = xopt;
@@ -178,7 +178,8 @@ void simulator::reset_obs(){
   }
 }
 
-products simulator::simulate(){
+products simulator::simulate(bool simflag){
+  //the "sources" structure holds the simulated sources
   sources.clear();
   int ns[] = {static_cast<int>(counts[0]->bins().size()),
 	      static_cast<int>(counts[1]->bins().size()),
@@ -288,18 +289,25 @@ products simulator::simulate(){
     f3[i] = sources[i].fluxes[2];
   }
   
-  diagnostic->init_model(c1.data(),c2.data(),w.data(),snum);
-  output.chisqr=diagnostic->get_chisq();
+  if(!simflag)
+    {
+      diagnostic->init_model(c1.data(),c2.data(),w.data(),snum);
+      output.chisqr=diagnostic->get_chisq();
+      //last_output = output;
+    }
   counts[0]->compute(f1,area,output.dnds[0]);
   counts[1]->compute(f2,area,output.dnds[1]);
   counts[2]->compute(f3,area,output.dnds[2]);
-  last_output = output;
+
+  last_output = output; //seems below like this is where the observed counts are, is that right?
   
   return output;
 }
 
 
-bool simulator::save(string outfile){
+bool simulator::save(string outfile,bool simflag){
+  LOG_DEBUG(printf("Simflag in simulator:save %s \n", simflag ? "true" : "false"));
+
   try{
     bool opened =  diagnostic->write_fits(outfile);
     
@@ -342,10 +350,15 @@ bool simulator::save(string outfile){
       luminosity[i] = sources[i].luminosity;
     }
     
-    static std::vector<string> colname(14,"");
-    static std::vector<string> colunit(14,"-");
-    static std::vector<string> colform(14,"f13.8");
-    
+    //if simulation-only mode we only need 11columns, otherwise add observed counts
+    int colnum=14;
+    if(simflag)
+      colnum=11;
+
+    static std::vector<string> colname(colnum,"");
+    static std::vector<string> colunit(colnum,"-");
+    static std::vector<string> colform(colnum,"f13.8");
+
     colname[0] = "F1";
     colname[1] = "F2";
     colname[2] = "F3";
@@ -354,13 +367,9 @@ bool simulator::save(string outfile){
     colname[5] = "s1";
     colname[6] = "s2";
     colname[7] = "s3";
-    colname[8] = "obs_dnds1";
-    colname[9] = "obs_dnds2";
-    colname[10] = "obs_dnds3";
-    colname[11] = "mod_dnds1";
-    colname[12] = "mod_dnds2";
-    colname[13] = "mod_dnds3";
-
+    colname[8] = "mod_dnds1";
+    colname[9] = "mod_dnds2";
+    colname[10] = "mod_dnds3";
     
     colunit[0] = "Jy";
     colunit[1] = "Jy";
@@ -372,17 +381,26 @@ bool simulator::save(string outfile){
     colunit[8] = "Jy^1.5/sr";
     colunit[9] = "Jy^1.5/sr";
     colunit[10] = "Jy^1.5/sr";
-    colunit[11] = "Jy^1.5/sr";
-    colunit[12] = "Jy^1.5/sr";
-    colunit[13] = "Jy^1.5/sr";
-    
+
     colform[4] = "e13.5";
     colform[8] = "e13.5";
     colform[9] = "e13.5";
     colform[10] = "e13.5";
-    colform[11] = "e13.5";
-    colform[12] = "e13.5";
-    colform[13] = "e13.5";
+
+    if(!simflag) {
+      colname[11] = "obs_dnds1";
+      colname[12] = "obs_dnds2";
+      colname[13] = "obs_dnds3";
+
+      colunit[11] = "Jy^1.5/sr";
+      colunit[12] = "Jy^1.5/sr";
+      colunit[13] = "Jy^1.5/sr";
+
+      colform[11] = "e13.5";
+      colform[12] = "e13.5";
+      colform[13] = "e13.5";
+    }
+    
     
     static string hname("Parameter Distributions");
     Table* newTable;
@@ -412,10 +430,12 @@ bool simulator::save(string outfile){
       newTable->column(colname[8]).write(counts[0]->counts(),1);
       newTable->column(colname[9]).write(counts[1]->counts(),1);
       newTable->column(colname[10]).write(counts[2]->counts(),1);
-      
-      newTable->column(colname[11]).write(last_output.dnds[0],1);
-      newTable->column(colname[12]).write(last_output.dnds[1],1);
-      newTable->column(colname[13]).write(last_output.dnds[2],1);
+
+      if(!simflag){
+	newTable->column(colname[11]).write(last_output.dnds[0],1);
+	newTable->column(colname[12]).write(last_output.dnds[1],1);
+	newTable->column(colname[13]).write(last_output.dnds[2],1);
+      }
     }
     catch(...){
       printf("Caught Save Error: Column Write\n");

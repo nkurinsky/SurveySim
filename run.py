@@ -69,7 +69,7 @@ f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
 
 #initialize MCMC settings parameters
-fields3='zmin','zmax','dz','Runs','Nchain','Tmax','conv_conf','conv_rmax','conv_step','Verbose(1/0)'
+fields3='zmin','zmax','dz','Runs','Nchain','Tmax','conv_conf','conv_rmax','conv_step','Verbose(0=none->3=debug)'
 zmin1=0.01 #Simulation minimum redshift
 zmax1=5.0 #Simulation maximum redshift
 dz1=0.05 #Redshift Bin Width
@@ -644,7 +644,7 @@ class SurveySimGUI:
         hdr.set('CONV_STE',conv_ste,'Steps btw convergence checks')
         hdr.set('BURN_STE',burn_ste,'Steps btw anneal calls in burn-in')
         hdr.set('BURNVRUN',burnvrun,'Ratio of normal to burn-in steps')
-        hdr.set('PRINT',mesprint,'Print Debug MSGs (0=silent,1=critical,2=info,3=debug)')
+        hdr.set('PRINT',mesprint,'Print level (0=silent,3=debug)')
 
         hdr['HISTORY']='Last updated on: '+time.strftime("%c") #get current date+time
         hdulist.close

@@ -1,8 +1,8 @@
 #include "functions.h"
 
 colsel_type set_colsel_type(string &keyvalue){
-  string scolsel(toLower(keyvalue));
-
+  //string scolsel(toLower(keyvalue));
+  string scolsel=keyvalue;
   if(scolsel == "None")
     return None;
   else if(scolsel == "mag1_mag2")
@@ -237,7 +237,7 @@ void Configuration::load(){
 
   try{
     tab.readKey("COLSEL",stemp);
-    colsel = set_axis_type(stemp);
+    colsel = set_colsel_type(stemp);
   }
   catch(CCfits::HDU::NoSuchKeyword){
     printf("Keyword \"COLSEL\" not specified, defaulting to None\n");

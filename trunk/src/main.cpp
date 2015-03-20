@@ -28,7 +28,8 @@ int main(int argc,char** argv){
   LOG_DEBUG(printf("Axis 1: %s\nAxis 2: %s\n",get_axis_type(q.axes[0]).c_str(),get_axis_type(q.axes[1]).c_str()));
 
   //general variable declarations
-  bool accept,saved;
+  bool accept;
+  bool saved=false;
   unsigned long i,m;
   unsigned long pi;
   double trial;
@@ -55,23 +56,24 @@ int main(int argc,char** argv){
   lumfunct lf;
   lf.set_params(lpars);
 
-  //goto skipmcmc;
-  //check whether something is being fit or only simulating a survey
-  int sum=0;
-  for(int i=0;i<LUMPARS;i++)
-    sum+=parfixed[i]; 
-  printf(" %1i",sum);
-  //if(sum<LUMPARS)       
-  //  printf("\nFitting observed survey....\n\n");
+  //check if anything is being fit or only simulating a survey
+  int sum=0,testsum;
+  bool simonly; //TRUE=ONLY Simulation; FALSE=full fitting to data
+  i=0;
+  for(i=0;i<LUMPARS;i++)
+    sum+= (int) parfixed[i];
 
-  //if(sum == LUMPARS)
-  //  {
-  //    printf("Done simuating survey");
-  //    goto skipmcmc;
-  //  }
-  
+  testsum= (int) LUMPARS;
+  if(sum == testsum)
+    {
+      simonly = true;
+      LOG_CRITICAL(printf("Simulating a survey only \n"));
+    }
+  else
+    simonly = false;
+
   //initialize simulator
-  simulator survey(q); 
+  simulator survey(q,simonly); 
   survey.set_color_exp(CE); //color evolution
   survey.set_lumfunct(&lf);
 
@@ -89,16 +91,27 @@ int main(int argc,char** argv){
 
   //mcmc variables and arrays
   double chi_min=1.0E+4; 
+  double tchi_min=chi_min;
   vector<int>::const_iterator p;
 
   double *setvars[q.nparams];
   ParameterSettings pset(q.nparams);
   
+  //moved these from lower in the code as "goto" objects if it jumps over some declarations
+  unique_ptr<string[]> parnames (new string[q.nparams]);
+  vector<double> results,means(q.nparams);
+
+  if(simonly) 
+    {
+      saved = survey.save(q.outfile,simonly);
+      goto skipmccheck;
+    }
+
   if(q.nparams > 0){
     double ptemp[q.nchain][q.nparams];
     vector<double > means(q.nparams);
     double pcurrent[q.nchain][q.nparams];
-    
+
     LOG_DEBUG(printf("Initializing Chains\n"));
     for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
       setvars[pi] = &(lpars[*p]);
@@ -117,7 +130,7 @@ int main(int argc,char** argv){
     }
     
     LOG_INFO(printf("\n ---------- Beginning MC Burn-in Phase ---------- \n"));
-    
+    i=0;
     for (i=0;i<q.burn_num;i++){
       for (m=0;m<q.nchain;m++){
 
@@ -129,25 +142,26 @@ int main(int argc,char** argv){
 	  *(setvars[pi]) = ptemp[m][pi] = results[pi];
 	}
 	
-	//log<LOG_DEBUG>(printf("%lu %lu -",(i+1),(m+1)));
+	LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
 	for(pi=0;pi<LUMPARS;pi++)
-	  //log<LOG_DEBUG>(printf(" %5.2lf",lpars[pi]));
-	  //log<LOG_DEBUG>(printf(" %5.2lf : ",(q.vary_cexp ? ptemp[m][q.cind] : CE)));
+	  LOG_DEBUG(printf(" %5.2lf",lpars[pi]));
+	  LOG_DEBUG(printf(" %5.2lf : ",(q.vary_cexp ? ptemp[m][q.cind] : CE)));
 	
 	lf.set_params(lpars);
 	survey.set_color_exp(CE);
 	
-	output=survey.simulate();
+	output=survey.simulate(simonly);
+
 	trial=output.chisqr;
 	
-	//log<LOG_DEBUG>(printf("Iteration Chi-Square: %lf",trial));      
+	LOG_DEBUG(printf("Iteration Chi-Square: %lf",trial));      
 	if(trial < chi_min){
-	  //log<LOG_DEBUG>(printf(" -- Current Best Trial"));
+	  LOG_DEBUG(printf(" -- Current Best Trial"));
 	  chi_min=trial;
 	  for(pi=0;pi<q.nparams;pi++)
 	    pset.best[pi]=ptemp[m][pi];
 	}
-	//log<LOG_DEBUG>(printf("\n"));
+	LOG_DEBUG(printf("\n"));
 	
 	accept = metrop.accept(m,trial);
 	if(accept)
@@ -179,8 +193,7 @@ int main(int argc,char** argv){
     
     metrop.reset();
     
-    //log<LOG_INFO>(printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",q.runs));
-    //TERSE(printf("\nBeginning Fitting, Run Maximum: %ld\n",q.runs));
+    LOG_INFO(printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",q.runs));
     
     for (i=0;i<q.runs;i++){
       for (m=0;m<q.nchain;m++){
@@ -201,7 +214,7 @@ int main(int argc,char** argv){
 	lf.set_params(lpars);
 	survey.set_color_exp(CE);
 	
-	output=survey.simulate();
+	output=survey.simulate(simonly);
 	trial=output.chisqr;
 	LOG_DEBUG(printf("Model Chi-Square: %lf",trial));
 	
@@ -257,17 +270,16 @@ int main(int argc,char** argv){
   }
 
   LOG_INFO(printf("\nRunning Best Fit...\n"));
-  output=survey.simulate();
-  double tchi_min = output.chisqr;
+  output=survey.simulate(simonly);
+  tchi_min = output.chisqr;
   LOG_INFO(printf("Saving Initial Survey\n"));
-  saved = survey.save(q.outfile);
+  saved = survey.save(q.outfile,simonly);
 
-  vector<double> results,means(q.nparams);
+  //vector<double> results,means(q.nparams);
   for(pi = 0;pi<q.nparams;pi++)
     means[pi] = pset.best[pi];
   
   for(unsigned long i=1;i<q.nsim;i++){
-    //vary according to final results
     rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
     for(pi = 0;pi<q.nparams;pi++){
       *(setvars[pi]) = results[pi];
@@ -276,17 +288,15 @@ int main(int argc,char** argv){
     lf.set_params(lpars);
     survey.set_color_exp(CE);
     
-    output=survey.simulate();
+    output=survey.simulate(simonly);
     if(output.chisqr < tchi_min){
       tchi_min = output.chisqr;
       LOG_INFO(printf("Saving new minimum (%lu/%lu)...",i,q.nsim));
-      saved = survey.save(q.outfile);
+      saved = survey.save(q.outfile,simonly);
     }
     final_counts.add_link(output.dnds,output.chisqr);
   }
   LOG_INFO(printf("Saved Chi2: %lf (%lf)\n",tchi_min,chi_min));
-  
-  unique_ptr<string[]> parnames (new string[q.nparams]);
   
   for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
     parnames[pi] = pnames[*p];
@@ -299,13 +309,19 @@ int main(int argc,char** argv){
   saved &= counts.save(q.outfile,countnames);
   LOG_DEBUG(printf("Saving Final Counts\n"));
   saved &= final_counts.save(q.outfile,countnames,"Counts Monte Carlo");
+  
+ skipmccheck:
 
+  if(simonly)
+    {
+      LOG_DEBUG(printf("Saving Counts\n"));
+      saved &= counts.save(q.outfile,countnames);
+    }
   saved ? printf("Save Successful") : printf("Save Failed");
 
   LOG_CRITICAL(printf("\nFitting Complete\n\n"));
   
   return saved ? 0 : 1;
-  //skipmcmc:
 }
 
 

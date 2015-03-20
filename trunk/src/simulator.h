@@ -43,8 +43,9 @@ private:
   long num_sources(double z, double l, double dl);
  public:
   //simulator();
-  simulator(const Configuration &config);
-  simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]);
+  bool simflag;
+  simulator(const Configuration &config,bool simflag);
+  //  simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]);
   bool load_filters(string file,int logflag);
   void set_diagnostic_xaxis(axis_type option);
   void set_diagnostic_yaxis(axis_type option);
@@ -56,9 +57,9 @@ private:
   void set_obs(string obsfile);
   void reset_obs();
   void reset();
-  products simulate();
+  products simulate(bool simflag);
   double model_chisq() { return last_output.chisqr; }
-  bool save(string outfile);
+  bool save(string outfile,bool simflag);
   ~simulator();  
 };
 

@@ -109,7 +109,6 @@ public:
   double area;
   double limits[3];
   double units[3];
-  string colsel;
 
   double dz;
   double zmax;
@@ -131,6 +130,7 @@ public:
   const short max = 3;
 
   axis_type axes[2];
+  colsel_type colsel;
 
 private:
 void load();
