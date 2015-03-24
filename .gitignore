@@ -20,3 +20,5 @@ Python/*.pyc
 trunk/src/alg_lib/*.o
 trunk/src/alg_lib/Makefile
 trunk/output/.ipynb_checkpoints*
+
+*output*
