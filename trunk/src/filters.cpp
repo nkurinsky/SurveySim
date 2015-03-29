@@ -164,9 +164,13 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
 
   vector<double> band;
   vector<double> transmission;
+  double units[] = {1.0,1.0,1.0};
   long tablelength = filters.rows();
   
   string bands[] = {"BAND_1","BAND_2","BAND_3"};
+  string unitKeys[] = {"UNITS1","UNITS2","UNITS3"};
+  string limitKeys[] = {"LIMIT1","LIMIT2","LIMIT3"};
+  string errorKeys[] = {"ERROR1","ERROR2","ERROR3"};
   for(int i=0;i<3;i++){
     try{
       string stemp;
@@ -175,6 +179,54 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     }
     catch(...){
       LOG_CRITICAL(printf("Error reading keyword \"%s\", defaulting to standard label\n",bands[i].c_str()));
+    }
+
+    //reading units, defaults to units in mJy
+    try{
+      string stemp;
+      head.readKey(unitKeys[i],stemp);
+      if(toLower(stemp) == "jy"){
+	units[i]=0.001;
+      }
+      else if(toLower(stemp) == "mjy"){
+	units[i]=1.0;
+      }
+      else{
+	LOG_CRITICAL(printf("Keyword \"%s\" contains unknown unit, defaulting to standard units mJy\n",unitKeys[i].c_str()));
+      }
+    }
+    catch(...){
+      LOG_CRITICAL(printf("Error reading keyword \"%s\", defaulting to standard units mJy\n",unitKeys[i].c_str()));
+    }
+
+    //reading flux limits, converting units
+    try{
+      head.readKey(limitKeys[i],limits[i]);
+      if(limits[i]<0){
+	LOG_CRITICAL(printf("Warning: keyword \"%s\" contains negative value, defaulting to standard value 0\n",limitKeys[i].c_str()));
+	limits[i]=0.0;
+      }
+      else
+	limits[i]*=units[i];
+    }
+    catch(...){
+      LOG_CRITICAL(printf("Error reading keyword \"%s\"\n",limitKeys[i].c_str()));
+      exit(10);
+    }
+    
+    //reading flux limits, converting units
+    try{
+      head.readKey(errorKeys[i],errors[i]);
+      if(errors[i]<0){
+	LOG_CRITICAL(printf("Warning: keyword \"%s\" contains negative value, defaulting to standard value 0\n",errorKeys[i].c_str()));
+	errors[i]=0.0;
+      }
+      else
+	errors[i]*=units[i];
+    }
+    catch(...){
+      LOG_CRITICAL(printf("Error reading keyword \"%s\"\n",errorKeys[i].c_str()));
+      exit(10);
     }
   }
 
@@ -205,7 +257,7 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     for(int j=0;j<band.size();j++){
       band[j]*=exp_scale;
     }
-    LOG_INFO(printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m)\n",num+1,band.front(),band.back()));
+    LOG_INFO(printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m, limit: %5.2e, error: %5.2e)\n",num+1,band.front(),band.back(),limits[num],errors[num]));
     if(not this->filters[num].load(bands[num],band,transmission,logflag) ){
       LOG_CRITICAL(printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str()));
       exit(1);
@@ -214,6 +266,14 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
 
   initialized = true;
   return true;
+}
+
+void filter_lib::filter_info(string names[], double fluxLimits[], double fluxErrors[]){
+  for(int i=0;i<3;i++){
+    names[i]=filters[i].get_name();
+    fluxLimits[i]=limits[i];
+    fluxErrors[i]=errors[i];
+  }
 }
 
 filter& filter_lib::get(short num){

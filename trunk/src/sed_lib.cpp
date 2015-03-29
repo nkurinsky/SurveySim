@@ -213,6 +213,15 @@ bool sed_lib::load_filters(string file,int lflag_tmp){
   return false;
 }
 
+void sed_lib::get_filter_info(string names[], double limits[], double errors[]){
+  if (filters.init()){
+    printf("ERROR: Filter library not initialized!!!\n");
+  }
+  else{
+    filters.filter_info(names,limits,errors);
+  }
+}
+
 //needs to interpolate to correct luminosity 
 //rounds to nearest template, in future may average/interp
 //make sure lums sorted in order!!! currently an assumption

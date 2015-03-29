@@ -16,8 +16,6 @@
 using namespace std; 
 
 int main(int argc,char** argv){
-  printf("\n");
-
   Configuration q(argc,argv);
 
   int logflag=q.oprint;
@@ -56,267 +54,251 @@ int main(int argc,char** argv){
   lumfunct lf;
   lf.set_params(lpars);
 
-  //check if anything is being fit or only simulating a survey
-  int sum=0,testsum;
-  bool simonly; //TRUE=ONLY Simulation; FALSE=full fitting to data
-  i=0;
-  for(i=0;i<LUMPARS;i++)
-    sum+= (int) parfixed[i];
-
-  testsum= (int) LUMPARS;
-  if(sum == testsum)
-    {
-      simonly = true;
-      LOG_CRITICAL(printf("Simulating a survey only \n"));
-    }
-  else
-    simonly = false;
-
   //initialize simulator
-  simulator survey(q,simonly); 
+  simulator survey(q); 
   survey.set_color_exp(CE); //color evolution
   survey.set_lumfunct(&lf);
-
   products output;
-
-  MCChains mcchain(q.nchain,q.nparams,q.runs,q.conv_step);
-  MCChains burnchain(q.nchain,q.nparams,q.runs,q.conv_step);
-  mcchain.set_constraints(q.rmax,q.a_ci);
-  burnchain.set_constraints(q.rmax,q.a_ci);
-
-  ResultChain counts(3,q.nchain*q.runs);
   ResultChain final_counts(3,q.nsim);
- 
-  MetropSampler metrop(q.nchain,q.tmax,q.tscale,q.idealpct,q.annrng,q.oprint);
 
-  //mcmc variables and arrays
-  double chi_min=1.0E+4; 
-  double tchi_min=chi_min;
-  vector<int>::const_iterator p;
-
-  double *setvars[q.nparams];
-  ParameterSettings pset(q.nparams);
-  
-  //moved these from lower in the code as "goto" objects if it jumps over some declarations
-  unique_ptr<string[]> parnames (new string[q.nparams]);
-  vector<double> results,means(q.nparams);
-
-  if(simonly) 
-    {
-      saved = survey.save(q.outfile,simonly);
-      goto skipmccheck;
+  if(q.simflag){ //observations not provided
+    LOG_CRITICAL(printf("Simulating a survey only \n"));
+    //run number of simulations to get counts range
+    for(unsigned long i=1;i<q.nsim;i++){      
+      output=survey.simulate();
+      final_counts.add_link(output.dnds,output.chisqr);
     }
+    LOG_DEBUG(printf("Saving Output\n"));
+    saved = survey.save(q.outfile);
+    LOG_DEBUG(printf("Saving Counts\n"));
+    saved &= final_counts.save(q.outfile,countnames);
+  }
+  else{    
 
-  if(q.nparams > 0){
-    double ptemp[q.nchain][q.nparams];
-    vector<double > means(q.nparams);
-    double pcurrent[q.nchain][q.nparams];
-
-    LOG_DEBUG(printf("Initializing Chains\n"));
-    for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
-      setvars[pi] = &(lpars[*p]);
-      pcurrent[0][pi] = *(setvars[pi]);
-      pset.set(pi,lmin[*p],lmax[*p],(lmax[*p] - lmin[*p])/6.0,lpars[*p]);
-    }
-    if(q.vary_cexp){
-      setvars[q.cind] = &CE;
-      pcurrent[0][q.cind] = *(setvars[pi]);
-      pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/6.0,CE);
-    }
+    MCChains mcchain(q.nchain,q.nparams,q.runs,q.conv_step);
+    MCChains burnchain(q.nchain,q.nparams,q.runs,q.conv_step);
+    mcchain.set_constraints(q.rmax,q.a_ci);
+    burnchain.set_constraints(q.rmax,q.a_ci);
     
-    for(m=1;m<q.nchain;m++){ 
-      for(pi=0;pi<q.nparams;pi++)
-	pcurrent[m][pi] = rng.flat(pset.min[pi],pset.max[pi]);
-    }
+    //mcmc variables and arrays
+    double chi_min=1.0E+4; 
+    double tchi_min=chi_min;
+    vector<int>::const_iterator p;
     
-    LOG_INFO(printf("\n ---------- Beginning MC Burn-in Phase ---------- \n"));
-    i=0;
-    for (i=0;i<q.burn_num;i++){
-      for (m=0;m<q.nchain;m++){
+    double *setvars[q.nparams];
+    ParameterSettings pset(q.nparams);
+    
+    unique_ptr<string[]> parnames (new string[q.nparams]);
+    vector<double> results,means(q.nparams);
+    
+    ResultChain counts(3,q.nchain*q.runs);
+    MetropSampler metrop(q.nchain,q.tmax,q.tscale,q.idealpct,q.annrng,q.oprint);
+    
 
-	vector<double> results;
-	for(pi=0;pi<q.nparams;pi++)
-	  means[pi] = pcurrent[m][pi];
-	rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
-	for(pi = 0;pi<q.nparams;pi++){
-	  *(setvars[pi]) = ptemp[m][pi] = results[pi];
-	}
-	
-	LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
-	for(pi=0;pi<LUMPARS;pi++)
-	  LOG_DEBUG(printf(" %5.2lf",lpars[pi]));
-	  LOG_DEBUG(printf(" %5.2lf : ",(q.vary_cexp ? ptemp[m][q.cind] : CE)));
-	
-	lf.set_params(lpars);
-	survey.set_color_exp(CE);
-	
-	output=survey.simulate(simonly);
-
-	trial=output.chisqr;
-	
-	LOG_DEBUG(printf("Iteration Chi-Square: %lf",trial));      
-	if(trial < chi_min){
-	  LOG_DEBUG(printf(" -- Current Best Trial"));
-	  chi_min=trial;
-	  for(pi=0;pi<q.nparams;pi++)
-	    pset.best[pi]=ptemp[m][pi];
-	}
-	LOG_DEBUG(printf("\n"));
-	
-	accept = metrop.accept(m,trial);
-	if(accept)
-	  for(pi=0;pi<q.nparams;pi++)
-	    pcurrent[m][pi]=ptemp[m][pi];
-	
-	burnchain.add_link(m,ptemp[m],trial,accept);
+    if(q.nparams > 0){ //observations provided, all parameters fixed
+      double ptemp[q.nchain][q.nparams];
+      vector<double > means(q.nparams);
+      double pcurrent[q.nchain][q.nparams];
+      
+      LOG_DEBUG(printf("Initializing Chains\n"));
+      for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
+	setvars[pi] = &(lpars[*p]);
+	pcurrent[0][pi] = *(setvars[pi]);
+	pset.set(pi,lmin[*p],lmax[*p],(lmax[*p] - lmin[*p])/6.0,lpars[*p]);
+      }
+      if(q.vary_cexp){
+	setvars[q.cind] = &CE;
+	pcurrent[0][q.cind] = *(setvars[pi]);
+	pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/6.0,CE);
       }
       
-      if(((i+1) % q.burn_step) == 0){
-	LOG_INFO(printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature()));
-	LOG_INFO(printf("Covariance Matrix:\n"));
-	for(int pi=0;pi<pset.covar.size();pi++){
-	  LOG_INFO(printf("\t["));
-	  for(int pj=0;pj<pset.covar[pi].size();pj++)
-	    LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
+      for(m=1;m<q.nchain;m++){ 
+	for(pi=0;pi<q.nparams;pi++)
+	  pcurrent[m][pi] = rng.flat(pset.min[pi],pset.max[pi]);
+      }
+      
+      LOG_INFO(printf("\n ---------- Beginning MC Burn-in Phase ---------- \n"));
+      i=0;
+      for (i=0;i<q.burn_num;i++){
+	for (m=0;m<q.nchain;m++){
+	  
+	  vector<double> results;
+	  for(pi=0;pi<q.nparams;pi++)
+	    means[pi] = pcurrent[m][pi];
+	  rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+	  for(pi = 0;pi<q.nparams;pi++){
+	    *(setvars[pi]) = ptemp[m][pi] = results[pi];
+	  }
+	  
+	  LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
+	  for(pi=0;pi<LUMPARS;pi++)
+	    LOG_DEBUG(printf(" %5.2lf",lpars[pi]));
+	  LOG_DEBUG(printf(" %5.2lf : ",(q.vary_cexp ? ptemp[m][q.cind] : CE)));
+	  
+	  lf.set_params(lpars);
+	  survey.set_color_exp(CE);
+	  
+	  output=survey.simulate();
+	  
+	  trial=output.chisqr;
+	  
+	  LOG_DEBUG(printf("Iteration Chi-Square: %lf",trial));      
+	  if(trial < chi_min){
+	    LOG_DEBUG(printf(" -- Current Best Trial"));
+	    chi_min=trial;
+	    for(pi=0;pi<q.nparams;pi++)
+	      pset.best[pi]=ptemp[m][pi];
+	  }
+	  LOG_DEBUG(printf("\n"));
+	  
+	  accept = metrop.accept(m,trial);
+	  if(accept)
+	    for(pi=0;pi<q.nparams;pi++)
+	      pcurrent[m][pi]=ptemp[m][pi];
+	  
+	  burnchain.add_link(m,ptemp[m],trial,accept);
+	}
+	
+	if(((i+1) % q.burn_step) == 0){
+	  LOG_INFO(printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature()));
+	  LOG_INFO(printf("Covariance Matrix:\n"));
+	  for(int pi=0;pi<pset.covar.size();pi++){
+	    LOG_INFO(printf("\t["));
+	    for(int pj=0;pj<pset.covar[pi].size();pj++)
+	      LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
 	    LOG_INFO(printf("]\n"));
 	  }
-	if(not metrop.anneal())
-	  i = q.runs;
-	burnchain.get_stdev(pset.sigma.data());
-	burnchain.get_covariance(pset.covar);
-      }
-    }
-    
-    for(m=0;m<q.nchain;m++)
-      for(pi=0;pi<q.nparams;pi++)
-	pcurrent[m][pi] = pset.best[pi];
-    
-    metrop.reset();
-    
-    LOG_INFO(printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",q.runs));
-    
-    for (i=0;i<q.runs;i++){
-      for (m=0;m<q.nchain;m++){
-
-	vector<double> results;
-	for(pi = 0;pi<q.nparams;pi++)
-	  means[pi] = pcurrent[m][pi];
-	rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
-	for(pi = 0;pi<q.nparams;pi++){
-	  *(setvars[pi]) = ptemp[m][pi] = results[pi];
+	  if(not metrop.anneal())
+	    i = q.runs;
+	  burnchain.get_stdev(pset.sigma.data());
+	  burnchain.get_covariance(pset.covar);
 	}
-		
-	LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
-	for(pi=0;pi<q.nparams;pi++)
-	  LOG_DEBUG(printf(" %lf",ptemp[m][pi]));
-	  LOG_DEBUG(printf(" : "));
-	
-	lf.set_params(lpars);
-	survey.set_color_exp(CE);
-	
-	output=survey.simulate(simonly);
-	trial=output.chisqr;
-	LOG_DEBUG(printf("Model Chi-Square: %lf",trial));
-	
-	accept = metrop.accept(m,trial);
-	
-	mcchain.add_link(m,ptemp[m],trial,accept);
-	counts.add_link(output.dnds,trial);
-	
-	if(accept){
-	  LOG_DEBUG(printf(" -- Accepted\n"));
-	  for(pi=0;pi<q.nparams;pi++)
-	    pcurrent[m][pi]=ptemp[m][pi];
-	}
-	else
-	  LOG_DEBUG(printf(" -- Rejected\n"));
       }
       
-      if(((i+1) % q.conv_step) == 0){
-	LOG_INFO(printf("Checking Convergence\n"));
-	if (i < q.burn_num)
-	  metrop.anneal();
-	mcchain.get_stdev(pset.sigma.data());
-	mcchain.get_covariance(pset.covar);
-	if(mcchain.converged()){
-	  LOG_INFO(printf("Chains Converged!\n"));
-	  i = q.runs;}
-	else
-	  LOG_INFO(printf("Chains Have Not Converged\n"));
-      } 
-    }
-    
-    mcchain.get_best_link(pset.best.data(),chi_min);
-    
-    LOG_INFO(printf("Best fit:\n"));
-    for(pi=0;pi<q.param_inds.size();pi++){
-      lpars[q.param_inds[pi]] = pset.best[pi];
-      LOG_INFO(printf("%s : %lf +\\- %lf\n",pnames[q.param_inds[pi]].c_str(),pset.best[pi],pset.sigma[pi]));
-    }
-    lf.set_params(lpars);
-    if(q.vary_cexp){
-      survey.set_color_exp(pset.best[q.cind]);
-      LOG_DEBUG(printf("CEXP : %lf +\\- %lf\n",pset.best[pi],pset.sigma[pi]));
-    }  
-    LOG_INFO(printf("\nCovariance Matrix:\n"));
-    for(int pi=0;pi<pset.covar.size();pi++){
-      LOG_INFO(printf("\t["));
-      for(int pj=0;pj<pset.covar[pi].size();pj++)
-	LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
+      for(m=0;m<q.nchain;m++)
+	for(pi=0;pi<q.nparams;pi++)
+	  pcurrent[m][pi] = pset.best[pi];
+      
+      metrop.reset();
+      
+      LOG_INFO(printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",q.runs));
+      
+      for (i=0;i<q.runs;i++){
+	for (m=0;m<q.nchain;m++){
+	  
+	  vector<double> results;
+	  for(pi = 0;pi<q.nparams;pi++)
+	    means[pi] = pcurrent[m][pi];
+	  rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+	  for(pi = 0;pi<q.nparams;pi++){
+	    *(setvars[pi]) = ptemp[m][pi] = results[pi];
+	  }
+	  
+	  LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
+	  for(pi=0;pi<q.nparams;pi++)
+	    LOG_DEBUG(printf(" %lf",ptemp[m][pi]));
+	  LOG_DEBUG(printf(" : "));
+	  
+	  lf.set_params(lpars);
+	  survey.set_color_exp(CE);
+	  
+	  output=survey.simulate();
+	  trial=output.chisqr;
+	  LOG_DEBUG(printf("Model Chi-Square: %lf",trial));
+	  
+	  accept = metrop.accept(m,trial);
+	  
+	  mcchain.add_link(m,ptemp[m],trial,accept);
+	  counts.add_link(output.dnds,trial);
+	  
+	  if(accept){
+	    LOG_DEBUG(printf(" -- Accepted\n"));
+	    for(pi=0;pi<q.nparams;pi++)
+	      pcurrent[m][pi]=ptemp[m][pi];
+	  }
+	  else
+	    LOG_DEBUG(printf(" -- Rejected\n"));
+	}
+	
+	if(((i+1) % q.conv_step) == 0){
+	  LOG_INFO(printf("Checking Convergence\n"));
+	  if (i < q.burn_num)
+	    metrop.anneal();
+	  mcchain.get_stdev(pset.sigma.data());
+	  mcchain.get_covariance(pset.covar);
+	  if(mcchain.converged()){
+	    LOG_INFO(printf("Chains Converged!\n"));
+	    i = q.runs;}
+	  else
+	    LOG_INFO(printf("Chains Have Not Converged\n"));
+	} 
+      }
+      
+      mcchain.get_best_link(pset.best.data(),chi_min);
+      
+      LOG_INFO(printf("Best fit:\n"));
+      for(pi=0;pi<q.param_inds.size();pi++){
+	lpars[q.param_inds[pi]] = pset.best[pi];
+	LOG_INFO(printf("%s : %lf +\\- %lf\n",pnames[q.param_inds[pi]].c_str(),pset.best[pi],pset.sigma[pi]));
+      }
+      lf.set_params(lpars);
+      if(q.vary_cexp){
+	survey.set_color_exp(pset.best[q.cind]);
+	LOG_DEBUG(printf("CEXP : %lf +\\- %lf\n",pset.best[pi],pset.sigma[pi]));
+      }  
+      LOG_INFO(printf("\nCovariance Matrix:\n"));
+      for(int pi=0;pi<pset.covar.size();pi++){
+	LOG_INFO(printf("\t["));
+	for(int pj=0;pj<pset.covar[pi].size();pj++)
+	  LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
         LOG_INFO(printf("]\n"));
+      }
+      
+      LOG_INFO(printf("Final Acceptance Rate: %lf%%\n",metrop.mean_acceptance()*100));
     }
     
-    LOG_INFO(printf("Final Acceptance Rate: %lf%%\n",metrop.mean_acceptance()*100));
+    LOG_INFO(printf("\nRunning Best Fit...\n"));
+    output=survey.simulate();
+    tchi_min = output.chisqr;
+    LOG_INFO(printf("Saving Initial Survey\n"));
+    saved = survey.save(q.outfile);
+
+    //vector<double> results,means(q.nparams);
+    for(pi = 0;pi<q.nparams;pi++)
+      means[pi] = pset.best[pi];
+    
+    for(unsigned long i=1;i<q.nsim;i++){
+      rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+      for(pi = 0;pi<q.nparams;pi++){
+	*(setvars[pi]) = results[pi];
+      }
+      
+      lf.set_params(lpars);
+      survey.set_color_exp(CE);
+      
+      output=survey.simulate();
+      if(output.chisqr < tchi_min){
+	tchi_min = output.chisqr;
+	LOG_INFO(printf("Saving new minimum (%lu/%lu)...",i,q.nsim));
+	saved = survey.save(q.outfile);
+      }
+      final_counts.add_link(output.dnds,output.chisqr);
+    }
+    LOG_INFO(printf("Saved Chi2: %lf (%lf)\n",tchi_min,chi_min));
+    
+    for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
+      parnames[pi] = pnames[*p];
+    if(q.vary_cexp)
+      parnames[q.cind] = "CEXP";
+    
+    LOG_DEBUG(printf("Saving Chains\n"));
+    saved &= mcchain.save(q.outfile,parnames.get());
+    LOG_DEBUG(printf("Saving Counts\n"));
+    saved &= counts.save(q.outfile,countnames);
+    LOG_DEBUG(printf("Saving Final Counts\n"));
+    saved &= final_counts.save(q.outfile,countnames,"Counts Monte Carlo");
   }
-
-  LOG_INFO(printf("\nRunning Best Fit...\n"));
-  output=survey.simulate(simonly);
-  tchi_min = output.chisqr;
-  LOG_INFO(printf("Saving Initial Survey\n"));
-  saved = survey.save(q.outfile,simonly);
-
-  //vector<double> results,means(q.nparams);
-  for(pi = 0;pi<q.nparams;pi++)
-    means[pi] = pset.best[pi];
   
-  for(unsigned long i=1;i<q.nsim;i++){
-    rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
-    for(pi = 0;pi<q.nparams;pi++){
-      *(setvars[pi]) = results[pi];
-    }
-    
-    lf.set_params(lpars);
-    survey.set_color_exp(CE);
-    
-    output=survey.simulate(simonly);
-    if(output.chisqr < tchi_min){
-      tchi_min = output.chisqr;
-      LOG_INFO(printf("Saving new minimum (%lu/%lu)...",i,q.nsim));
-      saved = survey.save(q.outfile,simonly);
-    }
-    final_counts.add_link(output.dnds,output.chisqr);
-  }
-  LOG_INFO(printf("Saved Chi2: %lf (%lf)\n",tchi_min,chi_min));
-  
-  for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
-    parnames[pi] = pnames[*p];
-  if(q.vary_cexp)
-    parnames[q.cind] = "CEXP";
-  
-  LOG_DEBUG(printf("Saving Chains\n"));
-  saved &= mcchain.save(q.outfile,parnames.get());
-  LOG_DEBUG(printf("Saving Counts\n"));
-  saved &= counts.save(q.outfile,countnames);
-  LOG_DEBUG(printf("Saving Final Counts\n"));
-  saved &= final_counts.save(q.outfile,countnames,"Counts Monte Carlo");
-  
- skipmccheck:
-
-  if(simonly)
-    {
-      LOG_DEBUG(printf("Saving Counts\n"));
-      saved &= counts.save(q.outfile,countnames);
-    }
   saved ? printf("Save Successful") : printf("Save Failed");
 
   LOG_CRITICAL(printf("\nFitting Complete\n\n"));

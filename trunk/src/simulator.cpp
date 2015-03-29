@@ -1,32 +1,17 @@
 #include "simulator.h"
 
-//simulator::simulator() : color_exp(0.0),
-//			 area(3.046174e-4), //default to 1sq degree
-//			 dz(0.1),
-//			 zmin(0.1), 
-//			 nz(59),
-//			 obsFile(""){
-  
-//  filters[0] = "F1";
-//  filters[1] = "F2";
-//  filters[2] = "F3";
-  
-//  axes[0] = ColorF1F3;
-//  axes[1] = ColorF2F3;
-//}
-
-//simulator::simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]) : simulator(){
- 
-//  modelFile = modelfile;
-//  set_sed_lib(sedfile);
-//  this->axes[0] = axes[0];
-//  this->axes[1] = axes[1];
-//  set_obs(obsfile);
-  
-//}
-
 //Lets assume we always have configuration so no need to have a "default" mode
-simulator::simulator(const Configuration &config,bool simflag){// : simulator(){
+simulator::simulator(const Configuration &config){
+  filters[0] = "F1";
+  filters[1] = "F2";
+  filters[2] = "F3";
+  obsFile="";  
+  color_exp=0.0; //default color evolution
+
+  configure(config);
+}
+
+void simulator::configure(const Configuration &config){
   logflag=config.oprint;
 
   modelFile = config.modfile;
@@ -38,40 +23,46 @@ simulator::simulator(const Configuration &config,bool simflag){// : simulator(){
   nz = (config.nz > 1) ? config.nz : 50;
   last_output.dndz.resize(nz);
     
-  set_sed_lib(config.sedfile);
+  seds.reset(new sed_lib(config.sedfile, nz, zmin, dz));
+  seds->load_filters(modelFile,logflag);
+  seds->get_filter_info(filters,flux_limits,band_errs);
   axes[0] = config.axes[0];
   axes[1] = config.axes[1];
-  set_obs(config.obsfile);
-}
+  
+  simflag=config.simflag;
 
-bool simulator::load_filters(string file,int logflag){
-  return seds->load_filters(file,logflag);
-}
-
-//void simulator::set_diagnostic_xaxis(axis_type option){
-//  axes[0] = option;
-//  reset_obs();
-//}
-
-//void simulator::set_diagnostic_yaxis(axis_type option){
-//  axes[1] = option;
-//  reset_obs();
-//}
-
-void simulator::set_diagnostic_axes(axis_type xopt, axis_type yopt){
-  axes[0] = xopt;
-  axes[1] = yopt;
-  reset_obs();
-}
-
-void simulator::set_size(double area,double dz,double zmin,int nz){
-  this->area = (area > 0) ? ((area < 41254.0) ? area : 41253.0) : 1;
-  this->dz = (dz > 0) ? dz : 0.1;
-  this->zmin = (zmin > 0.001) ? zmin : 0.001;
-  this->nz = (nz > 1) ? nz : 50;
-
-  last_output.dndz.resize(nz);
-  initialize_counts();
+  if( not simflag ){
+    if(config.obsfile != ""){
+      obsFile=config.obsfile;
+      diagnostic.reset(new hist_lib());
+      observations.reset(new obs_lib(obsFile, axes));
+      
+      double *x,*y;
+      int osize = observations->get_snum();
+      observations->get_all_colors(x,y);
+      diagnostic->init_obs(x,y,osize);
+    
+      last_output.chisqr=0;  
+      valarray<double> fluxes[3];
+      for(int i=0;i<3;i++){
+	fluxes[i].resize(osize,0.0);
+	for(int j=0;j<osize;j++)
+	  fluxes[i][j] = observations->get_flux(j,i);
+	counts[i].reset(new NumberCounts(fluxes[i],area,filters[i]));
+	last_output.dnds[i].resize(counts[i]->bins().size());
+      }
+    }
+    else{
+      LOG_CRITICAL(printf("simulator::configure Error: tried to set obs_lib with empty file name\n"));
+    }
+  }
+  else{ //no observations, will be initialized at first simulation
+    last_output.chisqr=-1;
+    for(int i=0;i<3;i++){
+      counts[i].reset();
+      last_output.dnds[i].resize(0);
+    }
+  }
 }
 
 void simulator::set_color_exp(double val, double zcut){
@@ -85,31 +76,6 @@ void simulator::set_lumfunct(lumfunct *lf){
   }
   else
     cout << "ERROR: NULL Pointer Passed to Simulator" << endl;
-}
-
-void simulator::initialize_filters(int logflag){
-
-  if((seds.get() != NULL) and (observations.get() != NULL)){    
-    seds->load_filters(modelFile,logflag);
-  }
-  
-}
-
-void simulator::initialize_counts(){
-  if(observations.get() != NULL){
-    
-    int osize = observations->get_snum();
-    valarray<double> fluxes[3];
-
-    for(int i=0;i<3;i++){
-      fluxes[i].resize(osize,0.0);
-      for(int j=0;j<osize;j++)
-	fluxes[i][j] = observations->get_flux(j,i);
-      counts[i].reset(new NumberCounts(fluxes[i],area,filters[i]));
-      last_output.dnds[i].resize(counts[i]->bins().size());
-    }
-
-  }
 }
 
 long simulator::num_sources(double z, double l, double dl){
@@ -145,40 +111,7 @@ long simulator::num_sources(double z, double l, double dl){
   return retval;
 }
 
-
-void simulator::set_sed_lib(string sedfile){
-  seds.reset(new sed_lib(sedfile, nz, zmin, dz));
-  initialize_filters(logflag);
-}
-
-void simulator::set_obs(string obsfile){
-  if(obsfile != ""){
-    obsFile=obsfile;
-    reset_obs();
-    
-    observations->info(filters,flux_limits,band_errs);
-    initialize_filters(logflag);
-    
-    last_output.chisqr=0;  
-    initialize_counts();
-  }
-  else
-    LOG_CRITICAL(printf("simulator::set_obs Error: tried to set obs_lib with empty file name\n"));
-}
-
-void simulator::reset_obs(){
-  if(obsFile != ""){
-    diagnostic.reset(new hist_lib());
-    observations.reset(new obs_lib(obsFile, axes));
-    
-    double *x,*y;
-    int osize = observations->get_snum();
-    observations->get_all_colors(x,y);
-    diagnostic->init_obs(x,y,osize);
-  }
-}
-
-products simulator::simulate(bool simflag){
+products simulator::simulate(){
   //the "sources" structure holds the simulated sources
   sources.clear();
   int ns[] = {static_cast<int>(counts[0]->bins().size()),
@@ -219,26 +152,34 @@ products simulator::simulate(bool simflag){
   for (is=0;is<nz;is++){
 
     zarray[is]=(is)*dz+zmin;    
-    
+
+    // here we determine minimum luminosity to attempt to simulate
     jsmin = 0;
     for (js=0;js<lnum;js++){
-      fagn=fagns->get_agn_frac(lums[js],zarray[is]);
-      random_sed=rng.flat(0,1);
-      if(random_sed > fagn) sedtype=0;
-      if(random_sed <= fagn) sedtype=1;
-      flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],sedtype,0);
-      if(flux_sim[0]>=flux_limits[0]){
-	jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
-	js = lnum; //break out of loop
-      };
-    };
+      // look at all SED types; don't want to bias by ignoring certain types
+      for(int stype=0;stype<AGNTYPES;stype++){
+	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
+	if(flux_sim[0]>=flux_limits[0]){
+	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
+	  js = lnum; //break out of loop
+	}
+      }
+    }
     
     for (js=jsmin;js<lnum;js++){
       nsrcs = num_sources(zarray[is],lums[js],dl);
       
       for (src_iter=0;src_iter<nsrcs;src_iter++){
 	detected = true;
-
+	//determine sedtype (agn type)
+	fagn=fagns->get_agn_frac(lums[js],zarray[is]);
+	random_sed=rng.flat(0,1);
+	if(random_sed > fagn) 
+	  sedtype=0;
+	else 
+	  sedtype=1;
+	
+	//get uniformly distributed luminosity and redshift
 	if(js == 0)
 	  tL=rng.flat(lums[js],lums[js]+dl/2.0);
 	else if (js == lnum-1)
@@ -270,7 +211,7 @@ products simulator::simulate(bool simflag){
   }
   
   //=========================================================================
-  // generate diagnostic color-color plots
+  // generate diagnostic plots
   //*************************************************************************
   
   int snum(sources.size());
@@ -288,28 +229,52 @@ products simulator::simulate(bool simflag){
     f2[i] = sources[i].fluxes[1];
     f3[i] = sources[i].fluxes[2];
   }
-  
-  if(!simflag)
-    {
-      diagnostic->init_model(c1.data(),c2.data(),w.data(),snum);
-      output.chisqr=diagnostic->get_chisq();
-      //last_output = output;
+
+  if(simflag){ //if not comparing to observations
+    for(int i=0;i<3;i++){ //for each band
+      if(not counts[i]){ //if counts not initialized
+	//initialize counts based on simulated fluxes
+	switch(i){
+	case 0:
+	  counts[i].reset(new NumberCounts(f1,area,filters[i]));
+	  break;
+	case 1:
+	  counts[i].reset(new NumberCounts(f2,area,filters[i]));
+	  break;
+	case 2:
+	  counts[i].reset(new NumberCounts(f3,area,filters[i]));
+	  break;
+	}
+	//resize output
+	last_output.dnds[i].resize(counts[i]->bins().size());
+      }
     }
+  }
+  else{ //comparing to observations; get diagnostics
+    diagnostic->init_model(c1.data(),c2.data(),w.data(),snum);
+    output.chisqr=diagnostic->get_chisq();
+  }
+
+  //compute counts
   counts[0]->compute(f1,area,output.dnds[0]);
   counts[1]->compute(f2,area,output.dnds[1]);
   counts[2]->compute(f3,area,output.dnds[2]);
 
-  last_output = output; //seems below like this is where the observed counts are, is that right?
+  //store last computed modeled counts
+  last_output = output;
   
   return output;
 }
 
 
-bool simulator::save(string outfile,bool simflag){
+bool simulator::save(string outfile){
   LOG_DEBUG(printf("Simflag in simulator:save %s \n", simflag ? "true" : "false"));
 
   try{
-    bool opened =  diagnostic->write_fits(outfile);
+    bool opened = true;
+    if(not simflag){ //if there are observations, save diagnostics
+      opened = diagnostic->write_fits(outfile);
+    }
     
     if(not opened)
       return opened;
@@ -427,14 +392,14 @@ bool simulator::save(string outfile,bool simflag){
       newTable->column(colname[6]).write(counts2,1);
       newTable->column(colname[7]).write(counts3,1);
       
-      newTable->column(colname[8]).write(counts[0]->counts(),1);
-      newTable->column(colname[9]).write(counts[1]->counts(),1);
-      newTable->column(colname[10]).write(counts[2]->counts(),1);
+      newTable->column(colname[8]).write(last_output.dnds[0],1);
+      newTable->column(colname[9]).write(last_output.dnds[1],1);
+      newTable->column(colname[10]).write(last_output.dnds[2],1);
 
       if(!simflag){
-	newTable->column(colname[11]).write(last_output.dnds[0],1);
-	newTable->column(colname[12]).write(last_output.dnds[1],1);
-	newTable->column(colname[13]).write(last_output.dnds[2],1);
+	newTable->column(colname[11]).write(counts[0]->counts(),1);
+	newTable->column(colname[12]).write(counts[1]->counts(),1);
+	newTable->column(colname[13]).write(counts[2]->counts(),1);
       }
     }
     catch(...){
@@ -451,8 +416,6 @@ bool simulator::save(string outfile,bool simflag){
   return true;
 }
   
-
-
 simulator::~simulator(){
 
 }

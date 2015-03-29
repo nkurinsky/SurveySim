@@ -9,6 +9,7 @@ trunk/filters/Makefile
 trunk/idl/Makefile
 trunk/templates/Makefile
 trunk/lib_aux/Makefile
+trunk/src/SurveySim
 
 trunk/config.log
 trunk/config.status

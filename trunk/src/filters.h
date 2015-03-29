@@ -26,6 +26,9 @@ class filter{
   double transmission(double wavelength);
   double low();
   double high();
+  string get_name(){
+    return name;
+  }
   void print(bool all=false);
   ~filter();
  private:
@@ -48,9 +51,12 @@ class filter_lib{
   bool init(){
     return initialized;}
   bool load_filters(string fitsfile,int logflag);
+  void filter_info(string names[], double fluxLimits[], double fluxErrors[]);
   filter& get(short num);
  private:
   filter filters[3];
+  double limits[3];
+  double errors[3];
   filter dummy;
   bool initialized;
 };

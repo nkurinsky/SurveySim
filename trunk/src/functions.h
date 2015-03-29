@@ -92,6 +92,7 @@ public:
   string sedfile;
   
   bool vary_cexp;
+  bool simflag;
   int oprint;
 
   int nz;
@@ -133,7 +134,7 @@ public:
   colsel_type colsel;
 
 private:
-void load();
+  void load();
 
 };
 

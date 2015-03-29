@@ -14,6 +14,8 @@
 #include "numberCounts.h"
 #include "simulator_utils.h"
 
+#define AGNTYPES 2
+
 class simulator{
 private:
   products last_output;
@@ -38,28 +40,17 @@ private:
   string modelFile;
   axis_type axes[2];
   RandomNumberGenerator rng;
-  void initialize_filters(int logflag);
-  void initialize_counts();
   long num_sources(double z, double l, double dl);
+  void reset();
+  bool simflag; //if true, observations ignored
  public:
-  //simulator();
-  bool simflag;
-  simulator(const Configuration &config,bool simflag);
-  //  simulator(string modelfile, string obsfile, string sedfile, axis_type axes[]);
-  bool load_filters(string file,int logflag);
-  void set_diagnostic_xaxis(axis_type option);
-  void set_diagnostic_yaxis(axis_type option);
-  void set_diagnostic_axes(axis_type xopt, axis_type yopt);
-  void set_size(double area,double dz,double zmin,int nz);
+  simulator(const Configuration &config);
+  void configure(const Configuration &config);
   void set_color_exp(double val, double zcut=1000);
   void set_lumfunct(lumfunct *lf);
-  void set_sed_lib(string sedfile);
-  void set_obs(string obsfile);
-  void reset_obs();
-  void reset();
-  products simulate(bool simflag);
+  products simulate();
   double model_chisq() { return last_output.chisqr; }
-  bool save(string outfile,bool simflag);
+  bool save(string outfile);
   ~simulator();  
 };
 

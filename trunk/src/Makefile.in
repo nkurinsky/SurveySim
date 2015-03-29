@@ -76,7 +76,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = fitter$(EXEEXT)
+bin_PROGRAMS = SurveySim$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -89,13 +89,13 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_fitter_OBJECTS = agn_frac.$(OBJEXT) main.$(OBJEXT) cosmo.$(OBJEXT) \
-	functions.$(OBJEXT) filters.$(OBJEXT) hist_lib.$(OBJEXT) \
-	lumfunct.$(OBJEXT) mc_util.$(OBJEXT) obs_lib.$(OBJEXT) \
-	sed_lib.$(OBJEXT) simulator.$(OBJEXT) \
+am_SurveySim_OBJECTS = agn_frac.$(OBJEXT) main.$(OBJEXT) \
+	cosmo.$(OBJEXT) functions.$(OBJEXT) filters.$(OBJEXT) \
+	hist_lib.$(OBJEXT) lumfunct.$(OBJEXT) mc_util.$(OBJEXT) \
+	obs_lib.$(OBJEXT) sed_lib.$(OBJEXT) simulator.$(OBJEXT) \
 	simulator_utils.$(OBJEXT) numberCounts.$(OBJEXT)
-fitter_OBJECTS = $(am_fitter_OBJECTS)
-fitter_DEPENDENCIES = ./alg_lib/libalglib.a
+SurveySim_OBJECTS = $(am_SurveySim_OBJECTS)
+SurveySim_DEPENDENCIES = ./alg_lib/libalglib.a
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -137,8 +137,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(fitter_SOURCES)
-DIST_SOURCES = $(fitter_SOURCES)
+SOURCES = $(SurveySim_SOURCES)
+DIST_SOURCES = $(SurveySim_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -302,8 +302,8 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTION = foreign
 SUBDIRS = alg_lib
 AM_CXXFLAGS = -Wall -I/usr/local/include -I./ -I./alg_lib -std=c++11
-fitter_SOURCES = agn_frac.h constants.h cosmo.h functions.h filters.h hist_lib.h lumfunct.h mc_util.h obs_lib.h sed_lib.h simulator.h simulator_utils.h numberCounts.h agn_frac.cpp main.cpp cosmo.cpp functions.cpp filters.cpp hist_lib.cpp lumfunct.cpp mc_util.cpp obs_lib.cpp sed_lib.cpp simulator.cpp simulator_utils.cpp numberCounts.cpp
-fitter_LDADD = ./alg_lib/libalglib.a
+SurveySim_SOURCES = agn_frac.h constants.h cosmo.h functions.h filters.h hist_lib.h lumfunct.h mc_util.h obs_lib.h sed_lib.h simulator.h simulator_utils.h numberCounts.h agn_frac.cpp main.cpp cosmo.cpp functions.cpp filters.cpp hist_lib.cpp lumfunct.cpp mc_util.cpp obs_lib.cpp sed_lib.cpp simulator.cpp simulator_utils.cpp numberCounts.cpp
+SurveySim_LDADD = ./alg_lib/libalglib.a
 all: all-recursive
 
 .SUFFIXES:
@@ -381,9 +381,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-fitter$(EXEEXT): $(fitter_OBJECTS) $(fitter_DEPENDENCIES) $(EXTRA_fitter_DEPENDENCIES) 
-	@rm -f fitter$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(fitter_OBJECTS) $(fitter_LDADD) $(LIBS)
+SurveySim$(EXEEXT): $(SurveySim_OBJECTS) $(SurveySim_DEPENDENCIES) $(EXTRA_SurveySim_DEPENDENCIES) 
+	@rm -f SurveySim$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(SurveySim_OBJECTS) $(SurveySim_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

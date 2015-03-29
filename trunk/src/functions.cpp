@@ -108,21 +108,38 @@ string toLower(const string &oldstr){
 }
 
 Configuration::Configuration(int argc, char *argv[]){
-  if(argc < 4){
+  if(argc < 3){
     printf("ERROR: Invalid number of arguments.\n");
-    printf("Calling sequence should be \"%s obsfile modfile sedfile [output]\"\n",argv[0]);
+    printf("Calling sequence should be \"%s modfile sedfile [obsfile] [-o output]\"\n",argv[0]);
     exit(1);
   }
   
   //File names passed in by Widget
-  obsfile = argv[1];
-  modfile = argv[2];
-  sedfile = argv[3];
+  modfile = argv[1];
+  sedfile = argv[2];
+  outfile="output.fits";
   //If outfile specified as argument, change from default
-  if(argc > 4)
-    outfile = argv[4];
-  else
-    outfile = "output.fits";
+  int i=3;
+  while(i<argc){
+    if((argv[i][0] == '-') and (argv[i][1] == 'o')){
+      if(i+1 < argc){
+	outfile = argv[i+1];
+	i+=2;
+      }
+      else{
+	fprintf(stderr,"ERROR: Please enter output file name after -o\n");
+	exit(1);
+      }
+    }
+    else if (i == 3){
+      obsfile=argv[i];
+      i++;
+    }
+    else{
+      fprintf(stderr,"ERROR: Unkown argument \"%s\" after obsfile argument\n",argv[i]);
+      exit(1);
+    }
+  }
   
   load();
 }
@@ -317,6 +334,7 @@ void Configuration::load(){
     vary_cexp = false;
   
   burn_num = runs/burn_ratio;
+  simflag = (nparams <= 0);
 }
 
 RandomNumberGenerator::RandomNumberGenerator(){
