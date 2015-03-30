@@ -120,6 +120,8 @@ Configuration::Configuration(int argc, char *argv[]){
   outfile="output.fits";
   //If outfile specified as argument, change from default
   int i=3;
+
+  simflag=true;
   while(i<argc){
     if((argv[i][0] == '-') and (argv[i][1] == 'o')){
       if(i+1 < argc){
@@ -132,6 +134,7 @@ Configuration::Configuration(int argc, char *argv[]){
       }
     }
     else if (i == 3){
+      simflag=false;
       obsfile=argv[i];
       i++;
     }
@@ -263,15 +266,6 @@ void Configuration::load(){
     printf("Value of \"COLSEL\" invalid, defaulting to None\n");
   }
 
-  //Read-in survey settings
-  // tab.readKey("limit1",limits[0]);
-  //tab.readKey("limit2",limits[1]);
-  //tab.readKey("limit3",limits[2]);
-
-  //tab.readKey("units1",units[0]);
-  //tab.readKey("units2",units[1]);
-  //tab.readKey("units3",units[2]);
-
   double rtemp;
   //Read in simulation settings
   tab.readKey("RUNS",rtemp);
@@ -334,7 +328,6 @@ void Configuration::load(){
     vary_cexp = false;
   
   burn_num = runs/burn_ratio;
-  simflag = (nparams <= 0);
 }
 
 RandomNumberGenerator::RandomNumberGenerator(){

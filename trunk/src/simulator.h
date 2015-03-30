@@ -43,6 +43,7 @@ private:
   long num_sources(double z, double l, double dl);
   void reset();
   bool simflag; //if true, observations ignored
+  void initial_simulation();
  public:
   simulator(const Configuration &config);
   void configure(const Configuration &config);

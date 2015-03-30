@@ -22,6 +22,7 @@ void simulator::configure(const Configuration &config){
   zmin = (config.zmin > 0.001) ? config.zmin : 0.001;
   nz = (config.nz > 1) ? config.nz : 50;
   last_output.dndz.resize(nz);
+  last_output.chisqr=0;    
     
   seds.reset(new sed_lib(config.sedfile, nz, zmin, dz));
   seds->load_filters(modelFile,logflag);
@@ -42,7 +43,6 @@ void simulator::configure(const Configuration &config){
       observations->get_all_colors(x,y);
       diagnostic->init_obs(x,y,osize);
     
-      last_output.chisqr=0;  
       valarray<double> fluxes[3];
       for(int i=0;i<3;i++){
 	fluxes[i].resize(osize,0.0);
@@ -57,7 +57,6 @@ void simulator::configure(const Configuration &config){
     }
   }
   else{ //no observations, will be initialized at first simulation
-    last_output.chisqr=-1;
     for(int i=0;i<3;i++){
       counts[i].reset();
       last_output.dnds[i].resize(0);
@@ -111,18 +110,143 @@ long simulator::num_sources(double z, double l, double dl){
   return retval;
 }
 
+void simulator::initial_simulation(){
+  
+  int is,js,jsmin;
+  int lnum = seds->get_lnum();
+  double dl = seds->get_dl();
+  long nsrcs;
+  double lums[lnum];
+  double zarray[nz];
+  double fagn,random_sed;
+  short sedtype; // this holds the id of the SED type 
+  
+  seds->get_lums(lums);
+  
+  //=========================================================================
+  // for each L-z depending on the number of sources, sample the SED and get 
+  // the appropriate fluxes
+  //*************************************************************************
+  
+  static double flux_sim[3], flux_raw[3];
+  static sprop *temp_src;
+  static int src_iter;
+  static bool detected = true;    
+
+  static double tL,tZ;
+  
+  //NOTE templates are given in W/Hz
+  for (is=0;is<nz;is++){
+
+    zarray[is]=(is)*dz+zmin;    
+
+    // here we determine minimum luminosity to attempt to simulate
+    jsmin = 0;
+    for (js=0;js<lnum;js++){
+      // look at all SED types; don't want to bias by ignoring certain types
+      for(int stype=0;stype<AGNTYPES;stype++){
+	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
+	if(flux_sim[0]>=flux_limits[0]){
+	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
+	  js = lnum; //break out of loop
+	}
+      }
+    }
+    
+    for (js=jsmin;js<lnum;js++){
+      nsrcs = num_sources(zarray[is],lums[js],dl);
+      
+      for (src_iter=0;src_iter<nsrcs;src_iter++){
+	detected = true;
+	//determine sedtype (agn type)
+	fagn=fagns->get_agn_frac(lums[js],zarray[is]);
+	random_sed=rng.flat(0,1);
+	if(random_sed > fagn) 
+	  sedtype=0;
+	else 
+	  sedtype=1;
+	
+	//get uniformly distributed luminosity and redshift
+	if(js == 0)
+	  tL=rng.flat(lums[js],lums[js]+dl/2.0);
+	else if (js == lnum-1)
+	  tL=rng.flat(lums[js]-dl/2.0,lums[js]);
+	else
+	  tL=rng.flat(lums[js]-dl/2.0,lums[js]+dl/2.0);
+	
+	tZ=rng.flat(zarray[is],zarray[is]+dz);
+
+	for (int i=0;i<3;i++){
+	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
+	}
+
+	for (int i=0;i<3;i++){
+	  flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
+	  if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
+	    detected = false;
+	}
+	
+	//check for detectability, if "Yes" add to list
+	if(detected){
+	  temp_src = new sprop(tZ,flux_sim,tL,axes);
+	  sources.push_back(*temp_src);
+	  delete temp_src;
+	}
+      }
+    }
+  }
+  
+  //=========================================================================
+  // generate diagnostic plots
+  //*************************************************************************
+  
+  int snum(sources.size());
+  valarray<double> f1(0.0,snum);
+  valarray<double> f2(0.0,snum);
+  valarray<double> f3(0.0,snum);
+  for (int i=0;i<snum;i++){
+    f1[i] = sources[i].fluxes[0];
+    f2[i] = sources[i].fluxes[1];
+    f3[i] = sources[i].fluxes[2];
+  }
+
+  for(int i=0;i<3;i++){ //for each band
+    if(not counts[i]){ //if counts not initialized
+      //initialize counts based on simulated fluxes
+      switch(i){
+      case 0:
+	counts[i].reset(new NumberCounts(f1,area,filters[i]));
+	break;
+      case 1:
+	counts[i].reset(new NumberCounts(f2,area,filters[i]));
+	break;
+      case 2:
+	counts[i].reset(new NumberCounts(f3,area,filters[i]));
+	break;
+      }
+      //resize output
+      last_output.dnds[i].resize(counts[i]->bins().size());
+    }
+  }
+}
+
 products simulator::simulate(){
   //the "sources" structure holds the simulated sources
   sources.clear();
+  
+  if(seds.get() == NULL){
+    LOG_CRITICAL(printf("ERROR: NULL Model Library\n"));
+    return last_output;
+  }
+
+  if((not counts[0]) or (not counts[1]) or (not counts[2])){
+    initial_simulation();
+  }
+
   int ns[] = {static_cast<int>(counts[0]->bins().size()),
 	      static_cast<int>(counts[1]->bins().size()),
 	      static_cast<int>(counts[2]->bins().size())};
   products output(nz,ns);
-  
-  if(seds.get() == NULL){
-    LOG_CRITICAL(printf("ERROR: NULL Model Library\n"));
-    return output;
-  }
   
   static int is,js,jsmin;
   
@@ -201,7 +325,7 @@ products simulator::simulate(){
 	
 	//check for detectability, if "Yes" add to list
 	if(detected){
-	  temp_src = new sprop(tZ,flux_sim,tL,1.0,axes);
+	  temp_src = new sprop(tZ,flux_sim,tL,axes);
 	  sources.push_back(*temp_src);
 	  output.dndz[is]++; 
 	  delete temp_src;
@@ -217,41 +341,19 @@ products simulator::simulate(){
   int snum(sources.size());
   vector<double> c1(snum,0.0);
   vector<double> c2(snum,0.0);
-  vector<double> w (snum,0.0);
   valarray<double> f1(0.0,snum);
   valarray<double> f2(0.0,snum);
   valarray<double> f3(0.0,snum);
   for (int i=0;i<snum;i++){
     c1[i] = sources[i].c1;
     c2[i] = sources[i].c2;
-    w[i] = sources[i].weight;
     f1[i] = sources[i].fluxes[0];
     f2[i] = sources[i].fluxes[1];
     f3[i] = sources[i].fluxes[2];
   }
 
-  if(simflag){ //if not comparing to observations
-    for(int i=0;i<3;i++){ //for each band
-      if(not counts[i]){ //if counts not initialized
-	//initialize counts based on simulated fluxes
-	switch(i){
-	case 0:
-	  counts[i].reset(new NumberCounts(f1,area,filters[i]));
-	  break;
-	case 1:
-	  counts[i].reset(new NumberCounts(f2,area,filters[i]));
-	  break;
-	case 2:
-	  counts[i].reset(new NumberCounts(f3,area,filters[i]));
-	  break;
-	}
-	//resize output
-	last_output.dnds[i].resize(counts[i]->bins().size());
-      }
-    }
-  }
-  else{ //comparing to observations; get diagnostics
-    diagnostic->init_model(c1.data(),c2.data(),w.data(),snum);
+  if (not simflag){ //comparing to observations; get diagnostics
+    diagnostic->init_model(c1.data(),c2.data(),snum);
     output.chisqr=diagnostic->get_chisq();
   }
 
@@ -387,16 +489,17 @@ bool simulator::save(string outfile){
       valarray<double> counts1(pow(10,counts[0]->bins()));
       valarray<double> counts2(pow(10,counts[1]->bins()));
       valarray<double> counts3(pow(10,counts[2]->bins()));
-      
-      newTable->column(colname[5]).write(counts1,1);
-      newTable->column(colname[6]).write(counts2,1);
-      newTable->column(colname[7]).write(counts3,1);
-      
-      newTable->column(colname[8]).write(last_output.dnds[0],1);
-      newTable->column(colname[9]).write(last_output.dnds[1],1);
-      newTable->column(colname[10]).write(last_output.dnds[2],1);
 
-      if(!simflag){
+      LOG_DEBUG(printf("Saving Counts\n"));
+      newTable->column(colname[5]).write(counts1,counts1.size(),1);
+      newTable->column(colname[6]).write(counts2,counts2.size(),1);
+      newTable->column(colname[7]).write(counts3,counts3.size(),1);
+      
+      newTable->column(colname[8]).write(last_output.dnds[0],last_output.dnds[0].size(),1);
+      newTable->column(colname[9]).write(last_output.dnds[1],last_output.dnds[1].size(),1);
+      newTable->column(colname[10]).write(last_output.dnds[2],last_output.dnds[2].size(),1);
+
+      if(not simflag){
 	newTable->column(colname[11]).write(counts[0]->counts(),1);
 	newTable->column(colname[12]).write(counts[1]->counts(),1);
 	newTable->column(colname[13]).write(counts[2]->counts(),1);

@@ -3,16 +3,14 @@
 sprop::sprop(){
   redshift = -1;
   luminosity = -1;
-  weight = 0;
   
   c1 = -99.0;
   c2 = -99.0;
 }
 
-sprop::sprop(double z,double f[],double lum, double w, axis_type opts[]) : sprop(){
+sprop::sprop(double z,double f[],double lum, axis_type opts[]) : sprop(){
   redshift = z;
   luminosity = lum;
-  weight = w;
 
   bool do_metrics(true);
   for (int i=0;i<3;i++){
@@ -26,7 +24,6 @@ sprop::sprop(double z,double f[],double lum, double w, axis_type opts[]) : sprop
   }
   
 }
-
 
 products::products(int nz, int ns[]) : chisqr(-1){
   dndz.resize(nz);

@@ -215,10 +215,11 @@ bool sed_lib::load_filters(string file,int lflag_tmp){
 
 void sed_lib::get_filter_info(string names[], double limits[], double errors[]){
   if (filters.init()){
-    printf("ERROR: Filter library not initialized!!!\n");
+    filters.filter_info(names,limits,errors);
   }
   else{
-    filters.filter_info(names,limits,errors);
+    printf("ERROR: Filter library not initialized!!!\n");
+    exit(1);
   }
 }
 

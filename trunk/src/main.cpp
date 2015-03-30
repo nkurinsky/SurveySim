@@ -64,10 +64,15 @@ int main(int argc,char** argv){
   if(q.simflag){ //observations not provided
     LOG_CRITICAL(printf("Simulating a survey only \n"));
     //run number of simulations to get counts range
-    for(unsigned long i=1;i<q.nsim;i++){      
-      output=survey.simulate();
-      final_counts.add_link(output.dnds,output.chisqr);
-    }
+    LOG_CRITICAL(printf("Progress:"));
+    //for(unsigned long i=1;i<q.nsim;i++){      
+    output=survey.simulate();
+    final_counts.add_link(output.dnds,output.chisqr);
+      //  if(i % 10 == 0){
+      //	LOG_CRITICAL(printf("."));
+      //}
+      //    }
+    LOG_CRITICAL(printf("\n"));
     LOG_DEBUG(printf("Saving Output\n"));
     saved = survey.save(q.outfile);
     LOG_DEBUG(printf("Saving Counts\n"));
@@ -95,7 +100,7 @@ int main(int argc,char** argv){
     MetropSampler metrop(q.nchain,q.tmax,q.tscale,q.idealpct,q.annrng,q.oprint);
     
 
-    if(q.nparams > 0){ //observations provided, all parameters fixed
+    if(q.nparams > 0){ //observations provided, not all parameters fixed
       double ptemp[q.nchain][q.nparams];
       vector<double > means(q.nparams);
       double pcurrent[q.nchain][q.nparams];

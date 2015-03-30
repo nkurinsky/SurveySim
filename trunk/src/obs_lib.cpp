@@ -75,21 +75,6 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[]){
 	printf("Keyword EF%sCOL missing from header (%s)\n",num.c_str(),fitsfile.c_str());
 	exit(1);
       }
-      try{table.readKey("F"+num+"MIN",flim[i]);}
-      catch(HDU::NoSuchKeyword){
-	printf("Keyword F%sLIM missing from header (%s)\n",num.c_str(),fitsfile.c_str());
-	exit(1);
-      }
-      try{table.readKey("F"+num+"FILT",filter[i]);}
-      catch(HDU::NoSuchKeyword){
-      	printf("Keyword F%sFILT missing from header (%s)\n",num.c_str(),fitsfile.c_str());
-      	exit(1);
-      }
-      try{table.readKey("F"+num+"ERR",ferr[i]);}
-      catch(HDU::NoSuchKeyword){
-        printf("Keyword F%sERR missing from header (%s)\n",num.c_str(),fitsfile.c_str());
-        exit(1);
-      }
     }
     
     unsigned long tablesize(table.rows());

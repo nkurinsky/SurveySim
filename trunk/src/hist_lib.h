@@ -36,7 +36,7 @@ class hist_lib{
   hist_lib(double obs_c1[],double obs_c2[],int obs_size); //only observation histogram created
   //Functions for passing data to class if not already done so by constructor
   void init_obs(double c1[],double c2[],int size);
-  bool init_model(double c1[],double c2[],double weights[],int size);
+  bool init_model(double c1[],double c2[],int size);
   //Functions for outputting properties of histograms
   double get_chisq();
   bool write_fits(string filename);
@@ -45,7 +45,7 @@ class hist_lib{
  private:
   //functions which produce histograms
   double ** get_hist(double c1[],double c2[],int cnum); //compute histogram, fitting binsize
-  double ** compute_hist(double c1[],double c2[],double weights[],int cnum); //compute histogram for given inputs
+  double ** compute_hist(double c1[],double c2[],int cnum); //compute histogram for given inputs
   double fit_err();
   double poiss_err(int x);
 };

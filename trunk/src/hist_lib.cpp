@@ -46,7 +46,7 @@ void hist_lib::init_obs(double c1[],double c2[],int size){
   }
 }
 
-bool hist_lib::init_model(double c1[],double c2[],double weights[],int size){
+bool hist_lib::init_model(double c1[],double c2[],int size){
   if (model_hist != NULL){
     for (int i=0;i<xysize;i++){
       delete[] model_hist[i];
@@ -56,7 +56,7 @@ bool hist_lib::init_model(double c1[],double c2[],double weights[],int size){
   } 
   //create histogram with class parameters
   if(obs_hist != NULL){
-    model_hist = compute_hist(c1,c2,weights,size);
+    model_hist = compute_hist(c1,c2,size);
     msize = size;
     
     if(comparison_hist != NULL){
@@ -185,16 +185,12 @@ double ** hist_lib::get_hist(double c1[],double c2[],int cnum){
   xbinsize = (xrange[1]-xrange[0])/xysize;
   ybinsize = (yrange[1]-yrange[0])/xysize;
 
-  double weights[cnum];
-  for (int i=0;i<cnum;i++)
-    weights[i] = 1.0;
-
   //create histogram with given range and calculated binsize
-  temp = compute_hist(c1,c2,weights,cnum);
+  temp = compute_hist(c1,c2,cnum);
   return temp;
 }
 
-double ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cnum){
+double ** hist_lib::compute_hist(double c1[],double c2[],int cnum){
   static double ** retvals;
 
   //initialize two dimensional integer array (Dynamic)
@@ -217,14 +213,12 @@ double ** hist_lib::compute_hist(double c1[],double c2[],double weights[],int cn
     if((c1[i] >= xrange[0]) and (c1[i] < xrange[1]) and (c2[i] >= yrange[0]) and (c2[i] < yrange[1])){
       xpt = static_cast<int>(floor(((c1[i]-xrange[0])/xbinsize)));
       ypt = static_cast<int>(floor(((c2[i]-yrange[0])/ybinsize)));
-      retvals[xpt][ypt]+= weights[i];
+      retvals[xpt][ypt]+= 1.0;
     }
     else
-      exc+= weights[i];
+      exc+= 1.0;
   }
   m_exc = exc;
-  //number of points which lay outside of the specified range
-  //printf("CHist Exclusions: %6.2E %6.2E (%5.2f%%)\n",double(exc),double(cnum),(double(exc)/double(cnum))*100.0);
   
   return retvals;
 }
