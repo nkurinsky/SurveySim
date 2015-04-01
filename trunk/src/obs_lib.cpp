@@ -35,7 +35,7 @@ obs::~obs(){
 
 }
 
-obs_lib::obs_lib(string fitsfile, axis_type axes[]){
+obs_lib::obs_lib(string fitsfile, axis_type axes[], double flim[]){
   //initialize FITS input
   std::auto_ptr<FITS> pInfile;
   
@@ -145,21 +145,6 @@ void obs_lib::get_all_colors(double* &c1,double* &c2){
   c2 = new double[observations.size()];
   for (unsigned int i=0;i<observations.size();i++){
     observations[i]->get_colors(c1[i],c2[i]);
-  }
-}
-
-void obs_lib::info(string filters[],double flims[],double ferrs[]){
-  if(filters == NULL)
-    filters = new string[3];
-  if(flims == NULL)
-    flims = new double[3];
-  if(ferrs == NULL)
-    ferrs = new double[3];
-  
-  for(int i=0;i<3;i++){
-    filters[i] = this->filter[i];
-    flims[i] = this->flim[i];
-    ferrs[i] = this->ferr[i];
   }
 }
 

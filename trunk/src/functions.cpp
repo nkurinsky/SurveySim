@@ -108,9 +108,20 @@ string toLower(const string &oldstr){
 }
 
 Configuration::Configuration(int argc, char *argv[]){
+
+  if((argc > 1) and (argv[1][0] == '-') and (argv[1][1] == 'h')){
+    printf("Calling sequence:\"%s modfile sedfile [obsfile] [-o outfile] [-v]\"\n",argv[0]);
+    printf("\tmodfile - Model file containing parameters and filters\n");
+    printf("\tsedfile - SED template file\n");
+    printf("\tobsfile - Observation file, table of fluxes\n");
+    printf("\t-o outfile - Name of output file, defaults to \"output.fits\"\n");
+    printf("\t-v - Force verbose output\n");
+    exit(0);
+  }
+  
   if(argc < 3){
     printf("ERROR: Invalid number of arguments.\n");
-    printf("Calling sequence should be \"%s modfile sedfile [obsfile] [-o output]\"\n",argv[0]);
+    printf("Calling sequence should be \"%s modfile sedfile [obsfile] [-o output] [-v]\"\n",argv[0]);
     exit(1);
   }
   
@@ -122,8 +133,13 @@ Configuration::Configuration(int argc, char *argv[]){
   int i=3;
 
   simflag=true;
+  bool force_verbose=false;
   while(i<argc){
-    if((argv[i][0] == '-') and (argv[i][1] == 'o')){
+    if((argv[i][0] == '-') and (argv[i][1] == 'v')){
+      force_verbose=true;
+      i++;
+    }
+    else if((argv[i][0] == '-') and (argv[i][1] == 'o')){
       if(i+1 < argc){
 	outfile = argv[i+1];
 	i+=2;
@@ -133,7 +149,7 @@ Configuration::Configuration(int argc, char *argv[]){
 	exit(1);
       }
     }
-    else if (i == 3){
+    else if (i >= 3){
       simflag=false;
       obsfile=argv[i];
       i++;
@@ -145,6 +161,9 @@ Configuration::Configuration(int argc, char *argv[]){
   }
   
   load();
+
+  if(force_verbose)
+    oprint=2;
 }
 
 void Configuration::print(){

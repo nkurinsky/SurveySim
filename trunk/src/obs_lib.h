@@ -21,16 +21,12 @@ class obs{
 class obs_lib{
  private:
   vector<obs*> observations;
-  string filter[3];
-  double ferr[3];
-  double flim[3];
   double zp[3]; //zero points for magnitude-flux conversions
  public:
-  obs_lib(string fitsfile, axis_type axes[]);
+  obs_lib(string fitsfile, axis_type axes[], double flim[]);
   double get_flux(int i,int band);
   void get_colors(int i,double &c1,double &c2);
   void get_all_colors(double* &c1,double* &c2);
-  void info(string filters[],double flims[],double ferrs[]);
   int get_snum(){
     return observations.size();}
   ~obs_lib();

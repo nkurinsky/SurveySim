@@ -108,9 +108,6 @@ public:
   unsigned long nsim;
 
   double area;
-  double limits[3];
-  double units[3];
-
   double dz;
   double zmax;
   double zmin;

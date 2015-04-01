@@ -3,7 +3,7 @@
 #ifndef NUMBERCOUNTS_H
 #define NUMBERCOUNTS_H
 
-#define EMPTYBIN 1e-10
+#define EMPTYBIN 1e-30
 
 #include "functions.h"
 #include <valarray>

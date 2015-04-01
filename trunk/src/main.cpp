@@ -64,19 +64,19 @@ int main(int argc,char** argv){
   if(q.simflag){ //observations not provided
     LOG_CRITICAL(printf("Simulating a survey only \n"));
     //run number of simulations to get counts range
-    LOG_CRITICAL(printf("Progress:"));
-    //for(unsigned long i=1;i<q.nsim;i++){      
-    output=survey.simulate();
-    final_counts.add_link(output.dnds,output.chisqr);
-      //  if(i % 10 == 0){
-      //	LOG_CRITICAL(printf("."));
-      //}
-      //    }
-    LOG_CRITICAL(printf("\n"));
-    LOG_DEBUG(printf("Saving Output\n"));
+    
+    for(unsigned long simi=1;simi<q.nsim;simi++){      
+      output=survey.simulate();
+      final_counts.add_link(output.dnds,output.chisqr);
+      if(simi % (q.nsim/20) == 0){
+	LOG_DEBUG(printf("."));
+      }
+    }
+    
+    LOG_DEBUG(printf("\nSaving Output\n"));
     saved = survey.save(q.outfile);
     LOG_DEBUG(printf("Saving Counts\n"));
-    saved &= final_counts.save(q.outfile,countnames);
+    saved &= final_counts.save(q.outfile,countnames,"Simulated Counts");
   }
   else{    
 
@@ -268,7 +268,6 @@ int main(int argc,char** argv){
     LOG_INFO(printf("Saving Initial Survey\n"));
     saved = survey.save(q.outfile);
 
-    //vector<double> results,means(q.nparams);
     for(pi = 0;pi<q.nparams;pi++)
       means[pi] = pset.best[pi];
     
@@ -310,5 +309,3 @@ int main(int argc,char** argv){
   
   return saved ? 0 : 1;
 }
-
-

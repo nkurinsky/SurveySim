@@ -5,14 +5,20 @@
 
 #include <math.h>
 #include "lumfunct.h"
+#include "functions.h"
 
 class agn_frac{
  private:
   lumfunct *lf;
+  int _types;
+  bool generate;
+  RandomNumberGenerator rng;
  public:
+  agn_frac(int agn_types);
   void set_lumfunct(lumfunct *lf);
   double get_agn_frac(double lum, double redshift);
   double get_agn_frac2(double lum, double redshift, int agntype);
+  int get_sedtype(double lum, double redshift);
 };
 
 

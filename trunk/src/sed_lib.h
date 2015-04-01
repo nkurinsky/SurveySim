@@ -79,6 +79,9 @@ class sed_lib{
     return lnum;}
   double get_dl();
   void get_lums(double luminosities[]);
+  int get_tnum(){
+    return tnum;
+  }
   int get_snum(){
     return seds.size();}
   ~sed_lib();

@@ -29,6 +29,7 @@ void simulator::configure(const Configuration &config){
   seds->get_filter_info(filters,flux_limits,band_errs);
   axes[0] = config.axes[0];
   axes[1] = config.axes[1];
+  fagns.reset(new agn_frac(seds->get_tnum()));
   
   simflag=config.simflag;
 
@@ -36,7 +37,8 @@ void simulator::configure(const Configuration &config){
     if(config.obsfile != ""){
       obsFile=config.obsfile;
       diagnostic.reset(new hist_lib());
-      observations.reset(new obs_lib(obsFile, axes));
+
+      observations.reset(new obs_lib(obsFile, axes, flux_limits));
       
       double *x,*y;
       int osize = observations->get_snum();
@@ -118,7 +120,6 @@ void simulator::initial_simulation(){
   long nsrcs;
   double lums[lnum];
   double zarray[nz];
-  double fagn,random_sed;
   short sedtype; // this holds the id of the SED type 
   
   seds->get_lums(lums);
@@ -144,7 +145,7 @@ void simulator::initial_simulation(){
     jsmin = 0;
     for (js=0;js<lnum;js++){
       // look at all SED types; don't want to bias by ignoring certain types
-      for(int stype=0;stype<AGNTYPES;stype++){
+      for(int stype=0;stype<seds->get_tnum();stype++){
 	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
 	if(flux_sim[0]>=flux_limits[0]){
 	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
@@ -159,12 +160,7 @@ void simulator::initial_simulation(){
       for (src_iter=0;src_iter<nsrcs;src_iter++){
 	detected = true;
 	//determine sedtype (agn type)
-	fagn=fagns->get_agn_frac(lums[js],zarray[is]);
-	random_sed=rng.flat(0,1);
-	if(random_sed > fagn) 
-	  sedtype=0;
-	else 
-	  sedtype=1;
+	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
 	
 	//get uniformly distributed luminosity and redshift
 	if(js == 0)
@@ -240,6 +236,7 @@ products simulator::simulate(){
   }
 
   if((not counts[0]) or (not counts[1]) or (not counts[2])){
+    LOG_DEBUG(printf("Initializing Counts Structure\n"));
     initial_simulation();
   }
 
@@ -255,7 +252,6 @@ products simulator::simulate(){
   static long nsrcs;
   double lums[lnum];
   double zarray[nz];
-  double fagn,random_sed;
   short sedtype; // this holds the id of the SED type 
   
   seds->get_lums(lums);
@@ -281,7 +277,7 @@ products simulator::simulate(){
     jsmin = 0;
     for (js=0;js<lnum;js++){
       // look at all SED types; don't want to bias by ignoring certain types
-      for(int stype=0;stype<AGNTYPES;stype++){
+      for(int stype=0;stype<seds->get_tnum();stype++){
 	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
 	if(flux_sim[0]>=flux_limits[0]){
 	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
@@ -296,12 +292,7 @@ products simulator::simulate(){
       for (src_iter=0;src_iter<nsrcs;src_iter++){
 	detected = true;
 	//determine sedtype (agn type)
-	fagn=fagns->get_agn_frac(lums[js],zarray[is]);
-	random_sed=rng.flat(0,1);
-	if(random_sed > fagn) 
-	  sedtype=0;
-	else 
-	  sedtype=1;
+	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
 	
 	//get uniformly distributed luminosity and redshift
 	if(js == 0)
@@ -339,20 +330,23 @@ products simulator::simulate(){
   //*************************************************************************
   
   int snum(sources.size());
-  vector<double> c1(snum,0.0);
-  vector<double> c2(snum,0.0);
+  
   valarray<double> f1(0.0,snum);
   valarray<double> f2(0.0,snum);
   valarray<double> f3(0.0,snum);
   for (int i=0;i<snum;i++){
-    c1[i] = sources[i].c1;
-    c2[i] = sources[i].c2;
     f1[i] = sources[i].fluxes[0];
     f2[i] = sources[i].fluxes[1];
     f3[i] = sources[i].fluxes[2];
   }
 
   if (not simflag){ //comparing to observations; get diagnostics
+    vector<double> c1(snum,0.0);
+    vector<double> c2(snum,0.0);
+    for (int i=0;i<snum;i++){
+      c1[i] = sources[i].c1;
+      c2[i] = sources[i].c2;
+    }
     diagnostic->init_model(c1.data(),c2.data(),snum);
     output.chisqr=diagnostic->get_chisq();
   }
@@ -370,13 +364,14 @@ products simulator::simulate(){
 
 
 bool simulator::save(string outfile){
-  LOG_DEBUG(printf("Simflag in simulator:save %s \n", simflag ? "true" : "false"));
 
   try{
     bool opened = true;
     if(not simflag){ //if there are observations, save diagnostics
       opened = diagnostic->write_fits(outfile);
     }
+    else
+      outfile="!"+outfile;
     
     if(not opened)
       return opened;
@@ -424,7 +419,7 @@ bool simulator::save(string outfile){
 
     static std::vector<string> colname(colnum,"");
     static std::vector<string> colunit(colnum,"-");
-    static std::vector<string> colform(colnum,"f13.8");
+    static std::vector<string> colform(colnum,"e13.5");
 
     colname[0] = "F1";
     colname[1] = "F2";
@@ -449,11 +444,6 @@ bool simulator::save(string outfile){
     colunit[9] = "Jy^1.5/sr";
     colunit[10] = "Jy^1.5/sr";
 
-    colform[4] = "e13.5";
-    colform[8] = "e13.5";
-    colform[9] = "e13.5";
-    colform[10] = "e13.5";
-
     if(!simflag) {
       colname[11] = "obs_dnds1";
       colname[12] = "obs_dnds2";
@@ -462,10 +452,6 @@ bool simulator::save(string outfile){
       colunit[11] = "Jy^1.5/sr";
       colunit[12] = "Jy^1.5/sr";
       colunit[13] = "Jy^1.5/sr";
-
-      colform[11] = "e13.5";
-      colform[12] = "e13.5";
-      colform[13] = "e13.5";
     }
     
     
@@ -490,20 +476,24 @@ bool simulator::save(string outfile){
       valarray<double> counts2(pow(10,counts[1]->bins()));
       valarray<double> counts3(pow(10,counts[2]->bins()));
 
-      LOG_DEBUG(printf("Saving Counts\n"));
-      newTable->column(colname[5]).write(counts1,counts1.size(),1);
-      newTable->column(colname[6]).write(counts2,counts2.size(),1);
-      newTable->column(colname[7]).write(counts3,counts3.size(),1);
+      newTable->column(colname[5]).write(counts1,1);
+      newTable->column(colname[6]).write(counts2,1);
+      newTable->column(colname[7]).write(counts3,1);
       
-      newTable->column(colname[8]).write(last_output.dnds[0],last_output.dnds[0].size(),1);
-      newTable->column(colname[9]).write(last_output.dnds[1],last_output.dnds[1].size(),1);
-      newTable->column(colname[10]).write(last_output.dnds[2],last_output.dnds[2].size(),1);
+      newTable->column(colname[8]).write(last_output.dnds[0],1);
+      newTable->column(colname[9]).write(last_output.dnds[1],1);
+      newTable->column(colname[10]).write(last_output.dnds[2],1);
 
       if(not simflag){
 	newTable->column(colname[11]).write(counts[0]->counts(),1);
 	newTable->column(colname[12]).write(counts[1]->counts(),1);
 	newTable->column(colname[13]).write(counts[2]->counts(),1);
       }
+    }
+    catch(FitsException &except){
+      printf("Caught Save Error: Column Write -- ");
+      printf("%s\n",except.message().c_str());
+      exit(1);
     }
     catch(...){
       printf("Caught Save Error: Column Write\n");
