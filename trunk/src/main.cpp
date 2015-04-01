@@ -25,6 +25,8 @@ int main(int argc,char** argv){
 
   LOG_DEBUG(printf("Axis 1: %s\nAxis 2: %s\n",get_axis_type(q.axes[0]).c_str(),get_axis_type(q.axes[1]).c_str()));
 
+  if(logflag >= 2) q.print();
+
   //general variable declarations
   bool accept;
   bool saved=false;

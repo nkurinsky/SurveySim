@@ -22,4 +22,6 @@ trunk/src/alg_lib/*.o
 trunk/src/alg_lib/Makefile
 trunk/output/.ipynb_checkpoints*
 
+trunk/src/alg_lib/libalglib.a
+
 *output*
