@@ -54,6 +54,7 @@ area=[4.0]
 band=['Band1','Band2','Band3']
 band_units=['mJy','mJy','mJy']
 flim=[0.0,0.0,0.0]
+ferr=[0.0,0.0,0.0]
 
 #read these from the default obsfile and then update as needed 
 ofile=fits.open(obsfile)
@@ -64,6 +65,9 @@ band_units[2]=ohdr["TUNIT3"]
 flim[0]=ohdr["F1MIN"]
 flim[1]=ohdr["F2MIN"]
 flim[2]=ohdr["F3MIN"]
+ferr[0]=ohdr["F1ERR"]
+ferr[1]=ohdr["F2ERR"]
+ferr[2]=ohdr["F3ERR"]
 
 f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
