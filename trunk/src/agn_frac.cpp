@@ -89,9 +89,8 @@ double agn_frac::get_agn_frac2(double lum, double redshift, int agntype){
     float eps=log10((1+redshift)/(1+2.5));
     float lstar=lstar0+k1*eps+k2*pow(eps,2)+k3*pow(eps,3);
     
-    //the average lgl6 to lg(Lagn_ir) conversion including converting to Lsun
-    // for now a placeholder only, will need to calculate properly
-    float lum5um=lum+7+26+log10(3.86)-0.4;
+    //the lgl5 [ergs/Hz] to lgLagn_ir [Lsun] conversion
+    float lum5um=lum+33+log10(3.86)-13.7782-0.48;
     
     float denom=pow(pow(10,lum5um)/pow(10,lstar),gamma1)+pow(pow(10,lum5um)/pow(10,lstar),gamma2);
     float phi=pow(10,phistar)/denom;
