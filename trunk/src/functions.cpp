@@ -287,8 +287,14 @@ void Configuration::load(){
 
   double rtemp;
   //Read in simulation settings
-  tab.readKey("RUNS",rtemp);
-  runs = static_cast<unsigned long>(rtemp);
+  try{
+    tab.readKey("RUNS",rtemp);
+    runs = static_cast<unsigned long>(rtemp);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    printf("Value of \"RUNS\" invalud, defaulting to 1000\n");
+    runs=1000;
+  }
   tab.readKey("ZMIN",zmin);
   tab.readKey("ZMAX",zmax);
   tab.readKey("DZ",dz);

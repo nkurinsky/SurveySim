@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+
+#Python prelims
+import os
+import sys
+
+codedir=os.getcwd()+'/trunk/';
+pydir=os.getcwd()+'/Python/';
+#ensure this is in the path
+sys.path.append(pydir)
+
+import time
+import pyfits as fits
+import matplotlib.pyplot as plt
+import numpy as np
+import img_scale
+from pylab import *
+import math
+from functools import partial
+
+with open (codedir+'filters/allfilters.dat','r') as f: 
+    flines=f.readlines()
+    
+    fcount=-1
+    lam1,lam2,lam3,trans1,trans2,trans3=[],[],[],[],[],[]
+    for fline in flines:
+        if fline.strip():
+            ncol=len(fline.split())
+            if ncol > 2:
+                fcount=fcount+1
+                if ncol == 2:
+                    if fcount == f_id[0]: 
+                        tmp1,tmp2=fline.split()[0:2]
+                        lam1.append(float(tmp1)),trans1.append(float(tmp2))
+                    if fcount == f_id[1]:
+                        tmp1,tmp2=fline.split()[0:2]
+                        lam2.append(float(tmp1)),trans2.append(float(tmp2))
+                    if fcount == f_id[2]:
+                        tmp1,tmp2=fline.split()[0:2]
+                        lam3.append(float(tmp1)),trans3.append(float(tmp2))
+                        
+col1=fits.Column(name='lambda1',format='FLOAT',array=lam1)
+col2=fits.Column(name='transmission1',format='FLOAT',array=trans1)
+col3=fits.Column(name='lambda2',format='FLOAT',array=lam2)
+col4=fits.Column(name='transmission2',format='FLOAT',array=trans2)
+col5=fits.Column(name='lambda3',format='FLOAT',array=lam3)
+col6=fits.Column(name='transmission3',format='FLOAT',array=trans3)
+
+cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
+tbhdu=fits.new_table(cols)
+tbhdr=tbhdu.header

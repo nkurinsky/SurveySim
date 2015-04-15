@@ -90,15 +90,20 @@ gpts=where((lambda_new ge 5.0) and (lambda_new lt 1000.0))
 ;============================================================================
 ;read-in new templates and cast in appropriate format
 ;----------------------------------------------------------------------------
-y_z1_comp=fltarr(nlam,nlum)
-y_z2_comp=fltarr(nlam,nlum)
-y_z1_lowtau=fltarr(nlam,nlum)
-y_z2_lowtau=fltarr(nlam,nlum)
-y_z1_hightau=fltarr(nlam,nlum)
-y_z2_hightau=fltarr(nlam,nlum)
+
+useset=1 ;Sajina et al. 2012
+useset=2 ;Kirkpatrick et al. 2015
+
+if(useset eq 1) then begin
+   y_z1_comp=fltarr(nlam,nlum)
+   y_z2_comp=fltarr(nlam,nlum)
+   y_z1_lowtau=fltarr(nlam,nlum)
+   y_z2_lowtau=fltarr(nlam,nlum)
+   y_z1_hightau=fltarr(nlam,nlum)
+   y_z2_hightau=fltarr(nlam,nlum)
 
 ;agn_lowtau (Sajina et al. 2012)
-readcol,'IRSsupersample_comp_template.dat',lam,y1,y1_low,y1_high,y2,y2_low,y2_high,skipline=8
+   readcol,'IRSsupersample_comp_template.dat',lam,y1,y1_low,y1_high,y2,y2_low,y2_high,skipline=8
 ;plot,lam,y1,/xlog,/ylog,yrange=[0.01,10],ystyle=1,xrange=[0.5,1000],xstyle=1
 ;oplot,lam*(1+4),y1,linestyle=2,color=red
 ;just testing, overplot the wise filters
@@ -109,67 +114,63 @@ readcol,'IRSsupersample_comp_template.dat',lam,y1,y1_low,y1_high,y2,y2_low,y2_hi
 ;oplot,filter_data.lambda2/1.d4,filter_data.transmission2,linestyle=1
 ;oplot,filter_data.lambda3/1.d4,filter_data.transmission3,linestyle=1
 
-nu_my=(3.d8/lam)*1.d6 ;in Hz
-y_tmp=interpol(y1/nu_my,lam,lambda_new)
-tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
-for i=0,nlum-1 do begin
-   ltir=lums[i]
-   scale=10.^(ltir-tmp_lum)
-   y_z1_comp[*,i]=y_tmp*scale
-endfor
-y_tmp=interpol(y2/nu_my,lam,lambda_new)
-tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
-for i=0,nlum-1 do begin
-   ltir=lums[i]
-   scale=10.^(ltir-tmp_lum)
-   y_z2_comp[*,i]=y_tmp*scale
-endfor
+   nu_my=(3.d8/lam)*1.d6        ;in Hz
+   y_tmp=interpol(y1/nu_my,lam,lambda_new)
+   tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
+   for i=0,nlum-1 do begin
+      ltir=lums[i]
+      scale=10.^(ltir-tmp_lum)
+      y_z1_comp[*,i]=y_tmp*scale
+   endfor
+   y_tmp=interpol(y2/nu_my,lam,lambda_new)
+   tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
+   for i=0,nlum-1 do begin
+      ltir=lums[i]
+      scale=10.^(ltir-tmp_lum)
+      y_z2_comp[*,i]=y_tmp*scale
+   endfor
 
-readcol,'IRSsupersample_agn_template_lowtau.dat',lam,y1,y1_low,y1_high,y2,y2_low,y2_high,skipline=8
-nu_my=(3.d8/lam)*1.d6 ;in Hz
-y_tmp=interpol(y1/nu_my,lam,lambda_new)
-tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
-for i=0,nlum-1 do begin
-   ltir=lums[i]
-   scale=10.^(ltir-tmp_lum)
-   y_z1_lowtau[*,i]=y_tmp*scale
-endfor
-y_tmp=interpol(y2/nu_my,lam,lambda_new)
-tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
-for i=0,nlum-1 do begin
-   ltir=lums[i]
-   scale=10.^(ltir-tmp_lum)
-   y_z2_lowtau[*,i]=y_tmp*scale
-endfor
+   readcol,'IRSsupersample_agn_template_lowtau.dat',lam,y1,y1_low,y1_high,y2,y2_low,y2_high,skipline=8
+   nu_my=(3.d8/lam)*1.d6        ;in Hz
+   y_tmp=interpol(y1/nu_my,lam,lambda_new)
+   tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
+   for i=0,nlum-1 do begin
+      ltir=lums[i]
+      scale=10.^(ltir-tmp_lum)
+      y_z1_lowtau[*,i]=y_tmp*scale
+   endfor
+   y_tmp=interpol(y2/nu_my,lam,lambda_new)
+   tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
+   for i=0,nlum-1 do begin
+      ltir=lums[i]
+      scale=10.^(ltir-tmp_lum)
+      y_z2_lowtau[*,i]=y_tmp*scale
+   endfor
 
 ;agn_hightau (Sajina et al. 2012)
-readcol,'IRSsupersample_agn_template_hightau.dat',lam,y1,y1_low,y1_high,y2,y2_low,y2_high,skipline=8
-nu_my=(3.d8/lam)*1.d6 ;in Hz
-y_tmp=interpol(y1/nu_my,lam,lambda_new)
-tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
-for i=0,nlum-1 do begin
-   ltir=lums[i]
-   scale=10.^(ltir-tmp_lum)
-   y_z1_hightau[*,i]=y_tmp*scale
-endfor
-y_tmp=interpol(y2/nu_my,lam,lambda_new)
-tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
-for i=0,nlum-1 do begin
-   ltir=lums[i]
-   scale=10.^(ltir-tmp_lum)
-   y_z2_hightau[*,i]=y_tmp*scale
-endfor
+   readcol,'IRSsupersample_agn_template_hightau.dat',lam,y1,y1_low,y1_high,y2,y2_low,y2_high,skipline=8
+   nu_my=(3.d8/lam)*1.d6        ;in Hz
+   y_tmp=interpol(y1/nu_my,lam,lambda_new)
+   tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
+   for i=0,nlum-1 do begin
+      ltir=lums[i]
+      scale=10.^(ltir-tmp_lum)
+      y_z1_hightau[*,i]=y_tmp*scale
+   endfor
+   y_tmp=interpol(y2/nu_my,lam,lambda_new)
+   tmp_lum=alog10(total(y_tmp[gpts]*dnu[gpts])/3.846d26)
+   for i=0,nlum-1 do begin
+      ltir=lums[i]
+      scale=10.^(ltir-tmp_lum)
+      y_z2_hightau[*,i]=y_tmp*scale
+   endfor
 
-;============================================================================
-;make new templates.fits file
-;----------------------------------------------------------------------------
-
-nz=3 ;z=0 (the Rieke templates),z=1 (or rather some appropriate bin), and z=2 (again some bin)
-nsed=4 ;assume at least 4 choices of SED per L-z bin (potentially 2 SF (or 1 SF, 1 composite) and 2 types of AGN (more or less obscured)
-templates=fltarr(nlam,ntmpl,nz,nsed)
-for i=0,ntmpl-1 do begin
-   for j=0,nz-1 do begin
-      ;for now, starforming templates constant with redshift
+   nz=3 ;z=0 (the Rieke templates),z=1 (or rather some appropriate bin), and z=2 (again some bin)
+   nsed=4 ;assume at least 4 choices of SED per L-z bin (potentially 2 SF (or 1 SF, 1 composite) and 2 types of AGN (more or less obscured)
+   templates=fltarr(nlam,ntmpl,nz,nsed)
+   for i=0,ntmpl-1 do begin
+      for j=0,nz-1 do begin
+                                ;for now, starforming templates constant with redshift
       templates[*,i,j,0]=rieke_templ_new[*,i] ;note this includes the lambda array
       if(i gt 0) then begin
          if(j eq 1) then begin
@@ -184,19 +185,68 @@ for i=0,ntmpl-1 do begin
          endif
       endif
    endfor
-endfor
+   endfor
 
 ;oplot,lambda_new,templates[*,1,1,1]
 ;modify the header
-my_header=old_header
+   my_header=old_header
 ;note these are placeholders, need to be sorted out exactly -- plus
 ;                                                              these
 ;are ranges rather than fixed points
-SXADDPAR, my_header, 'Z0', 0,'lowest redshift template'
-SXADDPAR, my_header, 'Z1', 1,'middle redshift template'
-SXADDPAR, my_header, 'Z2', 2,'highest redshift template'
+   SXADDPAR, my_header, 'Z0', 0,'lowest redshift template'
+   SXADDPAR, my_header, 'Z1', 1,'middle redshift template'
+   SXADDPAR, my_header, 'Z2', 2,'highest redshift template'
 
-writefits,'my_templates.fits',templates,my_header
+   writefits,'Sajinaetal2012_templates.fits',templates,my_header
+
+endif
+
+if(useset eq 2) then begin
+   y_z1_comp=fltarr(nlam,nlum)
+   y_z2_comp=fltarr(nlam,nlum)
+   y_z1_lowtau=fltarr(nlam,nlum)
+   y_z2_lowtau=fltarr(nlam,nlum)
+   y_z1_hightau=fltarr(nlam,nlum)
+   y_z2_hightau=fltarr(nlam,nlum)
+
+
+
+
+   nz=3 ;z=0 (the Rieke templates),z=1 (or rather some appropriate bin), and z=2 (again some bin)
+   nsed=4 ;assume at least 4 choices of SED per L-z bin (potentially 2 SF (or 1 SF, 1 composite) and 2 types of AGN (more or less obscured)
+   templates=fltarr(nlam,ntmpl,nz,nsed)
+   for i=0,ntmpl-1 do begin
+      for j=0,nz-1 do begin
+                                ;for now, starforming templates constant with redshift
+      templates[*,i,j,0]=rieke_templ_new[*,i] ;note this includes the lambda array
+      if(i gt 0) then begin
+         if(j eq 1) then begin
+            templates[*,i,j,1]=y_z1_comp[*,i-1]
+            templates[*,i,j,2]=y_z1_lowtau[*,i-1]
+            templates[*,i,j,3]=y_z1_hightau[*,i-1]
+         endif
+         if(j eq 2) then begin
+            templates[*,i,j,1]=y_z2_comp[*,i-1]
+            templates[*,i,j,2]=y_z2_lowtau[*,i-1]
+            templates[*,i,j,3]=y_z2_hightau[*,i-1]
+         endif
+      endif
+   endfor
+   endfor
+
+;oplot,lambda_new,templates[*,1,1,1]
+;modify the header
+   my_header=old_header
+;note these are placeholders, need to be sorted out exactly -- plus
+;                                                              these
+;are ranges rather than fixed points
+   SXADDPAR, my_header, 'Z0', 0,'lowest redshift template'
+   SXADDPAR, my_header, 'Z1', 1,'middle redshift template'
+   SXADDPAR, my_header, 'Z2', 2,'highest redshift template'
+
+   writefits,'Kirkpatricketal2015_templates.fits',templates,my_header
+endif
+
 skiptoend:
 
 end

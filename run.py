@@ -38,7 +38,7 @@ modelfile=codedir+'model/model.fits'
 obsdir=codedir+'obs/'
 obsfile=obsdir+'wise.fits'
 outfile=codedir+'output/output.fits'
-fitcode='fitter'
+fitcode=codedir+'src/SurveySim'
 
 #initialize luminosity function parameters (GUI middle frame)
 fields_lf='Phi_0','Lstar_0','alpha','beta','p','q','zcut','c_evol'

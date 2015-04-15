@@ -57,6 +57,7 @@ int main(int argc,char** argv){
   lf.set_params(lpars);
 
   //initialize simulator
+  printf("just before entering simulator:");
   simulator survey(q); 
   survey.set_color_exp(CE); //color evolution
   survey.set_lumfunct(&lf);
