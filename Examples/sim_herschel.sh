@@ -7,4 +7,4 @@ obsfile="../trunk/obs/observation.fits"
 echo "Updating Model File"
 ./update_mfile.py
 echo "Running Code"
-SurveySim $modelfile $sedfile $obsfile -v -o ./herschel_output.fits
+SurveySim $modelfile $sedfile -v -o ./herschel_sim_output.fits

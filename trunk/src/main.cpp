@@ -57,7 +57,6 @@ int main(int argc,char** argv){
   lf.set_params(lpars);
 
   //initialize simulator
-  printf("just before entering simulator:");
   simulator survey(q); 
   survey.set_color_exp(CE); //color evolution
   survey.set_lumfunct(&lf);
@@ -67,12 +66,13 @@ int main(int argc,char** argv){
   if(q.simflag){ //observations not provided
     LOG_CRITICAL(printf("Simulating a survey only \n"));
     //run number of simulations to get counts range
-    
+
+    LOG_CRITICAL(printf("Beginning Simulation Loop (%lu runs)\n",q.nsim));
     for(unsigned long simi=1;simi<q.nsim;simi++){      
       output=survey.simulate();
       final_counts.add_link(output.dnds,output.chisqr);
-      if(simi % (q.nsim/20) == 0){
-	LOG_DEBUG(printf("."));
+      if((simi % 20) == 0){
+	LOG_CRITICAL(printf("Current Iteration: %lu\n",simi));
       }
     }
     

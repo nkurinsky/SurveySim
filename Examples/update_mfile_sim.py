@@ -96,5 +96,3 @@ hdr.set('PRINT',mesprint,'Print level (0=silent,3=debug)')
 
 hdus.flush()
 hdus.close()
-
-print(hdr)

@@ -184,7 +184,7 @@ void simulator::initial_simulation(){
 	
 	//check for detectability, if "Yes" add to list
 	if(detected){
-	  temp_src = new sprop(tZ,flux_sim,tL,axes);
+	  temp_src = new sprop(tZ,flux_sim,tL,axes,sedtype);
 	  sources.push_back(*temp_src);
 	  delete temp_src;
 	}
@@ -316,7 +316,7 @@ products simulator::simulate(){
 	
 	//check for detectability, if "Yes" add to list
 	if(detected){
-	  temp_src = new sprop(tZ,flux_sim,tL,axes);
+	  temp_src = new sprop(tZ,flux_sim,tL,axes,sedtype);
 	  sources.push_back(*temp_src);
 	  output.dndz[is]++; 
 	  delete temp_src;
@@ -403,19 +403,20 @@ bool simulator::save(string outfile){
     unsigned long size = sources.size();
     LOG_INFO(printf("%s %lu\n","Sources Being Saved: ",size));
     
-    valarray<double> f1(size),f2(size),f3(size),luminosity(size),redshift(size);
+    valarray<double> f1(size),f2(size),f3(size),luminosity(size),redshift(size),sedtype(size);
     for(unsigned long i=0;i<size;i++){
       f1[i] = sources[i].fluxes[0];
       f2[i] = sources[i].fluxes[1];
       f3[i] = sources[i].fluxes[2];
       redshift[i] = sources[i].redshift;
       luminosity[i] = sources[i].luminosity;
+      sedtype[i] = sources[i].sedtype;
     }
     
     //if simulation-only mode we only need 11columns, otherwise add observed counts
-    int colnum=14;
+    int colnum=15;
     if(simflag)
-      colnum=11;
+      colnum-=3;
 
     static std::vector<string> colname(colnum,"");
     static std::vector<string> colunit(colnum,"-");
@@ -426,32 +427,33 @@ bool simulator::save(string outfile){
     colname[2] = "F3";
     colname[3] = "Z";
     colname[4] = "Lum";
-    colname[5] = "s1";
-    colname[6] = "s2";
-    colname[7] = "s3";
-    colname[8] = "mod_dnds1";
-    colname[9] = "mod_dnds2";
-    colname[10] = "mod_dnds3";
+    colname[5] = "Type";
+    colname[6] = "s1";
+    colname[7] = "s2";
+    colname[8] = "s3";
+    colname[9] = "mod_dnds1";
+    colname[10] = "mod_dnds2";
+    colname[11] = "mod_dnds3";
     
     colunit[0] = "Jy";
     colunit[1] = "Jy";
     colunit[2] = "Jy";
     colunit[4] = "W/Hz";
-    colunit[5] = "mJy";
     colunit[6] = "mJy";
     colunit[7] = "mJy";
-    colunit[8] = "Jy^1.5/sr";
+    colunit[8] = "mJy";
     colunit[9] = "Jy^1.5/sr";
     colunit[10] = "Jy^1.5/sr";
+    colunit[11] = "Jy^1.5/sr";
 
     if(!simflag) {
-      colname[11] = "obs_dnds1";
-      colname[12] = "obs_dnds2";
-      colname[13] = "obs_dnds3";
+      colname[12] = "obs_dnds1";
+      colname[13] = "obs_dnds2";
+      colname[14] = "obs_dnds3";
 
-      colunit[11] = "Jy^1.5/sr";
       colunit[12] = "Jy^1.5/sr";
       colunit[13] = "Jy^1.5/sr";
+      colunit[14] = "Jy^1.5/sr";
     }
     
     
@@ -471,23 +473,24 @@ bool simulator::save(string outfile){
       newTable->column(colname[2]).write(f3,1);
       newTable->column(colname[3]).write(redshift,1);
       newTable->column(colname[4]).write(luminosity,1);
-      
+      newTable->column(colname[5]).write(sedtype,1);
+
       valarray<double> counts1(pow(10,counts[0]->bins()));
       valarray<double> counts2(pow(10,counts[1]->bins()));
       valarray<double> counts3(pow(10,counts[2]->bins()));
 
-      newTable->column(colname[5]).write(counts1,1);
-      newTable->column(colname[6]).write(counts2,1);
-      newTable->column(colname[7]).write(counts3,1);
+      newTable->column(colname[6]).write(counts1,1);
+      newTable->column(colname[7]).write(counts2,1);
+      newTable->column(colname[8]).write(counts3,1);
       
-      newTable->column(colname[8]).write(last_output.dnds[0],1);
-      newTable->column(colname[9]).write(last_output.dnds[1],1);
-      newTable->column(colname[10]).write(last_output.dnds[2],1);
+      newTable->column(colname[9]).write(last_output.dnds[0],1);
+      newTable->column(colname[10]).write(last_output.dnds[1],1);
+      newTable->column(colname[11]).write(last_output.dnds[2],1);
 
       if(not simflag){
-	newTable->column(colname[11]).write(counts[0]->counts(),1);
-	newTable->column(colname[12]).write(counts[1]->counts(),1);
-	newTable->column(colname[13]).write(counts[2]->counts(),1);
+	newTable->column(colname[12]).write(counts[0]->counts(),1);
+	newTable->column(colname[13]).write(counts[1]->counts(),1);
+	newTable->column(colname[14]).write(counts[2]->counts(),1);
       }
     }
     catch(FitsException &except){

@@ -24,11 +24,11 @@ void agn_frac::set_lumfunct(lumfunct *lf){
 //Fraction of galaxies as a function of luminosity and redshift that are AGN (note ALL AGN including obscured and unobscured, can try to sub-divide at some future point.
 double agn_frac::get_agn_frac(double lum, double redshift){
 
-  map <tuple<double,double>,double> values;
+  static map <tuple<double,double>,double> values;
   tuple<double,double> point(lum,redshift);
   
   if(values.count(point) == 0){
-    printf("Initializing AGN_FRAC %f %f\n",lum,redshift);
+
     //the Chen,Hickox et al. 2013 relation between average(Log(Lx)) and Log(Lir)
     //here Lx is in ergs/s while lum (i.e. Lir) is in Lsun;
     float av_lglx=30.37+1.05*lum;
@@ -39,9 +39,12 @@ double agn_frac::get_agn_frac(double lum, double redshift){
     
     //the average lgl6 to lg(Lagn_ir) conversion including converting to Lsun
     // for now a placeholder only, will need to calculate properly
-    float av_lgAGNir=av_lgl6um-7-26-log10(3.86)+0.4;
+    static float offset(-7-26-log10(3.86)+0.4);
+    float av_lgAGNir=av_lgl6um+offset;
 
   //the logic here is that if the average Lir_agn is comparable to the Lir of the given bin, essentially 100% of the galaxies are AGN and scales from there. With the Chen+13 relation, we end up with fairly low AGN fractions even at the highest luminosities.
+
+    //store to speed up later calculations
     values[point]= pow(10,(av_lgAGNir-lum));
   }
   

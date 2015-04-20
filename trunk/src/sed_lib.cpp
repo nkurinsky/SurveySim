@@ -49,7 +49,7 @@ double sed::get_flux(double band, double redshift){
     double x_em = (band/(1+redshift));
     double z = redshift;
     if ((x_em < brange[0]) or (x_em > brange[1])){
-      printf("ERROR: emitted lambda %f out of range %f -> %f\n",x_em,brange[0],brange[1]);
+      printf("ERROR: emitted lambda %e out of range %e -> %e\n",x_em,brange[0],brange[1]);
       exit(1);
     }
     if (z < zrange[0]){
@@ -93,113 +93,194 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
   interp_zmin=zmin;
   interp_dz=dz;
   
-  double *bands;
-  FITS *pInfile;  
-  pInfile = new FITS(fitsfile,Read);
+  unique_ptr<FITS> pfits;
+  try{
+    pfits.reset(new FITS(fitsfile));
+  }
+  catch(CCfits::FITS::CantOpen){
+    cout << "Cannot open "<< fitsfile << endl;
+    exit(1);
+  }
 
-  std::valarray<double> contents;
-  PHDU& image = pInfile->pHDU();
-  image.read(contents); //store contents of image into the array "seds"
+  HDU& info=pfits->pHDU();
+  info.readAllKeys();
+  auto settings=info.keyWord();
 
-  bandnum = image.axis(0);
-  lnum = image.axis(1)-1; //since the first row here is the lambda array
-  int axnum = image.axes();
-
-  znum=tnum=1;
-  if(axnum >= 3){
-    redshiftq=true;
-    znum = image.axis(2);
-    LOG_DEBUG(printf("Detected SED redshift dimension, length %i\n",znum));
-    if(axnum >= 4){
-      typeq=true;
-      tnum = image.axis(3);
-      LOG_DEBUG(printf("Detected SED type dimension, length %i\n",tnum));
-    }
+  int nmodels,nzbins;
+  if(settings.count("NTYPES") == 1){
+    settings["NTYPES"]->value(nmodels);
   }
   else{
-    //LOG_INF0(printf("Redshift independent templates, will use default color evolution\n"));
+    cout << "Keyword NTYPES not specified; exiting" << endl;
+    exit(1);
   }
 
-  lums = new double[lnum];
-  double inds[lnum];
-  seds.reserve(lnum*tnum);
-  bands = new double[bandnum];
+  if(settings.count("NZBINS") == 1){
+    settings["NZBINS"]->value(nzbins);
+  }
+  else{
+    cout << "Keyword NZBINS not specified; exiting" << endl;
+    exit(1);
+  }
 
-  //read in the total IR luminosities associated with the different z=0 SED templates
-  double temp, scale;
-  HDU& header = pInfile->pHDU();
-  
+  float scale;
+  if(settings.count("SCALE") == 1){
+    settings["SCALE"]->value(scale);
+  }
+  else{
+    cout << "Keyword SCALE not specified; exiting" << endl;
+    exit(1);
+  }
+
+  redshiftq=nzbins>1;
+  typeq=nmodels>1;
+
+  vector<double> zmins;
+  vector<double> zmaxs;
+  vector<string> types;
+
+  //read SED types
+  string type;
+  for(int i=1;i<=nmodels;i++){
+    char buffer[10];
+    sprintf(buffer,"SEDTYPE%i",i);
+    string field(buffer);
+    if(settings.count(field) > 0){
+      settings[field]->value(type);
+      types.push_back(type);
+    }
+    else{
+      cout << "Keyword " << field << " not specified; exiting" << endl;
+      exit(1);
+    }
+  }
+
+  //Read redshift bins
+  double tzmin;
+  for(int i=0;i<nzbins;i++){
+    char buffer[10];
+    sprintf(buffer,"ZMIN%i",i);
+    string field(buffer);
+    if(settings.count(field) > 0){
+      settings[field]->value(tzmin);
+    }
+    else{
+      printf("Keyword %s missing from header (%s)\n",field.c_str(),fitsfile.c_str());
+      exit(1);
+    }
+    zmins.push_back(tzmin);    
+  }
+
+  //Read redshift bins
+  double tzmax;
+  for(int i=0;i<nzbins;i++){
+    char buffer[10];
+    sprintf(buffer,"ZMAX%i",i);
+    string field(buffer);
+    if(settings.count(field) > 0){
+      settings[field]->value(tzmax);
+    }
+    else{
+      printf("Keyword %s missing from header (%s)\n",field.c_str(),fitsfile.c_str());
+      exit(1);
+    }
+    zmaxs.push_back(tzmax);
+  }
+
+  auto extensions=pfits->extension();
+
+  //read luminosities from primary header
+  lnum=extensions.begin()->second->numCols()-1;
+  lums.reset(new double[lnum]);
+  unique_ptr<double[]> inds(new double[lnum]);
   char buffer[10];
+  double temp;
   for (unsigned int i=0;i<lnum;i++) {
-    std::string a = "ROW";
+    std::string a = "L";
     sprintf(buffer,"%i",i+1);
     a.append(buffer);
-    try{header.readKey(a,temp);}
-    catch(HDU::NoSuchKeyword){
+    if(settings.count(a) == 1){
+      settings[a]->value(temp);
+      lums[i] = temp;
+      inds[i] = static_cast<double>(i);
+    }
+    else{
       printf("Keyword %s missing from header (%s)\n",a.c_str(),fitsfile.c_str());
       exit(1);
     }
-    lums[i] = temp;
-    inds[i] = i;
   }
-  
-  try{header.readKey("SCALE",temp);}
-  catch(HDU::NoSuchKeyword){
-    printf("Keyword SCALE missing from header (%s)\n",fitsfile.c_str());
-    exit(1);
-  }
-  scale = pow(10,temp);
   
   acc = gsl_interp_accel_alloc();
   spline = gsl_spline_alloc(gsl_interp_cspline,lnum);
-  gsl_spline_init(spline,lums,inds,lnum);
-  
-  double fluxes[bandnum*znum];
-  sed *new_sed;
-  
-  for (unsigned int fi=0;fi<bandnum;fi++){
-    bands[fi]=contents[fi]*scale;
-  }
-  
-  brange[0] = bands[0];
-  brange[1] = bands[bandnum-1];
-  
-  double zs[znum];
-  if(znum > 1){
-    for (unsigned int i=0;i<znum;i++) {
-      std::string a = "Z";
-      sprintf(buffer,"%i",i);
-      a.append(buffer);
-      try{header.readKey(a,temp);}
-      catch(HDU::NoSuchKeyword){
-	printf("Keyword %s missing from header (%s)\n",a.c_str(),fitsfile.c_str());
-	exit(1);
-      }
-      zs[i] = temp;
+  gsl_spline_init(spline,lums.get(),inds.get(),lnum);
+
+  //find extensions corresponding to types
+  map<string,vector<string> > type_exts;
+  for(auto itype=types.begin();itype!=types.end();++itype){
+    for (auto ext=extensions.begin();ext != extensions.end();++ext){
+      std::size_t found = ext->first.find(*itype);
+      if (found!=std::string::npos){
+	type_exts[*itype].push_back(ext->first);
+      }      
     }
   }
-  else
-    zs[0]=0.0;
+  tnum=type_exts.size();
+  
+  cout << "Finding Types" << endl;
+  unique_ptr<sed> new_sed;  
+  LOG_INFO(printf("Reading in Types:\n"));
+  //for (auto itr=type_exts.begin(); itr != type_exts.end(); ++itr){
+  for(auto itr=types.begin();itr != types.end();++itr){
+    if(type_exts.count(*itr) == 0)
+      continue;
 
-  for(unsigned int ft=0; ft < tnum; ft++){
-    for (unsigned int fj=1;fj<(lnum+1);fj++){
-      for(unsigned int fz=0; fz < znum; fz++){
-	for (unsigned int fi=0;fi<bandnum;fi++){
-	  fluxes[fi+fz*bandnum]=contents[fi+bandnum*(fj+znum*(fz+tnum*ft))];
+    int type_len=itr->length();
+    vector<double> lambda;
+    vector<double> zs;
+    for(auto eitr=type_exts[*itr].begin();eitr!=type_exts[*itr].end();++eitr){
+      string extstr(*eitr);
+      extstr.erase(0,type_len+2);
+      int zbin(atoi(extstr.c_str()));
+      zs.push_back(zmins[zbin]);
+    }
+
+    auto firstInstance=extensions.find(type_exts[*itr].front())->second;
+    int tablelength=firstInstance->rows();
+    firstInstance->column(1).read(lambda,0,tablelength);
+    static double scale_factor(pow(10,scale));
+    for(auto lam=lambda.begin();lam!=lambda.end();++lam)
+      *lam *= scale_factor;
+    LOG_INFO(printf("%s\t",(*itr).c_str()));
+    if(itr == types.begin()){
+      brange[0] = lambda.front();
+      brange[1] = lambda.back();
+    }
+    LOG_INFO(printf("\n"));
+      
+    for(int i=2;i<lnum+2;i++){
+      vector<double> fluxtemp;
+      vector<double> fluxes;
+      for(auto eitr=type_exts[*itr].begin();eitr!=type_exts[*itr].end();eitr++){
+	extensions.find(*eitr)->second->column(i).read(fluxtemp,0,tablelength);
+	for(int i=0;i<fluxtemp.size();i++){
+	  fluxes.push_back(fluxtemp[i]);
 	}
       }
-      if(znum > 1)
-	new_sed = new sed(fluxes,bands,bandnum,zs,znum);
+      if(zs.size() > 1)
+	new_sed.reset(new sed(fluxes.data(),
+			      lambda.data(),
+			      lambda.size(),
+			      zs.data(),
+			      zs.size()));
       else
-	new_sed = new sed(fluxes,bands,bandnum);
-      seds.push_back(new_sed);
+	new_sed.reset(new sed(fluxes.data(),
+			      lambda.data(),
+			      lambda.size()));
+      seds.push_back(move(new_sed));
     }
   }
 
   color_exp = 0;
-
-  delete[] bands;
-  delete pInfile;
 }
 
 bool sed_lib::load_filters(string file,int lflag_tmp){
@@ -293,54 +374,35 @@ void sed_lib::get_lums(double luminosities[]){
 }
 
 sed_lib::~sed_lib(){
-  for (unsigned int i=0;i<seds.size();i++){
-    delete seds[i];
-  }
-  
   gsl_spline_free(spline);
   gsl_interp_accel_free(acc);
   
   if(filters.init())
     gsl_integration_workspace_free(w);
-  
-  delete[] lums;
 }
 
 void sed_lib::initialize_filter_fluxes(int logflag){
+  //vector contains alg_lib interpolation class
   flux_interpolator.resize(FILTER_NUM*tnum);
   
   alglib::real_1d_array ls;
   alglib::real_1d_array zs;
   alglib::real_1d_array fs;
 
-  ls.setcontent(lnum,lums);
+  ls.setcontent(lnum,lums.get());
   zs.setlength(interp_znum);
   for(int zi=0;zi<interp_znum;zi++)
     zs[zi] = static_cast<double>(zi)*interp_dz+interp_zmin;
   fs.setlength(lnum*interp_znum);
   
-  string clearprogress="[";
-  for(int li=0;li<lnum;li++){
-    clearprogress.append("");
-  }
-  clearprogress.append("]");
-
-//  FILE *fp = fopen("fluxes.txt","w+");
-
-  //printf("Initializing Filter Flux Interpolation\n");
   for (int type=0;type<tnum;type++){
     for (int filter=0;filter<3;filter++){
-      
       for(int zi=0;zi<interp_znum;zi++){  
-	//printf("\rType: %i\tFilter: %i\tZ: %lf - %s",type,filter,zs[zi],clearprogress.c_str());
-	//printf("\rType: %i\tFilter: %i\tZ: %lf - [",type,filter,zs[zi]);
 	for(int li=0;li<lnum;li++){
-	  //printf("=");
 	  fs[li+zi*lnum]=convolve_filter(li,zs[zi],type,filter);
-	  //fprintf(fp,"%i %f %i %i %g\n",li,zs[zi],type,filter,fs[li+zi*lnum]));
 	}
       }
-      LOG_DEBUG(printf("\rBuilding Spline...                                                         "));
+      LOG_DEBUG(printf("\rBuilding Spline..."));
       try{
 	alglib::spline2dbuildbilinearv(ls,lnum,
 				       zs,interp_znum,
@@ -352,13 +414,11 @@ void sed_lib::initialize_filter_fluxes(int logflag){
 	printf("error msg: %s\n", e.msg.c_str());
 	exit(1);
       }  
-      }
     }
-
-//  fclose(fp);
-
-    LOG_INFO(printf("\rBuilt Spline Interpolation for Filter Fluxes                                           \n"));
-    interp_init=true;
+  }
+  
+  LOG_INFO(printf("\rBuilt Spline Interpolation for Filter Fluxes\n"));
+  interp_init=true;
 }
 
 double sed_lib::interpolate_flux(double lum, double redshift, short sedtype, short filter_id){
@@ -398,7 +458,7 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, sh
     double scale,result,error;
     double bounds[2];
     gsl_function F;
-    flux_yield_params p(seds[lum_id+lnum*sedtype],&filters.get(filter_id),redshift);
+    flux_yield_params p(seds[lum_id+lnum*sedtype].get(),&filters.get(filter_id),redshift);
     F.function = &flux_yield;
     F.params = &p;
 

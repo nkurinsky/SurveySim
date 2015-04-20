@@ -8,9 +8,10 @@ sprop::sprop(){
   c2 = -99.0;
 }
 
-sprop::sprop(double z,double f[],double lum, axis_type opts[]) : sprop(){
+sprop::sprop(double z,double f[],double lum, axis_type opts[], short s) : sprop(){
   redshift = z;
   luminosity = lum;
+  sedtype = s;
 
   bool do_metrics(true);
   for (int i=0;i<3;i++){

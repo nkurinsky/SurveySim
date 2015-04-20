@@ -8,7 +8,7 @@ flux_errors=[3.1,3.2,4.5]
 value_initial=[-2.20,10.14,0.50,3.00,-4.50,4.50,2.00,0.0]
 value_min=[-3.00,9.00,0.00,0.00,-8.00,0.00,0.00,0.0]
 value_max=[-1.00,11.00,2.00,5.00,0.00,8.00,4.00,1.0]
-value_fix=[0,0,1,1,0,0,0,0]
+value_fix=[1,1,1,1,0,0,1,1]
 
 zmin=0.01 #Simulation minimum redshift
 zmax=5.0 #Simulation maximum redshift

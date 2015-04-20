@@ -15,10 +15,6 @@
 #define SL_INT_PRECISION 1E-2
 #define FILTER_NUM 3
 
-//#define LOG_CRITICAL(ARG) (logflag == 1 ? ARG : printf(""))
-//#define LOG_INFO(ARG) (logflag == 2 ? ARG : printf(""))
-//#define LOG_DEBUG(ARG) (logflag == 3 ? ARG : printf(""))
-
 using namespace CCfits;
 
 class sed{
@@ -40,11 +36,9 @@ public:
 
 class sed_lib{
  private:
-  std::vector<sed*> seds;
-  double *lums;
+  std::vector<unique_ptr<sed> > seds;
+  unique_ptr<double[]> lums;
   unsigned int lnum;
-  unsigned int bandnum;
-  unsigned int znum;
   unsigned int tnum;
   bool redshiftq, typeq;
   //for interpolation

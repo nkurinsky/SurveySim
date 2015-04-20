@@ -5155,7 +5155,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile idl/Makefile lib_aux/Makefile src/alg_lib/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile lib_aux/Makefile src/alg_lib/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5912,7 +5912,6 @@ do
     "filters/Makefile") CONFIG_FILES="$CONFIG_FILES filters/Makefile" ;;
     "templates/Makefile") CONFIG_FILES="$CONFIG_FILES templates/Makefile" ;;
     "obs/Makefile") CONFIG_FILES="$CONFIG_FILES obs/Makefile" ;;
-    "idl/Makefile") CONFIG_FILES="$CONFIG_FILES idl/Makefile" ;;
     "lib_aux/Makefile") CONFIG_FILES="$CONFIG_FILES lib_aux/Makefile" ;;
     "src/alg_lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/alg_lib/Makefile" ;;
 

@@ -12,10 +12,11 @@ struct sprop{
   double luminosity;
   double fluxes[3];
   double c1,c2;
+  short sedtype;
   sprop();
   //constructor initializes variables
   //as well as automatically computes colors if it is a valid operation
-  sprop(double z,double f[],double lum, axis_type opts[]); 
+  sprop(double z,double f[],double lum, axis_type opts[],short sedtype=0); 
   friend ostream &operator<<(ostream &out,sprop c);
 };
 
