@@ -99,7 +99,9 @@ double agn_frac::get_agn_frac2(double lum, double redshift, int agntype){
     float phi=pow(10,phistar)/denom;
     
     float phi_all,fagn;
-    phi_all = lf->get_nsrcs(redshift,lum);
+
+    //here adopt dlogL=1 as this is just a ratio of numbers, we don't need absolute source numbers in this function
+    phi_all = lf->get_nsrcs(redshift,lum,1);
     
     //the AGN fraction is the ratio of AGN Luminosity Function computed here and the overall luminosity function (from lumfunc.cpp), ensure that this does not exceed 100%
 

@@ -87,9 +87,10 @@ long simulator::num_sources(double z, double l, double dl){
 
   //source number is integral(dn/(dldv)*(dv/dz),dl,dz)
   double nsrcs = 0.0;
+  double dlogl=0.25; //need to generate this but adopt fixed value for now
   for(int i=0;i<2;i++){
     for(int j=0;j<2;j++){
-      nsrcs += lf->get_nsrcs(zval[j],lval[i])*dvdz(zval[j],area);
+      nsrcs += lf->get_nsrcs(zval[j],lval[i],dlogl)*dvdz(zval[j],area);
     }
   }
   nsrcs*=0.25*dl*dz;
