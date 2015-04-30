@@ -1,3 +1,4 @@
+//-*-c++-*-
 //created by Anna Sajina (09/27/12) 
 //based on earlier code by Noah Kurinsky
 
@@ -7,6 +8,11 @@
 #include "functions.h"
 
 using namespace std;
+
+namespace LF{
+  enum parameter {PHI0,L0,alpha,beta,p,q,zmax};
+  enum distribution {DoublePowerLaw,ModifiedSchechter};
+}
 
 //==============================================================================
 //Luminosity function class
@@ -21,16 +27,11 @@ class lumfunct {
   double beta;
   double p,q; //Parameters which evolve Phi and L
   double zmax;
+  LF::distribution _dist;
  public:
-  //lumfunct(double lpar[7]); uncomment if you want a constructor
-//For changing parameters
-  void set_phi0(double val){phi0=val;}
-  void set_L0(double val){L0=val;}
-  void set_alpha(double val){alpha=val;}
-  void set_beta(double val){beta=val;}
-  void set_p(double val){p=val;}
-  void set_q(double val){q=val;}
-  void set_zmax(double val){zmax=val;}
+  lumfunct(LF::distribution dist=LF::DoublePowerLaw);
+  double get_param(LF::parameter p);
+  void set_param(LF::parameter p, double value);
   void set_params(double lpars[]);
   void get_params(double lpars[]);
   //for getting the number of sources/Mpc^3 for a given L,z pair
