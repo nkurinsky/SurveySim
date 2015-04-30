@@ -20,16 +20,14 @@ class obs{
 
 class obs_lib{
  private:
-  vector<obs*> observations;
+  vector<shared_ptr<obs> > observations;
   double zp[3]; //zero points for magnitude-flux conversions
  public:
   obs_lib(string fitsfile, axis_type axes[], double flim[]);
   double get_flux(int i,int band);
   void get_colors(int i,double &c1,double &c2);
-  void get_all_colors(double* &c1,double* &c2);
-  int get_snum(){
-    return observations.size();}
-  ~obs_lib();
+  void get_all_colors(vector<double> &c1, vector<double> &c2);
+  int get_snum(){return observations.size();}
 };
 
 #endif

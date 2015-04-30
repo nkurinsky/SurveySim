@@ -37,7 +37,7 @@ obs::~obs(){
 
 obs_lib::obs_lib(string fitsfile, axis_type axes[], double flim[]){
   //initialize FITS input
-  std::auto_ptr<FITS> pInfile;
+  std::unique_ptr<FITS> pInfile;
   
   try{
     pInfile.reset(new FITS(fitsfile,Read));
@@ -114,7 +114,7 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[], double flim[]){
 	fluxes[j]=col[j][i];
       }
       if(accepted){
-	observations.push_back(new obs(fluxes,axes));
+	observations.push_back(make_shared<obs>(fluxes,axes));
       }
     }
   }
@@ -140,14 +140,9 @@ void obs_lib::get_colors(int i,double &c1,double &c2){
   }
 }
 
-void obs_lib::get_all_colors(double* &c1,double* &c2){
-  c1 = new double[observations.size()];
-  c2 = new double[observations.size()];
-  for (unsigned int i=0;i<observations.size();i++){
+void obs_lib::get_all_colors(vector<double> &c1, vector<double> &c2){
+  c1.resize(get_snum());
+  c2.resize(get_snum());
+  for(auto i=0;i<observations.size();i++)
     observations[i]->get_colors(c1[i],c2[i]);
-  }
-}
-
-obs_lib::~obs_lib(){
-
 }

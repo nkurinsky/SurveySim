@@ -40,10 +40,10 @@ void simulator::configure(const Configuration &config){
 
       observations.reset(new obs_lib(obsFile, axes, flux_limits));
       
-      double *x,*y;
+      vector<double> x,y;
       int osize = observations->get_snum();
       observations->get_all_colors(x,y);
-      diagnostic->init_obs(x,y,osize);
+      diagnostic->init_obs(x.data(),y.data(),osize);
     
       valarray<double> fluxes[3];
       for(int i=0;i<3;i++){
@@ -67,7 +67,7 @@ void simulator::configure(const Configuration &config){
 }
 
 void simulator::set_color_exp(double val, double zcut){
-  if (seds.get() != NULL)
+  if (seds)
     seds->set_color_evolution(val,zcut);
 }
 
