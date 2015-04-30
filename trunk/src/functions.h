@@ -121,6 +121,7 @@ public:
   vector<int> param_inds;
   double LFParameters[LUMPARS][4];
   double colorEvolution[4];
+  short dist;
 
   const short value = 0;
   const short fixed = 1;
