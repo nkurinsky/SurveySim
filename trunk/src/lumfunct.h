@@ -34,7 +34,7 @@ class lumfunct {
   void set_params(double lpars[]);
   void get_params(double lpars[]);
   //for getting the number of sources/Mpc^3 for a given L,z pair
-  double get_nsrcs(double redshift,double lum,double dlogl);
+  double get_nsrcs(double redshift,double lum);
   //~lumfunct(); uncomment if you want a destructor
 };
 

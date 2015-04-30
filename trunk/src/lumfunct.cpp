@@ -24,7 +24,7 @@ void lumfunct::set_params(double lpars[]){
 //this is the main function which would needs to be changed in order to change the adopted luminosity function
 //note need to also give it dlogl as the number of sources within a bin 
 //changes depending on the width of the bin!
-double lumfunct::get_nsrcs(double redshift,double lum,double dlogl){
+double lumfunct::get_nsrcs(double redshift,double lum){
   double nsrcs;
   double t1,t2;
   double ratio;
@@ -43,9 +43,9 @@ double lumfunct::get_nsrcs(double redshift,double lum,double dlogl){
   ratio=pow(10,lum)/t2;
 
   if (lf_form.compare("dbl_pl") == 0)
-    nsrcs=dlogl*t1/(pow(ratio,alpha)+pow(ratio,beta));
+    nsrcs=t1/(pow(ratio,alpha)+pow(ratio,beta));
   if (lf_form.compare("modSchecter") == 0)
-    nsrcs=dlogl*t1*(pow(ratio,1-alpha)*exp(-(1./2*pow(beta,2.))*(log(1-ratio)**2.);
+    nsrcs=t1*(pow(ratio,1-alpha)*exp(-(1./2*pow(beta,2.))*(log(1-ratio)**2.);
 
   return nsrcs;
 }
