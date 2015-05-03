@@ -3,6 +3,7 @@
 #Python prelims
 import os
 import sys
+import datetime
 
 codedir=os.getcwd()+'/trunk/';
 pydir=os.getcwd()+'/Python/';
@@ -39,13 +40,16 @@ obsdir=codedir+'obs/'
 obsfile=obsdir+'wise.fits'
 outfile=codedir+'output/output.fits'
 fitcode=codedir+'src/SurveySim'
+lfform='Schecter'
 
 #initialize luminosity function parameters (GUI middle frame)
-fields_lf='Phi_0','Lstar_0','alpha','beta','p','q','zcut','c_evol'
-value_initial=[-2.20,10.14,0.50,3.00,-4.50,4.50,2.00,0.0]
-value_min=[-3.00,9.00,0.00,0.00,-8.00,3.00,0.00,0.0]
-value_max=[-1.00,11.00,2.00,5.00,-1.00,6.00,0.00,1.0]
-value_fix=[1,1,1,1,0,0,1,1]
+fields_lf='Phi_0','Lstar_0','alpha','beta','p1','q1','p2','q2','zcut1','zcut2'
+
+#values based on Gruppioni+2013
+value_initial=[-2.29,10.12,1.15,0.52,-0.57,3.55,-3.92,1.62,1.1,1.85]
+value_min=[-2.35,9.94,1.08,0.47,-0.79,3.45,-4.26,1.11,0.00,0.00]
+value_max=[-2.23,10.28,1.22,0.57,-0.35,3.65,-3.58,2.13,5.00,5.00]
+value_fix=[1,1,1,1,0,0,0,0,1,1]
 
 #initialize survey parameters (GUI bottom frame)
 axes='ColorF1F2','Flux1'
@@ -151,11 +155,12 @@ for fline in flines:
 class SurveySimGUI:
     def __init__(self, master):
         #local variables to hold the entries in the GUI
-        self.v_fixed=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar()]
-        self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
-        self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
-        self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
+        self.v_fixed=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar()]
+        self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
+        self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
+        self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
         self.obsfile_set=StringVar()
+        self.lfform_set=StringVar()
         self.sedfile_set=StringVar()
         self.colsel=StringVar()
         self.area=DoubleVar()
@@ -174,7 +179,7 @@ class SurveySimGUI:
         self.labelframe_lf = LabelFrame(master, text="Luminosity Function Parameters",bg='light blue') 
         self.labelframe_lf.grid(column=0,row=1,rowspan=2)
         self.label_lf=Label(self.labelframe_lf,text="Initial/Min/Max/Fix",bg='light blue')
-        self.label_lf.grid(in_=self.labelframe_lf,row=1,column=1)
+        self.label_lf.grid(in_=self.labelframe_lf,row=2,column=1)
 
         self.labelframe_survey = LabelFrame(master, text="Survey fitting properties",bg='pink') 
         self.labelframe_survey.grid(column=1,row=1,sticky=W+N+S)
@@ -231,25 +236,33 @@ class SurveySimGUI:
 
 #  LF frame
         ind=0;
+        lab=Label(self.labelframe_lf,text='LF form',bg='light blue')
+        lab.grid(in_=self.labelframe_lf,row=ind+1,column=0)
+        lfforms=['dbl_pl','modSchecter','Schecter']
+        lf_option=OptionMenu(self.labelframe_lf,self.lfform_set,*lfforms)
+        self.lfform_set.set(lfform)
+        lf_option.grid(in_=self.labelframe_lf,row=ind+1,column=1)
+ 
+
         for field in fields_lf:
             lab = Label(self.labelframe_lf, text=field,bg='light blue')
-            lab.grid(in_=self.labelframe_lf,row=ind+2,column=0)
+            lab.grid(in_=self.labelframe_lf,row=ind+3,column=0)
 
             ent3 = Entry(self.labelframe_lf,textvariable=self.v_init[ind],width=5)
             self.v_init[ind].set(value_initial[ind])
-            ent3.grid(in_=self.labelframe_lf,row=ind+2,column=1)
+            ent3.grid(in_=self.labelframe_lf,row=ind+3,column=1)
 
             ent2 = Entry(self.labelframe_lf,textvariable=self.v_min[ind],width=5)
             self.v_min[ind].set(value_min[ind])
-            ent2.grid(in_=self.labelframe_lf,row=ind+2,column=2)
+            ent2.grid(in_=self.labelframe_lf,row=ind+3,column=2)
 
             ent1 = Entry(self.labelframe_lf,textvariable=self.v_max[ind],width=5)
             self.v_max[ind].set(value_max[ind])
-            ent1.grid(in_=self.labelframe_lf,row=ind+2,column=3)
+            ent1.grid(in_=self.labelframe_lf,row=ind+3,column=3)
 
             ent0 = Entry(self.labelframe_lf,textvariable=self.v_fixed[ind],width=1)
             self.v_fixed[ind].set(value_fix[ind])
-            ent0.grid(in_=self.labelframe_lf,row=ind+2,column=4)
+            ent0.grid(in_=self.labelframe_lf,row=ind+3,column=4)
             ind=ind+1;
         
 # Survey frame
@@ -492,6 +505,7 @@ class SurveySimGUI:
 
     def update_mfile(self):
         ind=0
+        lfform=self.lfform_set.get()
         for field in fields_lf:
             value_initial[ind]=self.v_init[ind].get()
             value_min[ind]=self.v_min[ind].get()
@@ -572,6 +586,8 @@ class SurveySimGUI:
         hdr=hdulist[0].header #the header associated with extension=0
 
     #create/update luminosity function parameters in model file header
+        hdr.set('DATE',datetime.date.today().strftime("%B %d, %Y"),'Date of creation')
+        hdr.set('LF_FORM',lfform,'The functional form of the LF')
         hdr.set('PHI0',value_initial[0],'Luminosity Function Normalization')
         hdr.set('PHI0_FIX',value_fix[0],'Fix Phi0 (Y=1/N=0)')
         hdr.set('PHI0_MIN',value_min[0],'Minimum Phi0 value')
