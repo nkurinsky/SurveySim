@@ -13,6 +13,7 @@ class agn_frac{
   int _types;
   bool generate;
   RandomNumberGenerator rng;
+  map <tuple<double,double>,double> values;
  public:
   agn_frac(int agn_types);
   void set_lumfunct(lumfunct *lf);

@@ -238,7 +238,8 @@ void Configuration::load(){
   
   axes[0] = ColorF1F3;
   axes[1] = ColorF2F3;
-  
+  lfDist = LF::DoublePowerLaw;
+
   std::unique_ptr<CCfits::FITS> pInfile;
   try{
     pInfile.reset(new CCfits::FITS(modfile,CCfits::Read,true));

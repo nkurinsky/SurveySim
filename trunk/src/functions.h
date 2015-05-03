@@ -69,6 +69,11 @@ enum colsel_type{
   ColF2F3
 };
 
+namespace LF{
+  enum parameter {PHI0,L0,alpha,beta,p,q,zmax};
+  enum distribution {DoublePowerLaw,ModifiedSchechter};
+}
+
 axis_type set_axis_type(string &keyvalue);
 string get_axis_type(axis_type opt);
 
@@ -130,6 +135,8 @@ public:
 
   axis_type axes[2];
   colsel_type colsel;
+
+  LF::distribution lfDist;
 
 private:
   void load();

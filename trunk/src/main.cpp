@@ -53,7 +53,7 @@ int main(int argc,char** argv){
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
   string countnames[]= {"dnds1","dnds2","dnds3"};
   
-  lumfunct lf;
+  lumfunct lf(q.lfDist);
   lf.set_params(lpars);
 
   //initialize simulator

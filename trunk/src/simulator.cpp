@@ -124,6 +124,8 @@ void simulator::initial_simulation(){
   short sedtype; // this holds the id of the SED type 
   
   seds->get_lums(lums);
+
+  unique_ptr<int[]> jsmin_type(new int[seds->get_tnum()]);
   
   //=========================================================================
   // for each L-z depending on the number of sources, sample the SED and get 
@@ -142,19 +144,21 @@ void simulator::initial_simulation(){
 
     zarray[is]=(is)*dz+zmin;    
 
+    jsmin=lnum;
     // here we determine minimum luminosity to attempt to simulate
-    jsmin = 0;
-    for (js=0;js<lnum;js++){
-      // look at all SED types; don't want to bias by ignoring certain types
-      for(int stype=0;stype<seds->get_tnum();stype++){
+    for(int stype=0;stype<seds->get_tnum();stype++){
+      jsmin_type[stype] = 0;
+      for (js=0;js<lnum;js++){
 	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
 	if(flux_sim[0]>=flux_limits[0]){
-	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
+	  jsmin_type[stype] = (js > 0) ? (js-1) : js; //js-1 to allow for noise
 	  js = lnum; //break out of loop
 	}
       }
+      if(jsmin_type[stype] < jsmin)
+	jsmin=jsmin_type[stype];
     }
-    
+
     for (js=jsmin;js<lnum;js++){
       nsrcs = num_sources(zarray[is],lums[js],dl);
       
@@ -256,6 +260,8 @@ products simulator::simulate(){
   short sedtype; // this holds the id of the SED type 
   
   seds->get_lums(lums);
+
+  unique_ptr<int[]> jsmin_type(new int[seds->get_tnum()]);
   
   //=========================================================================
   // for each L-z depending on the number of sources, sample the SED and get 
@@ -274,17 +280,19 @@ products simulator::simulate(){
 
     zarray[is]=(is)*dz+zmin;    
 
+    jsmin=lnum;
     // here we determine minimum luminosity to attempt to simulate
-    jsmin = 0;
-    for (js=0;js<lnum;js++){
-      // look at all SED types; don't want to bias by ignoring certain types
-      for(int stype=0;stype<seds->get_tnum();stype++){
+    for(int stype=0;stype<seds->get_tnum();stype++){
+      jsmin_type[stype] = 0;
+      for (js=0;js<lnum;js++){
 	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
 	if(flux_sim[0]>=flux_limits[0]){
-	  jsmin = (js > 0) ? (js-1) : js; //js-1 to allow for noise
+	  jsmin_type[stype] = (js > 0) ? (js-1) : js; //js-1 to allow for noise
 	  js = lnum; //break out of loop
 	}
       }
+      if(jsmin_type[stype] < jsmin)
+	jsmin=jsmin_type[stype];
     }
     
     for (js=jsmin;js<lnum;js++){

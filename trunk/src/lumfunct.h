@@ -9,11 +9,6 @@
 
 using namespace std;
 
-namespace LF{
-  enum parameter {PHI0,L0,alpha,beta,p,q,zmax};
-  enum distribution {DoublePowerLaw,ModifiedSchechter};
-}
-
 //==============================================================================
 //Luminosity function class
 //******************************************************************************

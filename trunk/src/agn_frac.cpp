@@ -23,8 +23,6 @@ void agn_frac::set_lumfunct(lumfunct *lf){
 }
 //Fraction of galaxies as a function of luminosity and redshift that are AGN (note ALL AGN including obscured and unobscured, can try to sub-divide at some future point.
 double agn_frac::get_agn_frac(double lum, double redshift){
-
-  static map <tuple<double,double>,double> values;
   tuple<double,double> point(lum,redshift);
   
   if(values.count(point) == 0){
@@ -113,7 +111,7 @@ double agn_frac::get_agn_frac2(double lum, double redshift, int agntype){
 
 int agn_frac::get_sedtype(double lum, double redshift){
   if(generate)
-    return get_agn_frac(lum,redshift) > rng.flat(0,1) ? 0 : 1;
+    return get_agn_frac(lum,redshift) > rng.flat(0,1) ? 1 : 0;
   else
     return 0;
 }
