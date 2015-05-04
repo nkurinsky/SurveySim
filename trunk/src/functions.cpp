@@ -318,6 +318,7 @@ void Configuration::load(){
   tab.readKey("CONV_RMA",rmax);
   tab.readKey("CONV_CON",a_ci);
   tab.readKey("PRINT",rtemp);
+  tab.readKey("LF_form",lfform);
   oprint = rtemp; // == 0.0 ? true : false;
 
   //compute redshift bin number from FITS values

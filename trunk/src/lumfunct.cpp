@@ -2,6 +2,7 @@
 
 lumfunct::lumfunct(LF::distribution dist){
   switch(dist){
+  case LF::distribution::Schecter:
   case LF::distribution::DoublePowerLaw:
   case LF::distribution::ModifiedSchechter:
     _dist=dist;
@@ -103,6 +104,8 @@ double lumfunct::get_nsrcs(double redshift,double lum){
   ratio=pow(10,lum)/t2;
   
   switch(_dist){
+  case LF::distribution::Schecter:
+    return t1*pow(ratio,alpha)*exp(-ratio);
   case LF::distribution::DoublePowerLaw:
     return t1/(pow(ratio,alpha)+pow(ratio,beta));
   case LF::distribution::ModifiedSchechter:

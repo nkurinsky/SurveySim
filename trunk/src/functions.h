@@ -1,6 +1,6 @@
 //Noah Kurinsky -*-c++-*-
 //7/5/2012
-//This header file provides the interface for the various small functions
+//This header file provides the interface for the various functions
 //used for constraining models
 
 #ifndef FUNCTIONS_H
@@ -71,7 +71,7 @@ enum colsel_type{
 
 namespace LF{
   enum parameter {PHI0,L0,alpha,beta,p,q,zmax};
-  enum distribution {DoublePowerLaw,ModifiedSchechter};
+  enum distribution {Schecter,DoublePowerLaw,ModifiedSchechter};
 }
 
 axis_type set_axis_type(string &keyvalue);
@@ -122,6 +122,7 @@ public:
   double tscale;
   double idealpct;
   double annrng;
+  string lfform;
 
   vector<int> param_inds;
   double LFParameters[LUMPARS][4];
