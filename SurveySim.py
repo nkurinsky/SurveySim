@@ -33,12 +33,12 @@ fields_files='Survey data','SEDs'
 
 #initialize datafiles
 seddir=codedir+'templates/'
-sedfile=seddir+'my_templates.fits'
+sedfile=seddir+'Kirkpatrick2015_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
 modelfile=codedir+'model/model.fits'
 obsdir=codedir+'obs/'
 obsfile=obsdir+'wise.fits'
-outfile=codedir+'output/output.fits'
+outfile=os.getcwd()+'/output.fits'
 fitcode=codedir+'src/SurveySim'
 lfform='Schecter'
 
@@ -319,13 +319,13 @@ class SurveySimGUI:
         canvas.get_tk_widget().grid(in_=self.labelframe_seds,column=0,row=0,sticky=N+S)
         ax = fig.add_subplot(111)
         sfile=fits.open(self.sedfile_set.get())
-        shdr=sfile[0].header
+        shdr=sfile[1].header
         nlam=shdr["NAXIS1"]
-        ntmp=shdr["NAXIS2"]
-        seds=sfile[0].data #the first extension contains the data
-        lam=seds[0,0,0,]
+        ntmp=shdr["TFIELDS"]-1 #number of templates -1 is because the first field is the lambda array
+        seds=sfile[1].data #the first extension contains the data
+        lam=seds['lambda'] #seds[0,0,0,]
         for i in range(1,ntmp):
-            fnu=seds[0,0,i,]
+            fnu=seds['lnu'+str(i)]
             ax.plot(lam,fnu)
 
         ax.set_xscale('log')
@@ -708,7 +708,7 @@ class SurveySimGUI:
         obsfile=self.obsfile_set.get()
         sedfile=self.sedfile_set.get()
 #        os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
-        os.system(fitcode+' '+modelfile+' '+obsfile+' '+sedfile+' '+outfile)
+        os.system(fitcode+' '+modelfile+' '+sedfile+' '+obsfile+' '+outfile)
 
     def quit(self):
         self.master.destroy()
@@ -717,7 +717,7 @@ class ColInfoWindow(Frame):
     def __init__(self):
         popup =tk.Frame.__init__(self)
         popup = Toplevel(self)
-        about_message='E.g.: mag1-mag2>2 [AB]  or    colF1F2>2         [Fnu spectral index]'
+        about_message='E.g.: mag1-mag2>2 [AB]  or    colF1F2>2          [Fnu spectral index]'
         msg = Message(popup, text=about_message,width=160)
         msg.pack()
         button = Button(popup, text="Okay", command=popup.destroy)
