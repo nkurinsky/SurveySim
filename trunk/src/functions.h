@@ -43,7 +43,7 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
 
-#define LUMPARS 7
+#define LUMPARS 10
 #define SDEG_PER_STER 3282.8
 
 #define LOG_CRITICAL(ARG) (logflag >= 1 ? ARG : printf(""))
@@ -70,7 +70,7 @@ enum colsel_type{
 };
 
 namespace LF{
-  enum parameter {PHI0,L0,alpha,beta,p,q,zmax};
+  enum parameter {PHI0,L0,alpha,beta,p,q,p2,q2,zbp,zbq};
   enum distribution {Schecter,DoublePowerLaw,ModifiedSchechter};
 }
 

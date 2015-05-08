@@ -89,7 +89,7 @@ long simulator::num_sources(double z, double l, double dl){
   double nsrcs = 0.0;
   for(int i=0;i<2;i++){
     for(int j=0;j<2;j++){
-      nsrcs += lf->get_nsrcs(zval[j],lval[i])*dvdz(zval[j],area);
+      nsrcs += lf->get_phi(zval[j],lval[i])*dvdz(zval[j],area);
     }
   }
   //Multiply by dlogl and dz

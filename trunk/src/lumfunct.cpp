@@ -27,8 +27,14 @@ double lumfunct::get_param(LF::parameter par){
     return p;
   case LF::parameter::q:
     return q;
-  case LF::parameter::zmax:
-    return zmax;
+  case LF::parameter::p2:
+    return p2;
+  case LF::parameter::q2:
+    return q2;
+  case LF::parameter::zbp:
+    return zbp;
+  case LF::parameter::zbq:
+    return zbq;
   default:
     fprintf(stderr,"Error in lumfunct::get_param: Invalid parameter %i\n",par);
     return -999;
@@ -55,8 +61,17 @@ void lumfunct::set_param(LF::parameter par, double value){
   case LF::parameter::q:
     q = value;
     return;
-  case LF::parameter::zmax:
-    zmax = value;
+  case LF::parameter::p2:
+    p2 = value;
+    return;
+  case LF::parameter::q2:
+    q2 = value;
+    return;
+  case LF::parameter::zbp:
+    zbp = value;
+    return;
+  case LF::parameter::zbq:
+    zbq = value;
     return;
   default:
     fprintf(stderr,"Error in lumfunct::set_param: Invalid parameter %i\n",par);
@@ -71,7 +86,10 @@ void lumfunct::get_params(double lpars[]){
   lpars[LF::parameter::beta]  = beta;
   lpars[LF::parameter::p]     = p;
   lpars[LF::parameter::q]     = q;
-  lpars[LF::parameter::zmax]  = zmax;
+  lpars[LF::parameter::p2]    = p2;
+  lpars[LF::parameter::q2]    = q2;
+  lpars[LF::parameter::zbp]  = zbp;
+  lpars[LF::parameter::zbq]  = zbq;
 }
 
 void lumfunct::set_params(double lpars[]){
@@ -81,25 +99,31 @@ void lumfunct::set_params(double lpars[]){
   beta  = lpars[LF::parameter::beta];
   p     = lpars[LF::parameter::p];
   q     = lpars[LF::parameter::q];
-  zmax  = lpars[LF::parameter::zmax];
+  p2    = lpars[LF::parameter::p2];
+  q2    = lpars[LF::parameter::q2];
+  // break redshift in "p"
+  zbp = lpars[LF::parameter::zbp];
+  // break redshift in "q"
+  zbq= lpars[LF::parameter::zbq];
 }
 
-//this function returns the number of sources (per Mpc^3) for a given L-z pair
-//this is the main function which would needs to be changed in order to change the adopted luminosity function
-//note need to also give it dlogl as the number of sources within a bin 
-//changes depending on the width of the bin!
-double lumfunct::get_nsrcs(double redshift,double lum){
-  double nsrcs;
+//this function returns the number of sources (per Mpc^3 per dlogL) for a given L-z pair
+double lumfunct::get_phi(double redshift,double lum){
+  double phi;
   double t1,t2;
   double ratio;
   
-  if(redshift <= zmax) {
+  if(redshift <= zbp) {
     t1=pow(10,phi0)*pow((1.+redshift),p);
+  }
+  if(redshift <= zbq) {
     t2=pow(10,L0)*pow((1.+redshift),q);
   } 
-  if(redshift > zmax) {
-    t1=pow(10,phi0)*pow((1.+zmax),p);
-    t2=pow(10,L0)*pow((1.+zmax),q);
+  if(redshift > zbp) {
+    t1=pow(10,phi0)*pow((1.+zbp),p)*pow((1.+redshift-zbp),p2);
+  }
+  if(redshift > zbq) {
+    t2=pow(10,L0)*pow((1.+zbq),q)*pow((1.+redshift-zbq),q2);
   }
   ratio=pow(10,lum)/t2;
   
@@ -112,6 +136,6 @@ double lumfunct::get_nsrcs(double redshift,double lum){
     return t1*pow(ratio,1-alpha)*exp(-1*pow(log(1-ratio),2)/(2*pow(beta,2)));
   default:
     //constructor ensures we never get here, but it is necessary for compilation
-    return nsrcs;
+    return phi;
   }
 }

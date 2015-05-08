@@ -50,7 +50,7 @@ int main(int argc,char** argv){
   double CEmax = q.colorEvolution[q.max];
   q.LFparameters(parfixed,q.fixed);
 
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ"};  
   string countnames[]= {"dnds1","dnds2","dnds3"};
   
   lumfunct lf(q.lfDist);

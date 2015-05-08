@@ -7,7 +7,7 @@ import sys
 #codedir=os.getcwd()+'/trunk/';
 pydir=os.getcwd();
 codedir = pydir.replace(' ', '')[:-6] #remove last 6 characters (i.e. Python)
-seddir=codedir+'trunk/templates/'
+seddir=codedir+'trunk/templates/TSV'
 
 #ensure this is in the path
 #sys.path.append(pydir)

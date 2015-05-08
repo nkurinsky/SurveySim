@@ -618,15 +618,30 @@ class SurveySimGUI:
         hdr.set('Q_MIN',value_min[5],'Minimum q value')
         hdr.set('Q_MAX',value_max[5],'Maximum q value')
     
-        hdr.set('ZCUT',value_initial[6],'LF evolution redshift cutoff')
-        hdr.set('ZCUT_FIX',value_fix[6],'Fix zcut (Y=1/N=0)')
-        hdr.set('ZCUT_MIN',value_min[6],'Minimum zcut value')
-        hdr.set('ZCUT_MAX',value_max[6],'Maximum zcut value')
+        hdr.set('P2',value_initial[6],'2nd density evolution ')
+        hdr.set('P2_FIX',value_fix[6],'Fix p2 (Y=1/N=0)')
+        hdr.set('P2_MIN',value_min[6],'Minimum p2 value')
+        hdr.set('P2_MAX',value_max[6],'Maximum p2 value')
 
-        hdr.set('CEXP',value_initial[6],'Color evolution term')
-        hdr.set('CEXP_FIX',value_fix[6],'Fix cexp (Y=1/N=0)')
-        hdr.set('CEXP_MIN',value_min[6],'Minimum cexp value')
-        hdr.set('CEXP_MAX',value_max[6],'Maximum cexp value')
+        hdr.set('Q2',value_initial[7],'2nd luminosity evolution ')
+        hdr.set('Q2_FIX',value_fix[7],'Fix q2 (Y=1/N=0)')
+        hdr.set('Q2_MIN',value_min[7],'Minimum q2 value')
+        hdr.set('Q2_MAX',value_max[7],'Maximum q2 value')
+    
+        hdr.set('ZBP',value_initial[8],'z_break density evolution')
+        hdr.set('ZBP_FIX',value_fix[8],'Fix (Y=1/N=0)')
+        hdr.set('ZBP_MIN',value_min[8],'Minimum ')
+        hdr.set('ZBP_MAX',value_max[8],'Maximum')
+
+        hdr.set('ZBQ',value_initial[9],'z_break luminosity evolution')
+        hdr.set('ZBQ_FIX',value_fix[9],'Fix (Y=1/N=0)')
+        hdr.set('ZBQ_MIN',value_min[9],'Minimum ')
+        hdr.set('ZBQ_MAX',value_max[9],'Maximum')
+
+#        hdr.set('CEXP',value_initial[6],'Color evolution term')
+#        hdr.set('CEXP_FIX',value_fix[6],'Fix cexp (Y=1/N=0)')
+#        hdr.set('CEXP_MIN',value_min[6],'Minimum cexp value')
+#        hdr.set('CEXP_MAX',value_max[6],'Maximum cexp value')
 
 #====================================================================
 # Survey properties 
@@ -708,7 +723,7 @@ class SurveySimGUI:
         obsfile=self.obsfile_set.get()
         sedfile=self.sedfile_set.get()
 #        os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
-        os.system(fitcode+' '+modelfile+' '+sedfile+' '+obsfile+' '+outfile)
+        os.system(fitcode+' '+modelfile+' '+sedfile+' '+obsfile+' -o '+outfile)
 
     def quit(self):
         self.master.destroy()
