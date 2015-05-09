@@ -1,12 +1,11 @@
-SurveySim
-=========
+Last updated: May 9, 2015 by Anna Sajina
 
-Project Code for Survey Simulation
+SurveySim is an MCMC-based code to fit the luminosity function (LF) evolution based on infrared surveys or simulate such surveys by adopting a particular form of the LF evolution. This code was developed by Noah Kurinsky and Anna Sajina primarily as part of Noah Kurinsky's Tufts undergraduate senior thesis. Details on the code structure and usage are found in trunk/manual/UsersGuide.pdf. Please cite Kurinsky et al. 2015 (in prep) whenever making use of SurveySim or parts therein. 
 
-Contained in this repository are the main C++ code which runs the MCMC and performs simulation (in Fitting) and the IDL widget, along with IDL code and data used for preliminary analysis. This repository is not an official public release but represents the current Trunk of development, close to the first release. If interested in the function of the main program, please refer to 
+In this main directory:
+ 
+ SurveySim.py: opens a user-friendly GUI interface to SurveySim
+ run.sh:       is the quickest, command line, means of running SurveySim based
+               on pre-built model files (see trunk/model for examples)
 
-http://web.stanford.edu/~kurinsky/Papers/UndergraduateThesis.pdf
-
-for more details. If interested in contributing to development, please send me an email. Feel free to fork the repository, with the knowledge that it is not currently tested on clean systems and requires some custom library configuration at the present time.
-
-Compilation: See the README file in Source
+The actual code is contained within the "trunk" directory. Please refer to the README file therein for compilation instructions.

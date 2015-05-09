@@ -196,7 +196,7 @@ void Configuration::print(){
   printf("  Redshift Bin Width   : %f\n",dz);
   printf("  Area [square deg]    : %f\n",area);
 
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","ZCUT"};  
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ"};  
   printf("\nLuminosity Function Parameter Settings:\n");
   printf("Parameter\tStart\t Min \t Max \tStep \tFit\n");
   for(int i=0;i<LUMPARS;i++){
@@ -208,13 +208,13 @@ void Configuration::print(){
 	   LFParameters[i][fixed] == 0.0 ? "True" : "False"
 	   );
   }
-  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
-	 "CEXP",
-	 colorEvolution[value],
-	 colorEvolution[min],
-	 colorEvolution[max],
-	 colorEvolution[fixed] == 0.0 ? "True" : "False"
-	 );
+  //  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
+  //	 "CEXP",
+  //	 colorEvolution[value],
+  //	 colorEvolution[min],
+  //	 colorEvolution[max],
+  //	 colorEvolution[fixed] == 0.0 ? "True" : "False"
+  //	 );
 
   printf("\nNumber Unfixed Parameters: %lu\n",nparams);
   

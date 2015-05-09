@@ -40,7 +40,7 @@ dmodelfile=codedir+'model/default_model.fits'
 modelfile=codedir+'model/model.fits'
 obsdir=codedir+'obs/'
 obsfile=obsdir+'wise.fits'
-outfile=os.getcwd()+'/output.fits'
+outfile=os.getcwd()+'/OUTPUT/output.fits'
 fitcode=codedir+'src/SurveySim'
 lfform='Schecter'
 
