@@ -109,22 +109,24 @@ void lumfunct::set_params(double lpars[]){
 
 //this function returns the number of sources (per Mpc^3 per dlogL) for a given L-z pair
 double lumfunct::get_phi(double redshift,double lum){
-  double phi;
-  double t1,t2;
+  double t1(pow(10,phi0));
+  double t2(pow(10,L0));
   double ratio;
   
   if(redshift <= zbp) {
-    t1=pow(10,phi0)*pow((1.+redshift),p);
+    t1*=pow((1.+redshift),p);
   }
+  else{
+    t1*=pow((1.+zbp),p)*pow((1.+redshift-zbp),p2);
+  }
+
   if(redshift <= zbq) {
-    t2=pow(10,L0)*pow((1.+redshift),q);
+    t2*=pow((1.+redshift),q);
   } 
-  if(redshift > zbp) {
-    t1=pow(10,phi0)*pow((1.+zbp),p)*pow((1.+redshift-zbp),p2);
+  else{
+    t2*=pow((1.+zbq),q)*pow((1.+redshift-zbq),q2);
   }
-  if(redshift > zbq) {
-    t2=pow(10,L0)*pow((1.+zbq),q)*pow((1.+redshift-zbq),q2);
-  }
+  
   ratio=pow(10,lum)/t2;
   
   switch(_dist){
@@ -135,7 +137,9 @@ double lumfunct::get_phi(double redshift,double lum){
   case LF::distribution::ModifiedSchechter:
     return t1*pow(ratio,1-alpha)*exp(-1*pow(log(1-ratio),2)/(2*pow(beta,2)));
   default:
+    static int logflag=3;
+    LOG_CRITICAL(printf("ERROR: Invalid LF dist (%i) requested\n",_dist));
     //constructor ensures we never get here, but it is necessary for compilation
-    return phi;
+    return 0;
   }
 }

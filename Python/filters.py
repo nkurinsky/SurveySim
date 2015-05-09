@@ -1,11 +1,16 @@
-#!/usr/bin/env python
-
 import os
 
+def filterDir():
+    wd=os.getcwd()
+    topdir="SurveySim"
+    index=wd.find(topdir)+len(topdir)
+    return wd[0:index]+'/trunk/filters/'
+
 def read_filters():
-    codedir=os.getcwd()+'/trunk/';
-#read-in filter transmission curves/ use the FSPS filter set
-    with open (codedir+'filters/FILTER_LIST','r') as f: 
+    codedir=os.getcwd()+'/../trunk/';
+    #read-in filter transmission curves/ use the FSPS filter set
+    #with open (codedir+'filters/FILTER_LIST','r') as f: 
+    with open (filterDir()+'FILTER_LIST','r') as f:
         flines=f.readlines()
 
     filter_id,filter_choices=[],[]
@@ -37,7 +42,7 @@ def read_filters():
 def fill_filters(f_id):
     codedir=os.getcwd()+'/trunk/';
 #read-in filter transmission curves for selected bands
-    with open (codedir+'filters/allfilters.dat','r') as f: 
+    with open (filterDir()+'allfilters.dat','r') as f: 
         flines=f.readlines()
 
     fcount=-1
@@ -59,3 +64,27 @@ def fill_filters(f_id):
                     lam3.append(float(tmp1)),trans3.append(float(tmp2))
 
     return lam1,lam2,lam3,trans1,trans2,trans3
+
+def getFilterID(name):
+    ids,names=read_filters()
+    for i in range(0,len(ids)):
+        if(name in names[i]):
+            return ids[i],names[i]
+    raise LookupError("Filter \""+name+"\" not found in library")
+
+def getFilterName(fid):
+    ids,names=read_filters()
+    for i in range(0,len(ids)):
+        if(fid == ids[i]):
+            return names[i]
+    raise LookupError("Filter ID \""+str(fid)+"\" not found in library")
+
+def getFilterIDs(instrument):
+    ids=[]
+    names=[]
+    fid,fnames=read_filters()
+    for i in range(0,len(fid)):
+        if(instrument in fnames[i]):
+            ids.append(fid[i])
+            names.append(fnames[i])
+    return ids,names
