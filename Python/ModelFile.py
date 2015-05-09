@@ -18,7 +18,14 @@ class filterOptions:
         self.unit=unit
 
     def __str__(self):
-        return "ID: "+str(self.fid)+", Limit="+str(self.limit)+" "+self.unit+", Error="+str(self.err)+" "+self.unit
+        return self.name()+", Limit="+str(self.limit)+" "+self.unit+", Error="+str(self.err)+" "+self.unit
+
+    def setID(self,name):
+        res=getFilterID(name)
+        self.fid=res[0]
+
+    def name(self):
+        return getFilterName(self.fid)
 
     def writeKeys(self,hdr,number):
         hdr.set('Filter'+str(number),getFilterName(self.fid),'Filter '+str(number)+' name')
@@ -65,12 +72,12 @@ class ModelFile:
             'min':0.01,
             'max':5.00,
             'delta':0.05}
+        self.filters=[filterOptions(98,9.3,3.1,'mJy'),
+                      filterOptions(99,9.6,3.2,'mJy'),
+                      filterOptions(100,13.5,4.5,'mJy')]
         self.survey={
             'area': 4.0,
-            'lfForm':0,
-            'filter1':filterOptions(98,9.3,3.1,'mJy'),
-            'filter2':filterOptions(99,9.6,3.2,'mJy'),
-            'filter3':filterOptions(100,13.5,4.5,'mJy')}
+            'lfForm':0}
         self.axis1='ColorF1F2'
         self.axis2='Flux1'
         self.colsel='None'
@@ -105,23 +112,27 @@ class ModelFile:
         }
 
     def info(self):
-        print("Name: "+self.filename)
-        print("Survey")
+        print "Model File Info:"
+        print "  Name:",self.filename
+        print "  Survey"
         keyPrint(self.survey)
         keyPrint(self.redshift)
-        print("Settings")
+        print "  Filters"
+        for i in range (0,len(self.filters)) : print "\t",self.filters[i]
+        print "  Settings"
         keyPrint(self.settings)
-        print("Convergence")
+        print "  Convergence"
         keyPrint(self.convergence)
-        print("Annealing")
+        print "  Annealing"
         keyPrint(self.annealing)
-        print("Parameters")
+        print "  Parameters"
         keyPrint(self.params)
+        print ""
 
     def filterIDs(self):
-        return [self.survey['filter1'].fid,
-                self.survey['filter2'].fid,
-                self.survey['filter3'].fid]
+        return [self.filters[0].fid,
+                self.filters[1].fid,
+                self.filters[2].fid]
 
     def setLF(type):
         if(type == 'DoublePowerLaw'):
@@ -138,7 +149,7 @@ class ModelFile:
 
     def write(self,filename):
         self.filename=filename
-        update()
+        self.update()
 
     def update(self):
 
@@ -168,9 +179,7 @@ class ModelFile:
         hdr.set('AXIS1',self.axis1,'1st axis to be fit')
         hdr.set('AXIS2',self.axis2,'2nd axis to be fit')
 
-        self.survey['filter1'].writeKeys(hdr,1)
-        self.survey['filter2'].writeKeys(hdr,2)
-        self.survey['filter3'].writeKeys(hdr,3)
+        for i in range(0,len(self.filters)): self.filters[i].writeKeys(hdr,i)
         
         #====================================================================
         # Code settings

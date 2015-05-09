@@ -77,7 +77,7 @@ def getFilterName(fid):
     for i in range(0,len(ids)):
         if(fid == ids[i]):
             return names[i]
-    raise LookupError("Filter ID \""+fid+"\" not found in library")
+    raise LookupError("Filter ID \""+str(fid)+"\" not found in library")
 
 def getFilterIDs(instrument):
     ids=[]
