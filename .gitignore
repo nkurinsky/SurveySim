@@ -15,13 +15,12 @@ trunk/config.log
 trunk/config.status
 
 *.DS*
+*output.fits
 
 Python/*.pyc
 
 trunk/src/alg_lib/*.o
 trunk/src/alg_lib/Makefile
-trunk/output/.ipynb_checkpoints*
+*.ipynb_checkpoints*
 
 trunk/src/alg_lib/libalglib.a
-
-*output*
