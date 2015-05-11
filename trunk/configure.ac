@@ -21,17 +21,13 @@ LIBS="-lm -lgslcblas -lgsl -lcfitsio -lCCFits"
 
 AC_CHECK_LIB(m,cos)
 AC_CHECK_LIB([gslcblas],[cblas_sgemm],[],[
-        echo "GSLCBLAS library required, not found"
-        exit -1])
+        echo "Warning: GSLCBLAS library required, not found"])
 AC_CHECK_LIB([gsl],main,[],[
-	echo "GSL library required, not found"
-	exit -1])
+	echo "Warning: GSL library required, not found"])
 AC_CHECK_LIB([cfitsio],[ffopen],[],[
-	echo "cfitsio library required, not found"
-	exit -1])
+	echo "Warning:cfitsio library required, not found"])
 AC_CHECK_LIB([CCFits],[main],[],[
-	echo "CCFits library required, not found"
-	exit -1])
+	echo "Warning:CCFits library required, not found"])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h])

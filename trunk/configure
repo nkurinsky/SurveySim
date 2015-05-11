@@ -4633,8 +4633,7 @@ _ACEOF
 
 else
 
-        echo "GSLCBLAS library required, not found"
-        exit -1
+        echo "Warning: GSLCBLAS library required, not found"
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lgsl" >&5
@@ -4676,8 +4675,7 @@ _ACEOF
 
 else
 
-	echo "GSL library required, not found"
-	exit -1
+	echo "Warning: GSL library required, not found"
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ffopen in -lcfitsio" >&5
@@ -4725,8 +4723,7 @@ _ACEOF
 
 else
 
-	echo "cfitsio library required, not found"
-	exit -1
+	echo "Warning:cfitsio library required, not found"
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lCCFits" >&5
@@ -4768,8 +4765,7 @@ _ACEOF
 
 else
 
-	echo "CCFits library required, not found"
-	exit -1
+	echo "Warning:CCFits library required, not found"
 fi
 
 
