@@ -109,25 +109,60 @@ void lumfunct::set_params(double lpars[]){
 
 //this function returns the number of sources (per Mpc^3 per dlogL) for a given L-z pair
 double lumfunct::get_phi(double redshift,double lum){
-  double t1(pow(10,phi0));
-  double t2(pow(10,L0));
+  static double norm(pow(10,phi0));
+  static double knee(pow(10,L0));
+  static double lastphi0(phi0);
+  static double lastL0(L0);
+
+  static double zbptop(pow(1+zbp,p));
+  static double zbqtoq(pow(1+zbq,q));
+  static double lastp(p);
+  static double lastzbp(zbp);
+  static double lastq(q);
+  static double lastzbq(zbq);
+
+  if(phi0 != lastphi0){
+    lastphi0=phi0;
+    norm=pow(10,phi0);
+  }
+  if(L0 != lastL0){
+    lastL0=L0;
+    knee=pow(10,L0);
+  }
+
+  double t1(norm);
+  double t2(knee);
   double ratio;
   
   if(redshift <= zbp) {
     t1*=pow((1.+redshift),p);
   }
   else{
-    t1*=pow((1.+zbp),p)*pow((1.+redshift-zbp),p2);
+    if((zbp != lastzbp) or (p != lastp)){
+      lastzbp=zbp;
+      lastp=p;
+      zbptop = pow(1+zbp,p);
+    }
+    t1*=zbptop*pow((1.+redshift-zbp),p2);
   }
 
   if(redshift <= zbq) {
     t2*=pow((1.+redshift),q);
   } 
   else{
-    t2*=pow((1.+zbq),q)*pow((1.+redshift-zbq),q2);
+    if((zbq != lastzbq) or (q != lastq)){
+      lastq=q;
+      lastzbq=zbq;
+      zbqtoq = pow(1+zbq,q);
+    }
+    t2*=zbqtoq*pow((1.+redshift-zbq),q2);
   }
   
-  ratio=pow(10,lum)/t2;
+  static map<double,double> luminosity;
+  if(luminosity.count(lum) == 0)
+    luminosity[lum]=pow(10,lum);
+
+  ratio=luminosity[lum]/t2;
   
   switch(_dist){
   case LF::distribution::Schecter:

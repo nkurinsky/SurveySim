@@ -19,8 +19,8 @@ AC_PROG_RANLIB
 # Checks for libraries.
 LIBS="-lm -lgslcblas -lgsl -lcfitsio -lCCFits"
 
-AC_CHECK_LIB(m,main)
-AC_CHECK_LIB([gslcblas],[main],[],[
+AC_CHECK_LIB(m,cos)
+AC_CHECK_LIB([gslcblas],[cblas_sgemm],[],[
         echo "GSLCBLAS library required, not found"
         exit -1])
 AC_CHECK_LIB([gsl],main,[],[
