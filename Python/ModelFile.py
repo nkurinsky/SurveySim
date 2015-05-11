@@ -54,8 +54,8 @@ class parameter:
         suffs=['FIX','MIN','MAX']
         for i in range(0,3):
             keys.append(key+'_'+suffs[i])
-            if(len(keys[i]) > 7):
-                keys[i]=keys[i][0:7]
+            if(len(keys[i]) > 8):
+                keys[i]=keys[i][0:8]
         hdr.set(keys[0],self.fixed,'Fix '+str(key)+' (Y=1/N=0)')
         hdr.set(keys[1],self.pmin,'Minimum '+str(key)+' value')
         hdr.set(keys[2],self.pmax,'Maximum '+str(key)+' value')
@@ -89,7 +89,8 @@ class ModelFile:
             'ideal_pct':0.25,
             'range':0.05,
             'burn_step':10,
-            'temp':10.0}
+            'temp':10.0,
+            'tscale':0.001}
         self.settings={
             'runs':1e4,
             'nchain':5,
@@ -102,12 +103,12 @@ class ModelFile:
             'L0':parameter(10.12,9.0,11.0,1,"Log Luminosity Knee"),
             'Alpha':parameter(1.15,0.0,1.0,1,"Primary Slope"),
             'Beta':parameter(0.52,2.5,3.5,1,"Secondary Slope"),
-            'P1':parameter(-0.57,-8.0,0.0,0,"Low Z Density Evolution"),
+            'P':parameter(-0.57,-8.0,0.0,0,"Low Z Density Evolution"),
             'P2':parameter(-3.92,-8.0,0.0,0,"High Z Density Evolution"),
-            'Q1':parameter(3.55,0.0,8.0,0,"Low Z Luminosity Evolution"),
+            'Q':parameter(3.55,0.0,8.0,0,"Low Z Luminosity Evolution"),
             'Q2':parameter(1.62,0.0,8.0,0,"High Z Luminosity Evolution"),
-            'zcut1':parameter(1.1,0.0,5.0,1,"Low Z Cutoff"),
-            'zcut2':parameter(1.85,0.0,5.0,1,"High Z Cutoff"),
+            'zbp':parameter(1.1,0.0,5.0,1,"P Z Cutoff"),
+            'zbq':parameter(1.85,0.0,5.0,1,"Q Z Cutoff"),
             'cexp':parameter(0.0,-3.0,3.0,1,"SED Redshift Evolution")
         }
 
@@ -179,7 +180,7 @@ class ModelFile:
         hdr.set('AXIS1',self.axis1,'1st axis to be fit')
         hdr.set('AXIS2',self.axis2,'2nd axis to be fit')
 
-        for i in range(0,len(self.filters)): self.filters[i].writeKeys(hdr,i)
+        for i in range(0,len(self.filters)): self.filters[i].writeKeys(hdr,i+1)
         
         #====================================================================
         # Code settings
@@ -192,6 +193,7 @@ class ModelFile:
         hdr.set('NCHAIN',self.settings['nchain'],'Chain Number')
 
         hdr.set('TMAX',self.annealing['temp'],'Starting Anneal Temperature')
+        hdr.set('TSCALE',self.annealing['tscale'],'Annealing Temperature Scale')
         hdr.set('ANN_PCT',self.annealing['ideal_pct'],'Ideal acceptance Percentage')
         hdr.set('ANN_RNG',self.annealing['range'],'Range to maintain acceptance')
 

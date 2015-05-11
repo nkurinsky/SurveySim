@@ -198,7 +198,7 @@ void Configuration::print(){
 
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ"};  
   printf("\nLuminosity Function Parameter Settings:\n");
-  printf("Parameter\tStart\t Min \t Max \tStep \tFit\n");
+  printf("Parameter\tStart\t Min \t Max \tFit\n");
   for(int i=0;i<LUMPARS;i++){
     printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
 	   pnames[i].c_str(),
@@ -296,30 +296,38 @@ void Configuration::load(){
     printf("Value of \"RUNS\" invalud, defaulting to 1000\n");
     runs=1000;
   }
-  tab.readKey("ZMIN",zmin);
-  tab.readKey("ZMAX",zmax);
-  tab.readKey("DZ",dz);
-  tab.readKey("AREA",area);
-  //generalize:
-  nsim = 1000;
-
-  tab.readKey("NCHAIN",rtemp);
-  nchain = static_cast<unsigned long>(rtemp);
-  tab.readKey("TMAX",tmax);
-  tab.readKey("TSCALE",tscale);
-  tab.readKey("ANN_PCT",idealpct);
-  tab.readKey("ANN_RNG",annrng);
-  tab.readKey("BURN_STE",rtemp);
-  burn_step = static_cast<unsigned long>(rtemp);
-  tab.readKey("CONV_STE",rtemp);
-  conv_step = static_cast<unsigned long>(rtemp);
-  tab.readKey("BURNVRUN",rtemp);
-  burn_ratio = static_cast<unsigned long>(rtemp);
-  tab.readKey("CONV_RMA",rmax);
-  tab.readKey("CONV_CON",a_ci);
-  tab.readKey("PRINT",rtemp);
-  tab.readKey("LF_form",lfform);
-  oprint = rtemp; // == 0.0 ? true : false;
+  try{
+    tab.readKey("ZMIN",zmin);
+    tab.readKey("ZMAX",zmax);
+    tab.readKey("DZ",dz);
+    tab.readKey("AREA",area);
+    //generalize:
+    nsim = 1000;
+    
+    tab.readKey("NCHAIN",rtemp);
+    nchain = static_cast<unsigned long>(rtemp);
+    tab.readKey("TMAX",tmax);
+    tab.readKey("TSCALE",tscale);
+    tab.readKey("ANN_PCT",idealpct);
+    tab.readKey("ANN_RNG",annrng);
+    tab.readKey("BURN_STE",rtemp);
+    burn_step = static_cast<unsigned long>(rtemp);
+    tab.readKey("CONV_STE",rtemp);
+    conv_step = static_cast<unsigned long>(rtemp);
+    tab.readKey("BURNVRUN",rtemp);
+    burn_ratio = static_cast<unsigned long>(rtemp);
+    tab.readKey("CONV_RMA",rmax);
+    tab.readKey("CONV_CON",a_ci);
+    tab.readKey("PRINT",rtemp);
+    oprint = rtemp; // == 0.0 ? true : false; 
+    tab.readKey("LF_FORM",rtemp);
+    lfform = static_cast<unsigned long>(rtemp);
+  }
+  catch(CCfits::FitsException::FitsException e){
+    printf("Error reading model file\nPlease check that all keywords are present\n");
+    cerr << e.message() << endl;
+    exit(10);
+  }
 
   //compute redshift bin number from FITS values
   nz = (zmax-zmin)/dz;
@@ -332,7 +340,13 @@ void Configuration::load(){
     for(int j=0;j<4;j++){
       tag = pnames[i]+suffix[j];
       tag = tag.substr(0,8);
-      tab.readKey(tag,LFParameters[i][j]);
+      try{
+	tab.readKey(tag,LFParameters[i][j]);
+      }
+      catch(CCfits::HDU::NoSuchKeyword){
+	printf("Error reading keyword %s\n",tag.c_str());
+	exit(12);
+      }
     }
     if(LFParameters[i][fixed] == 0)
       param_inds.push_back(i);
@@ -342,7 +356,13 @@ void Configuration::load(){
   for(int j=0;j<4;j++){
     tag = "CEXP"+suffix[j];
     tag = tag.substr(0,8);
-    tab.readKey(tag,colorEvolution[j]);
+    try{
+      tab.readKey(tag,colorEvolution[j]);
+    }
+    catch(CCfits::HDU::NoSuchKeyword){
+      printf("Error reading keyword %s\n",tag.c_str());
+      exit(12);
+    }
   }
 
   nparams = param_inds.size();

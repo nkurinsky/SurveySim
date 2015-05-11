@@ -172,14 +172,6 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
   string limitKeys[] = {"LIMIT1","LIMIT2","LIMIT3"};
   string errorKeys[] = {"ERROR1","ERROR2","ERROR3"};
   for(int i=0;i<3;i++){
-    try{
-      string stemp;
-      head.readKey(bands[i],stemp);
-      bands[i] = stemp;
-    }
-    catch(...){
-      LOG_CRITICAL(printf("Error reading keyword \"%s\", defaulting to standard label\n",bands[i].c_str()));
-    }
 
     //reading units, defaults to units in mJy
     try{
@@ -210,7 +202,7 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
 	limits[i]*=units[i];
     }
     catch(...){
-      LOG_CRITICAL(printf("Error reading keyword \"%s\"\n",limitKeys[i].c_str()));
+      printf("Error reading keyword \"%s\"\n",limitKeys[i].c_str());
       exit(10);
     }
     
@@ -225,7 +217,7 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
 	errors[i]*=units[i];
     }
     catch(...){
-      LOG_CRITICAL(printf("Error reading keyword \"%s\"\n",errorKeys[i].c_str()));
+      printf("Error reading keyword \"%s\"\n",errorKeys[i].c_str());
       exit(10);
     }
   }
@@ -259,7 +251,7 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     }
     LOG_INFO(printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m, limit: %5.2e, error: %5.2e)\n",num+1,band.front(),band.back(),limits[num],errors[num]));
     if(not this->filters[num].load(bands[num],band,transmission,logflag) ){
-      LOG_CRITICAL(printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str()));
+      printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str());
       exit(1);
     }
   }
