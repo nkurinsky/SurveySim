@@ -306,12 +306,12 @@ products simulator::simulate(){
 	  //printf("%lu\t%lu\n",srcTotal,detTotal);
 	  //trying to avoid infinite loops
 	  if(detTotal > 10*observations->get_snum()){
-	    printf("Detected sources %lu (%i times obsnum) too high, aborting\n",detTotal,10);
+	    //printf("Detected sources %lu (%i times obsnum) too high, aborting\n",detTotal,10);
 	    output.chisqr=100;
 	    return output;
 	  }
 	  else if (srcTotal > 1e6){
-	    printf("Simulated sources %lu too high (>1e6), aborting\n",srcTotal);
+	    //printf("Simulated sources %lu too high (>1e6), aborting\n",srcTotal);
             output.chisqr=100;
             return output; 
 	  }
