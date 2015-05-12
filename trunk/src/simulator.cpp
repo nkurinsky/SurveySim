@@ -274,7 +274,9 @@ products simulator::simulate(){
   static bool detected = true;    
 
   static double tL,tZ;
-  
+
+  unsigned long srcTotal=0;
+  unsigned long detTotal=0;
   //NOTE templates are given in W/Hz
   for (is=0;is<nz;is++){
 
@@ -299,6 +301,22 @@ products simulator::simulate(){
       nsrcs = num_sources(zarray[is],lums[js],dl);
       
       for (src_iter=0;src_iter<nsrcs;src_iter++){
+	srcTotal++;
+	if(((srcTotal % 10000) == 0) and (srcTotal != 0)){
+	  //printf("%lu\t%lu\n",srcTotal,detTotal);
+	  //trying to avoid infinite loops
+	  if(detTotal > 10*observations->get_snum()){
+	    printf("Detected sources %lu (%i times obsnum) too high, aborting\n",detTotal,10);
+	    output.chisqr=100;
+	    return output;
+	  }
+	  else if (srcTotal > 1e6){
+	    printf("Simulated sources %lu too high (>1e6), aborting\n",srcTotal);
+            output.chisqr=100;
+            return output; 
+	  }
+	}
+	
 	detected = true;
 	//determine sedtype (agn type)
 	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
@@ -325,6 +343,7 @@ products simulator::simulate(){
 	
 	//check for detectability, if "Yes" add to list
 	if(detected){
+	  detTotal++;
 	  temp_src = new sprop(tZ,flux_sim,tL,axes,sedtype);
 	  sources.push_back(*temp_src);
 	  output.dndz[is]++; 
