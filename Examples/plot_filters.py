@@ -4,6 +4,7 @@
 import os
 import sys
 from pylab import *
+import numpy
 
 sys.path.append("../Python/")
 from filters import *
@@ -17,9 +18,11 @@ for filt in my_filters:
     ids.append(fid)
 print(ids)
 
+clf()
 fdata=fill_filters(ids)
 for i in range(0,3):
-    plot(fdata[i],fdata[i+3])
+    x=numpy.array(fdata[i],dtype=numpy.float)*1e-10
+    plot(x,fdata[i+3])
 xlabel('Wavelength')
 ylabel('Transmission')
 xscale('log')

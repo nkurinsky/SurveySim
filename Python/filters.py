@@ -45,7 +45,7 @@ def fill_filters(f_id):
     with open (filterDir()+'allfilters.dat','r') as f: 
         flines=f.readlines()
 
-    fcount=-1
+    fcount=0
     lam1,lam2,lam3,trans1,trans2,trans3=[],[],[],[],[],[]
     for fline in flines:
         if fline.strip():

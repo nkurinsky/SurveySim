@@ -7,13 +7,13 @@ import sys
 sys.path.append("../Python/")
 from filters import *
 
-instruments=["JWST","SPIRE","WISE"]
+instruments=["JWST","Herschel","WISE"]
 
 print(filterDir())
 
 for instrument in instruments:
     ids,names=getFilterIDs(instrument)
-    print(names)
+    print instrument,names
 
 print(getFilterID("SPIRE_250"))
 print(getFilterName(98))

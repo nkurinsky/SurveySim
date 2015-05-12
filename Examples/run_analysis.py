@@ -12,16 +12,17 @@ mod.filters[0].setID("SPIRE_250")
 mod.filters[1].setID("SPIRE_350")
 mod.filters[2].setID("SPIRE_500")
 
-print(mod.params.keys())
-mod.params['P'].max=4
-mod.params['P'].min=-6
-mod.params['P2'].max=4
-mod.params['P2'].min=-6
+#mod.params['P'].pmax=4
+#mod.params['P'].pmin=-6
+#mod.params['P2'].pmax=4
+#mod.params['P2'].pmin=-6
 
 mod.params['zbp'].fixed=0
 mod.params['zbq'].fixed=0
 
 mod.settings['verbosity']=3
+mod.annealing['tmax']=20
+mod.annealing['tscale']=0.001
 
 mod.convergence['r_max']=1.10
 mod.convergence['CI']=0.1

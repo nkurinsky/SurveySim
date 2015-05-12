@@ -26,9 +26,6 @@ def MCMCcontour(x,y):
     H, xedges, yedges = numpy.histogram2d(y, x, bins=(nbins2d(y), nbins2d(x)),normed=True)
     extent = [yedges[0], yedges[-1], xedges[0], xedges[-1]]
     cset = plt.contour(H, origin="lower",colors="black",extent=extent)
-    plt.clabel(cset, inline=1, fontsize=10, fmt="%0.2f")
-    for c in cset.collections:
-        c.set_linestyle("solid")
 
 class FitInfo:
 
@@ -342,6 +339,7 @@ class MCMCInfo:
         plt.legend(loc='upper right')
         plt.xlabel("Iteration")
         plt.ylabel("R Convergence Criterion")
+        plt.xlim(1,max(iterations))
 
     def showR(self):
         self.plotR()
@@ -361,6 +359,9 @@ class MCMCInfo:
         plt.legend(loc='upper right',title="Chain Number")
         plt.xlabel("Iteration")
         plt.ylabel("Chi-Square Statistic")
+        plt.yscale('log')
+        plt.ylim(1e-1,10)
+        plt.xlim(1,max(iterations))
 
     def showChisq(self):
         self.plotChisq()
