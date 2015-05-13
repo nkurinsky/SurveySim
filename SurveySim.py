@@ -433,7 +433,6 @@ class SettingsWindow(Frame):
                 self.s_set[ind].set(conv_con1)
             ind=ind+1;
 
-
 def main():
     root=Tk()   
     mygui=SurveySimGUI(root)
