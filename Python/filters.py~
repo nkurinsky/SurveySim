@@ -9,6 +9,7 @@ def filterDir():
 def read_filters():
     codedir=os.getcwd()+'/../trunk/';
     #read-in filter transmission curves/ use the FSPS filter set
+    #with open (codedir+'filters/FILTER_LIST','r') as f: 
     with open (filterDir()+'FILTER_LIST','r') as f:
         flines=f.readlines()
 
@@ -44,7 +45,7 @@ def fill_filters(f_id):
     with open (filterDir()+'allfilters.dat','r') as f: 
         flines=f.readlines()
 
-    fcount=0
+    fcount=-1
     lam1,lam2,lam3,trans1,trans2,trans3=[],[],[],[],[],[]
     for fline in flines:
         if fline.strip():
