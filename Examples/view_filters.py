@@ -4,7 +4,7 @@
 import os
 import sys
 
-sys.path.append("../Python/")
+sys.path.append("/usr/local/surveysim/python/")
 from filters import *
 
 instruments=["JWST","Herschel","WISE"]

@@ -6,7 +6,7 @@ import sys
 from pylab import *
 import numpy
 
-sys.path.append("../Python/")
+sys.path.append("/usr/local/surveysim/python")
 from filters import *
 
 my_filters=['Herschel_SPIRE_250um', 'Herschel_SPIRE_350um', 'Herschel_SPIRE_500um']
