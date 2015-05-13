@@ -1,10 +1,14 @@
 import os
 
 def filterDir():
-    wd=os.getcwd()
-    topdir="SurveySim"
-    index=wd.find(topdir)+len(topdir)
-    return wd[0:index]+'/trunk/filters/'
+    instdir='/usr/local/surveysim/filters/'
+    if(os.path.exists(instdir)):
+        return instdir
+    else:
+        wd=os.getcwd()
+        topdir="SurveySim"
+        index=wd.find(topdir)+len(topdir)
+        return wd[0:index]+'/trunk/filters/'
 
 def read_filters():
     codedir=os.getcwd()+'/../trunk/';
