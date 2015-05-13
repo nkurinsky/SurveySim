@@ -5,7 +5,6 @@ import os
 import sys
 import datetime
 import time
-sys.path.append("../Python/")
 from filters import *
 import pyfits as fits
         

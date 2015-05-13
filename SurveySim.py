@@ -6,7 +6,7 @@ import sys
 import datetime
 
 codedir=os.getcwd()+'/trunk/';
-pydir=os.getcwd()+'/Python/';
+pydir=os.getcwd()+'/trunk/python/';
 #ensure this is in the path
 sys.path.append(pydir)
 
