@@ -288,15 +288,15 @@ class SurveySimGUI:
     def showresults(self): #read-in the results from output.fits and show plots
         print("Showing results....")
         output=OutputFile(outfile)
-        output.show()
+        output.show(block=False)
         return
 
     def mcmcdiag(self): #show chain behavior
         print("MCMC diagnostics....")
         output=OutputFile(outfile)
         if(output.fit()):
-            output.MCMC.showFit()
-            output.MCMC.showChains()
+            output.MCMC.showFit(block=False)
+            output.MCMC.showChains(block=False)
         return
 
     def update_mfile(self):

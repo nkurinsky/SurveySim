@@ -295,8 +295,8 @@ int main(int argc,char** argv){
     
     for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
       parnames[pi] = pnames[*p];
-    //        if(q.vary_cexp)
-    //  parnames[q.cind] = "CEXP";
+            if(q.vary_cexp)
+      parnames[q.cind] = "CEXP";
     
     LOG_DEBUG(printf("Saving Chains\n"));
     saved &= mcchain.save(q.outfile,parnames.get());
