@@ -102,9 +102,9 @@ class ModelFile:
         self.axis2='Flux1'
         self.colsel='None'
         self.convergence={
-            'r_max':1.01,
+            'r_max':1.05,
             'step':20,
-            'CI':0.01}
+            'CI':0.05}
         self.annealing={
             'ideal_pct':0.25,
             'range':0.05,
@@ -123,10 +123,10 @@ class ModelFile:
             'L0':parameter(10.12,9.0,11.0,1,"Log Luminosity Knee"),
             'Alpha':parameter(1.15,0.0,1.0,1,"Primary Slope"),
             'Beta':parameter(0.52,2.5,3.5,1,"Secondary Slope"),
-            'P':parameter(-0.57,-8.0,0.0,0,"Low Z Density Evolution"),
-            'P2':parameter(-3.92,-8.0,0.0,0,"High Z Density Evolution"),
-            'Q':parameter(3.55,0.0,8.0,0,"Low Z Luminosity Evolution"),
-            'Q2':parameter(1.62,0.0,8.0,0,"High Z Luminosity Evolution"),
+            'P':parameter(-0.57,-5.0,0.0,0,"Low Z Density Evolution"),
+            'P2':parameter(-3.92,-5.0,0.0,0,"High Z Density Evolution"),
+            'Q':parameter(3.55,0.0,5.0,0,"Low Z Luminosity Evolution"),
+            'Q2':parameter(1.62,0.0,5.0,0,"High Z Luminosity Evolution"),
             'zbp':parameter(1.1,0.0,5.0,1,"P Z Cutoff"),
             'zbq':parameter(1.85,0.0,5.0,1,"Q Z Cutoff"),
             'cexp':parameter(0.0,-3.0,3.0,1,"SED Redshift Evolution")

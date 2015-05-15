@@ -20,6 +20,13 @@ class filterOptions:
     def __str__(self):
         return self.name()+", Limit="+str(self.limit)+" "+self.unit+", Error="+str(self.err)+" "+self.unit
 
+    def loadKeys(self,hdr,number):
+        name=hdr['Filter'+str(number)]
+        self.fid=getFilterID(name)[0]
+        self.unit=hdr['units'+str(number)]
+        self.limit=hdr['limit'+str(number)]
+        self.error=hdr['error'+str(number)]
+
     def setID(self,name):
         res=getFilterID(name)
         self.fid=res[0]
@@ -48,6 +55,19 @@ class parameter:
         else:
             return "("+self.desc+") Value="+str(self.value)+", Range=("+str(self.pmin)+","+str(self.pmax)+")"
 
+    def loadKeys(self,hdr,key):
+        self.value=hdr[key]
+        self.desc=hdr.comments[key]
+        keys=[]
+        suffs=['FIX','MIN','MAX']
+        for i in range(0,3):
+            keys.append(key+'_'+suffs[i])
+            if(len(keys[i]) > 8):
+                keys[i]=keys[i][0:8]
+        self.fixed=hdr[keys[0]]
+        self.pmin=hdr[keys[1]]
+        self.pmax=hdr[keys[2]]
+            
     def writeKeys(self,hdr,key):
         hdr.set(key,self.value,self.desc)
         keys=[]
@@ -147,6 +167,37 @@ class ModelFile:
         
     def load(self,filename):
         self.filename=filename
+        hdus=fits.open(filename)
+        phdr=hdus[0].header
+        #load parameters
+        for n,p in self.params.iteritems() : p.loadKeys(phdr,n)
+        self.survey['lfForm']=phdr['LF_FORM']
+        
+        self.survey['area']=phdr['AREA']
+        self.colsel=phdr['COLSEL']
+        self.axis1=phdr['AXIS1']
+        self.axis2=phdr['AXIS2']
+        for i in range(0,len(self.filters)): self.filters[i].loadKeys(phdr,i+1)
+        
+        self.redshift['min']=phdr['ZMIN']
+        self.redshift['max']=phdr['ZMAX']
+        self.redshift['delta']=phdr['DZ']
+
+        self.settings['runs']=phdr['RUNS']
+        self.settings['burnRatio']=phdr['BURNVRUN']
+        self.settings['nchain']=phdr['NCHAIN']
+        self.settings['verbosity']=phdr['PRINT']
+
+        self.annealing['temp']=phdr['TMAX']
+        self.annealing['tscale']=phdr['TSCALE']
+        self.annealing['ideal_pct']=phdr['ANN_PCT']
+        self.annealing['range']=phdr['ANN_RNG']
+        self.annealing['burn_step']=phdr['BURN_STE']
+
+        self.convergence['CI']=phdr['CONV_CON']
+        self.convergence['r_max']=phdr['CONV_RMA']
+        self.convergence['step']=phdr['CONV_STE']
+        
 
     def write(self,filename):
         self.filename=filename
@@ -165,20 +216,18 @@ class ModelFile:
         cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
         tbhdu=fits.new_table(cols)
 
-#        tbhdu=fits.BinTableHDU.from_columns([
-#            fits.Column(name='lambda1',format='FLOAT',array=lam1),
-#            fits.Column(name='transmission1',format='FLOAT',array=trans1),
-#            fits.Column(name='lambda2',format='FLOAT',array=lam2),
-#            fits.Column(name='transmission2',format='FLOAT',array=trans2),
-#            fits.Column(name='lambda3',format='FLOAT',array=lam3),
-#            fits.Column(name='transmission3',format='FLOAT',array=trans3)])
         tbhdu.header['LSCALE']=(-10,"Wavelength of Filter Lambda")
 
         hdr=fits.Header() #the header associated with extension=0
 
         #create/update luminosity function parameters in model file header
         hdr.set('DATE',datetime.date.today().strftime("%B %d, %Y"),'Date of creation')
+
+        #====================================================================
+        # LF properties 
+        #--------------------------------------------------------------------   
         hdr.set('LF_FORM',self.survey['lfForm'],'The functional form of the LF')
+
         for n,p in self.params.iteritems() : p.writeKeys(hdr,n)
 
         #====================================================================
