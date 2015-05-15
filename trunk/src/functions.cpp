@@ -182,7 +182,8 @@ void Configuration::print(){
 
   printf("\nMCMC Settings:\n");
   printf("  Chain Number         : %lu\n", nchain);
-  printf("  Starting Temp        : %5.2f\n",tmax);
+  printf("  Starting Temp        : %5.2f\n",temp);
+  printf("  Learning Rate        : %5.2f\n",learningRate);
   printf("  Ideal Accept Pct     : %4.2f\n",idealpct);
   printf("  Burn-in Step         : %lu\n",burn_step);
   printf("  Convergence Step     : %lu\n",conv_step);
@@ -306,8 +307,8 @@ void Configuration::load(){
     
     tab.readKey("NCHAIN",rtemp);
     nchain = static_cast<unsigned long>(rtemp);
-    tab.readKey("TMAX",tmax);
-    tab.readKey("TSCALE",tscale);
+    tab.readKey("TEMP",temp);
+    tab.readKey("LRATE",learningRate);
     tab.readKey("ANN_PCT",idealpct);
     tab.readKey("ANN_RNG",annrng);
     tab.readKey("BURN_STE",rtemp);
@@ -316,8 +317,9 @@ void Configuration::load(){
     conv_step = static_cast<unsigned long>(rtemp);
     tab.readKey("BURNVRUN",rtemp);
     burn_ratio = static_cast<unsigned long>(rtemp);
-    tab.readKey("CONV_RMA",rmax);
+    //tab.readKey("CONV_RMA",rmax);
     tab.readKey("CONV_CON",a_ci);
+    rmax=1+a_ci;
     tab.readKey("PRINT",rtemp);
     oprint = rtemp; // == 0.0 ? true : false; 
     tab.readKey("LF_FORM",rtemp);

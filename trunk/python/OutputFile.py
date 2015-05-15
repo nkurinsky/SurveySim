@@ -151,8 +151,9 @@ class FitImage:
     def __str__(self):
         return "Image: "+self.name
 
-    def plot(self):
-        plt.imshow(self.img, interpolation='bicubic', cmap=FitImage.colorMaps[self.name], extent=self.extent,aspect='auto')
+    def plot(self,interpolation='none',cmap=cm.Greys):
+        plt.imshow(self.img, interpolation=interpolation, cmap=cmap, extent=self.extent, aspect='auto')
+        plt.contour(self.img, interpolation=interpolation, colors='grey', extent=self.extent, origin='image', aspect='auto')
         plt.xlabel("AXIS 1")
         plt.ylabel("AXIS 2")
         plt.title(self.name)
@@ -324,9 +325,10 @@ class MCMCInfo:
                 if(i == (len(pnames)-1)):
                     plt.xlabel(pnames[j])
 
-    def showFit(self):
+    def showFit(self,block=True):
+        plt.figure(figsize=(12,8))
         self.plotFit()
-        plt.show(block=True)
+        plt.show(block=block)
 
     def saveFit(self,filename):
         plt.figure(figsize=(12,12))
@@ -342,9 +344,10 @@ class MCMCInfo:
         plt.ylabel("R Convergence Criterion")
         plt.xlim(1,max(iterations))
 
-    def showR(self):
+    def showR(self,block=True):
+        plt.figure()
         self.plotR()
-        plt.show(block=True)
+        plt.show(block=block)
     
     def saveR(self,filename):
         self.plotR()
@@ -364,9 +367,10 @@ class MCMCInfo:
         plt.ylim(1e-1,10)
         plt.xlim(1,max(iterations))
 
-    def showChisq(self):
+    def showChisq(self,block=True):
+        plt.figure()
         self.plotChisq()
-        plt.show(block=True)
+        plt.show(block=block)
     
     def saveChisq(self,filename):
         self.plotChisq()
@@ -378,10 +382,10 @@ class MCMCInfo:
         plt.subplot(2,1,2)
         self.plotChisq()
 
-    def showChains(self):
+    def showChains(self,block=True):
         plt.figure(figsize=(12,8))
         self.plotChains()
-        plt.show(block=True)
+        plt.show(block=block)
 
 class OutputFile:
 
@@ -431,10 +435,10 @@ class OutputFile:
             if(col > 1):
                 plt.ylabel("")
 
-    def showImages(self):
+    def showImages(self,block=True):
         plt.figure(figsize=(12,5))
         self.plotImages()
-        plt.show(block=True)
+        plt.show(block=block)
 
     def saveImages(self,filename):
         plt.figure(figsize=(12,5))
@@ -448,10 +452,10 @@ class OutputFile:
             if(i > 1):
                 plt.ylabel("")
 
-    def showCounts(self):
+    def showCounts(self,block=True):
         plt.figure(figsize=(16,6))
         self.plotCounts()
-        plt.show(block=True)
+        plt.show(block=block)
 
     def saveCounts(self,filename):
         plt.figure(figsize=(12,5))
@@ -485,10 +489,10 @@ class OutputFile:
                 plt.ylabel("")
         plt.tight_layout()
        
-    def show(self):
+    def show(self,block=True):
         #plt.figure(figsize=(16,10))
         my_dpi=116 
         plt.figure(figsize=(1600/my_dpi, 1200/my_dpi), dpi=my_dpi)
         print 'hello'
         self.plot()
-        plt.show(block=True)
+        plt.show(block=block)

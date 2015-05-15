@@ -4,7 +4,7 @@ import os
 import sys
 import datetime
 import time
-sys.path.append("../Python/")
+sys.path.append("/usr/local/surveysim/python")
 from ModelFile import *
 
 mod=ModelFile()
@@ -26,8 +26,8 @@ mod.params['zbp'].fixed=0
 mod.params['zbq'].fixed=0
 
 mod.settings['verbosity']=3
-mod.annealing['tmax']=20
-mod.annealing['tscale']=0.001
+mod.annealing['temp']=.05
+mod.annealing['learningRate']=2
 
 mod.convergence['r_max']=1.10
 mod.convergence['CI']=0.1

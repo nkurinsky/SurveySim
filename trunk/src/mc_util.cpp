@@ -37,7 +37,7 @@ int dcomp(const void * a,const void * b){
   else return 0;
 }
 
-MetropSampler::MetropSampler(int nchains, double maxTemp, double tempScale, double idealpct, double acpt_buf,int logflag){
+MetropSampler::MetropSampler(int nchains, double initTemp, double learningRate, double idealpct, double acpt_buf,int logflag){
   this->nchains = nchains;
   accept_total = new long[nchains];
   iteration_total = new long[nchains];
@@ -47,8 +47,8 @@ MetropSampler::MetropSampler(int nchains, double maxTemp, double tempScale, doub
     iteration_total[i] = 0;
     previous[i] = 1.0E+4;
   }
-  temp = maxTemp;
-  tscale = tempScale;
+  temp = initTemp;
+  learning_rate=learningRate;
   ideal_acceptance = idealpct;
   accept_buffer = acpt_buf;
   accept_ratio = 1.0/log(idealpct);
@@ -56,7 +56,7 @@ MetropSampler::MetropSampler(int nchains, double maxTemp, double tempScale, doub
 
 bool MetropSampler::accept(int chainnum, double trial){
   static double itemp,tester;
-  tester=(trial-previous[chainnum])/(tscale*temp);
+  tester=(trial-previous[chainnum])/temp;
   accepted = true;
 
   if(tester > 0){
@@ -104,7 +104,8 @@ double MetropSampler::acceptance_rate(){
 bool MetropSampler::anneal(){
   double rate = acceptance_rate();
   if((rate > (ideal_acceptance + accept_buffer)) or (rate < (ideal_acceptance - accept_buffer))){
-    temp *= (1+LEARNING_RATE*(ideal_acceptance - rate)); //basic steepest descent learning, somewhat idealized
+    //basic steepest descent learning, somewhat idealized
+    temp *= (1+learning_rate*(ideal_acceptance - rate)); 
     return true;
   }
 
@@ -112,7 +113,7 @@ bool MetropSampler::anneal(){
 }
 
 double MetropSampler::temperature() const{
-  return tscale*temp;
+  return temp;
 }
 
 void MetropSampler::reset(){

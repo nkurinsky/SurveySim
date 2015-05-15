@@ -100,8 +100,7 @@ int main(int argc,char** argv){
     vector<double> results,means(q.nparams);
     
     ResultChain counts(3,q.nchain*q.runs);
-    MetropSampler metrop(q.nchain,q.tmax,q.tscale,q.idealpct,q.annrng,q.oprint);
-    
+    MetropSampler metrop(q.nchain,q.temp,q.learningRate,q.idealpct,q.annrng,q.oprint);    
 
     if(q.nparams > 0){ //observations provided, not all parameters fixed
       double ptemp[q.nchain][q.nparams];
@@ -295,8 +294,8 @@ int main(int argc,char** argv){
     
     for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
       parnames[pi] = pnames[*p];
-    //        if(q.vary_cexp)
-    //  parnames[q.cind] = "CEXP";
+            if(q.vary_cexp)
+      parnames[q.cind] = "CEXP";
     
     LOG_DEBUG(printf("Saving Chains\n"));
     saved &= mcchain.save(q.outfile,parnames.get());

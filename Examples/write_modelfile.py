@@ -4,7 +4,7 @@ import os
 import sys
 import datetime
 import time
-sys.path.append("../Python/")
+sys.path.append("/usr/local/surveysim/python/")
 from ModelFile import *
 
 mod=ModelFile()

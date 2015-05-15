@@ -5,8 +5,10 @@ import os
 import sys
 import datetime
 
-codedir=os.getcwd()+'/trunk/';
-pydir=os.getcwd()+'/Python/';
+thisdir=os.getcwd()+'/'
+codedir='/usr/local/surveysim/'
+#pydir=os.getcwd()+'/trunk/python/';
+pydir='/usr/local/surveysim/python'
 #ensure this is in the path
 sys.path.append(pydir)
 
@@ -42,11 +44,15 @@ fields_files='Survey data','SEDs'
 seddir=codedir+'templates/'
 sedfile=seddir+'Kirkpatrick2015_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
-modelfile=codedir+'model/model.fits'
+modelfile=thisdir+'model.fits'
 obsdir=codedir+'obs/'
 obsfile=obsdir+'wise.fits'
+outdir=os.getcwd()+'/OUTPUT/'
 outfile=os.getcwd()+'/OUTPUT/output.fits'
 fitcode=codedir+'src/SurveySim'
+
+if(not os.path.exists(outdir)):
+    os.makedirs(outdir)
 
 lfform_tmp=mod.survey['lfForm']
 if(lfform_tmp == 0):
@@ -94,7 +100,7 @@ tmax1=mod.annealing['temp'] #Starting Anneal Temperature
 #burn_ste=mod.annealing['burn_step'] #Steps btw anneal calls in burn-in
 #burnvrun=10 #Ratio of normal to burn-in steps
 
-conv_rma1=mod.convergence['r_max'] #Convergence Rmax Criterion
+#conv_rma1=mod.convergence['r_max'] #Convergence Rmax Criterion
 conv_ste1=mod.convergence['step'] #Steps btw convergence checks
 conv_con1=mod.convergence['CI'] #Convergence confidence interval
 
@@ -288,15 +294,15 @@ class SurveySimGUI:
     def showresults(self): #read-in the results from output.fits and show plots
         print("Showing results....")
         output=OutputFile(outfile)
-        output.show()
+        output.show(block=False)
         return
 
     def mcmcdiag(self): #show chain behavior
         print("MCMC diagnostics....")
         output=OutputFile(outfile)
         if(output.fit()):
-            output.MCMC.showFit()
-            output.MCMC.showChains()
+            output.MCMC.showFit(block=False)
+            output.MCMC.showChains(block=False)
         return
 
     def update_mfile(self):
@@ -336,8 +342,9 @@ class SurveySimGUI:
 
             mod.settings['verbosity']=self.settings.s_set[5].get()
             mod.annealing['temp']=self.settings.s_set[6].get() 
-
-            mod.convergence['r_max']=self.settings.s_set[7].get()
+            #mod.annealing['learningRate']=need to add this!
+            
+            #mod.convergence['r_max']=self.settings.s_set[7].get()
             mod.convergence['step']=self.settings.s_set[8].get()
             mod.convergence['CI']=self.settings.s_set[9].get()
 
@@ -346,8 +353,9 @@ class SurveySimGUI:
             mod.filters[1].filterIDs=filter_choices.index(band[1])
             mod.filters[2].filterIDs=filter_choices.index(band[2])
 
+        print(modelfile)
         mod.write(modelfile)
-        #mod.info()
+        mod.info()
 
     def plot_seds(self):
         fig=plt.Figure(figsize=(3.0,2.0)) #,dpi=100, facecolor='w')
@@ -432,7 +440,6 @@ class SettingsWindow(Frame):
             if(ind == 9):
                 self.s_set[ind].set(conv_con1)
             ind=ind+1;
-
 
 def main():
     root=Tk()   

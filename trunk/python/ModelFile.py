@@ -5,7 +5,6 @@ import os
 import sys
 import datetime
 import time
-sys.path.append("../Python/")
 from filters import *
 import pyfits as fits
         
@@ -102,15 +101,18 @@ class ModelFile:
         self.axis2='Flux1'
         self.colsel='None'
         self.convergence={
+<<<<<<< HEAD:Python/ModelFile.py
             'r_max':1.05,
+=======
+>>>>>>> origin/master:trunk/python/ModelFile.py
             'step':20,
             'CI':0.05}
         self.annealing={
             'ideal_pct':0.25,
             'range':0.05,
             'burn_step':10,
-            'temp':10.0,
-            'tscale':0.001}
+            'temp':0.01,
+            'learningRate':1.0}
         self.settings={
             'runs':1e4,
             'nchain':5,
@@ -140,6 +142,10 @@ class ModelFile:
         keyPrint(self.redshift)
         print "  Filters"
         for i in range (0,len(self.filters)) : print "\t",self.filters[i]
+        print "  Axes"
+        print "\t",self.axis1
+        print "\t",self.axis2
+        print "\t",self.colsel
         print "  Settings"
         keyPrint(self.settings)
         print "  Convergence"
@@ -188,14 +194,13 @@ class ModelFile:
         self.settings['nchain']=phdr['NCHAIN']
         self.settings['verbosity']=phdr['PRINT']
 
-        self.annealing['temp']=phdr['TMAX']
-        self.annealing['tscale']=phdr['TSCALE']
+        self.annealing['temp']=phdr['TEMP']
+        self.annealing['learningRate']=phdr['LRATE']
         self.annealing['ideal_pct']=phdr['ANN_PCT']
         self.annealing['range']=phdr['ANN_RNG']
         self.annealing['burn_step']=phdr['BURN_STE']
 
         self.convergence['CI']=phdr['CONV_CON']
-        self.convergence['r_max']=phdr['CONV_RMA']
         self.convergence['step']=phdr['CONV_STE']
         
 
@@ -250,13 +255,12 @@ class ModelFile:
 
         hdr.set('NCHAIN',self.settings['nchain'],'Chain Number')
 
-        hdr.set('TMAX',self.annealing['temp'],'Starting Anneal Temperature')
-        hdr.set('TSCALE',self.annealing['tscale'],'Annealing Temperature Scale')
+        hdr.set('TEMP',self.annealing['temp'],'Starting Anneal Temperature')
+        hdr.set('LRATE',self.annealing['learningRate'],'Annealing Learning Rate')
         hdr.set('ANN_PCT',self.annealing['ideal_pct'],'Ideal acceptance Percentage')
         hdr.set('ANN_RNG',self.annealing['range'],'Range to maintain acceptance')
 
         hdr.set('CONV_CON',self.convergence['CI'],'Convergence confidence interval') 
-        hdr.set('CONV_RMA',self.convergence['r_max'],'Convergence Rmax Criterion')
         hdr.set('CONV_STE',self.convergence['step'],'Steps btw convergence checks')
 
         hdr.set('BURN_STE',self.annealing['burn_step'],'Steps btw anneal calls in burn-in')

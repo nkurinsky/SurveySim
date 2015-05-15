@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python /usr/local/surveysim/python/SurveySim.py

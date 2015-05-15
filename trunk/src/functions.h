@@ -118,8 +118,8 @@ public:
   double zmin;
   double rmax;
   double a_ci;
-  double tmax;
-  double tscale;
+  double temp;
+  double learningRate;
   double idealpct;
   double annrng;
   string lfform;

@@ -12,8 +12,7 @@
 #include "functions.h"
 #include <deque>
 
-#define RECENT_NUM 100
-#define LEARNING_RATE 1.0
+#define RECENT_NUM 500
 
 class ParameterSettings{
 public:
@@ -33,7 +32,7 @@ class MetropSampler {
   long *iteration_total;
   double *previous;
   double temp;
-  double tscale;
+  double learning_rate;
   bool accepted;
   double ideal_acceptance;
   double accept_buffer;
@@ -44,7 +43,7 @@ class MetropSampler {
   RandomNumberGenerator rng;
  public:
   int logflag;
-  MetropSampler(int nchains,double maxTemp, double tempScale, double idealpct, double acpt_buf,int logflag);
+  MetropSampler(int nchains,double initTemp, double learningRate, double idealpct, double acpt_buf,int logflag);
   bool accept(int chainnum, double trial);
   double acceptance(int chainnum);
   double mean_acceptance();

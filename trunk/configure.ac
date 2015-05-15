@@ -39,5 +39,5 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_CHECK_FUNCS([floor pow sqrt])
 
-AC_CONFIG_FILES([Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile lib_aux/Makefile src/alg_lib/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile lib_aux/Makefile src/alg_lib/Makefile python/Makefile])
 AC_OUTPUT

@@ -13,8 +13,11 @@ else:
     file=sys.argv[1]
     output=OutputFile(file)
     output.info()
-    output.show()
-    if(output.fit()):
-        output.MCMC.showFit()
-        output.MCMC.showChains()
-    print ""
+    plt.clf()
+    output.images['observation'].plot(cmap=cm.Greys,interpolation='Spline16')
+    plt.xlim(0.75,2.25)
+    plt.ylim(-1.5,-.5)
+    plt.ylabel("Log(Flux1)")
+    plt.xlabel("Color(F1,F2)")
+    plt.title('Example Observation Diagnostic')
+    plt.savefig('example_diag')
