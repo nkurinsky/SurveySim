@@ -100,8 +100,7 @@ int main(int argc,char** argv){
     vector<double> results,means(q.nparams);
     
     ResultChain counts(3,q.nchain*q.runs);
-    MetropSampler metrop(q.nchain,q.tmax,q.tscale,q.idealpct,q.annrng,q.oprint);
-    
+    MetropSampler metrop(q.nchain,q.temp,q.learningRate,q.idealpct,q.annrng,q.oprint);    
 
     if(q.nparams > 0){ //observations provided, not all parameters fixed
       double ptemp[q.nchain][q.nparams];
