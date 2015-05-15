@@ -100,7 +100,7 @@ tmax1=mod.annealing['temp'] #Starting Anneal Temperature
 #burn_ste=mod.annealing['burn_step'] #Steps btw anneal calls in burn-in
 #burnvrun=10 #Ratio of normal to burn-in steps
 
-conv_rma1=mod.convergence['r_max'] #Convergence Rmax Criterion
+#conv_rma1=mod.convergence['r_max'] #Convergence Rmax Criterion
 conv_ste1=mod.convergence['step'] #Steps btw convergence checks
 conv_con1=mod.convergence['CI'] #Convergence confidence interval
 
@@ -342,8 +342,9 @@ class SurveySimGUI:
 
             mod.settings['verbosity']=self.settings.s_set[5].get()
             mod.annealing['temp']=self.settings.s_set[6].get() 
-
-            mod.convergence['r_max']=self.settings.s_set[7].get()
+            #mod.annealing['learningRate']=need to add this!
+            
+            #mod.convergence['r_max']=self.settings.s_set[7].get()
             mod.convergence['step']=self.settings.s_set[8].get()
             mod.convergence['CI']=self.settings.s_set[9].get()
 
