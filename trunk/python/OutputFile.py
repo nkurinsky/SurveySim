@@ -151,8 +151,9 @@ class FitImage:
     def __str__(self):
         return "Image: "+self.name
 
-    def plot(self):
-        plt.imshow(self.img, interpolation='bicubic', cmap=FitImage.colorMaps[self.name], extent=self.extent,aspect='auto')
+    def plot(self,interpolation='none',cmap=cm.Greys):
+        plt.imshow(self.img, interpolation=interpolation, cmap=cmap, extent=self.extent, aspect='auto')
+        plt.contour(self.img, interpolation=interpolation, colors='grey', extent=self.extent, origin='image', aspect='auto')
         plt.xlabel("AXIS 1")
         plt.ylabel("AXIS 2")
         plt.title(self.name)

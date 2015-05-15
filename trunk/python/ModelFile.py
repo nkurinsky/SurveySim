@@ -138,6 +138,10 @@ class ModelFile:
         keyPrint(self.redshift)
         print "  Filters"
         for i in range (0,len(self.filters)) : print "\t",self.filters[i]
+        print "  Axes"
+        print "\t",self.axis1
+        print "\t",self.axis2
+        print "\t",self.colsel
         print "  Settings"
         keyPrint(self.settings)
         print "  Convergence"
