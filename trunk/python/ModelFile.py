@@ -101,16 +101,8 @@ class ModelFile:
         self.axis2='Flux1'
         self.colsel='None'
         self.convergence={
-<<<<<<< HEAD:Python/ModelFile.py
-            'r_max':1.05,
-=======
->>>>>>> origin/master:trunk/python/ModelFile.py
             'step':20,
-<<<<<<< HEAD
             'CI':0.9}
-=======
-            'CI':0.05}
->>>>>>> d01ed543a8098b4c2d695c19dfacb896f81f800d
         self.annealing={
             'ideal_pct':0.25,
             'range':0.05,
