@@ -209,13 +209,13 @@ void Configuration::print(){
 	   LFParameters[i][fixed] == 0.0 ? "True" : "False"
 	   );
   }
-  //  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
-  //	 "CEXP",
-  //	 colorEvolution[value],
-  //	 colorEvolution[min],
-  //	 colorEvolution[max],
-  //	 colorEvolution[fixed] == 0.0 ? "True" : "False"
-  //	 );
+  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
+  	 "CEXP",
+  	 colorEvolution[value],
+  	 colorEvolution[min],
+  	 colorEvolution[max],
+  	 colorEvolution[fixed] == 0.0 ? "True" : "False"
+	 );
 
   printf("\nNumber Unfixed Parameters: %lu\n",nparams);
   
