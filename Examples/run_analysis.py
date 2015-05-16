@@ -29,8 +29,7 @@ mod.settings['verbosity']=3
 mod.annealing['temp']=.05
 mod.annealing['learningRate']=2
 
-mod.convergence['r_max']=1.10
-mod.convergence['CI']=0.1
+mod.convergence['CI']=0.9
 
 mod.write('spire_model.fits')
 mod.info()

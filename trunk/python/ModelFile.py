@@ -102,7 +102,7 @@ class ModelFile:
         self.colsel='None'
         self.convergence={
             'step':20,
-            'CI':0.01}
+            'CI':0.9}
         self.annealing={
             'ideal_pct':0.25,
             'range':0.05,
@@ -256,7 +256,7 @@ class ModelFile:
         hdr.set('ANN_PCT',self.annealing['ideal_pct'],'Ideal acceptance Percentage')
         hdr.set('ANN_RNG',self.annealing['range'],'Range to maintain acceptance')
 
-        hdr.set('CONV_CON',self.convergence['CI'],'Convergence confidence interval') 
+        hdr.set('CONV_CON',self.convergence['CI'],'Convergence confidence interval (fraction)') 
         hdr.set('CONV_STE',self.convergence['step'],'Steps btw convergence checks')
 
         hdr.set('BURN_STE',self.annealing['burn_step'],'Steps btw anneal calls in burn-in')

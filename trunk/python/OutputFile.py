@@ -6,6 +6,7 @@ import numpy
 from numpy import std
 from math import ceil
 import os
+import Tkinter as tk
 
 from ModelFile import keyPrint
 
@@ -27,6 +28,12 @@ def MCMCcontour(x,y):
     H, xedges, yedges = numpy.histogram2d(y, x, bins=(nbins2d(y), nbins2d(x)),normed=True)
     extent = [yedges[0], yedges[-1], xedges[0], xedges[-1]]
     cset = plt.contour(H, origin="lower",colors="black",extent=extent)
+
+def maxWindowSize():
+    root=tk.Tk()
+    root.state('withdrawn')
+    size=root.maxsize()
+    return size
 
 class FitInfo:
 
@@ -151,8 +158,11 @@ class FitImage:
     def __str__(self):
         return "Image: "+self.name
 
-    def plot(self,interpolation='none',cmap=cm.Greys):
+    def plot(self,interpolation='none',cmap=cm.Greys,labelCbar=True):
         plt.imshow(self.img, interpolation=interpolation, cmap=cmap, extent=self.extent, aspect='auto')
+        cbar=plt.colorbar()
+        if(labelCbar):
+            cbar.set_label("Normalized Density")
         plt.contour(self.img, interpolation=interpolation, colors='grey', extent=self.extent, origin='image', aspect='auto')
         plt.xlabel("AXIS 1")
         plt.ylabel("AXIS 2")
@@ -309,6 +319,7 @@ class MCMCInfo:
             for j in range(0,len(pnames)):
                 if(i >= j):
                     plt.subplot(dim,dim,i*dim+j+1)
+                    plt.subplots_adjust(hspace = .05, wspace=0.05)
                 if(i == j):
                     datapts=self.Parameters[pnames[i]]
                     plt.hist(datapts,
@@ -318,15 +329,24 @@ class MCMCInfo:
                          color="black")
                     if(j == 0):
                         plt.ylabel("Relative Probability")
+                    else:
+                        plt.setp( plt.gca().get_yticklabels(), visible=False)
                 elif(i > j):
                     MCMCcontour(self.Parameters[pnames[j]],self.Parameters[pnames[i]])
                     if(j == 0):
                         plt.ylabel(pnames[i])
+                    else:
+                        plt.setp( plt.gca().get_yticklabels(), visible=False)
                 if(i == (len(pnames)-1)):
                     plt.xlabel(pnames[j])
+                else:
+                    plt.setp( plt.gca().get_xticklabels(), visible=False)
 
     def showFit(self,block=True):
-        plt.figure(figsize=(12,8))
+        my_dpi=116
+        maxsize=maxWindowSize()
+        figsize=(maxsize[0]/float(my_dpi)-0.25,maxsize[1]/float(my_dpi)-0.5)
+        plt.figure(figsize=figsize)
         self.plotFit()
         plt.show(block=block)
 
@@ -431,7 +451,7 @@ class OutputFile:
         for key in self.images.keys():
             col=col+1
             plt.subplot(1,3,col)
-            self.images[key].plot()
+            self.images[key].plot(labelCbar=False)
             if(col > 1):
                 plt.ylabel("")
 
@@ -484,15 +504,15 @@ class OutputFile:
         for key in self.images.keys():
             col=col+1
             plt.subplot(rows,3,col+6)
-            self.images[key].plot()
+            self.images[key].plot(labelCbar=False)
             if(col > 1):
                 plt.ylabel("")
         plt.tight_layout()
        
     def show(self,block=True):
-        #plt.figure(figsize=(16,10))
         my_dpi=116 
-        plt.figure(figsize=(1600/my_dpi, 1200/my_dpi), dpi=my_dpi)
-        print 'hello'
+        maxsize=maxWindowSize()
+        figsize=(maxsize[0]/float(my_dpi)-0.25,maxsize[1]/float(my_dpi)-0.5)
+        plt.figure(figsize=figsize, dpi=my_dpi)
         self.plot()
         plt.show(block=block)

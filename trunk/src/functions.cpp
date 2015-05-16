@@ -189,7 +189,7 @@ void Configuration::print(){
   printf("  Convergence Step     : %lu\n",conv_step);
   printf("  Run:Burn-In          : %lu\n",burn_ratio);
   printf("  Convergence Criterion: %4.2f\n",rmax);
-  printf("  Confidence Interval  : %4.2f\n",a_ci);
+  printf("  Confidence Interval  : %4.2f%%\n",1-a_ci);
  
   printf("\nSimulation Settings:\n");
   printf("  Run Number Max       : %lu\n",runs);
@@ -317,8 +317,8 @@ void Configuration::load(){
     conv_step = static_cast<unsigned long>(rtemp);
     tab.readKey("BURNVRUN",rtemp);
     burn_ratio = static_cast<unsigned long>(rtemp);
-    //tab.readKey("CONV_RMA",rmax);
-    tab.readKey("CONV_CON",a_ci);
+    tab.readKey("CONV_CON",rtemp);
+    a_ci=1-rtemp;
     rmax=1+a_ci;
     tab.readKey("PRINT",rtemp);
     oprint = rtemp; // == 0.0 ? true : false; 
