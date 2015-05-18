@@ -119,8 +119,8 @@ class ModelFile:
             #values based on Gruppioni+2013
             'Phi0':parameter(-2.29,-3.0,-1.0,1,"Log Normalization"),
             'L0':parameter(10.12,9.0,11.0,1,"Log Luminosity Knee"),
-            'Alpha':parameter(1.15,0.0,1.0,1,"Primary Slope"),
-            'Beta':parameter(0.52,2.5,3.5,1,"Secondary Slope"),
+            'Alpha':parameter(3.0,2.8,3.2,1,"Primary Slope"),
+            'Beta':parameter(0.52,0.4,0.6,1,"Secondary Slope"),
             'P':parameter(-0.57,-5.0,0.0,0,"Low Z Density Evolution"),
             'P2':parameter(-3.92,-5.0,0.0,0,"High Z Density Evolution"),
             'Q':parameter(3.55,0.0,5.0,0,"Low Z Luminosity Evolution"),

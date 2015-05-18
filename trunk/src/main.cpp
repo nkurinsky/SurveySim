@@ -300,9 +300,9 @@ int main(int argc,char** argv){
     LOG_DEBUG(printf("Saving Chains\n"));
     saved &= mcchain.save(q.outfile,parnames.get());
     LOG_DEBUG(printf("Saving Counts\n"));
-    saved &= counts.save(q.outfile,countnames);
+    saved &= counts.save(q.outfile,countnames,"Simulation Counts");
     LOG_DEBUG(printf("Saving Final Counts\n"));
-    saved &= final_counts.save(q.outfile,countnames,"Counts Monte Carlo");
+    saved &= final_counts.save(q.outfile,countnames,"Final Monte Carlo Counts");
   }
   
   saved ? printf("Save Successful") : printf("Save Failed");

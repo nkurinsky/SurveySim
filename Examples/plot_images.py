@@ -22,3 +22,5 @@ else:
         plt.xlabel("Color(F1,F2)")
         plt.title('Example Diagnostic: '+k)
         plt.savefig('example_diag_'+k)
+    plt.clf()
+    output.saveImages('example_diags',xrange=(0.5,2.5),yrange=(-0.5,0.8))

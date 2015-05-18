@@ -98,7 +98,7 @@ bool hist_lib::write_fits(string filename){
   }
   
   static std::vector<long> extAx(2,xysize);
-  static string names[] = {"model","observation"};
+  static string names[] = {"Model Diagnostic","Observation Diagnostic"};
   static int nelements;
   nelements = xysize*xysize;
 

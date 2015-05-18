@@ -158,7 +158,7 @@ class FitImage:
     def __str__(self):
         return "Image: "+self.name
 
-    def plot(self,interpolation='none',cmap=cm.Greys,labelCbar=True):
+    def plot(self,interpolation='nearest',cmap=cm.Greys,labelCbar=True):
         plt.imshow(self.img, interpolation=interpolation, cmap=cmap, extent=self.extent, aspect='auto')
         cbar=plt.colorbar()
         if(labelCbar):
@@ -213,7 +213,7 @@ class NumberCounts:
         print level2,"Simulated Count Chains (chains)"
         print level3,self.chains.keys()
 
-    def plot(self,band):
+    def plot(self,band,showLegend=True):
         bi=band-1
         if(self.fitted):
             chi=self.chains['chisq']
@@ -249,7 +249,8 @@ class NumberCounts:
         plt.ylabel('DnDs*Jy^(-1.5)')
         plt.xscale('log')
         plt.yscale('log')
-        plt.legend(loc='lower right')
+        if(showLegend):
+            plt.legend(loc='lower right')
 
     def show(self,band):
         self.plot(band)
@@ -447,7 +448,7 @@ class OutputFile:
             self.MCMC.info()
         self.counts.info()
 
-    def plotImages(self):
+    def plotImages(self,xrange=None,yrange=None):
         col=0
         for key in self.images.keys():
             col=col+1
@@ -455,15 +456,20 @@ class OutputFile:
             self.images[key].plot(labelCbar=False)
             if(col > 1):
                 plt.ylabel("")
+            if(xrange != None):
+                plt.xlim(xrange[0],xrange[1])
+            if(yrange != None):
+                plt.ylim(yrange[0],yrange[1])
+        plt.gcf().set_tight_layout(True)
 
-    def showImages(self,block=True):
-        plt.figure(figsize=(12,5))
-        self.plotImages()
+    def showImages(self,block=True,xrange=None,yrange=None):
+        plt.figure(figsize=(12,4))
+        self.plotImages(xrange=xrange,yrange=yrange)
         plt.show(block=block)
 
-    def saveImages(self,filename):
-        plt.figure(figsize=(12,5))
-        self.plotImages()
+    def saveImages(self,filename,xrange=None,yrange=None):
+        plt.figure(figsize=(12,4))
+        self.plotImages(xrange=xrange,yrange=yrange)
         plt.savefig(filename)
 
     def plotCounts(self):
@@ -490,7 +496,7 @@ class OutputFile:
             rows=2
         for i in range(1,4):
             plt.subplot(rows,3,i)
-            self.counts.plot(i)
+            self.counts.plot(i,showLegend=False)
             if(i > 1):
                 plt.ylabel("")
         
@@ -508,7 +514,7 @@ class OutputFile:
             self.images[key].plot(labelCbar=False)
             if(col > 1):
                 plt.ylabel("")
-        plt.tight_layout()
+        plt.gcf().set_tight_layout(True)
        
     def show(self,block=True):
         my_dpi=116 
