@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.63])
 
 AC_INIT([SurveySim], [1.0], [nkurinsky91@gmail.com])
 AC_CONFIG_SRCDIR([src/constants.h])
@@ -17,17 +17,18 @@ AC_PROG_CPP
 AC_PROG_RANLIB
 
 # Checks for libraries.
-LIBS="-lm -lgslcblas -lgsl -lcfitsio -lCCFits"
+#LIBS="-lm -lgslcblas -lgsl -lcfitsio -lCCFits"
 
-AC_CHECK_LIB(m,cos)
+AC_CHECK_LIB([m],[cos],[],[
+	echo "Warning: LM library required, not found"; exit 1])
 AC_CHECK_LIB([gslcblas],[cblas_sgemm],[],[
-        echo "Warning: GSLCBLAS library required, not found"])
+        echo "Warning: GSLCBLAS library required, not found"; exit 1])
 AC_CHECK_LIB([gsl],main,[],[
-	echo "Warning: GSL library required, not found"])
+	echo "Warning: GSL library required, not found"; exit 1])
 AC_CHECK_LIB([cfitsio],[ffopen],[],[
-	echo "Warning:cfitsio library required, not found"])
-AC_CHECK_LIB([CCFits],[main],[],[
-	echo "Warning:CCFits library required, not found"])
+	echo "Warning:cfitsio library required, not found"; exit 1])
+AC_CHECK_LIB([CCfits],[main],[],[
+	echo "Warning:CCFits library required, not found"; exit 1])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h])

@@ -1,3 +1,8 @@
 #!/bin/bash
 
-python /usr/local/surveysim/python/SurveySim.py
+if [ -z $SURVEYSIMPATH ]
+then
+    python /usr/local/surveysim/python/SurveySim.py
+else
+    python ${SURVEYSIMPATH}/python/SurveySim.py
+fi

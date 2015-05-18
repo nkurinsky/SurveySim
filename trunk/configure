@@ -4540,7 +4540,7 @@ fi
 
 
 # Checks for libraries.
-LIBS="-lm -lgslcblas -lgsl -lcfitsio -lCCFits"
+#LIBS="-lm -lgslcblas -lgsl -lcfitsio -lCCFits"
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cos in -lm" >&5
@@ -4586,6 +4586,9 @@ _ACEOF
 
   LIBS="-lm $LIBS"
 
+else
+
+	echo "Warning: LM library required, not found"; exit 1
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cblas_sgemm in -lgslcblas" >&5
@@ -4633,7 +4636,7 @@ _ACEOF
 
 else
 
-        echo "Warning: GSLCBLAS library required, not found"
+        echo "Warning: GSLCBLAS library required, not found"; exit 1
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lgsl" >&5
@@ -4675,7 +4678,7 @@ _ACEOF
 
 else
 
-	echo "Warning: GSL library required, not found"
+	echo "Warning: GSL library required, not found"; exit 1
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ffopen in -lcfitsio" >&5
@@ -4723,16 +4726,16 @@ _ACEOF
 
 else
 
-	echo "Warning:cfitsio library required, not found"
+	echo "Warning:cfitsio library required, not found"; exit 1
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lCCFits" >&5
-$as_echo_n "checking for main in -lCCFits... " >&6; }
-if ${ac_cv_lib_CCFits_main+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lCCfits" >&5
+$as_echo_n "checking for main in -lCCfits... " >&6; }
+if ${ac_cv_lib_CCfits_main+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lCCFits  $LIBS"
+LIBS="-lCCfits  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -4746,26 +4749,26 @@ return main ();
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_CCFits_main=yes
+  ac_cv_lib_CCfits_main=yes
 else
-  ac_cv_lib_CCFits_main=no
+  ac_cv_lib_CCfits_main=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_CCFits_main" >&5
-$as_echo "$ac_cv_lib_CCFits_main" >&6; }
-if test "x$ac_cv_lib_CCFits_main" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_CCfits_main" >&5
+$as_echo "$ac_cv_lib_CCfits_main" >&6; }
+if test "x$ac_cv_lib_CCfits_main" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_LIBCCFITS 1
 _ACEOF
 
-  LIBS="-lCCFits $LIBS"
+  LIBS="-lCCfits $LIBS"
 
 else
 
-	echo "Warning:CCFits library required, not found"
+	echo "Warning:CCFits library required, not found"; exit 1
 fi
 
 

@@ -1,4 +1,4 @@
-from astropy.io import fits
+import pyfits as fits
 from matplotlib import gridspec
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -377,7 +377,8 @@ class MCMCInfo:
         colors=['black','cyan','red','green','orange','purple','grey','magenta']
         for i in range(0,len(self.ChiSquares)):
             iterations=numpy.arange(1,len(self.ChiSquares[i])+1)
-            plt.plot(iterations,self.ChiSquares[i],label=str(i),color=colors[i])
+            gpts = numpy.where(self.ChiSquares[i] < 100)
+            plt.plot(iterations[gpts],self.ChiSquares[i][gpts],label=str(i),color=colors[i])
             gpts = numpy.where(self.Acceptance[i] > 0)
             plt.plot(iterations[gpts],self.ChiSquares[i][gpts],'--',color=colors[i])
         plt.legend(loc='upper right',title="Chain Number")

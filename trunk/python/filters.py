@@ -1,9 +1,16 @@
 import os
 
 def filterDir():
+    ssdir=os.getenv("SURVEYSIMPATH")
+    if(ssdir != None):
+        if(os.path.exists(ssdir)):
+            return ssdir+"/filters/"
     instdir='/usr/local/surveysim/filters/'
+    instdir2=os.getenv("HOME")+"/local/surveysim/filters/"
     if(os.path.exists(instdir)):
         return instdir
+    if(os.path.exists(instdir2)):
+        return instdir2
     else:
         wd=os.getcwd()
         topdir="SurveySim"

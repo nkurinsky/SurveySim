@@ -6,14 +6,16 @@ import sys
 import datetime
 
 thisdir=os.getcwd()+'/'
-codedir='/usr/local/surveysim/'
-#pydir=os.getcwd()+'/trunk/python/';
-pydir='/usr/local/surveysim/python'
+if (os.getenv("SURVEYSIMPATH") != None):
+    codedir=os.getenv("SURVEYSIMPATH")+'/'
+else:
+    codedir='/usr/local/surveysim/'
+pydir=codedir+'python'
 #ensure this is in the path
 sys.path.append(pydir)
 
 import time
-from astropy.io import fits
+import pyfits as fits
 import matplotlib.pyplot as plt
 import numpy as np
 import img_scale

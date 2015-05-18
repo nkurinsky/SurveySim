@@ -215,7 +215,7 @@ class ModelFile:
         col6=fits.Column(name='transmission3',format='FLOAT',array=trans3)
 
         cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
-        tbhdu=fits.new_table(cols)
+        tbhdu=fits.BinTableHDU.from_columns(cols)
 
         tbhdu.header['LSCALE']=(-10,"Wavelength of Filter Lambda")
 
