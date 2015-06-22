@@ -328,9 +328,9 @@ class SurveySimGUI:
         ind=0
         for field in fields_bands:
             mod.filters[ind].setID(self.bands[ind].get())
-            #there is a bug where the fid is off by 1
-            mod.filters[ind].fid=mod.filters[ind].fid-1
-            mod.filters[ind].limits=self.limits[ind].get()
+            mod.filters[ind].fid=mod.filters[ind].fid
+            mod.filters[ind].limit=self.limits[ind].get()
+            mod.filters[ind].error=mod.filters[ind].limit/3.0 #assume 3sigma det.limit
             mod.filters[ind].unit=self.units[ind].get()
             ind=ind+1
 
@@ -355,10 +355,8 @@ class SurveySimGUI:
             mod.filters[0].filterIDs=filter_choices.index(band[0])
             mod.filters[1].filterIDs=filter_choices.index(band[1])
             mod.filters[2].filterIDs=filter_choices.index(band[2])
-
-        print(modelfile)
+    
         mod.write(modelfile)
-        #mod.info()
 
     def plot_seds(self):
         fig=plt.Figure(figsize=(3.0,2.0)) #,dpi=100, facecolor='w')

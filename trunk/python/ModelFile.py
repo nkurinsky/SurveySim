@@ -153,9 +153,9 @@ class ModelFile:
         print ""
 
     def filterIDs(self):
-        return [self.filters[0].fid+1,
-                self.filters[1].fid+1,
-                self.filters[2].fid+1]
+        return [self.filters[0].fid,
+                self.filters[1].fid,
+                self.filters[2].fid]
 
     def setLF(type):
         if(type == 'DoublePowerLaw'):
@@ -207,7 +207,7 @@ class ModelFile:
     def update(self):
         #creating filter table
         lam1,lam2,lam3,trans1,trans2,trans3=fill_filters(self.filterIDs());
-        print self.filterIDs(),lam1[0],trans1[0]#lam1[trans1 == max(trans1)]
+        #print self.filterIDs(),lam1[0],trans1[0]#lam1[trans1 == max(trans1)]
         col1=fits.Column(name='lambda1',format='FLOAT',array=lam1)
         col2=fits.Column(name='transmission1',format='FLOAT',array=trans1)
         col3=fits.Column(name='lambda2',format='FLOAT',array=lam2)
@@ -216,7 +216,7 @@ class ModelFile:
         col6=fits.Column(name='transmission3',format='FLOAT',array=trans3)
 
         cols=fits.ColDefs([col1,col2,col3,col4,col5,col6])
-        tbhdu=fits.BinTableHDU.from_columns(cols)
+        tbhdu=fits.TableHDU.from_columns(cols)
 
         tbhdu.header['LSCALE']=(-10,"Wavelength of Filter Lambda")
 
@@ -271,6 +271,9 @@ class ModelFile:
             print 'Replacing existing model file'
             os.remove(self.filename)
             thdulist.writeto(self.filename);
+            #test=fits.open(self.filename);
+            #tbdata=test[1].data;
+            #print tbdata['lambda1'];
         else:
             print 'Writing a new model file'
             thdulist.writeto(self.filename);
