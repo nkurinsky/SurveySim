@@ -66,8 +66,8 @@ lnu12=np.array(lnu12)*conv_whz
 lnu13=np.array(lnu13)*conv_whz
 lnu14=np.array(lnu14)*conv_whz
 
-#want to extend to 0.5um 
-lam_short=[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.10,4.20,4.30,4.40,4.50,4.60,4.70,5.0,5.1,5.2]
+#want to extend to 0.2um 
+lam_short=[0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.10,4.20,4.30,4.40,4.50,4.60,4.70,5.0,5.1,5.2]
 lam_short=np.array(lam_short)
 lam_rieke=np.array(lam_rieke)
 lam_default=np.concatenate((lam_short,lam_rieke),axis=0)
@@ -88,37 +88,40 @@ lam_swire=np.array(lam_swire)/1e4 #convert to microns
 lnu_swire=np.array(flam_swire)*lam_swire**2. #convert to fnu but overall normalization not set yet!
  
 f = interpolate.interp1d(lam_swire,lnu_swire)
+#print lam_swire[0],lam_swire[1196]
 lnu_tmp=f(lam_short)
-#print lam_short[44],lnu_tmp[44],lam_rieke[0],lnu1[0]
-tmp=lnu_tmp*(lnu1[0]/lnu_tmp[44])
+istitch=45
+#print lam_short[istitch],lnu_tmp[istitch],lam_rieke[0],lnu1[0]
+tmp=lnu_tmp*(lnu1[0]/lnu_tmp[istitch])
 lnu1_default=np.concatenate((tmp,lnu1),axis=0)
-tmp=lnu_tmp*(lnu2[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu2[0]/lnu_tmp[istitch])
 lnu2_default=np.concatenate((tmp,lnu2),axis=0)
-tmp=lnu_tmp*(lnu3[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu3[0]/lnu_tmp[istitch])
 lnu3_default=np.concatenate((tmp,lnu3),axis=0)
-tmp=lnu_tmp*(lnu4[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu4[0]/lnu_tmp[istitch])
 lnu4_default=np.concatenate((tmp,lnu4),axis=0)
-tmp=lnu_tmp*(lnu5[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu5[0]/lnu_tmp[istitch])
 lnu5_default=np.concatenate((tmp,lnu5),axis=0)
-tmp=lnu_tmp*(lnu6[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu6[0]/lnu_tmp[istitch])
 lnu6_default=np.concatenate((tmp,lnu6),axis=0)
-tmp=lnu_tmp*(lnu7[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu7[0]/lnu_tmp[istitch])
 lnu7_default=np.concatenate((tmp,lnu7),axis=0)
-tmp=lnu_tmp*(lnu8[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu8[0]/lnu_tmp[istitch])
 lnu8_default=np.concatenate((tmp,lnu8),axis=0)
-tmp=lnu_tmp*(lnu9[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu9[0]/lnu_tmp[istitch])
 lnu9_default=np.concatenate((tmp,lnu9),axis=0)
-tmp=lnu_tmp*(lnu10[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu10[0]/lnu_tmp[istitch])
 lnu10_default=np.concatenate((tmp,lnu10),axis=0)
-tmp=lnu_tmp*(lnu11[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu11[0]/lnu_tmp[istitch])
 lnu11_default=np.concatenate((tmp,lnu11),axis=0)
-tmp=lnu_tmp*(lnu12[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu12[0]/lnu_tmp[istitch])
 lnu12_default=np.concatenate((tmp,lnu12),axis=0)
-tmp=lnu_tmp*(lnu13[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu13[0]/lnu_tmp[istitch])
 lnu13_default=np.concatenate((tmp,lnu13),axis=0)
-tmp=lnu_tmp*(lnu14[0]/lnu_tmp[44])
+tmp=lnu_tmp*(lnu14[0]/lnu_tmp[istitch])
 lnu14_default=np.concatenate((tmp,lnu14),axis=0)
 
+print lam_default[0]
 col1=fits.Column(name='lambda',format='FLOAT',array=lam_default)
 col2=fits.Column(name='lnu1',format='FLOAT',array=lnu1_default)
 col3=fits.Column(name='lnu2',format='FLOAT',array=lnu2_default)
@@ -139,6 +142,7 @@ col15=fits.Column(name='lnu14',format='FLOAT',array=lnu14_default)
 #plt.xscale('log')
 #plt.yscale('log')
 #plt.show()
+print len(lam_default),len(lnu1_default)
 
 cols_SFG_z0=fits.ColDefs([col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15])
 
@@ -164,14 +168,16 @@ scale=pow(10,lir_list-np.log10(lir))
 
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
+
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([0.5],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
     lam_old=np.concatenate((lam_old,[1031]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
+print lam_old[0],lam_default[0]
 lnu=f(lam_default)
 
 col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
@@ -195,7 +201,7 @@ with open (seddir+'/Comprehensive_SFG2.txt','r') as f:
 lam_old=lam
 lnu_old=lnu
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([0.5],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
     lam_old=np.concatenate((lam_old,[1031]),axis=0)
@@ -244,7 +250,7 @@ scale=pow(10,lir_list-np.log10(lir))
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([0.5],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
     lam_old=np.concatenate((lam_old,[1031]),axis=0)
@@ -306,7 +312,7 @@ scale=pow(10,lir_list-np.log10(lir))
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([0.5],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
     lam_old=np.concatenate((lam_old,[1031]),axis=0)
@@ -338,7 +344,7 @@ with open (seddir+'/Comprehensive_AGN2.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([0.5],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
     lam_old=np.concatenate((lam_old,[1031]),axis=0)
@@ -389,7 +395,7 @@ print 'AGN3 template L_TIR', np.log10(lir)
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([0.5],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
     lam_old=np.concatenate((lam_old,[1031]),axis=0)
@@ -433,7 +439,7 @@ with open (seddir+'/Comprehensive_AGN4.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([0.5],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
     lam_old=np.concatenate((lam_old,[1031]),axis=0)
@@ -453,7 +459,7 @@ scale=pow(10,lir_list-np.log10(lir))
 
 col14=fits.Column(name='lnu13',format='FLOAT',array=lnu*scale[12])
 col15=fits.Column(name='lnu14',format='FLOAT',array=lnu*scale[13])
-
+print len(lam_default),len(lnu)
 cols_AGN_z2=fits.ColDefs([col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15])
 
 #==========================================================================
@@ -496,7 +502,22 @@ hdulist[0].header.update('zmin1',0.5,'minimum of 2nd redshift bin')
 hdulist[0].header.update('zmax1',1.2,'maximum of 2nd redshift bin')
 hdulist[0].header.update('zmin2',1.201,'minimum of 3rd redshift bin')
 hdulist[0].header.update('zmax2',2.5,'in code adopt the maximum z')
+hdulist[0].header.update('SCALE',-6,'wavelength scale relative to m')
 
+hdulist[0].header.update('L1',lir_list[0],'luminosity array')
+hdulist[0].header.update('L2',lir_list[1],'luminosity array')
+hdulist[0].header.update('L3',lir_list[2],'luminosity array')
+hdulist[0].header.update('L4',lir_list[3],'luminosity array')
+hdulist[0].header.update('L5',lir_list[4],'luminosity array')
+hdulist[0].header.update('L6',lir_list[5],'luminosity array')
+hdulist[0].header.update('L7',lir_list[6],'luminosity array')
+hdulist[0].header.update('L8',lir_list[7],'luminosity array')
+hdulist[0].header.update('L9',lir_list[8],'luminosity array')
+hdulist[0].header.update('L10',lir_list[9],'luminosity array')
+hdulist[0].header.update('L11',lir_list[10],'luminosity array')
+hdulist[0].header.update('L12',lir_list[11],'luminosity array')
+hdulist[0].header.update('L13',lir_list[12],'luminosity array')
+hdulist[0].header.update('L14',lir_list[13],'luminosity array')
 
 
 hdr=hdulist[0].header

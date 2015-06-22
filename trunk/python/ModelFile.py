@@ -6,7 +6,7 @@ import sys
 import datetime
 import time
 from filters import *
-import pyfits as fits
+from astropy.io import fits
         
 class filterOptions:
 
@@ -153,9 +153,9 @@ class ModelFile:
         print ""
 
     def filterIDs(self):
-        return [self.filters[0].fid,
-                self.filters[1].fid,
-                self.filters[2].fid]
+        return [self.filters[0].fid+1,
+                self.filters[1].fid+1,
+                self.filters[2].fid+1]
 
     def setLF(type):
         if(type == 'DoublePowerLaw'):
@@ -207,6 +207,7 @@ class ModelFile:
     def update(self):
         #creating filter table
         lam1,lam2,lam3,trans1,trans2,trans3=fill_filters(self.filterIDs());
+        print self.filterIDs(),lam1[0],trans1[0]#lam1[trans1 == max(trans1)]
         col1=fits.Column(name='lambda1',format='FLOAT',array=lam1)
         col2=fits.Column(name='transmission1',format='FLOAT',array=trans1)
         col3=fits.Column(name='lambda2',format='FLOAT',array=lam2)

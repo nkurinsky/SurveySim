@@ -9,7 +9,8 @@ thisdir=os.getcwd()+'/'
 if (os.getenv("SURVEYSIMPATH") != None):
     codedir=os.getenv("SURVEYSIMPATH")+'/'
 else:
-    codedir='/usr/local/surveysim/'
+#    codedir='/usr/local/surveysim/'
+     codedir=thisdir+'trunk/'
 pydir=codedir+'python'
 #ensure this is in the path
 sys.path.append(pydir)
@@ -357,7 +358,7 @@ class SurveySimGUI:
 
         print(modelfile)
         mod.write(modelfile)
-        mod.info()
+        #mod.info()
 
     def plot_seds(self):
         fig=plt.Figure(figsize=(3.0,2.0)) #,dpi=100, facecolor='w')
