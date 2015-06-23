@@ -343,7 +343,7 @@ bool MCChains::converged(){
   return converged;
 }
 
-bool MCChains::save(string filename, string parnames[]){
+bool MCChains::save(string filename, string parnames[], string hname){
 
   using namespace CCfits;
   std::auto_ptr<FITS> pFits(0);
@@ -363,7 +363,6 @@ bool MCChains::save(string filename, string parnames[]){
   std::vector<string> colnames(tablewidth,"CHISQ");
   std::vector<string> colunits(tablewidth,"-");
   std::vector<string> colform(tablewidth,"e13.5");
-  string hname("Chain");
   char ctemp[2];
   string cnum;
   

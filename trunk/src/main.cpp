@@ -298,7 +298,7 @@ int main(int argc,char** argv){
       parnames[q.cind] = "CEXP";
     
     LOG_DEBUG(printf("Saving Chains\n"));
-    saved &= mcchain.save(q.outfile,parnames.get());
+    saved &= mcchain.save(q.outfile,parnames.get(),"MCMC Chain Record");
     LOG_DEBUG(printf("Saving Counts\n"));
     saved &= counts.save(q.outfile,countnames,"Simulation Counts");
     LOG_DEBUG(printf("Saving Final Counts\n"));

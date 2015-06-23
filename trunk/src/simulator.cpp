@@ -485,7 +485,7 @@ bool simulator::save(string outfile){
     }
     
     
-    static string hname("Parameter Distributions");
+    static string hname("Best Fit Distributions");
     Table* newTable;
     try{
       newTable = pFits->addTable(hname,size,colname,colform,colunit,AsciiTbl);

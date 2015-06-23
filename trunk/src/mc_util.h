@@ -80,7 +80,7 @@ class MCChains {
   void get_covariance(vector<vector<double> > &covar);
   bool set_constraints(double Rmax, double alpha);
   bool converged();
-  bool save(string filename, string parnames[]);
+  bool save(string filename, string parnames[], string hname="MCChain");
   ~MCChains();
 };
 

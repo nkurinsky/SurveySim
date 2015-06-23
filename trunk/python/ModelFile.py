@@ -157,7 +157,7 @@ class ModelFile:
                 self.filters[1].fid,
                 self.filters[2].fid]
 
-    def setLF(type):
+    def setLF(self,type):
         if(type == 'DoublePowerLaw'):
             self.survey['lfForm']=0
         elif (type == "ModifiedSchecter"):
