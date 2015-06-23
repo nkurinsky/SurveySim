@@ -64,6 +64,8 @@ if(lfform_tmp == 1):
     lfform='ModifiedSchecter'
 if(lfform_tmp == 2):
     lfform='Schecter'
+if(lfform_tmp == 3):
+    lfform='DoubleExponential'
 
 #initialize luminosity function parameters (GUI middle frame)
 fields_lf=mod.params.keys()
@@ -88,7 +90,9 @@ f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
 
 #initialize MCMC settings parameters
-fields3='zmin','zmax','dz','Runs','Nchain','verbosity','Tmax','conv_rmax','conv_step','conv_ci'
+#fields3='zmin','zmax','dz','Runs','Nchain','verbosity','Tmax','conv_rmax','conv_step','conv_ci'
+fields3='zmin','zmax','dz','Runs','Nchain','verbosity','Tmax','conv_ci'
+
 zmin1=mod.redshift['min'] #Simulation minimum redshift
 zmax1=mod.redshift['max'] #Simulation maximum redshift
 dz1=mod.redshift['delta'] #Redshift Bin Width
@@ -104,7 +108,7 @@ tmax1=mod.annealing['temp'] #Starting Anneal Temperature
 #burnvrun=10 #Ratio of normal to burn-in steps
 
 #conv_rma1=mod.convergence['r_max'] #Convergence Rmax Criterion
-conv_ste1=mod.convergence['step'] #Steps btw convergence checks
+#conv_ste1=mod.convergence['step'] #Steps btw convergence checks
 conv_con1=mod.convergence['CI'] #Convergence confidence interval
 
 #-----------------------------------------------------------------------------------------
@@ -325,12 +329,15 @@ class SurveySimGUI:
             mod.params[field].fixed=self.v_fixed[ind].get()
             ind=ind+1
 
+        mod.area=self.area.get()
+        mod.axis1=self.fitaxes[0].get()
+        mod.axis2=self.fitaxes[1].get() 
         ind=0
         for field in fields_bands:
             mod.filters[ind].setID(self.bands[ind].get())
             mod.filters[ind].fid=mod.filters[ind].fid
             mod.filters[ind].limit=self.limits[ind].get()
-            mod.filters[ind].error=mod.filters[ind].limit/3.0 #assume 3sigma det.limit
+            mod.filters[ind].error=mod.filters[ind].limit/3.0 #assume 3sigma det.limit, we do not use this at present
             mod.filters[ind].unit=self.units[ind].get()
             ind=ind+1
 
@@ -348,8 +355,8 @@ class SurveySimGUI:
             #mod.annealing['learningRate']=need to add this!
             
             #mod.convergence['r_max']=self.settings.s_set[7].get()
-            mod.convergence['step']=self.settings.s_set[8].get()
-            mod.convergence['CI']=self.settings.s_set[9].get()
+            #mod.convergence['step']=self.settings.s_set[8].get()
+            mod.convergence['CI']=self.settings.s_set[7].get()
 
         if (band[0] != 'Band1'):
             mod.filters[0].filterIDs=filter_choices.index(band[0])
@@ -410,7 +417,7 @@ class SettingsWindow(Frame):
         new.title("MCMC Settings")
 
         #variables to hold MCMC settings values
-        self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),IntVar()]
+        self.s_set=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
 
         ind=0;
         for field3_i in fields3:
@@ -434,11 +441,11 @@ class SettingsWindow(Frame):
                 self.s_set[ind].set(mesprint1)
             if(ind == 6):
                 self.s_set[ind].set(tmax1)
+ #           if(ind == 7):
+ #               self.s_set[ind].set(conv_rma1)
+ #           if(ind == 8):
+ #               self.s_set[ind].set(conv_ste1)
             if(ind == 7):
-                self.s_set[ind].set(conv_rma1)
-            if(ind == 8):
-                self.s_set[ind].set(conv_ste1)
-            if(ind == 9):
                 self.s_set[ind].set(conv_con1)
             ind=ind+1;
 
