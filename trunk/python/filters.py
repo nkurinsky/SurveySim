@@ -55,8 +55,13 @@ def fill_filters(f_id):
     with open (filterDir()+'allfilters.dat','r') as f: 
         flines=f.readlines()
 
+    nfilt=len(f_id)
     fcount=0
-    lam1,lam2,lam3,trans1,trans2,trans3=[],[],[],[],[],[]
+    if(nfilt ==3):
+        lam1,lam2,lam3,trans1,trans2,trans3=[],[],[],[],[],[]
+    if(nfilt ==4):
+        lam1,lam2,lam3,lam4,trans1,trans2,trans3,trans4=[],[],[],[],[],[],[],[]
+
     for fline in flines:
         if fline.strip():
             ncol=len(fline.split())
@@ -72,8 +77,20 @@ def fill_filters(f_id):
                 if fcount == f_id[2]:
                     tmp1,tmp2=fline.split()[0:2]
                     lam3.append(float(tmp1)),trans3.append(float(tmp2))
+                if(nfilt == 4):
+                    if fcount == f_id[3]:
+                        tmp1,tmp2=fline.split()[0:2]
+                        lam4.append(float(tmp1)),trans4.append(float(tmp2))
 
-    return lam1,lam2,lam3,trans1,trans2,trans3
+ 
+    if nfilt == 1:
+        return lam1,trans1
+    if nfilt == 2:
+        return lam1,lam2,trans1,trans2
+    if nfilt == 3:
+        return lam1,lam2,lam3,trans1,trans2,trans3
+    if nfilt == 4:
+        return lam1,lam2,lam3,lam4,trans1,trans2,trans3,trans4
 
 def getFilterID(name):
     ids,names=read_filters()

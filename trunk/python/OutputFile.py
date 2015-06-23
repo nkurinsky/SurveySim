@@ -1,7 +1,9 @@
 import pyfits as fits
 from matplotlib import gridspec
 import matplotlib.cm as cm
+import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.figure as fig
 import numpy
 from numpy import std
 from math import ceil
@@ -460,7 +462,8 @@ class OutputFile:
                 plt.xlim(xrange[0],xrange[1])
             if(yrange != None):
                 plt.ylim(yrange[0],yrange[1])
-        plt.gcf().set_tight_layout(True)
+        #plt.gcf().set_tight_layout(True)
+        plt.tight_layout(True)
 
     def showImages(self,block=True,xrange=None,yrange=None):
         plt.figure(figsize=(12,4))
@@ -514,8 +517,9 @@ class OutputFile:
             self.images[key].plot(labelCbar=False)
             if(col > 1):
                 plt.ylabel("")
-        plt.gcf().set_tight_layout(True)
-       
+        #plt.gcf().set_tight_layout(True)
+        plt.tight_layout(True)
+
     def show(self,block=True):
         my_dpi=116 
         maxsize=maxWindowSize()
