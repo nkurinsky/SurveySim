@@ -2,7 +2,7 @@
 
 #Python prelims
 import os
-import sys
+import sys, getopt
 import datetime
 
 thisdir=os.getcwd()+'/'
@@ -54,6 +54,24 @@ outdir=os.getcwd()+'/OUTPUT/'
 outfile=os.getcwd()+'/OUTPUT/output.fits'
 fitcode=codedir+'src/SurveySim'
 
+try:
+    opts, args = getopt.getopt(sys.argv[1:],"hi:o:",["ifile=","ofile="])
+except getopt.GetoptError:
+    print 'SurveySim.py -i <modelfile> -o <outputfile>'
+    sys.exit(2)
+for opt, arg in opts:
+    if opt == '-h':
+        print 'SurveySim.py -i <modelfile> -o <outputfile>'
+        sys.exit()
+    elif opt in ("-i", "--ifile"):
+        dmodelfile = arg
+    elif opt in ("-o", "--ofile"):
+        outfile = arg
+print 'Input file is "', dmodelfile
+print 'Output file is "', outfile
+
+mod.load(dmodelfile)
+
 if(not os.path.exists(outdir)):
     os.makedirs(outdir)
 
@@ -78,7 +96,7 @@ for lffield in fields_lf:
     value_fix.append(mod.params[lffield].fixed)
 
 #initialize survey parameters (GUI bottom frame)
-axes='ColorF1F2','Flux1'
+axes=mod.axis1,mod.axis2
 
 area=mod.survey['area']
 band=[getFilterName(mod.filters[0].fid),getFilterName(mod.filters[1].fid),getFilterName(mod.filters[2].fid)]
