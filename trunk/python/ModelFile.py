@@ -127,7 +127,8 @@ class ModelFile:
             'Q2':parameter(1.62,0.0,5.0,0,"High Z Luminosity Evolution"),
             'zbp':parameter(1.1,0.0,5.0,1,"P Z Cutoff"),
             'zbq':parameter(1.85,0.0,5.0,1,"Q Z Cutoff"),
-            'cexp':parameter(0.0,-3.0,3.0,1,"SED Redshift Evolution")
+            'cexp':parameter(0.0,-3.0,3.0,1,"SED Redshift Evolution"),
+            'zbc':parameter(2.0,0.0,5.0,1,"SED Redshift Evolution")
         }
 
     def info(self):

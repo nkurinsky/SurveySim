@@ -197,6 +197,20 @@ void Configuration::print(){
   printf("  Redshift Bin Width   : %f\n",dz);
   printf("  Area [square deg]    : %f\n",area);
 
+  printf("\nLuminosity Function Form: ");
+  switch(lfDist){
+  case LF::distribution::Schecter:
+    printf("Schecter Function");
+    break;
+  case LF::distribution::DoublePowerLaw:
+    printf("Double Power Law");
+    break;
+  case LF::distribution::ModifiedSchecter:
+    printf("Modified Schecter Function");
+    break;
+  }
+  printf("\n");
+
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ"};  
   printf("\nLuminosity Function Parameter Settings:\n");
   printf("Parameter\tStart\t Min \t Max \tFit\n");
@@ -209,12 +223,19 @@ void Configuration::print(){
 	   LFParameters[i][fixed] == 0.0 ? "True" : "False"
 	   );
   }
-  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
+  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
   	 "CEXP",
   	 colorEvolution[value],
   	 colorEvolution[min],
   	 colorEvolution[max],
   	 colorEvolution[fixed] == 0.0 ? "True" : "False"
+	 );
+  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
+  	 "ZBC",
+  	 colorZCut[value],
+  	 colorZCut[min],
+  	 colorZCut[max],
+  	 colorZCut[fixed] == 0.0 ? "True" : "False"
 	 );
 
   printf("\nNumber Unfixed Parameters: %lu\n",nparams);
@@ -322,8 +343,23 @@ void Configuration::load(){
     rmax=1+a_ci;
     tab.readKey("PRINT",rtemp);
     oprint = rtemp; // == 0.0 ? true : false; 
+
     tab.readKey("LF_FORM",rtemp);
-    lfform = static_cast<unsigned long>(rtemp);
+    switch(static_cast<int>(rtemp)){
+    case 0:
+      lfDist=LF::DoublePowerLaw;
+      break;
+    case 1:
+      lfDist=LF::ModifiedSchecter;
+      break;
+    case 2:
+      lfDist=LF::Schecter;
+      break;
+    default:
+      cerr << "Error: Invalid LF Form " << rtemp << endl;
+      exit(90);
+    }
+
   }
   catch(CCfits::FitsException::FitsException e){
     printf("Error reading model file\nPlease check that all keywords are present\n");
@@ -367,6 +403,18 @@ void Configuration::load(){
     }
   }
 
+  for(int j=0;j<4;j++){
+    tag = "ZBC"+suffix[j];
+    tag = tag.substr(0,8);
+    try{
+      tab.readKey(tag,colorZCut[j]);
+    }
+    catch(CCfits::HDU::NoSuchKeyword){
+      printf("Error reading keyword %s\n",tag.c_str());
+      exit(12);
+    }
+  }
+
   nparams = param_inds.size();
   cind = nparams;
   if(colorEvolution[fixed] == 0){
@@ -375,6 +423,14 @@ void Configuration::load(){
   }
   else 
     vary_cexp = false;
+
+  zbcind = nparams;
+  if(colorZCut[fixed] == 0){
+    nparams++;
+    vary_zbc = true;
+  }
+  else 
+    vary_zbc = false;
   
   burn_num = runs/burn_ratio;
 }
@@ -391,11 +447,14 @@ RandomNumberGenerator::~RandomNumberGenerator(){
 
 double RandomNumberGenerator::gaussian(double mean, double sigma, double min, double max){
   static double temp;
-  do{
-    temp = mean+gsl_ran_gaussian(r,sigma);
-  }while((temp < min) or (temp > max));
-  
-  return temp;
+
+  temp = mean+gsl_ran_gaussian(r,sigma);
+  if((temp >= min) and (temp <= max))
+    return temp;
+  else if(temp > max)
+    return max;
+  else
+    return min;
 }
 
 double RandomNumberGenerator::flat(double min, double max){

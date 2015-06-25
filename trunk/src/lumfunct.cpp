@@ -4,7 +4,7 @@ lumfunct::lumfunct(LF::distribution dist){
   switch(dist){
   case LF::distribution::Schecter:
   case LF::distribution::DoublePowerLaw:
-  case LF::distribution::ModifiedSchechter:
+  case LF::distribution::ModifiedSchecter:
     _dist=dist;
     break;
   default:
@@ -169,7 +169,7 @@ double lumfunct::get_phi(double redshift,double lum){
     return t1*pow(ratio,alpha)*exp(-ratio);
   case LF::distribution::DoublePowerLaw:
     return t1/(pow(ratio,alpha)+pow(ratio,beta));
-  case LF::distribution::ModifiedSchechter:
+  case LF::distribution::ModifiedSchecter:
     return t1*pow(ratio,1-alpha)*exp(-1*pow(log(1-ratio),2)/(2*pow(beta,2)));
   default:
     static int logflag=3;

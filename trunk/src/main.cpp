@@ -48,6 +48,9 @@ int main(int argc,char** argv){
   double CE = q.colorEvolution[q.value];
   double CEmin = q.colorEvolution[q.min];
   double CEmax = q.colorEvolution[q.max];
+  double ZBC = q.colorZCut[q.value];
+  double ZBCmin = q.colorZCut[q.min];
+  double ZBCmax = q.colorZCut[q.max];
   q.LFparameters(parfixed,q.fixed);
 
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ"};  
@@ -58,7 +61,7 @@ int main(int argc,char** argv){
 
   //initialize simulator
   simulator survey(q); 
-  survey.set_color_exp(CE); //color evolution
+  survey.set_color_exp(CE,ZBC); //color evolution
   survey.set_lumfunct(&lf);
   products output;
   ResultChain final_counts(3,q.nsim);
@@ -117,6 +120,12 @@ int main(int argc,char** argv){
 	setvars[q.cind] = &CE;
 	pcurrent[0][q.cind] = *(setvars[pi]);
 	pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/6.0,CE);
+	pi++;
+      }
+      if(q.vary_zbc){
+	setvars[q.zbcind] = &ZBC;
+	pcurrent[0][q.zbcind] = *(setvars[pi]);
+	pset.set(q.zbcind,ZBCmin,ZBCmax,(ZBCmax - ZBCmin)/6.0,ZBC);
       }
       
       for(m=1;m<q.nchain;m++){ 
@@ -141,9 +150,10 @@ int main(int argc,char** argv){
 	  for(pi=0;pi<LUMPARS;pi++)
 	    LOG_DEBUG(printf(" %5.2lf",lpars[pi]));
 	  LOG_DEBUG(printf(" %5.2lf : ",(q.vary_cexp ? ptemp[m][q.cind] : CE)));
+	  LOG_DEBUG(printf(" %5.2lf : ",(q.vary_zbc ? ptemp[m][q.zbcind] : ZBC)));
 	  
 	  lf.set_params(lpars);
-	  survey.set_color_exp(CE);
+	  survey.set_color_exp(CE,ZBC);
 	  
 	  output=survey.simulate();
 	  
@@ -207,7 +217,7 @@ int main(int argc,char** argv){
 	  LOG_DEBUG(printf(" : "));
 	  
 	  lf.set_params(lpars);
-	  survey.set_color_exp(CE);
+	  survey.set_color_exp(CE,ZBC);
 	  
 	  output=survey.simulate();
 	  trial=output.chisqr;
@@ -250,9 +260,15 @@ int main(int argc,char** argv){
       }
       lf.set_params(lpars);
       if(q.vary_cexp){
-	survey.set_color_exp(pset.best[q.cind]);
+	CE=pset.best[q.cind];
 	LOG_DEBUG(printf("CEXP : %lf +\\- %lf\n",pset.best[pi],pset.sigma[pi]));
+	pi++;
       }  
+      if(q.vary_zbc){
+	ZBC=pset.best[q.zbcind];
+	LOG_DEBUG(printf("ZBC : %lf +\\- %lf\n",pset.best[pi],pset.sigma[pi]));
+      }
+      survey.set_color_exp(CE,ZBC);
       LOG_INFO(printf("\nCovariance Matrix:\n"));
       for(int pi=0;pi<pset.covar.size();pi++){
 	LOG_INFO(printf("\t["));
@@ -280,7 +296,7 @@ int main(int argc,char** argv){
       }
       
       lf.set_params(lpars);
-      survey.set_color_exp(CE);
+      survey.set_color_exp(CE,ZBC);
       
       output=survey.simulate();
       if(output.chisqr < tchi_min){
@@ -294,9 +310,11 @@ int main(int argc,char** argv){
     
     for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
       parnames[pi] = pnames[*p];
-            if(q.vary_cexp)
+    if(q.vary_cexp)
       parnames[q.cind] = "CEXP";
-    
+    if(q.vary_zbc)
+      parnames[q.zbcind] = "ZBC";
+
     LOG_DEBUG(printf("Saving Chains\n"));
     saved &= mcchain.save(q.outfile,parnames.get(),"MCMC Chain Record");
     LOG_DEBUG(printf("Saving Counts\n"));

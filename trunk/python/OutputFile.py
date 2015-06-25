@@ -29,7 +29,9 @@ def nbins2d (dat):
 def MCMCcontour(x,y):
     H, xedges, yedges = numpy.histogram2d(y, x, bins=(nbins2d(y), nbins2d(x)),normed=True)
     extent = [yedges[0], yedges[-1], xedges[0], xedges[-1]]
-    cset = plt.contour(H, origin="lower",colors="black",extent=extent)
+    hmax=numpy.max(H)
+    levels=[0.95*hmax,0.9*hmax,0.8*hmax,0.7*hmax,0.6*hmax,0.5*hmax]
+    cset = plt.contour(H, origin="lower",colors="black",extent=extent,levels=levels)
 
 def maxWindowSize():
     root=tk.Tk()
@@ -91,7 +93,7 @@ class FitInfo:
 
     def plotSEDType(self):
         bins=max(self.sedType)-min(self.sedType)+1
-        plt.hist(self.sedType,bins=bins,histtype='step',color="black");
+        plt.hist(self.sedType,bins=bins,histtype='step',color="black",log=True);
         plt.xlabel('SED Type')
         plt.ylabel('N(Type)')
 
@@ -236,13 +238,13 @@ class NumberCounts:
         if(self.fitted):            
             model=self.best['modeled'][bi]
             obs=self.best['observed'][bi]
-            opts=numpy.where(obs > 1.0)
-            pts=numpy.where(model > 1.0)
+            opts=numpy.where(obs > 1e-10)
+            pts=numpy.where(model > 1e-10)
             plt.plot(bins[opts],obs[opts],'o',label="Observation",color='black')
             plt.plot(bins[pts],model[pts],'d',label="Model",color='black')
         else:
             model=self.single['modeled'][bi]
-            pts=numpy.where(model > 1.0)
+            pts=numpy.where(model > 1e-10)
             plt.plot(bins[pts],model[pts],'d',label="Model",color='black')
             
         plt.errorbar(bins[pts],model[pts],yerr=[mins[pts],maxs[pts]],linestyle="None",color='gray')

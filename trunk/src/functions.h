@@ -71,7 +71,7 @@ enum colsel_type{
 
 namespace LF{
   enum parameter {PHI0,L0,alpha,beta,p,q,p2,q2,zbp,zbq};
-  enum distribution {Schecter,DoublePowerLaw,ModifiedSchechter};
+  enum distribution {Schecter,DoublePowerLaw,ModifiedSchecter};
 }
 
 axis_type set_axis_type(string &keyvalue);
@@ -97,12 +97,14 @@ public:
   string sedfile;
   
   bool vary_cexp;
+  bool vary_zbc;
   bool simflag;
   int oprint;
 
   int nz;
   int ns;
   int cind;
+  int zbcind;
   unsigned long runs;
   unsigned long nchain;
   unsigned long burn_step;
@@ -122,11 +124,11 @@ public:
   double learningRate;
   double idealpct;
   double annrng;
-  string lfform;
 
   vector<int> param_inds;
   double LFParameters[LUMPARS][4];
   double colorEvolution[4];
+  double colorZCut[4];
   short dist;
 
   const short value = 0;
