@@ -13,9 +13,10 @@ echo "Running SurveySim...."
 #obsfile="trunk/obs/observation.fits"
 #SurveySim $modelfile $sedfile $obsfile -v -o OUTPUT/herschel_output.fits
 
-modelfile="trunk/model/model.fits"
-obsfile="trunk/obs/spire.fits"
-SurveySim $modelfile $sedfile $obsfile -v -o OUTPUT/herschel_output.fits 
+modelfile="Examples/spire_MS_D_Fit/spire_MS_D_Fit_model.fits"
+obsfile="trunk/obs/spire_cdfs-swire.fits"
+outputfile="OUTPUT/spire_D_output.fits"
+SurveySim $modelfile $sedfile $obsfile -v -o outputfile 
 
 #if running in simulation-mode
 #simulating Herschel
