@@ -137,10 +137,10 @@ conv_con1=mod.convergence['CI'] #Convergence confidence interval
 class SurveySimGUI:
     def __init__(self, master):
         #local variables to hold the entries in the GUI
-        self.v_fixed=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar()] 
-        self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
-        self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
-        self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
+        self.v_fixed=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar()] 
+        self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
+        self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
+        self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
         self.obsfile_set=StringVar()
         self.lfform_set=StringVar()
         self.sedfile_set=StringVar()
@@ -347,6 +347,8 @@ class SurveySimGUI:
             mod.params[field].fixed=self.v_fixed[ind].get()
             ind=ind+1
 
+        #mod.zbc=self.zbc.get()
+        mod.zbc=2.0
         mod.area=self.area.get()
         mod.axis1=self.fitaxes[0].get()
         mod.axis2=self.fitaxes[1].get() 
