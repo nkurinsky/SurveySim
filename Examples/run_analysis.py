@@ -41,7 +41,7 @@ mod.params['Alpha'].fixed=0
 mod.params['Beta'].value=0.5
 mod.params['Beta'].pmin=0
 mod.params['Beta'].pmax=2.0
-mod.params['Beta'].fixed=0
+mod.params['Beta'].fixed=1
 
 mod.params['Phi0'].value=-3.1
 mod.params['Phi0'].fixed=0
@@ -86,7 +86,7 @@ mod.annealing['learningRate']=0.4
 
 mod.convergence['CI']=0.95
 
-simname="spire_MS_D_G13"
+simname="spire_MS_D_betafix_G13"
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
 

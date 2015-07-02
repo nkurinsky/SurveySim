@@ -300,7 +300,8 @@ class MCMCInfo:
                 p0=p0+str(0)
             self.Parameters[p0]=list()
             for i in range(0,self.ChainNum):
-                self.Parameters[p0].extend(params[p0+str(i)])
+                gpts=numpy.where(self.ChiSquares[i] < numpy.median(self.ChiSquares))
+                self.Parameters[p0].extend(params[p0+str(i)][gpts])
 
         for k,v in self.Parameters.iteritems():
             self.BestFit[k]={'mean':numpy.mean(self.Parameters[k]),
