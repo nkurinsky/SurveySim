@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+#Python prelims
+import os
+
+wd=os.getcwd()
+fdir=wd+"trunk/filters/"
+
