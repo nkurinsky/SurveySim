@@ -25,6 +25,7 @@ mod.filters[0].err=2.5
 mod.filters[1].setID("SPIRE_350")
 mod.filters[1].limit=0.01
 mod.filters[1].err=2.1
+mod.filters[1].serr=1.0
 
 mod.filters[2].setID("SPIRE_500")
 mod.filters[2].limit=0.01

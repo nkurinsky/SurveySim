@@ -9,8 +9,7 @@ thisdir=os.getcwd()+'/'
 if (os.getenv("SURVEYSIMPATH") != None):
     codedir=os.getenv("SURVEYSIMPATH")+'/'
 else:
-#    codedir='/usr/local/surveysim/'
-     codedir=thisdir+'trunk/'
+    codedir='/usr/local/surveysim/'
 pydir=codedir+'python'
 #ensure this is in the path
 sys.path.append(pydir)

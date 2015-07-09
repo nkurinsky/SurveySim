@@ -18,7 +18,6 @@ def filterDir():
         return wd[0:index]+'/trunk/filters/'
 
 def read_filters():
-    codedir=os.getcwd()+'/../trunk/';
     #read-in filter transmission curves/ use the FSPS filter set
     with open (filterDir()+'FILTER_LIST','r') as f:
         flines=f.readlines()
@@ -50,8 +49,7 @@ def read_filters():
     return filter_id,filter_choices   
 
 def fill_filters(f_id):
-    codedir=os.getcwd()+'/trunk/';
-#read-in filter transmission curves for selected bands
+    #read-in filter transmission curves for selected bands
     with open (filterDir()+'allfilters.dat','r') as f: 
         flines=f.readlines()
 

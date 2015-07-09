@@ -10,21 +10,23 @@ from astropy.io import fits
         
 class filterOptions:
 
-    def __init__(self,fid,limit,err,unit):
+    def __init__(self,fid,limit,err,serr,unit):
         self.fid=fid
         self.limit=limit
         self.err=err
+        self.serr=serr
         self.unit=unit
 
     def __str__(self):
-        return self.name()+", Limit="+str(self.limit)+" "+self.unit+", Error="+str(self.err)+" "+self.unit
+        return self.name()+", Limit="+str(self.limit)+" "+self.unit+", Error="+str(self.err)+", Skew Error="+str(self.serr)+", "+self.unit
 
     def loadKeys(self,hdr,number):
         name=hdr['Filter'+str(number)]
         self.fid=getFilterID(name)[0]
         self.unit=hdr['units'+str(number)]
         self.limit=hdr['limit'+str(number)]
-        self.error=hdr['error'+str(number)]
+        self.err=hdr['error'+str(number)]
+        self.serr=hdr['serror'+str(number)]
 
     def setID(self,name):
         res=getFilterID(name)
@@ -38,6 +40,7 @@ class filterOptions:
         hdr.set('units'+str(number),self.unit,'[mJy/ABmag]')
         hdr.set('limit'+str(number),self.limit,'flux/magnitude limit')
         hdr.set('error'+str(number),self.err,'flux/magnitude error')
+        hdr.set('serror'+str(number),self.serr,'flux/magnitude skew error')
 
 class parameter:
 
@@ -91,9 +94,9 @@ class ModelFile:
             'min':0.01,
             'max':5.00,
             'delta':0.05}
-        self.filters=[filterOptions(98,9.3,3.1,'mJy'),
-                      filterOptions(99,9.6,3.2,'mJy'),
-                      filterOptions(100,13.5,4.5,'mJy')]
+        self.filters=[filterOptions(98,9.3,3.1,0,'mJy'),
+                      filterOptions(99,9.6,3.2,0,'mJy'),
+                      filterOptions(100,13.5,4.5,0,'mJy')]
         self.survey={
             'area': 4.0,
             'lfForm':0}

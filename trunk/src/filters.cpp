@@ -265,7 +265,7 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     for(int j=0;j<band.size();j++){
       band[j]*=exp_scale;
     }
-    LOG_INFO(printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m, limit: %5.2e, error: %5.2e)\n",num+1,band.front(),band.back(),limits[num],errors[num]));
+    LOG_INFO(printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m, limit: %5.2e, error: %5.2e, skew error: %5.2e)\n",num+1,band.front(),band.back(),limits[num],errors[num],skew_errors[num]));
     if(not this->filters[num].load(bands[num],band,transmission,logflag) ){
       printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str());
       exit(1);

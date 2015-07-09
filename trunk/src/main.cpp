@@ -159,9 +159,9 @@ int main(int argc,char** argv){
 	  
 	  trial=output.chisqr;
 	  
-	  //LOG_DEBUG(printf("Iteration Chi-Square: %lf",trial));      
+	  LOG_DEBUG(printf("Iteration Chi-Square: %lf",trial));      
 	  if(trial < chi_min){
-	    //LOG_DEBUG(printf(" -- Current Best Trial"));
+	    LOG_DEBUG(printf(" -- Current Best Trial"));
 	    chi_min=trial;
 	    for(pi=0;pi<q.nparams;pi++)
 	      pset.best[pi]=ptemp[m][pi];
@@ -211,17 +211,17 @@ int main(int argc,char** argv){
 	    *(setvars[pi]) = ptemp[m][pi] = results[pi];
 	  }
 	  
-	  //LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
+	  LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
 	  for(pi=0;pi<q.nparams;pi++)
-	    //LOG_DEBUG(printf(" %lf",ptemp[m][pi]));
-	    //LOG_DEBUG(printf(" : "));
+	    LOG_DEBUG(printf(" %lf",ptemp[m][pi]));
+	    LOG_DEBUG(printf(" : "));
 	  
 	  lf.set_params(lpars);
 	  survey.set_color_exp(CE,ZBC);
 	  
 	  output=survey.simulate();
 	  trial=output.chisqr;
-	  //LOG_DEBUG(printf("Model Chi-Square: %lf",trial));
+	  LOG_DEBUG(printf("Model Chi-Square: %lf",trial));
 	  
 	  accept = metrop.accept(m,trial);
 	  
@@ -229,12 +229,12 @@ int main(int argc,char** argv){
 	  counts.add_link(output.dnds,trial);
 	  
 	  if(accept){
-	    //LOG_DEBUG(printf(" -- Accepted\n"));
+	    LOG_DEBUG(printf(" -- Accepted\n"));
 	    for(pi=0;pi<q.nparams;pi++)
 	      pcurrent[m][pi]=ptemp[m][pi];
 	  }
-	  //else
-	  //  LOG_DEBUG(printf(" -- Rejected\n"));
+	  else
+	    LOG_DEBUG(printf(" -- Rejected\n"));
 	}
 	
 	if(((i+1) % q.conv_step) == 0){
