@@ -294,9 +294,9 @@ bool sed_lib::load_filters(string file,int lflag_tmp){
   return false;
 }
 
-void sed_lib::get_filter_info(string names[], double limits[], double errors[]){
+void sed_lib::get_filter_info(string names[], double limits[], double errors[], double skewErrs[]){
   if (filters.init()){
-    filters.filter_info(names,limits,errors);
+    filters.filter_info(names,limits,errors,skewErrs);
   }
   else{
     printf("ERROR: Filter library not initialized!!!\n");

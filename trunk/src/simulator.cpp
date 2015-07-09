@@ -26,7 +26,11 @@ void simulator::configure(const Configuration &config){
     
   seds.reset(new sed_lib(config.sedfile, nz, zmin, dz));
   seds->load_filters(modelFile,logflag);
-  seds->get_filter_info(filters,flux_limits,band_errs);
+  seds->get_filter_info(filters,flux_limits,band_errs,skew_errs);
+  
+  for(int i=0;i<3;i++)
+    hasSkewErr[i]=(skew_errs[i]>0.0);
+  
   axes[0] = config.axes[0];
   axes[1] = config.axes[1];
   fagns.reset(new agn_frac(seds->get_tnum()));
@@ -183,6 +187,8 @@ void simulator::initial_simulation(){
 
 	for (int i=0;i<3;i++){
 	  flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
+	  if(hasSkewErr[i])
+	    flux_sim[i] += rng.poisson(skew_errs[i]);
 	  if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
 	    detected = false;
 	}
@@ -337,6 +343,8 @@ products simulator::simulate(){
 
 	for (int i=0;i<3;i++){
 	  flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
+	  if(hasSkewErr[i])
+	    flux_sim[i] += rng.poisson(skew_errs[i]);
 	  if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
 	    detected = false;
 	}

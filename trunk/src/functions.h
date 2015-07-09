@@ -151,6 +151,7 @@ public:
   RandomNumberGenerator();
   ~RandomNumberGenerator();
   double gaussian(double mean, double sigma, double min, double max);
+  double poisson(double lambda);
   void gaussian_mv(const vector<double> &mean, const vector<vector<double> > &covar, const vector<double> &min, const vector<double> &max, vector<double> &result);
   double flat(double min, double max);
 private:

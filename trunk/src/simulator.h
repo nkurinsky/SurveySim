@@ -29,6 +29,8 @@ private:
   std::unique_ptr<NumberCounts> counts[3];
   string filters[3];
   double band_errs[3];
+  double skew_errs[3];
+  bool hasSkewErr[3];
   double flux_limits[3];
   double color_exp;
   double area;

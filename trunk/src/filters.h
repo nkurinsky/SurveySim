@@ -51,12 +51,13 @@ class filter_lib{
   bool init(){
     return initialized;}
   bool load_filters(string fitsfile,int logflag);
-  void filter_info(string names[], double fluxLimits[], double fluxErrors[]);
+  void filter_info(string names[], double fluxLimits[], double fluxErrors[], double skewErrors[]);
   filter& get(short num);
  private:
   filter filters[3];
   double limits[3];
   double errors[3];
+  double skew_errors[3];
   filter dummy;
   bool initialized;
 };

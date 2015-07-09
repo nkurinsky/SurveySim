@@ -171,6 +171,7 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
   string unitKeys[] = {"UNITS1","UNITS2","UNITS3"};
   string limitKeys[] = {"LIMIT1","LIMIT2","LIMIT3"};
   string errorKeys[] = {"ERROR1","ERROR2","ERROR3"};
+  string serrorKeys[] = {"SERROR1","SERROR2","SERROR3"};
   for(int i=0;i<3;i++){
 
     //reading units, defaults to units in mJy
@@ -206,7 +207,7 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
       exit(10);
     }
     
-    //reading flux limits, converting units
+    //reading errors, converting units
     try{
       head.readKey(errorKeys[i],errors[i]);
       if(errors[i]<0){
@@ -218,6 +219,21 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     }
     catch(...){
       printf("Error reading keyword \"%s\"\n",errorKeys[i].c_str());
+      exit(10);
+    }
+
+    //reading skew errors, converting units
+    try{
+      head.readKey(serrorKeys[i],skew_errors[i]);
+      if(skew_errors[i]<0){
+	LOG_CRITICAL(printf("Warning: keyword \"%s\" contains negative value, defaulting to standard value 0\n",serrorKeys[i].c_str()));
+	skew_errors[i]=0.0;
+      }
+      else
+	skew_errors[i]*=units[i];
+    }
+    catch(...){
+      printf("Error reading keyword \"%s\"\n",serrorKeys[i].c_str());
       exit(10);
     }
   }
@@ -260,11 +276,12 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
   return true;
 }
 
-void filter_lib::filter_info(string names[], double fluxLimits[], double fluxErrors[]){
+void filter_lib::filter_info(string names[], double fluxLimits[], double fluxErrors[], double skewErrors[]){
   for(int i=0;i<3;i++){
     names[i]=filters[i].get_name();
     fluxLimits[i]=limits[i];
     fluxErrors[i]=errors[i];
+    skewErrors[i]=skew_errors[i];
   }
 }
 

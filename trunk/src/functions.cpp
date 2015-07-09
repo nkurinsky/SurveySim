@@ -457,6 +457,16 @@ double RandomNumberGenerator::gaussian(double mean, double sigma, double min, do
     return min;
 }
 
+double RandomNumberGenerator::poisson(double lambda){
+  static double temp;
+
+  temp = lambda+gsl_ran_gaussian(r,sqrt(lambda));
+  if(temp >= 0)
+    return temp;
+  else
+    return 0;
+}
+
 double RandomNumberGenerator::flat(double min, double max){
   return gsl_ran_flat(r,min,max);
 }

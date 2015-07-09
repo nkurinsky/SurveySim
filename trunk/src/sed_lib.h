@@ -65,7 +65,7 @@ class sed_lib{
  public:
   sed_lib(string fitsfile, int nz, double zmin, double dz);
   bool load_filters(string fitsfile,int logflag);
-  void get_filter_info(string names[], double limits[], double errors[]);
+  void get_filter_info(string names[], double limits[], double errors[], double skewErrs[]);
   double get_flux(double lum, double redshift, short sedtype, double band);
   double get_filter_flux(double lum, double redshift, short sedtype, short filter_id);
   void set_color_evolution(double exp, double zcut=1000);
