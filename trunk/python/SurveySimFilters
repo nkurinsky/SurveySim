@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+#Python prelims
+import os
+import sys
+from filters import *
+
+if(len(sys.argv) == 1):
+    print "Searches filter list for matching filter or instrument"
+    print "Calling Sequence: "+sys.argv[0]+" [list of instruments or filters]"
+else:
+    print "Filter Location: "+filterDir()
+    for i in range(1,len(sys.argv)):
+        instrument=sys.argv[i]
+        ids,names=getFilterIDs(instrument)
+        print instrument,names
+
