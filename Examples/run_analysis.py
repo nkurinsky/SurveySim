@@ -6,9 +6,11 @@ import datetime
 import time
 from ModelFile import *
 
+ssdir="/usr/local/surveysim/"
+
 mfile="spire_model.fits"
-templatefile="../trunk/templates/Kirkpatrick2015_templates.fits"
-obsfile="../trunk/obs/spire_cdfs-swire.fits"
+templatefile=ssdir+"templates/Kirkpatrick2015_templates.fits"
+obsfile=ssdir+"obs/spire_cdfs-swire.fits"
 outfile="spire_output.fits"
 
 mod=ModelFile()
