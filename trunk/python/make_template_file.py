@@ -6,8 +6,8 @@ import sys
 
 #codedir=os.getcwd()+'/trunk/';
 pydir=os.getcwd();
-codedir = pydir.replace(' ', '')[:-6] #remove last 6 characters (i.e. Python)
-seddir=codedir+'trunk/templates/TSV'
+#codedir = pydir.replace(' ', '')[:-6] #remove last 6 characters (i.e. Python)
+seddir=os.getcwd()+'/trunk/templates/TSV'
 
 #ensure this is in the path
 #sys.path.append(pydir)
@@ -121,22 +121,75 @@ lnu13_default=np.concatenate((tmp,lnu13),axis=0)
 tmp=lnu_tmp*(lnu14[0]/lnu_tmp[istitch])
 lnu14_default=np.concatenate((tmp,lnu14),axis=0)
 
-print lam_default[0]
+#print lam_default[0]
+
+dnu=(np.abs(lam_default-np.roll(lam_default,1))/lam_default)/lam_default 
+dnu=(c*1e6)*dnu
+lir1=0
+lir2=0
+lir3=0
+lir4=0
+lir5=0
+lir6=0
+lir7=0
+lir8=0
+lir9=0
+lir10=0
+lir11=0
+lir12=0
+lir13=0
+lir14=0
+
+for i in range(0,len(lam_default)-1):
+    if(lam_default[i] >= 5.0):
+        lir1+=(lnu1_default[i]*dnu[i])/3.86e26
+        lir2+=(lnu2_default[i]*dnu[i])/3.86e26
+        lir3+=(lnu3_default[i]*dnu[i])/3.86e26
+        lir4+=(lnu4_default[i]*dnu[i])/3.86e26
+        lir5+=(lnu5_default[i]*dnu[i])/3.86e26
+        lir6+=(lnu6_default[i]*dnu[i])/3.86e26
+        lir7+=(lnu7_default[i]*dnu[i])/3.86e26
+        lir8+=(lnu8_default[i]*dnu[i])/3.86e26
+        lir9+=(lnu9_default[i]*dnu[i])/3.86e26
+        lir10+=(lnu10_default[i]*dnu[i])/3.86e26
+        lir11+=(lnu11_default[i]*dnu[i])/3.86e26
+        lir12+=(lnu12_default[i]*dnu[i])/3.86e26
+        lir13+=(lnu13_default[i]*dnu[i])/3.86e26
+        lir14+=(lnu14_default[i]*dnu[i])/3.86e26
+
+
+print 'SFG0 template L_TIR', np.log10(lir1)
+scale1=pow(10,lir_list[0]-np.log10(lir1))
+scale2=pow(10,lir_list[1]-np.log10(lir2))
+scale3=pow(10,lir_list[2]-np.log10(lir3))
+scale4=pow(10,lir_list[3]-np.log10(lir4))
+scale5=pow(10,lir_list[4]-np.log10(lir5))
+scale6=pow(10,lir_list[5]-np.log10(lir6))
+scale7=pow(10,lir_list[6]-np.log10(lir7))
+scale8=pow(10,lir_list[7]-np.log10(lir8))
+scale9=pow(10,lir_list[8]-np.log10(lir9))
+scale10=pow(10,lir_list[9]-np.log10(lir10))
+scale11=pow(10,lir_list[10]-np.log10(lir11))
+scale12=pow(10,lir_list[11]-np.log10(lir12))
+scale13=pow(10,lir_list[12]-np.log10(lir13))
+scale14=pow(10,lir_list[13]-np.log10(lir14))
+
+print scale1,scale2,scale3,scale4,scale5,scale13
 col1=fits.Column(name='lambda',format='FLOAT',array=lam_default)
-col2=fits.Column(name='lnu1',format='FLOAT',array=lnu1_default)
-col3=fits.Column(name='lnu2',format='FLOAT',array=lnu2_default)
-col4=fits.Column(name='lnu3',format='FLOAT',array=lnu3_default)
-col5=fits.Column(name='lnu4',format='FLOAT',array=lnu4_default)
-col6=fits.Column(name='lnu5',format='FLOAT',array=lnu5_default)
-col7=fits.Column(name='lnu6',format='FLOAT',array=lnu6_default)
-col8=fits.Column(name='lnu7',format='FLOAT',array=lnu7_default)
-col9=fits.Column(name='lnu8',format='FLOAT',array=lnu8_default)
-col10=fits.Column(name='lnu9',format='FLOAT',array=lnu9_default)
-col11=fits.Column(name='lnu10',format='FLOAT',array=lnu10_default)
-col12=fits.Column(name='lnu11',format='FLOAT',array=lnu11_default)
-col13=fits.Column(name='lnu12',format='FLOAT',array=lnu12_default)
-col14=fits.Column(name='lnu13',format='FLOAT',array=lnu13_default)
-col15=fits.Column(name='lnu14',format='FLOAT',array=lnu14_default)
+col2=fits.Column(name='lnu1',format='FLOAT',array=lnu1_default*scale1)
+col3=fits.Column(name='lnu2',format='FLOAT',array=lnu2_default*scale2)
+col4=fits.Column(name='lnu3',format='FLOAT',array=lnu3_default*scale3)
+col5=fits.Column(name='lnu4',format='FLOAT',array=lnu4_default*scale4)
+col6=fits.Column(name='lnu5',format='FLOAT',array=lnu5_default*scale5)
+col7=fits.Column(name='lnu6',format='FLOAT',array=lnu6_default*scale6)
+col8=fits.Column(name='lnu7',format='FLOAT',array=lnu7_default*scale7)
+col9=fits.Column(name='lnu8',format='FLOAT',array=lnu8_default*scale8)
+col10=fits.Column(name='lnu9',format='FLOAT',array=lnu9_default*scale9)
+col11=fits.Column(name='lnu10',format='FLOAT',array=lnu10_default*scale10)
+col12=fits.Column(name='lnu11',format='FLOAT',array=lnu11_default*scale11)
+col13=fits.Column(name='lnu12',format='FLOAT',array=lnu12_default*scale12)
+col14=fits.Column(name='lnu13',format='FLOAT',array=lnu13_default*scale13)
+col15=fits.Column(name='lnu14',format='FLOAT',array=lnu14_default*scale14)
 
 #plt.plot(lam_default,lnu4_default)
 #plt.xscale('log')
@@ -179,6 +232,15 @@ else:
 f = interpolate.interp1d(lam_old,lnu_old)
 print lam_old[0],lam_default[0]
 lnu=f(lam_default)
+
+dnu=(np.abs(lam_default-np.roll(lam_default,1))/lam_default)/lam_default 
+dnu=(c*1e6)*dnu
+lir=0
+for i in range(0,len(lam_default)-1):
+    if(lam_default[i] >= 5.0):
+        lir+=(lnu[i]*scale[0]*dnu[i])/3.86e26
+
+print 'SFG1 template L_TIR (after interp)', np.log10(lir)
 
 col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
 col3=fits.Column(name='lnu2',format='FLOAT',array=lnu*scale[1])

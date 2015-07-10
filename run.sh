@@ -27,3 +27,4 @@ SurveySim $modelfile $sedfile $obsfile -v -o outputfile
 #modelfile="jwst_model.fits"
 #SurveySim $modelfile $sedfile -v -o OUTPUT/jwst_output.fits
 
+
