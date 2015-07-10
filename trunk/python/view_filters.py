@@ -8,7 +8,7 @@ from filters import *
 import matplotlib.pyplot as plt
 import numpy as np
 
-instruments=["ALMA"] #"WISE", "JWST", "Herschel_SPIRE" etc.
+instruments=["AzTEC"] #"WISE", "JWST", "Herschel_SPIRE" etc.
 
 print(filterDir())
 

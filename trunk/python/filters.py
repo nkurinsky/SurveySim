@@ -45,6 +45,8 @@ def read_filters():
             if ncol == 3:
                 tmp1,tmp2,tmp3=fline.split()[0:3]
                 filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3)
+            if ncol < 3:
+                print "read_filters::Warning: line \""+fline+"\" invalid, at least 3 columns needed"
 
     return filter_id,filter_choices   
 
