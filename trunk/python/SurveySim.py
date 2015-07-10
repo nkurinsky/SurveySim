@@ -50,8 +50,8 @@ modelfile=thisdir+'model.fits'
 obsdir=codedir+'obs/'
 obsfile=obsdir+'wise.fits'
 outdir=os.getcwd()+'/OUTPUT/'
-outfile=os.getcwd()+'/OUTPUT/output.fits'
-fitcode=os.getcwd()+'/trunk/src/SurveySim'
+outfile=os.getcwd()+'/output.fits'
+fitcode=codedir+'../bin/SurveySim'
 
 try:
     opts, args = getopt.getopt(sys.argv[1:],"hi:o:",["ifile=","ofile="])

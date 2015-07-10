@@ -228,12 +228,17 @@ class NumberCounts:
             chainCounts=self.chains['counts'][bi]
             
         bins=self.bins[bi]
-        mins=numpy.zeros(len(bins))
-        maxs=numpy.zeros(len(bins))
+        medians=numpy.zeros(len(bins))
+        errlow=numpy.zeros(len(bins))
+        errhigh=numpy.zeros(len(bins))
         for i in range(0,len(chainCounts[0])):
             link=chainCounts[:,i]
-            mins[i]=min(link)
-            maxs[i]=max(link)
+            medians[i]=numpy.median(link)
+            sortpts=numpy.argsort(link)
+            lowind=int(0.159*len(sortpts))
+            highind=int((1.0-0.159)*len(sortpts))
+            errlow[i]=medians[i]-link[sortpts[lowind]]
+            errhigh[i]=link[sortpts[highind]]-medians[i]
 
         if(self.fitted):            
             model=self.best['modeled'][bi]
@@ -241,13 +246,15 @@ class NumberCounts:
             opts=numpy.where(obs > 1e-10)
             pts=numpy.where(model > 1e-10)
             plt.plot(bins[opts],obs[opts],'o',label="Observation",color='black')
-            plt.plot(bins[pts],model[pts],'d',label="Model",color='black')
+            plt.plot(bins[pts],model[pts],'d',label="Best",color='black')
         else:
             model=self.single['modeled'][bi]
             pts=numpy.where(model > 1e-10)
-            plt.plot(bins[pts],model[pts],'d',label="Model",color='black')
-            
-        plt.errorbar(bins[pts],model[pts],yerr=[mins[pts],maxs[pts]],linestyle="None",color='gray')
+            plt.plot(bins[pts],model[pts],'d',label="Best",color='black')
+        
+        mpts=numpy.where(medians > 1e-10)
+        plt.plot(bins[mpts],medians[mpts],'s',label="Median",color='black')
+        plt.errorbar(bins[mpts],medians[mpts],yerr=[errlow[mpts],errhigh[mpts]],linestyle="None",color='gray')
         plt.title("Counts Band "+str(band))
         plt.xlabel('Flux [mJy]')
         plt.ylabel('DnDs*Jy^(-1.5)')
