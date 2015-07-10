@@ -1,11 +1,11 @@
 #!/bin/bash
 
 git pull
-pushd Source
+#pushd Source
 ./configure
 make
 sudo make install
 make clean
-popd
+#popd
 
 echo "SurveySim updated and built"
