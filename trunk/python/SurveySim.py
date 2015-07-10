@@ -51,7 +51,7 @@ obsdir=codedir+'obs/'
 obsfile=obsdir+'wise.fits'
 outdir=os.getcwd()+'/OUTPUT/'
 outfile=os.getcwd()+'/output.fits'
-fitcode=codedir+'../bin/SurveySim'
+fitcode='/usr/local/bin/SurveySim'
 
 try:
     opts, args = getopt.getopt(sys.argv[1:],"hi:o:",["ifile=","ofile="])
