@@ -5,7 +5,8 @@ def filterDir():
     if(ssdir != None):
         if(os.path.exists(ssdir)):
             return ssdir+"/filters/"
-    instdir='/usr/local/surveysim/filters/'
+   # instdir='/usr/local/surveysim/filters/'  # change made by Jed
+    instdir ='/usr/local/SurveySim/trunk/python/filters/'
     instdir2=os.getenv("HOME")+"/local/surveysim/filters/"
     if(os.path.exists(instdir)):
         return instdir
@@ -21,7 +22,7 @@ def read_filters():
     #read-in filter transmission curves/ use the FSPS filter set
     with open (filterDir()+'FILTER_LIST','r') as f:
         flines=f.readlines()
-
+        
     filter_id,filter_choices=[],[]
 
     for fline in flines:
@@ -45,6 +46,9 @@ def read_filters():
             if ncol == 3:
                 tmp1,tmp2,tmp3=fline.split()[0:3]
                 filter_id.append(int(tmp1));filter_choices.append(tmp2+'_'+tmp3)
+                ### DEBUGGING ###
+                #if (tmp1 == '126' and tmp2 == 'AzTEC' and tmp3 == '1.1'):
+                #   print 'AzTEC found' 
             if ncol < 3:
                 print "read_filters::Warning: line \""+fline+"\" invalid, at least 3 columns needed"
 
