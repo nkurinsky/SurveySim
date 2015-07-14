@@ -391,8 +391,7 @@ plt.show()
 #============================================================================
 #AGN
 #----------------------------------------------------------------------------
-
-#for z=0 use Mullaney et al template. 
+#for z=0 use Mullaney et al 2011 template. 
 mullaney_filename='/Users/annie/code/idl/auxdata/mullaney_table3.tex'
 with open (mullaney_filename,'r') as f:
     flines=f.readlines()[6:]
@@ -402,7 +401,16 @@ with open (mullaney_filename,'r') as f:
         agn_z0_lam.append(float(tmp1)),agn_z0_lnu.append(float(tmp2))
 
 
-f = interpolate.interp1d([lam_default[0],agn_z0_lam],[0,agn_z0_lnu])
+#assume power-law interpolation
+tmp_lam=[lam_default[0],1,3]
+#tmp_lnu=[agn_z0_lnu[0]-0.7*(agn_z0_lam[0]-lam_default[0])]
+#if(tmp_lnu[0] < 0):
+tmp_lnu=[0.00005,0.05,0.3]
+agn_z0_lam_extended=np.concatenate((tmp_lam[0:],agn_z0_lam[0:]))
+agn_z0_lnu_extended=np.concatenate((tmp_lnu[0:],agn_z0_lnu[0:]))
+
+print agn_z0_lnu_extended[0:5]
+f = interpolate.interp1d(agn_z0_lam_extended,agn_z0_lnu_extended)
 lnu=f(lam_default)
 #these should be the same as above when using the same lambda
 #dnu=(np.abs(lam-np.roll(lam,1))/lam)/lam 
@@ -611,6 +619,7 @@ tbhdu10=fits.new_table(cols_SFG_z0)
 tbhdu11=fits.new_table(cols_SFG_z1)
 tbhdu12=fits.new_table(cols_SFG_z2)
 
+tbhdu20=fits.new_table(cols_AGN_z0)
 tbhdu21=fits.new_table(cols_AGN_z1)
 tbhdu22=fits.new_table(cols_AGN_z2)
 
@@ -621,7 +630,7 @@ tbhdu11.header.update('EXTNAME','SFG_z1',
 tbhdu12.header.update('EXTNAME','SFG_z2',
                         'Kirkpatrick2015')
 
-tbhdu10.header.update('EXTNAME','AGN_z0',
+tbhdu20.header.update('EXTNAME','AGN_z0',
                         'Mullaney2011')
 tbhdu21.header.update('EXTNAME','AGN_z1',
                         'Kirkpatrick2015')
@@ -668,7 +677,7 @@ hdulist[0].header.update('L14',lir_list[13],'luminosity array')
 hdr=hdulist[0].header
 
 hdulist.close
-thdulist=fits.HDUList([hdulist[0],tbhdu10,tbhdu11,tbhdu12,tbhdu10,tbhdu21,tbhdu22])
+thdulist=fits.HDUList([hdulist[0],tbhdu10,tbhdu11,tbhdu12,tbhdu20,tbhdu21,tbhdu22])
 if(os.path.isfile(sedfile)):
     print 'Replacing existing template file...'
     os.remove(sedfile)
