@@ -231,7 +231,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 templatedir = $(prefix)/@PACKAGE@/templates
-dist_template_DATA = Kirkpatrick2015_templates.fits
+dist_template_DATA = Kirkpatrick2015_templates.fits default_templates.fits sf_templates.fits
 all: all-am
 
 .SUFFIXES:
