@@ -15,8 +15,8 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
     double diff,nbins,binlow;
     valarray<double> logf(log10(fluxes));
     
-    _range[0] = logf.min()-0.3; //accept sources 0.5 times dimmer than minimum
-    _range[1] = logf.max()+1.0; //accept sources 10 times brighter than maximum
+    _range[0] = logf.min(); //-0.3; //accept sources 0.5 times dimmer than minimum
+    _range[1] = logf.max(); //+1.0; //accept sources 10 times brighter than maximum
     
     N=static_cast<double>(logf.size());
     mean = logf.sum()/N;

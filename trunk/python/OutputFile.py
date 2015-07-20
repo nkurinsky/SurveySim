@@ -4,11 +4,21 @@ import matplotlib.cm as cm
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.figure as fig
-import numpy
+import numpy as np
 from numpy import std
 from math import ceil
 import os
 import Tkinter as tk
+
+#Prelims to make prettier colors
+import seaborn as sns
+sns.set(style='white')#,font='serif')#,font_scale=1.5,palette='Set2')
+#sns.despine()
+
+plt.rc('text', usetex=True)
+
+params = {'text.latex.preamble' : [r'\usepackage{siunitx}', r'\usepackage{sfmath}']}
+plt.rcParams.update(params)
 
 from ModelFile import keyPrint
 
@@ -27,9 +37,9 @@ def nbins2d (dat):
     return int(ceil((max(dat)-min(dat))/binSize(dat)/2))
 
 def MCMCcontour(x,y):
-    H, xedges, yedges = numpy.histogram2d(y, x, bins=(nbins2d(y), nbins2d(x)),normed=True)
+    H, xedges, yedges = np.histogram2d(y, x, bins=(nbins2d(y), nbins2d(x)),normed=True)
     extent = [yedges[0], yedges[-1], xedges[0], xedges[-1]]
-    hmax=numpy.max(H)
+    hmax=np.max(H)
     levels=[0.95*hmax,0.9*hmax,0.8*hmax,0.7*hmax,0.6*hmax,0.5*hmax]
     cset = plt.contour(H, origin="lower",colors="black",extent=extent,levels=levels)
 
@@ -221,20 +231,20 @@ class NumberCounts:
         bi=band-1
         if(self.fitted):
             chi=self.chains['chisq']
-            chimed=numpy.median(chi)
-            gpts=numpy.where(chi < chimed)
+            chimed=np.median(chi)
+            gpts=np.where(chi < chimed)
             chainCounts=self.chains['counts'][bi][gpts]
         else:
             chainCounts=self.chains['counts'][bi]
             
         bins=self.bins[bi]
-        medians=numpy.zeros(len(bins))
-        errlow=numpy.zeros(len(bins))
-        errhigh=numpy.zeros(len(bins))
+        medians=np.zeros(len(bins))
+        errlow=np.zeros(len(bins))
+        errhigh=np.zeros(len(bins))
         for i in range(0,len(chainCounts[0])):
             link=chainCounts[:,i]
-            medians[i]=numpy.median(link)
-            sortpts=numpy.argsort(link)
+            medians[i]=np.median(link)
+            sortpts=np.argsort(link)
             lowind=int(0.159*len(sortpts))
             highind=int((1.0-0.159)*len(sortpts))
             errlow[i]=medians[i]-link[sortpts[lowind]]
@@ -243,23 +253,32 @@ class NumberCounts:
         if(self.fitted):            
             model=self.best['modeled'][bi]
             obs=self.best['observed'][bi]
-            opts=numpy.where(obs > 1e-10)
-            pts=numpy.where(model > 1e-10)
+            opts=np.where(obs > 1e-10)
+            pts=np.where(model > 1e-10)
             plt.plot(bins[opts],obs[opts],'o',label="Observation",color='black')
             plt.plot(bins[pts],model[pts],'d',label="Best",color='black')
         else:
             model=self.single['modeled'][bi]
-            pts=numpy.where(model > 1e-10)
+            pts=np.where(model > 1e-10)
             plt.plot(bins[pts],model[pts],'d',label="Best",color='black')
         
-        mpts=numpy.where(medians > 1e-10)
+        mpts=np.where(medians > 1e-10)
+        #sns.set(font='serif',font_scale=1.5,palette='Set2')
+        sns.set(style='white',font_scale=1.5,palette='Set2')
+        #sns.despine()
+
         plt.plot(bins[mpts],medians[mpts],'s',label="Median",color='black')
         plt.errorbar(bins[mpts],medians[mpts],yerr=[errlow[mpts],errhigh[mpts]],linestyle="None",color='gray')
+ #this needs to be made non-run specific perhaps by repeating the band keywords from the model into this 
         plt.title("Counts Band "+str(band))
-        plt.xlabel('Flux [mJy]')
-        plt.ylabel('DnDs*Jy^(-1.5)')
+        
+        plt.xlabel(r'Flux [mJy]')
+        plt.ylabel(r'$S^{2.5} dN/dSd\Omega*[Jy^{1.5} ster^{-1}]$')
         plt.xscale('log')
         plt.yscale('log')
+
+        
+        
         if(showLegend):
             plt.legend(loc='lower right')
 
@@ -297,22 +316,22 @@ class MCMCInfo:
         rnames=chdu.data.names
         for i in range(0,len(rnames)):
             rs=chdu.data[rnames[i]]
-            gpts=numpy.where(rs > 0)
+            gpts=np.where(rs > 0)
             self.Rvalues[pnames[i]]=rs[gpts]
 
-        pnames=numpy.unique(pnames)
+        pnames=np.unique(pnames)
         for i in range(0,len(pnames)):
             p0=pnames[i]
             if((p0 == "PHI") | (p0 == "L")):
                 p0=p0+str(0)
             self.Parameters[p0]=list()
             for i in range(0,self.ChainNum):
-                gpts=numpy.where(self.ChiSquares[i] < numpy.median(self.ChiSquares))
+                gpts=np.where(self.ChiSquares[i] < np.median(self.ChiSquares))
                 self.Parameters[p0].extend(params[p0+str(i)][gpts])
 
         for k,v in self.Parameters.iteritems():
-            self.BestFit[k]={'mean':numpy.mean(self.Parameters[k]),
-                             'median':numpy.median(self.Parameters[k]),
+            self.BestFit[k]={'mean':np.mean(self.Parameters[k]),
+                             'median':np.median(self.Parameters[k]),
                              'sigma':std(self.Parameters[k])}
 
     def info(self):
@@ -326,40 +345,124 @@ class MCMCInfo:
         print level3,"Convergence"
 
     def plotFit(self):
-        pnames=self.Parameters.keys()
+        pnames=self.Parameters.keys()    
+        #want to re-order these as they do not appear in the most sensible order
+        pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','ZBP','ZBQ','P2','Q2','CEVOL']
+        pnames_sorted=[]
+        for p in pnames_default:
+            if p in pnames:
+                pnames_sorted.append(p)
+        pnames=pnames_sorted
         dim=len(pnames)
-        for i in range(0,len(pnames)):
-            for j in range(0,len(pnames)):
+        for i in range(0,dim):
+            for j in range(0,dim):
                 if(i >= j):
-                    plt.subplot(dim,dim,i*dim+j+1)
+                    ax=plt.subplot(dim,dim,i*dim+j+1)
                     plt.subplots_adjust(hspace = .05, wspace=0.05)
                 if(i == j):
                     datapts=self.Parameters[pnames[i]]
-                    plt.hist(datapts,
-                         bins=nbins(datapts),
-                         normed=True,
-                         histtype='step',
-                         color="black")
+                    #plt.hist(datapts,
+                    #     bins=nbins(datapts),
+                    #     normed=True,
+                    #     histtype='step',
+                    #     color="black")
+                    datapts=np.array(datapts)
+                    datapts.astype(float)
+                    sns.despine()
+                    sns.kdeplot(datapts)
                     if(j == 0):
-                        plt.ylabel("Relative Probability")
+                        plt.ylabel("Probability")
                     else:
                         plt.setp( plt.gca().get_yticklabels(), visible=False)
                 elif(i > j):
-                    MCMCcontour(self.Parameters[pnames[j]],self.Parameters[pnames[i]])
+                    x=self.Parameters[pnames[j]]
+                    y=self.Parameters[pnames[i]]
+                    x=np.array(x)
+                    y=np.array(y)
+                    x.astype(float)
+                    y.astype(float)
+                    #MCMCcontour(self.Parameters[pnames[j]],self.Parameters[pnames[i]])
+                    sns.kdeplot(x,y,n_levels=10,cmap="Purples_d")
+                    start, end = ax.get_xlim()
+                    stepsize=(end-start)/5. #force to only show a maximum of 5 tickmarks
+                    if(stepsize >= 1):
+                        stepsize=int(stepsize+0.5)
+                    if((stepsize > 0.3) & (stepsize < 1)):
+                        stepsize=0.5
+                    xticks=np.arange(start, end, stepsize)
+                    xticks=np.around(xticks)
+                    ax.xaxis.set_ticks(xticks)
+                    
+                    start, end = ax.get_ylim()
+                    stepsize=(end-start)/5. #force to only show a maximum of 5 tickmarks
+                    yticks=np.around(np.arange(start, end, stepsize)+0.5,1)
+                    ax.yaxis.set_ticks(yticks)
                     if(j == 0):
-                        plt.ylabel(pnames[i])
+                        tmp=pnames[i]
+                        if(tmp == 'ALPHA'):
+                            plt.ylabel(r'$\alpha$')
+                        if(tmp == 'BETA'):
+                            plt.ylabel(r'$\beta$')
+                        if(tmp == 'PHI0'):
+                             plt.ylabel(r'$\Phi_{*,0}$')
+                        if(tmp == 'L0'):
+                             plt.ylabel(r'$L_{*,0}$')
+                        if(tmp == 'P'):
+                            plt.ylabel(r'$p_1$')
+                        if(tmp == 'Q'):
+                            plt.ylabel(r'$q_1$')
+                        if(tmp == 'P2'):
+                            plt.ylabel(r'$p_2$')
+                        if(tmp == 'Q2'):
+                            plt.ylabel(r'$q_2$')                           
+                        if(tmp == 'ZBP'):
+                            plt.ylabel(r'$z_{break,p}$')
+                        if(tmp == 'ZBQ'):
+                            plt.ylabel(r'$z_{break,q}$')
                     else:
                         plt.setp( plt.gca().get_yticklabels(), visible=False)
                 if(i == (len(pnames)-1)):
-                    plt.xlabel(pnames[j])
+                    tmp=pnames[j]
+                    if(tmp == 'ALPHA'):
+                        plt.xlabel(r'$\alpha$')
+                    if(tmp == 'BETA'):
+                        plt.xlabel(r'$\beta$')
+                    if(tmp == 'PHI0'):
+                        plt.xlabel(r'$\Phi_{*,0}$')
+                    if(tmp == 'L0'):
+                        plt.xlabel(r'$L_{*,0}$')
+                    if(tmp == 'P'):
+                        plt.xlabel(r'$p_1$')
+                    if(tmp == 'Q'):
+                        plt.xlabel(r'$q_1$')
+                    if(tmp == 'P2'):
+                        plt.xlabel(r'$p_2$')
+                    if(tmp == 'Q2'):
+                        plt.xlabel(r'$q_2$')
+                    if(tmp == 'ZBP'):
+                        plt.xlabel(r'$z_{break,p}$')
+                    if(tmp == 'ZBQ'):
+                        plt.xlabel(r'$z_{break,q}$')
                 else:
                     plt.setp( plt.gca().get_xticklabels(), visible=False)
+        #add legend with best-fit parameter values
+        ax.annotate('Best-fit values:', xy=(.7, .8),  xycoords='figure fraction',
+                horizontalalignment='center', verticalalignment='center',size=20)
+        yoffset=0.03
+        for k,v in self.BestFit.iteritems(): 
+        #    print level3,k,'-\t',v
+             #ax.annotate(k,'=',xy=(.7,.8-yoffset),xycoords='figure fraction',
+             #   horizontalalignment='center', verticalalignment='center',size=20)
+             yoffset=yoffset+0.03
+        #print self.BestFit(pnames[0])
+
 
     def showFit(self,block=True):
         my_dpi=116
         maxsize=maxWindowSize()
         figsize=(maxsize[0]/float(my_dpi)-0.25,maxsize[1]/float(my_dpi)-0.5)
-        plt.figure(figsize=figsize)
+        #plt.figure(figsize=figsize)
+        fig=plt.figure(figsize=[12,12])
         self.plotFit()
         plt.show(block=block)
 
@@ -370,7 +473,7 @@ class MCMCInfo:
 
     def plotR(self):
         for key in self.Rvalues.keys():
-            iterations=numpy.arange(1,len(self.Rvalues[key])+1)
+            iterations=np.arange(1,len(self.Rvalues[key])+1)
             plt.plot(iterations,self.Rvalues[key],label=key)
         plt.legend(loc='upper right')
         plt.xlabel("Iteration")
@@ -389,10 +492,10 @@ class MCMCInfo:
     def plotChisq(self):
         colors=['black','cyan','red','green','orange','purple','grey','magenta']
         for i in range(0,len(self.ChiSquares)):
-            iterations=numpy.arange(1,len(self.ChiSquares[i])+1)
-            gpts = numpy.where(self.ChiSquares[i] < 100)
+            iterations=np.arange(1,len(self.ChiSquares[i])+1)
+            gpts = np.where(self.ChiSquares[i] < 100)
             plt.plot(iterations[gpts],self.ChiSquares[i][gpts],label=str(i),color=colors[i])
-            gpts = numpy.where(self.Acceptance[i] > 0)
+            gpts = np.where(self.Acceptance[i] > 0)
             plt.plot(iterations[gpts],self.ChiSquares[i][gpts],'--',color=colors[i])
         plt.legend(loc='upper right',title="Chain Number")
         plt.xlabel("Iteration")

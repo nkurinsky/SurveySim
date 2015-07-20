@@ -9,7 +9,8 @@ import numpy
 sys.path.append("/usr/local/surveysim/python")
 from filters import *
 
-my_filters=['Herschel_SPIRE_250um', 'Herschel_SPIRE_350um', 'Herschel_SPIRE_500um']
+#my_filters=['Herschel_SPIRE_250um', 'Herschel_SPIRE_350um', 'Herschel_SPIRE_500um']
+my_filters=['Spitzer_IRAC_1','Spitzer_IRAC_2','Spitzer_IRAC_4']
 
 ids=[]
 for filt in my_filters:
