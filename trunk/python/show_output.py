@@ -13,8 +13,9 @@ else:
     file=sys.argv[1]
     output=OutputFile(file)
     output.info()
-    output.show()
-    if(output.fit()):
-        output.MCMC.showFit()
-        output.MCMC.showChains()
+#    output.saveCounts('spire_counts.pdf')
+#    output.show()
+#    if(output.fit()):
+#        output.MCMC.showFit()
+#        output.MCMC.showChains()
     print ""

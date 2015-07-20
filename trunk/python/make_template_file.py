@@ -141,8 +141,12 @@ lnu13_default=np.concatenate((tmp,lnu13),axis=0)
 tmp=lnu_tmp_ulirg*(lnu14[0]/lnu_tmp_ulirg[istitch])
 lnu14_default=np.concatenate((tmp,lnu14),axis=0)
 
+#*************************************************************
+#do this once -- so only compute luminosities after interpolating onto the lam_default wavelength array
+#*************************************************************
 dnu=(np.abs(lam_default-np.roll(lam_default,1))/lam_default)/lam_default 
 dnu=(c*1e6)*dnu
+
 lir1=0
 lir2=0
 lir3=0
@@ -176,7 +180,7 @@ for i in range(0,len(lam_default)-1):
         lir14+=(lnu14_default[i]*dnu[i])/3.86e26
 
 
-print 'SFG0 template L_TIR', np.log10(lir1)
+
 scale1=pow(10,lir_list[0]-np.log10(lir1))
 scale2=pow(10,lir_list[1]-np.log10(lir2))
 scale3=pow(10,lir_list[2]-np.log10(lir3))
@@ -191,6 +195,8 @@ scale11=pow(10,lir_list[10]-np.log10(lir11))
 scale12=pow(10,lir_list[11]-np.log10(lir12))
 scale13=pow(10,lir_list[12]-np.log10(lir13))
 scale14=pow(10,lir_list[13]-np.log10(lir14))
+
+print 'SFG0 template L_TIR', np.log10(lir1*scale1)
 
 col1=fits.Column(name='lambda',format='FLOAT',array=lam_default)
 col2=fits.Column(name='lnu1',format='FLOAT',array=lnu1_default*scale1)
@@ -208,14 +214,7 @@ col13=fits.Column(name='lnu12',format='FLOAT',array=lnu12_default*scale12)
 col14=fits.Column(name='lnu13',format='FLOAT',array=lnu13_default*scale13)
 col15=fits.Column(name='lnu14',format='FLOAT',array=lnu14_default*scale14)
 
-#plt.plot(lam_default,lnu4_default)
-#plt.xscale('log')
-#plt.yscale('log')
-#plt.show()
-#print len(lam_default),len(lnu1_default)
-
 cols_SFG_z0=fits.ColDefs([col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15])
-
 
 #read-in the Kirkpatrick et al. SFG templates
 with open (seddir+'/Comprehensive_SFG1.txt','r') as f: 
@@ -225,16 +224,6 @@ with open (seddir+'/Comprehensive_SFG1.txt','r') as f:
     for fline in flines:
         tmp1,tmp2,tmp3=fline.split()
         lam.append(float(tmp1)),lnu.append(float(tmp2))
-
-dnu=(np.abs(lam-np.roll(lam,1))/lam)/lam 
-dnu=(c*1e6)*dnu
-lir=0
-for i in range(0,len(lam)-1):
-    if(lam[i] >= 5.0):
-        lir+=(lnu[i]*dnu[i])/3.86e26
-
-print 'SFG1 template L_TIR', np.log10(lir)
-scale=pow(10,lir_list-np.log10(lir))
 
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
@@ -250,14 +239,13 @@ f = interpolate.interp1d(lam_old,lnu_old)
 #print lam_old[0],lam_default[0]
 lnu=f(lam_default)
 
-dnu=(np.abs(lam_default-np.roll(lam_default,1))/lam_default)/lam_default 
-dnu=(c*1e6)*dnu
 lir=0
 for i in range(0,len(lam_default)-1):
     if(lam_default[i] >= 5.0):
-        lir+=(lnu[i]*scale[0]*dnu[i])/3.86e26
+        lir+=(lnu[i]*dnu[i])/3.86e26
 
-print 'SFG1 template L_TIR (after interp)', np.log10(lir)
+scale=pow(10,lir_list-np.log10(lir))
+print 'SFG1 template L_TIR', np.log10(lir)
 
 #this is if we scale the existing SFG1 template from Kirkpatrick+2015 down to logL=9.75
 #col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
@@ -299,9 +287,7 @@ else:
 
 f = interpolate.interp1d(lam_old,lnu_old)
 lnu=f(lam_default)
-#these should be the same as above when using the same lambda
-#dnu=(np.abs(lam-np.roll(lam,1))/lam)/lam 
-#dnu=(c*1e6)*dnu
+
 lir=0
 for i in range(0,len(lam_default)-1):
     if(lam_default[i] >= 5.0):
@@ -318,7 +304,6 @@ col15=fits.Column(name='lnu14',format='FLOAT',array=lnu*scale[13])
 
 cols_SFG_z1=fits.ColDefs([col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15])
 
-
 with open (seddir+'/Comprehensive_SFG3.txt','r') as f: 
     flines=f.readlines()[4:] #4 lines of header
     fcount=-1
@@ -326,16 +311,6 @@ with open (seddir+'/Comprehensive_SFG3.txt','r') as f:
     for fline in flines:
         tmp1,tmp2,tmp3=fline.split()
         lam.append(float(tmp1)),lnu.append(float(tmp2))
-
-dnu=(np.abs(lam-np.roll(lam,1))/lam)/lam 
-dnu=(c*1e6)*dnu
-lir=0
-for i in range(0,len(lam)-1):
-    if(lam[i] >= 5.0):
-        lir+=(lnu[i]*dnu[i])/3.86e26
-
-print 'SFG3 template L_TIR', np.log10(lir)
-scale=pow(10,lir_list-np.log10(lir))
 
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
@@ -348,6 +323,14 @@ else:
 
 f = interpolate.interp1d(lam_old,lnu_old)
 lnu=f(lam_default)
+
+lir=0
+for i in range(0,len(lam_default)-1):
+    if(lam[i] >= 5.0):
+        lir+=(lnu[i]*dnu[i])/3.86e26
+
+print 'SFG3 template L_TIR', np.log10(lir)
+scale=pow(10,lir_list-np.log10(lir))
 
 #scaling from Kirkpatrick+2015 SFGz2
 #col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
@@ -389,6 +372,206 @@ plt.yscale('log')
 plt.show()
 
 #============================================================================
+#Composites
+#----------------------------------------------------------------------------
+#For a z~0 composite use Mrk231
+with open ('/Users/annie/code/idl/auxdata/swire/Mrk231_template_norm.sed','r') as f:
+    flines=f.readlines()
+    fcount=-1
+    lam_swire_comp,flam_swire_comp=[],[]
+    for fline in flines:
+        tmp0,tmp1=fline.split()
+        lam_swire_comp.append(float(tmp0)),flam_swire_comp.append(float(tmp1))
+
+lam_swire_comp=np.array(lam_swire_comp)/1e4 #convert to microns
+lnu_swire_comp=np.array(flam_swire_comp)*lam_swire_comp**2. #convert to fnu but overall normalization not set yet!
+
+f_tmp=interpolate.interp1d(lam_swire_comp,lnu_swire_comp)
+lnu=f_tmp(lam_default)
+
+lir=0
+for i in range(0,len(lam_default)-1):
+    if(lam_default[i] >= 5.0):
+        lir+=(lnu[i]*dnu[i])/3.86e26
+
+print 'COM1 template L_TIR', np.log10(lir)
+scale=pow(10,lir_list-np.log10(lir))
+
+col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
+col3=fits.Column(name='lnu2',format='FLOAT',array=lnu*scale[1])
+col4=fits.Column(name='lnu3',format='FLOAT',array=lnu*scale[2])
+col5=fits.Column(name='lnu4',format='FLOAT',array=lnu*scale[3])
+col6=fits.Column(name='lnu5',format='FLOAT',array=lnu*scale[4])
+col7=fits.Column(name='lnu6',format='FLOAT',array=lnu*scale[5])
+col8=fits.Column(name='lnu7',format='FLOAT',array=lnu*scale[6])
+col9=fits.Column(name='lnu8',format='FLOAT',array=lnu*scale[7])
+col10=fits.Column(name='lnu9',format='FLOAT',array=lnu*scale[8])
+col11=fits.Column(name='lnu10',format='FLOAT',array=lnu*scale[9])
+col12=fits.Column(name='lnu11',format='FLOAT',array=lnu*scale[10])
+col13=fits.Column(name='lnu12',format='FLOAT',array=lnu*scale[11])
+col14=fits.Column(name='lnu13',format='FLOAT',array=lnu*scale[12])
+col15=fits.Column(name='lnu14',format='FLOAT',array=lnu*scale[13])
+
+cols_COM_z0=fits.ColDefs([col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15])
+
+with open (seddir+'/Comprehensive_Composite1.txt','r') as f: 
+    flines=f.readlines()[4:] #4 lines of header, and 4 lines as the lower-lambda values not well defined for the higher-L templates
+    fcount=-1
+    lam,lnu=[],[]
+    for fline in flines:
+        tmp1,tmp2,tmp3=fline.split()
+        lam.append(float(tmp1)),lnu.append(float(tmp2))
+
+lam_old=np.array(lam)
+lnu_old=np.array(lnu)
+if(lam_old[0] > lam_default[0]):
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
+else:
+    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lnu_old=np.concatenate((lnu_old,[0]),axis=0)
+
+f = interpolate.interp1d(lam_old,lnu_old)
+lnu=f(lam_default)
+lir=0
+for i in range(0,len(lam_default)-1):
+    if(lam[i] >= 5.0):
+        lir+=(lnu[i]*dnu[i])/3.86e26
+
+print 'Composite1 template L_TIR', np.log10(lir)
+scale=pow(10,lir_list-np.log10(lir))
+
+col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
+col3=fits.Column(name='lnu2',format='FLOAT',array=lnu*scale[1])
+col4=fits.Column(name='lnu3',format='FLOAT',array=lnu*scale[2])
+col5=fits.Column(name='lnu4',format='FLOAT',array=lnu*scale[3])
+col6=fits.Column(name='lnu5',format='FLOAT',array=lnu*scale[4])
+col7=fits.Column(name='lnu6',format='FLOAT',array=lnu*scale[5])
+col8=fits.Column(name='lnu7',format='FLOAT',array=lnu*scale[6])
+col9=fits.Column(name='lnu8',format='FLOAT',array=lnu*scale[7])
+col10=fits.Column(name='lnu9',format='FLOAT',array=lnu*scale[8])
+
+#now the higher luminosity z~1 Composite template (defined from 12.05-12.6)
+with open (seddir+'/Comprehensive_Composite2.txt','r') as f: 
+    flines=f.readlines()[4:]
+    fcount=-1
+    lam,lnu=[],[]
+    for fline in flines:
+        tmp1,tmp2,tmp3=fline.split()
+        lam.append(float(tmp1)),lnu.append(float(tmp2))
+
+lam_old=np.array(lam)
+lnu_old=np.array(lnu)
+if(lam_old[0] > lam_default[0]):
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
+else:
+    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lnu_old=np.concatenate((lnu_old,[0]),axis=0)
+
+f = interpolate.interp1d(lam_old,lnu_old)
+lnu=f(lam_default)
+
+lir=0
+for i in range(0,len(lam_default)-1):
+    if(lam_default[i] >= 5.0):
+        lir+=(lnu[i]*dnu[i])/3.86e26
+
+print 'COM2 template L_TIR', np.log10(lir)
+scale=pow(10,lir_list-np.log10(lir))
+
+col11=fits.Column(name='lnu10',format='FLOAT',array=lnu*scale[9])
+col12=fits.Column(name='lnu11',format='FLOAT',array=lnu*scale[10])
+col13=fits.Column(name='lnu12',format='FLOAT',array=lnu*scale[11])
+col14=fits.Column(name='lnu13',format='FLOAT',array=lnu*scale[12])
+col15=fits.Column(name='lnu14',format='FLOAT',array=lnu*scale[13])
+
+cols_COM_z1=fits.ColDefs([col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15])
+
+#=========================================================================
+# the z-1.8 set
+#-------------------------------------------------------------------------
+
+with open (seddir+'/Comprehensive_Composite3.txt','r') as f: 
+    flines=f.readlines()[4:] #4 lines of header, and 4 lines as the lower-lambda values not well defined for the higher-L templates
+    fcount=-1
+    lam,lnu=[],[]
+    for fline in flines:
+        tmp1,tmp2,tmp3=fline.split()
+        lam.append(float(tmp1)),lnu.append(float(tmp2))
+
+lam_old=np.array(lam)
+lnu_old=np.array(lnu)
+if(lam_old[0] > lam_default[0]):
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
+else:
+    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lnu_old=np.concatenate((lnu_old,[0]),axis=0)
+
+f = interpolate.interp1d(lam_old,lnu_old)
+lnu=f(lam_default)
+
+lir=0
+for i in range(0,len(lam_default)-1):
+    if(lam[i] >= 5.0):
+        lir+=(lnu[i]*dnu[i])/3.86e26
+
+print 'COM3 template L_TIR', np.log10(lir)
+
+scale=pow(10,lir_list-np.log10(lir))
+
+col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
+col3=fits.Column(name='lnu2',format='FLOAT',array=lnu*scale[1])
+col4=fits.Column(name='lnu3',format='FLOAT',array=lnu*scale[2])
+col5=fits.Column(name='lnu4',format='FLOAT',array=lnu*scale[3])
+col6=fits.Column(name='lnu5',format='FLOAT',array=lnu*scale[4])
+col7=fits.Column(name='lnu6',format='FLOAT',array=lnu*scale[5])
+col8=fits.Column(name='lnu7',format='FLOAT',array=lnu*scale[6])
+col9=fits.Column(name='lnu8',format='FLOAT',array=lnu*scale[7])
+col10=fits.Column(name='lnu9',format='FLOAT',array=lnu*scale[8])
+col11=fits.Column(name='lnu10',format='FLOAT',array=lnu*scale[9])
+col12=fits.Column(name='lnu11',format='FLOAT',array=lnu*scale[10])
+
+
+#now the higher luminosity z~2 Composite template (defined from 12.4-13.4)
+with open (seddir+'/Comprehensive_Composite4.txt','r') as f: 
+    flines=f.readlines()[4:]
+    fcount=-1
+    lam,lnu=[],[]
+    for fline in flines:
+        tmp1,tmp2,tmp3=fline.split()
+        lam.append(float(tmp1)),lnu.append(float(tmp2))
+
+
+lam_old=np.array(lam)
+lnu_old=np.array(lnu)
+if(lam_old[0] > lam_default[0]):
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
+else:
+    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lnu_old=np.concatenate((lnu_old,[0]),axis=0)
+
+f = interpolate.interp1d(lam_old,lnu_old)
+lnu=f(lam_default)
+
+lir=0
+for i in range(0,len(lam_default)-1):
+    if(lam_default[i] >= 5.0):
+        lir+=(lnu[i]*dnu[i])/3.86e26
+
+print 'COM4 template L_TIR', np.log10(lir)
+scale=pow(10,lir_list-np.log10(lir))
+
+col13=fits.Column(name='lnu12',format='FLOAT',array=lnu*scale[11])
+col14=fits.Column(name='lnu13',format='FLOAT',array=lnu*scale[12])
+col15=fits.Column(name='lnu14',format='FLOAT',array=lnu*scale[13])
+#print len(lam_default),len(lnu)
+
+cols_COM_z2=fits.ColDefs([col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15])
+
+#============================================================================
 #AGN
 #----------------------------------------------------------------------------
 #for z=0 use Mullaney et al 2011 template. 
@@ -412,9 +595,7 @@ agn_z0_lnu_extended=np.concatenate((tmp_lnu[0:],agn_z0_lnu[0:]))
 print agn_z0_lnu_extended[0:5]
 f = interpolate.interp1d(agn_z0_lam_extended,agn_z0_lnu_extended)
 lnu=f(lam_default)
-#these should be the same as above when using the same lambda
-#dnu=(np.abs(lam-np.roll(lam,1))/lam)/lam 
-#dnu=(c*1e6)*dnu
+
 lir=0
 for i in range(0,len(lam_default)-1):
     if(lam_default[i] >= 5.0):
@@ -449,15 +630,6 @@ with open (seddir+'/Comprehensive_AGN1.txt','r') as f:
         tmp1,tmp2,tmp3=fline.split()
         lam.append(float(tmp1)),lnu.append(float(tmp2))
 
-dnu=(np.abs(lam-np.roll(lam,1))/lam)/lam 
-dnu=(c*1e6)*dnu
-lir=0
-for i in range(0,len(lam)-1):
-    if(lam[i] >= 5.0):
-        lir+=(lnu[i]*dnu[i])/3.86e26
-
-print 'AGN1 template L_TIR', np.log10(lir)
-scale=pow(10,lir_list-np.log10(lir))
 
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
@@ -470,6 +642,14 @@ else:
 
 f = interpolate.interp1d(lam_old,lnu_old)
 lnu=f(lam_default)
+
+lir=0
+for i in range(0,len(lam_default)-1):
+    if(lam[i] >= 5.0):
+        lir+=(lnu[i]*dnu[i])/3.86e26
+
+print 'AGN1 template L_TIR', np.log10(lir)
+scale=pow(10,lir_list-np.log10(lir))
 
 col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
 col3=fits.Column(name='lnu2',format='FLOAT',array=lnu*scale[1])
@@ -503,7 +683,6 @@ else:
 f = interpolate.interp1d(lam_old,lnu_old)
 lnu=f(lam_default)
 
-#these should be the same as above when using the same lambda
 lir=0
 for i in range(0,len(lam_default)-1):
     if(lam_default[i] >= 5.0):
@@ -512,14 +691,12 @@ for i in range(0,len(lam_default)-1):
 print 'AGN2 template L_TIR', np.log10(lir)
 scale=pow(10,lir_list-np.log10(lir))
 
-
 col12=fits.Column(name='lnu11',format='FLOAT',array=lnu*scale[10])
 col13=fits.Column(name='lnu12',format='FLOAT',array=lnu*scale[11])
 col14=fits.Column(name='lnu13',format='FLOAT',array=lnu*scale[12])
 col15=fits.Column(name='lnu14',format='FLOAT',array=lnu*scale[13])
 
 cols_AGN_z1=fits.ColDefs([col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15])
-
 
 #=========================================================================
 # the z-1.8 set
@@ -533,14 +710,6 @@ with open (seddir+'/Comprehensive_AGN3.txt','r') as f:
         tmp1,tmp2,tmp3=fline.split()
         lam.append(float(tmp1)),lnu.append(float(tmp2))
 
-dnu=(np.abs(lam-np.roll(lam,1))/lam)/lam 
-dnu=(c*1e6)*dnu
-lir=0
-for i in range(0,len(lam)-1):
-    if(lam[i] >= 5.0):
-        lir+=(lnu[i]*dnu[i])/3.86e26
-
-print 'AGN3 template L_TIR', np.log10(lir)
 
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
@@ -554,13 +723,14 @@ else:
 f = interpolate.interp1d(lam_old,lnu_old)
 lnu=f(lam_default)
 
-lir_test=0
+lir=0
 for i in range(0,len(lam_default)-1):
-    if(lam_default[i] >= 5.0):
-        lir_test+=(lnu[i]*dnu_default[i])/3.86e26
+    if(lam[i] >= 5.0):
+        lir+=(lnu[i]*dnu[i])/3.86e26
 
-print 'AGN3 template L_TIR after interpolation', np.log10(lir_test)
-scale=pow(10,lir_list-np.log10(lir_test))
+print 'AGN3 template L_TIR', np.log10(lir)
+
+scale=pow(10,lir_list-np.log10(lir))
 
 col2=fits.Column(name='lnu1',format='FLOAT',array=lnu*scale[0])
 col3=fits.Column(name='lnu2',format='FLOAT',array=lnu*scale[1])
@@ -619,9 +789,13 @@ tbhdu10=fits.new_table(cols_SFG_z0)
 tbhdu11=fits.new_table(cols_SFG_z1)
 tbhdu12=fits.new_table(cols_SFG_z2)
 
-tbhdu20=fits.new_table(cols_AGN_z0)
-tbhdu21=fits.new_table(cols_AGN_z1)
-tbhdu22=fits.new_table(cols_AGN_z2)
+tbhdu20=fits.new_table(cols_COM_z0)
+tbhdu21=fits.new_table(cols_COM_z1)
+tbhdu22=fits.new_table(cols_COM_z2)
+
+tbhdu30=fits.new_table(cols_AGN_z0)
+tbhdu31=fits.new_table(cols_AGN_z1)
+tbhdu32=fits.new_table(cols_AGN_z2)
 
 tbhdu10.header.update('EXTNAME','SFG_z0',
                         'Rieke2009+SWIRE Sc')
@@ -630,25 +804,36 @@ tbhdu11.header.update('EXTNAME','SFG_z1',
 tbhdu12.header.update('EXTNAME','SFG_z2',
                         'Kirkpatrick2015')
 
-tbhdu20.header.update('EXTNAME','AGN_z0',
-                        'Mullaney2011')
-tbhdu21.header.update('EXTNAME','AGN_z1',
+tbhdu20.header.update('EXTNAME','COM_z0',
+                        'SWIRE Mrk231')
+tbhdu21.header.update('EXTNAME','COM_z1',
                         'Kirkpatrick2015')
-tbhdu22.header.update('EXTNAME','AGN_z2',
+tbhdu22.header.update('EXTNAME','COM_z2',
+                        'Kirkpatrick2015')
+
+tbhdu30.header.update('EXTNAME','AGN_z0',
+                        'Mullaney2011')
+tbhdu31.header.update('EXTNAME','AGN_z1',
+                        'Kirkpatrick2015')
+tbhdu32.header.update('EXTNAME','AGN_z2',
                         'Kirkpatrick2015')
 
 tbhdr=tbhdu10.header
 tbhdr=tbhdu11.header
 tbhdr=tbhdu12.header
 tbhdr=tbhdu10.header
+tbhdr=tbhdu20.header
 tbhdr=tbhdu21.header
 tbhdr=tbhdu22.header
+tbhdr=tbhdu30.header
+tbhdr=tbhdu31.header
+tbhdr=tbhdu32.header
 
 hdulist[0].header.update('Nzbins',3,'number of redshift bins')
 hdulist[0].header.update('Ntypes',3,'number of SED types included')
 hdulist[0].header.update('SEDTYPE1','SFG','name of 1st SED type')
-hdulist[0].header.update('SEDTYPE2','AGN','name of 2nd SED type')
-hdulist[0].header.update('SEDTYPE3','Comp','name of 3rd SED type')
+hdulist[0].header.update('SEDTYPE2','COM','name of 2nd SED type')
+hdulist[0].header.update('SEDTYPE3','AGN','name of 3rd SED type')
 
 hdulist[0].header.update('zmin0',0,'minimum of 1st redshift bin')
 hdulist[0].header.update('zmax0',0.499,'maximum of 1st redshift bin')
@@ -677,7 +862,7 @@ hdulist[0].header.update('L14',lir_list[13],'luminosity array')
 hdr=hdulist[0].header
 
 hdulist.close
-thdulist=fits.HDUList([hdulist[0],tbhdu10,tbhdu11,tbhdu12,tbhdu20,tbhdu21,tbhdu22])
+thdulist=fits.HDUList([hdulist[0],tbhdu10,tbhdu11,tbhdu12,tbhdu20,tbhdu21,tbhdu22,tbhdu30,tbhdu31,tbhdu32])
 if(os.path.isfile(sedfile)):
     print 'Replacing existing template file...'
     os.remove(sedfile)

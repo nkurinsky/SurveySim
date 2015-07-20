@@ -28,6 +28,7 @@ def read_filters():
     for fline in flines:
         if fline.strip():
             ncol=len(fline.split())
+
             if 3<ncol<6:
                 tmp1,tmp2,tmp3,tmp4=fline.split()[0:4]
                 if (tmp4 != '(from') and (tmp2 != '2MASS') and (tmp2 != 'Steidel') and (tmp2 != 'Stromgren') and (tmp2 != 'Idealized') and (tmp2 != 'SCUBA') and (tmp2 != 'JWST') :

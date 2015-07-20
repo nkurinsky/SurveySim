@@ -263,13 +263,22 @@ class NumberCounts:
             plt.plot(bins[pts],model[pts],'d',label="Best",color='black')
         
         mpts=np.where(medians > 1e-10)
+        #sns.set(font='serif',font_scale=1.5,palette='Set2')
+        sns.set(style='white',font_scale=1.5,palette='Set2')
+        #sns.despine()
+
         plt.plot(bins[mpts],medians[mpts],'s',label="Median",color='black')
         plt.errorbar(bins[mpts],medians[mpts],yerr=[errlow[mpts],errhigh[mpts]],linestyle="None",color='gray')
+ #this needs to be made non-run specific perhaps by repeating the band keywords from the model into this 
         plt.title("Counts Band "+str(band))
-        plt.xlabel('Flux [mJy]')
-        plt.ylabel('DnDs*Jy^(-1.5)')
+        
+        plt.xlabel(r'Flux [mJy]')
+        plt.ylabel(r'$S^{2.5} dN/dSd\Omega*[Jy^{1.5} ster^{-1}]$')
         plt.xscale('log')
         plt.yscale('log')
+
+        
+        
         if(showLegend):
             plt.legend(loc='lower right')
 
