@@ -7,10 +7,10 @@ import datetime
 import time
 from ModelFile import *
 
-mfile="LHE_B_model.fits"
+mfile="../../Examples/AzTEC/LHE_B_model.fits"
 templatefile="../templates/default_templates.fits" # make sure to follow path
 obsfile="../obs/LHE_complete_c.fits"
-outfile="LHE_B_output.fits"
+outfile="../../Examples/AzTEC/LHE_B_output.fits"
 
 ## Info on this specific run 
 ## ------------------------
