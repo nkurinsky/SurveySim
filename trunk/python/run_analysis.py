@@ -7,8 +7,8 @@ import time
 from ModelFile import *
 
 mfile="spire_model.fits"
-templatefile="../trunk/templates/Kirkpatrick2015_templates.fits"
-obsfile="../trunk/obs/spire_cdfs-swire.fits"
+templatefile="../templates/Kirkpatrick2015_templates.fits"
+obsfile="../obs/spire_cdfs-swire.fits"
 outfile="spire_output.fits"
 
 mod=ModelFile()
