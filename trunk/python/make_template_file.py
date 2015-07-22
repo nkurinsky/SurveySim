@@ -68,9 +68,14 @@ lnu14=np.array(lnu14)*conv_whz
 
 #want to extend to 0.2um 
 lam_short=[0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,4.10,4.20,4.30,4.40,4.50,4.60,4.70,5.0,5.1,5.2]
+#this will be extended at some point to catch the radio properly
+lam_long=[1040,1050,1060,1070,1080,1090]
+
 lam_short=np.array(lam_short)
 lam_rieke=np.array(lam_rieke)
-lam_default=np.concatenate((lam_short,lam_rieke),axis=0)
+lam_long=np.array(lam_long)
+
+lam_default=np.concatenate((lam_short,lam_rieke,lam_long),axis=0)
 
 dnu_default=(np.abs(lam_default-np.roll(lam_default,1))/lam_default)/lam_default 
 dnu_default=(c*1e6)*dnu_default
@@ -111,35 +116,36 @@ lnu_tmp_ulirg=f_ulirg(lam_short)
 istitch=45
 #print lam_short[istitch],lnu_tmp[istitch],lam_rieke[0],lnu1[0]
 tmp=lnu_tmp*(lnu1[0]/lnu_tmp[istitch])
-lnu1_default=np.concatenate((tmp,lnu1),axis=0)
+tmp2=lam_long*0.0 #placeholder, will have to extend properly
+lnu1_default=np.concatenate((tmp,lnu1,tmp2),axis=0)
 tmp=lnu_tmp*(lnu2[0]/lnu_tmp[istitch])
-lnu2_default=np.concatenate((tmp,lnu2),axis=0)
+lnu2_default=np.concatenate((tmp,lnu2,tmp2),axis=0)
 tmp=lnu_tmp*(lnu3[0]/lnu_tmp[istitch])
-lnu3_default=np.concatenate((tmp,lnu3),axis=0)
+lnu3_default=np.concatenate((tmp,lnu3,tmp2),axis=0)
 tmp=lnu_tmp*(lnu4[0]/lnu_tmp[istitch])
-lnu4_default=np.concatenate((tmp,lnu4),axis=0)
+lnu4_default=np.concatenate((tmp,lnu4,tmp2),axis=0)
 tmp=lnu_tmp*(lnu5[0]/lnu_tmp[istitch])
-lnu5_default=np.concatenate((tmp,lnu5),axis=0)
+lnu5_default=np.concatenate((tmp,lnu5,tmp2),axis=0)
 tmp=lnu_tmp*(lnu6[0]/lnu_tmp[istitch])
-lnu6_default=np.concatenate((tmp,lnu6),axis=0)
+lnu6_default=np.concatenate((tmp,lnu6,tmp2),axis=0)
 tmp=lnu_tmp*(lnu7[0]/lnu_tmp[istitch])
-lnu7_default=np.concatenate((tmp,lnu7),axis=0)
+lnu7_default=np.concatenate((tmp,lnu7,tmp2),axis=0)
 
 #from here on use the ulirg-based near-IR SED
 tmp=lnu_tmp_ulirg*(lnu8[0]/lnu_tmp_ulirg[istitch])
-lnu8_default=np.concatenate((tmp,lnu8),axis=0)
+lnu8_default=np.concatenate((tmp,lnu8,tmp2),axis=0)
 tmp=lnu_tmp_ulirg*(lnu9[0]/lnu_tmp_ulirg[istitch])
-lnu9_default=np.concatenate((tmp,lnu9),axis=0)
+lnu9_default=np.concatenate((tmp,lnu9,tmp2),axis=0)
 tmp=lnu_tmp_ulirg*(lnu10[0]/lnu_tmp_ulirg[istitch])
-lnu10_default=np.concatenate((tmp,lnu10),axis=0)
+lnu10_default=np.concatenate((tmp,lnu10,tmp2),axis=0)
 tmp=lnu_tmp_ulirg*(lnu11[0]/lnu_tmp_ulirg[istitch])
-lnu11_default=np.concatenate((tmp,lnu11),axis=0)
+lnu11_default=np.concatenate((tmp,lnu11,tmp2),axis=0)
 tmp=lnu_tmp_ulirg*(lnu12[0]/lnu_tmp_ulirg[istitch])
-lnu12_default=np.concatenate((tmp,lnu12),axis=0)
+lnu12_default=np.concatenate((tmp,lnu12,tmp2),axis=0)
 tmp=lnu_tmp_ulirg*(lnu13[0]/lnu_tmp_ulirg[istitch])
-lnu13_default=np.concatenate((tmp,lnu13),axis=0)
+lnu13_default=np.concatenate((tmp,lnu13,tmp2),axis=0)
 tmp=lnu_tmp_ulirg*(lnu14[0]/lnu_tmp_ulirg[istitch])
-lnu14_default=np.concatenate((tmp,lnu14),axis=0)
+lnu14_default=np.concatenate((tmp,lnu14,tmp2),axis=0)
 
 #*************************************************************
 #do this once -- so only compute luminosities after interpolating onto the lam_default wavelength array
@@ -229,10 +235,10 @@ lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -279,10 +285,10 @@ with open (seddir+'/Comprehensive_SFG2.txt','r') as f:
 lam_old=lam
 lnu_old=lnu
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -315,10 +321,10 @@ with open (seddir+'/Comprehensive_SFG3.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -425,10 +431,10 @@ with open (seddir+'/Comprehensive_Composite1.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -463,10 +469,10 @@ with open (seddir+'/Comprehensive_Composite2.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -503,10 +509,10 @@ with open (seddir+'/Comprehensive_Composite3.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -547,10 +553,10 @@ with open (seddir+'/Comprehensive_Composite4.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -634,10 +640,10 @@ with open (seddir+'/Comprehensive_AGN1.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -674,10 +680,10 @@ with open (seddir+'/Comprehensive_AGN2.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -714,10 +720,10 @@ with open (seddir+'/Comprehensive_AGN3.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
@@ -759,10 +765,10 @@ with open (seddir+'/Comprehensive_AGN4.txt','r') as f:
 lam_old=np.array(lam)
 lnu_old=np.array(lnu)
 if(lam_old[0] > lam_default[0]):
-    lam_old=np.concatenate(([lam_default[0]],lam_old,[1031]),axis=0)
+    lam_old=np.concatenate(([lam_default[0]],lam_old,[1091]),axis=0)
     lnu_old=np.concatenate(([0],lnu_old,[0]),axis=0)
 else:
-    lam_old=np.concatenate((lam_old,[1031]),axis=0)
+    lam_old=np.concatenate((lam_old,[1091]),axis=0)
     lnu_old=np.concatenate((lnu_old,[0]),axis=0)
 
 f = interpolate.interp1d(lam_old,lnu_old)
