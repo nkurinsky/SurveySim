@@ -7,10 +7,10 @@ import datetime
 import time
 from ModelFile import *
 
-mfile="../../Examples/ALMA_band7_model.fits"
+mfile="../../Examples/ALMAB7_model_001.fits"
 templatefile="../templates/default_templates.fits"
 #obsfile="../trunk/obs/AzTEC_LHE.fits"
-outfile="../../Examples/ALMA_band7_output.fits"
+outfile="../../Examples/ALMAB7_output_001.fits"
 
 mod=ModelFile()
 
