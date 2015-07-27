@@ -149,7 +149,7 @@ void simulator::initial_simulation(){
     zarray[is]=(is)*dz+zmin;    
 
     jsmin=lnum;
-    // here we determine minimum luminosity to attempt to simulate
+    // here we determine minimum luminosity per SED type
     for(int stype=0;stype<seds->get_tnum();stype++){
       jsmin_type[stype] = 0;
       for (js=0;js<lnum;js++){

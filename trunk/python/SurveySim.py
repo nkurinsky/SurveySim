@@ -356,7 +356,7 @@ class SurveySimGUI:
             mod.filters[ind].setID(self.bands[ind].get())
             mod.filters[ind].fid=mod.filters[ind].fid
             mod.filters[ind].limit=self.limits[ind].get()
-            mod.filters[ind].error=mod.filters[ind].limit/3.0 #assume 3sigma det.limit, we do not use this at present
+            mod.filters[ind].err=mod.filters[ind].limit/3.0 #assume 3sigma det.limit, we do not use this at present
             mod.filters[ind].unit=self.units[ind].get()
             ind=ind+1
 

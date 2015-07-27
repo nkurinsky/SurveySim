@@ -109,9 +109,30 @@ double agn_frac::get_agn_frac2(double lum, double redshift, int agntype){
     
 }
 
+//old version with AGN only
+//int agn_frac::get_sedtype(double lum, double redshift){
+//  if(generate)
+//    return get_agn_frac(lum,redshift) > rng.flat(0,1) ? 1 : 0;
+//  else
+//    return 0;
+//}
+
+//new version, assume half of the AGN are composites
 int agn_frac::get_sedtype(double lum, double redshift){
-  if(generate)
-    return get_agn_frac(lum,redshift) > rng.flat(0,1) ? 1 : 0;
-  else
-    return 0;
+  float fagn,fcomp,fsfg,rnd;
+  int stype;
+  fagn=get_agn_frac(lum,redshift);
+  fcomp=fagn/2.0;
+  fagn=fagn/2.0;
+  fsfg=1-fagn-fcomp;
+  //if(generate)
+  rnd=rng.flat(0,1);
+  stype= rnd < fsfg ? 0 : 1;
+  if(stype == 1)
+    stype=rnd < fsfg+fcomp ? 1 : 2;
+    //e.g. fsfg=0.4, fcomp=0.3 and fagn=0.3
+    //rnd<0.4 -> stype=0 i.e. sfg
+    //rnd < 0.7 (0.4+0.3) stype=1 i.e. composite
+    //rnd > 0.7 stype = 2 i.e. agn
+  return stype;
 }
