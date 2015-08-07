@@ -269,16 +269,14 @@ class NumberCounts:
 
         plt.plot(bins[mpts],medians[mpts],'s',label="Median",color='black')
         plt.errorbar(bins[mpts],medians[mpts],yerr=[errlow[mpts],errhigh[mpts]],linestyle="None",color='gray')
- #this needs to be made non-run specific perhaps by repeating the band keywords from the model into this 
+        #this needs to be made non-run specific perhaps by repeating the band keywords from the model into this 
         plt.title("Counts Band "+str(band))
-        
+
         plt.xlabel(r'Flux [mJy]')
         plt.ylabel(r'$S^{2.5} dN/dSd\Omega*[Jy^{1.5} ster^{-1}]$')
         plt.xscale('log')
         plt.yscale('log')
 
-        
-        
         if(showLegend):
             plt.legend(loc='lower right')
 
@@ -347,7 +345,7 @@ class MCMCInfo:
     def plotFit(self):
         pnames=self.Parameters.keys()    
         #want to re-order these as they do not appear in the most sensible order
-        pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','ZBP','ZBQ','P2','Q2','CEVOL']
+        pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','ZBP','ZBQ','P2','Q2','CEXP','ZBC']
         pnames_sorted=[]
         for p in pnames_default:
             if p in pnames:
@@ -419,6 +417,10 @@ class MCMCInfo:
                             plt.ylabel(r'$z_{break,p}$')
                         if(tmp == 'ZBQ'):
                             plt.ylabel(r'$z_{break,q}$')
+                        if(tmp == 'ZBC'):
+                            plt.ylabel(r'$z_{break,c}$')
+                        if(tmp == 'CEXP'):
+                            plt.ylabel(r'$c_{exp}$')
                     else:
                         plt.setp( plt.gca().get_yticklabels(), visible=False)
                 if(i == (len(pnames)-1)):
@@ -443,6 +445,10 @@ class MCMCInfo:
                         plt.xlabel(r'$z_{break,p}$')
                     if(tmp == 'ZBQ'):
                         plt.xlabel(r'$z_{break,q}$')
+                    if(tmp == 'ZBC'):
+                        plt.xlabel(r'$z_{break,c}$')
+                    if(tmp == 'CEXP'):
+                        plt.xlabel(r'$c_{exp}$')
                 else:
                     plt.setp( plt.gca().get_xticklabels(), visible=False)
         #add legend with best-fit parameter values
