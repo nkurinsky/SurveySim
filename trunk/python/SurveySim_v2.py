@@ -136,10 +136,10 @@ conv_con1=mod.convergence['CI'] #Convergence confidence interval
 class SurveySimGUI:
     def __init__(self, master):
         #local variables to hold the entries in the GUI
-        self.v_fixed=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar()] 
-        self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
-        self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
-        self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
+        self.v_fixed=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar()] 
+        self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
+        self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
+        self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
         self.obsfile_set=StringVar()
         self.lfform_set=StringVar()
         self.sedfile_set=StringVar()
@@ -155,24 +155,28 @@ class SurveySimGUI:
         self.master=master
         master.title("SurveySim")
         self.labelframe_top = LabelFrame(master, text="Data files",bg='grey')
-        self.labelframe_top.grid(columnspan=3,sticky=W+E)
+        self.labelframe_top.grid(column=2,row=0,sticky=N)#,sticky=W+E)
+        #self.labelframe_top.grid(column)
+
+#        self.labelframe_agn=LabelFrame(master,text="AGN fraction",bg='blue')
+#        self.labelframe_agn.grid(columnspan=3,sticky=E)
 
         self.labelframe_lf = LabelFrame(master, text="Luminosity Function Parameters",bg='light blue') 
-        self.labelframe_lf.grid(column=0,row=1,rowspan=2)
+        self.labelframe_lf.grid(column=0,row=0,rowspan=2)
         self.label_lf=Label(self.labelframe_lf,text="Initial/Min/Max/Fix",bg='light blue')
         self.label_lf.grid(in_=self.labelframe_lf,row=2,column=1)
 
         self.labelframe_survey = LabelFrame(master, text="Survey fitting properties",bg='pink') 
-        self.labelframe_survey.grid(column=1,row=1,sticky=W+N+S)
+        self.labelframe_survey.grid(column=1,row=0,sticky=W+N+S)
         self.label_survey=Label(self.labelframe_survey,text="Filter/Limit/Units",bg='pink') 
         self.label_survey.grid(in_=self.labelframe_survey,row=1,column=1)
 
         self.labelframe_seds=LabelFrame(master,text="SEDs",bg='green')
-        self.labelframe_seds.grid(column=2,row=1)
+        self.labelframe_seds.grid(column=2,row=0,pady=100,sticky=W+E)
 
 #the GUI buttons
         self.labelframe_buttons=LabelFrame(master)
-        self.labelframe_buttons.grid(column=1,columnspan=2,row=2,sticky=S+E+W)
+        self.labelframe_buttons.grid(column=1,columnspan=2,row=1,sticky=S+E+W)
         row=Frame(self.labelframe_buttons)
         row.pack(side=LEFT)
         self.settings_button = Button(row,text='Settings',command=self.settings)
@@ -214,6 +218,12 @@ class SurveySimGUI:
             self.obsfile_set.set(obsfile)
             self.sedfile_set.set(sedfile)
             ind=ind+1
+#AGN fraction frame
+#        ind=0
+#        row=Frame(self.labelframe_agn,bg='blue')
+        #lab=Label(row,text=field0,bg='blue')
+        #lab.pack(side=LEFT)
+#        row.pack(side=TOP,padx=1,pady=5)
 
 #  LF frame
         ind=0;
@@ -284,6 +294,24 @@ class SurveySimGUI:
         ent3_1=Entry(self.labelframe_survey,textvar=self.fitaxes[1],width=8)
         self.fitaxes[1].set(axes[1])
         ent3_1.grid(in_=self.labelframe_survey,row=ind+5,column=1,pady=2)
+
+#        lab = Label(self.labelframe_survey, width=6, text='fagn0=', anchor='w',bg='pink')
+#        lab.grid(in_=self.labelframe_survey,row=ind+5,column=0,pady=2)
+#        ent4_1=Entry(self.labelframe_survey,textvar=self.fagn0,width=8)
+#        self.fagn0.set(fagn0)
+#        ent4_1.grid(in_=self.labelframe_survey,row=ind+6,column=1,pady=2)
+
+#        lab = Label(self.labelframe_survey, width=6, text='zbt', anchor='w',bg='pink')
+#        lab.grid(in_=self.labelframe_survey,row=ind+5,column=0,pady=2)
+#        ent5_1=Entry(self.labelframe_survey,textvar=self.zbt,width=8)
+#        self.zbt.set(zbt)
+#        ent5_1.grid(in_=self.labelframe_survey,row=ind+7,column=1,pady=2)
+
+#        lab = Label(self.labelframe_survey, width=6, text='t1', anchor='w',bg='pink')
+#        lab.grid(in_=self.labelframe_survey,row=ind+5,column=0,pady=2)
+#        ent6_1=Entry(self.labelframe_survey,textvar=self.t1,width=8)
+#        self.t1.set(t1)
+#        ent6_1.grid(in_=self.labelframe_survey,row=ind+8,column=1,pady=2)
 
 #Plot_SED_templates frame
         fig=plt.Figure(figsize=(4,3)) 

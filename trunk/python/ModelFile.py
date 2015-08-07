@@ -125,11 +125,15 @@ class ModelFile:
             'Alpha':parameter(3.0,2.8,3.2,1,"Primary Slope"),
             'Beta':parameter(0.52,0.4,0.6,1,"Secondary Slope"),
             'P':parameter(-0.57,-5.0,0.0,0,"Low Z Density Evolution"),
-            'P2':parameter(-3.92,-5.0,0.0,0,"High Z Density Evolution"),
             'Q':parameter(3.55,0.0,5.0,0,"Low Z Luminosity Evolution"),
+            'P2':parameter(-3.92,-5.0,0.0,0,"High Z Density Evolution"),
             'Q2':parameter(1.62,0.0,5.0,0,"High Z Luminosity Evolution"),
-            'zbp':parameter(1.1,0.0,5.0,1,"P Z Cutoff"),
-            'zbq':parameter(1.85,0.0,5.0,1,"Q Z Cutoff"),
+            'zbp':parameter(1.1,0.0,5.0,1,"P Z Break"),
+            'zbq':parameter(1.85,0.0,5.0,1,"Q Z Break"),
+            'fa0':parameter(0.08,0,0.2,1,"AGN fraction at logL=12,z=0"),
+            't1':parameter(-0.5,-1,1,1,"T1"),
+            't2':parameter(1.3,0.5,2,1,"T2"),
+            'zbt':parameter(1,0.5,2,1,"T Z Break"),
             'cexp':parameter(0.0,-3.0,3.0,1,"SED Redshift Evolution"),
             'zbc':parameter(2.0,0.0,5.0,1,"SED Redshift Evolution")
         }
@@ -175,8 +179,125 @@ class ModelFile:
         self.filename=filename
         hdus=fits.open(filename)
         phdr=hdus[0].header
-        #load parameters
+        #phdr_long=hdus[0].header.keys()
+        #print phdr_long[6]
+#temporary, add these keywords to default_model.fits
+#        del phdr['FAGNO_FI']
+#        del phdr['FAGN0_mi']
+#        del phdr['FAGN0_ma']
+        phdr['FA0'] = 0.08  
+        phdr['FA0_MIN']=0
+        phdr['FA0_MAX']=0.2
+        phdr['FA0_FIX']=1
+        phdr['zbt']=1
+        phdr['zbt_min']=0.5        
+        phdr['zbt_max']=1.5      
+        phdr['zbt_fix']=1
+        phdr['t1']=-0.5
+        phdr['t1_min']=-1.0
+        phdr['t1_max']=1.0
+        phdr['t1_fix']=1
+        phdr['t2']=1.3
+        phdr['t2_fix']=1
+        phdr['t2_min']=0.5
+        phdr['t2_max']=2.0
+
+#force a more sensible order of parameters
+#        phdr.set('PHI0',value=phdr['PHI0'],comment=phdr.comments['PHI0'],after='LF_FORM')
+#        phdr.set('L0',value=phdr['L0'],comment=phdr.comments['L0'],after='PHI0')
+#        phdr.set('PHI0',value=phdr['PHI0'],comment=phdr.comments['PHI0'],after='LF_FORM')
+#        phdr.set('L0',value=phdr['L0'],comment=phdr.comments['L0'],after='PHI0')
+
+#        print phdr[5:7]
+
+ #       print phdr['PHI0'].comment()
+ #       phdr_tmp[6]=phdr['PHI0']
+ #       #print phdr_tmp[6].comment
+ #       #print phdr['PHI0'].keys()
+ #       phdr_tmp[7]=phdr['PHI0_MIN']
+ #       phdr_tmp[8]=phdr['PHI0_MAX']
+ #       phdr_tmp[9]=phdr['PHI0_FIX']
+
+#        phdr_tmp[10]=phdr['L0']
+#        phdr_tmp[11]=phdr['L0_MIN']
+#        phdr_tmp[12]=phdr['L0_MAX']
+#        phdr_tmp[13]=phdr['L0_FIX']
+
+#        phdr_tmp[14]=phdr['ALPHA']
+#        phdr_tmp[15]=phdr['ALPHA_MI']
+#        phdr_tmp[16]=phdr['ALPHA_MA']
+#        phdr_tmp[17]=phdr['ALPHA_FI']
+
+#        phdr_tmp[18]=phdr['BETA']
+#        phdr_tmp[19]=phdr['BETA_MIN']
+#        phdr_tmp[20]=phdr['BETA_MAX']
+#        phdr_tmp[21]=phdr['BETA_FIX']
+
+#        phdr_tmp[22]=phdr['P']
+#        phdr_tmp[23]=phdr['P_MIN']
+#        phdr_tmp[24]=phdr['P_MAX']
+#        phdr_tmp[25]=phdr['P_FIX']
+
+#        phdr_tmp[26]=phdr['Q']
+#        phdr_tmp[27]=phdr['Q_MIN']
+#        phdr_tmp[28]=phdr['Q_MAX']
+#        phdr_tmp[29]=phdr['Q_FIX']
+
+#        phdr_tmp[30]=phdr['P2']
+#        phdr_tmp[31]=phdr['P2_MIN']
+#        phdr_tmp[32]=phdr['P2_MAX']
+#        phdr_tmp[33]=phdr['P2_FIX']
+
+#        phdr_tmp[34]=phdr['Q2']
+#        phdr_tmp[35]=phdr['Q2_MIN']
+#        phdr_tmp[36]=phdr['Q2_MAX']
+#        phdr_tmp[37]=phdr['Q2_FIX']
+
+#        phdr_tmp[38]=phdr['ZBP']
+#        phdr_tmp[39]=phdr['ZBP_MIN']
+#        phdr_tmp[40]=phdr['ZBP_MAX']
+#        phdr_tmp[41]=phdr['ZBP_FIX']
+
+#        phdr_tmp[42]=phdr['ZBQ']
+#        phdr_tmp[43]=phdr['ZBQ_MIN']
+#        phdr_tmp[44]=phdr['ZBQ_MAX']
+#        phdr_tmp[45]=phdr['ZBQ_FIX']
+
+#        phdr_tmp[46]=phdr['FA0']
+#        phdr_tmp[47]=phdr['FA0_MIN']
+#        phdr_tmp[48]=phdr['FA0_MAX']
+#        phdr_tmp[49]=phdr['FA0_FIX']
+
+#        phdr_tmp[50]=phdr['T1']
+#        phdr_tmp[51]=phdr['T1_MIN']
+#        phdr_tmp[52]=phdr['T1_MAX']
+#        phdr_tmp[53]=phdr['T1_FIX']
+
+#        phdr_tmp[54]=phdr['T2']
+#        phdr_tmp[55]=phdr['T2_MIN']
+#        phdr_tmp[56]=phdr['T2_MAX']
+#        phdr_tmp[57]=phdr['T2_FIX']
+
+#        phdr_tmp[58]=phdr['ZBT']
+#        phdr_tmp[59]=phdr['ZBT_MIN']
+#        phdr_tmp[60]=phdr['ZBT_MAX']
+#        phdr_tmp[61]=phdr['ZBT_FIX']
+
+#        phdr_tmp[62]=phdr['CEXP']
+#        phdr_tmp[63]=phdr['CEXP_MIN']
+#        phdr_tmp[64]=phdr['CEXP_MAX']
+#        phdr_tmp[65]=phdr['CEXP_FIX']
+
+#        phdr_tmp[66]=phdr['ZBC']
+#        phdr_tmp[67]=phdr['ZBC_MIN']
+#        phdr_tmp[68]=phdr['ZBC_MAX']
+#        phdr_tmp[69]=phdr['ZBC_FIX']
+
+#        phdr=phdr_tmp
+
+        #load LF parameters
         for n,p in self.params.iteritems() : p.loadKeys(phdr,n)
+
         self.survey['lfForm']=phdr['LF_FORM']
         
         self.survey['area']=phdr['AREA']

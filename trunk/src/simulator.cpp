@@ -169,7 +169,7 @@ void simulator::initial_simulation(){
       for (src_iter=0;src_iter<nsrcs;src_iter++){
 	detected = true;
 	//determine sedtype (agn type)
-	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
+	sedtype=fagns->get_sedtype(lums[js],zarray[is],fagn0,zbt,t1,t2);
 	
 	//get uniformly distributed luminosity and redshift
 	if(js == 0)
@@ -325,7 +325,7 @@ products simulator::simulate(){
 	
 	detected = true;
 	//determine sedtype (agn type)
-	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
+	sedtype=fagns->get_sedtype(lums[js],zarray[is],fagn0,zbt,t1,t2);
 	
 	//get uniformly distributed luminosity and redshift
 	if(js == 0)

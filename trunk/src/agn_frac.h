@@ -17,9 +17,8 @@ class agn_frac{
  public:
   agn_frac(int agn_types);
   void set_lumfunct(lumfunct *lf);
-  double get_agn_frac(double lum, double redshift);
-  double get_agn_frac2(double lum, double redshift, int agntype);
-  int get_sedtype(double lum, double redshift);
+  double get_agn_frac(double lum, double redshift,double fagn0,double zbt,double t1,double t2);
+  int get_sedtype(double lum, double redshift,double fagn0,double zbt,double t1,double t2);
 };
 
 

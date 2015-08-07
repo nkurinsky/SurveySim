@@ -36,6 +36,7 @@ private:
   double area;
   double dz;
   double zmin;
+  double fagn0,zbt,t1,t2; //parameters to evolve the agn fraction
   int nz;
   int logflag;
   string obsFile;
