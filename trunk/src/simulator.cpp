@@ -75,6 +75,10 @@ void simulator::set_color_exp(double val, double zcut){
     seds->set_color_evolution(val,zcut);
 }
 
+void simulator::set_fagn_pars(double lpars[]){
+  fagns->set_params(lpars);
+}
+
 void simulator::set_lumfunct(lumfunct *lf){
   if(lf != NULL){
     this->lf = lf;
@@ -142,7 +146,7 @@ void simulator::initial_simulation(){
   static bool detected = true;    
 
   static double tL,tZ;
-  
+
   //NOTE templates are given in W/Hz
   for (is=0;is<nz;is++){
 
@@ -169,7 +173,7 @@ void simulator::initial_simulation(){
       for (src_iter=0;src_iter<nsrcs;src_iter++){
 	detected = true;
 	//determine sedtype (agn type)
-	sedtype=fagns->get_sedtype(lums[js],zarray[is],fagn0,zbt,t1,t2);
+	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
 	
 	//get uniformly distributed luminosity and redshift
 	if(js == 0)
@@ -325,7 +329,7 @@ products simulator::simulate(){
 	
 	detected = true;
 	//determine sedtype (agn type)
-	sedtype=fagns->get_sedtype(lums[js],zarray[is],fagn0,zbt,t1,t2);
+	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
 	
 	//get uniformly distributed luminosity and redshift
 	if(js == 0)

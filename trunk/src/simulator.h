@@ -14,8 +14,6 @@
 #include "numberCounts.h"
 #include "simulator_utils.h"
 
-#define AGNTYPES 2
-
 class simulator{
 private:
   products last_output;
@@ -36,7 +34,6 @@ private:
   double area;
   double dz;
   double zmin;
-  double fagn0,zbt,t1,t2; //parameters to evolve the agn fraction
   int nz;
   int logflag;
   string obsFile;
@@ -51,6 +48,7 @@ private:
   simulator(const Configuration &config);
   void configure(const Configuration &config);
   void set_color_exp(double val, double zcut=1000);
+  void set_fagn_pars(double lpars[]);
   void set_lumfunct(lumfunct *lf);
   products simulate();
   double model_chisq() { return last_output.chisqr; }

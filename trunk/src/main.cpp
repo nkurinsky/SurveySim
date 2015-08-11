@@ -62,6 +62,7 @@ int main(int argc,char** argv){
   //initialize simulator
   simulator survey(q); 
   survey.set_color_exp(CE,ZBC); //color evolution
+  survey.set_fagn_pars(lpars);
   survey.set_lumfunct(&lf);
   products output;
   ResultChain final_counts(3,q.nsim);
@@ -154,6 +155,7 @@ int main(int argc,char** argv){
 	  
 	  lf.set_params(lpars);
 	  survey.set_color_exp(CE,ZBC);
+	  survey.set_fagn_pars(lpars);
 	  
 	  output=survey.simulate();
 	  
@@ -218,6 +220,7 @@ int main(int argc,char** argv){
 	  
 	  lf.set_params(lpars);
 	  survey.set_color_exp(CE,ZBC);
+	  survey.set_fagn_pars(lpars);
 	  
 	  output=survey.simulate();
 	  trial=output.chisqr;
@@ -269,6 +272,7 @@ int main(int argc,char** argv){
 	LOG_DEBUG(printf("ZBC : %lf +\\- %lf\n",pset.best[pi],pset.sigma[pi]));
       }
       survey.set_color_exp(CE,ZBC);
+      survey.set_fagn_pars(lpars);
       LOG_INFO(printf("\nCovariance Matrix:\n"));
       for(int pi=0;pi<pset.covar.size();pi++){
 	LOG_INFO(printf("\t["));
@@ -297,6 +301,7 @@ int main(int argc,char** argv){
       
       lf.set_params(lpars);
       survey.set_color_exp(CE,ZBC);
+      survey.set_fagn_pars(lpars);
       
       output=survey.simulate();
       if(output.chisqr < tchi_min){
