@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# modified for AzTEC run by Jed 
 
 import os
 import sys
@@ -7,17 +6,16 @@ import datetime
 import time
 from ModelFile import *
 
-mfile="../../Examples/ALMAB7_model_001.fits"
+mfile="/Volumes/Pepona/Research/wise_populations/alma_test/models/model_dpl_a.fits"
 templatefile="../templates/default_templates.fits"
-#obsfile="../trunk/obs/AzTEC_LHE.fits"
-outfile="../../Examples/ALMAB7_output_001.fits"
+outfile="/Volumes/Pepona/Research/wise_populations/alma_test/outputs/output_dpl_a_002.fits"
 
 mod=ModelFile()
 
 mod.axis1="ColorF2F3"
 mod.axis2="Flux1"
 
-mod.survey['area']=1.0 
+mod.survey['area']=1.0 #deg2
 
 mod.filters[0].setID('ALMA_band7')        
 mod.filters[0].limit=3.5               # S/N limit
@@ -66,7 +64,7 @@ mod.params['P'].fixed=1
 mod.params['Q'].value=4.46
 mod.params['Q'].fixed=1
 
-mod.params['P2'].value=-2.88
+mod.params['P2'].value=2.88  #was -2.88
 mod.params['P2'].fixed=1
 
 mod.params['Q2'].value=1.49
@@ -75,7 +73,7 @@ mod.params['Q2'].fixed=1
 mod.params['cexp'].value=0
 mod.params['cexp'].fixed=1
 
-mod.settings['verbosity']=3
+mod.settings['verbosity']=1
 mod.annealing['temp']=.02
 mod.annealing['learningRate']=0.1
 
