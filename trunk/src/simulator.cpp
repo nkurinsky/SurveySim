@@ -431,15 +431,23 @@ bool simulator::save(string outfile){
     double lpars[LUMPARS];
     lf->get_params(lpars);
     
-    pFits->pHDU().addKey("PHI0",lpars[0],"Normalization"); 
-    pFits->pHDU().addKey("L0",lpars[1],"Knee location z=0"); 
-    pFits->pHDU().addKey("ALPHA",lpars[2],"upper slope"); 
-    pFits->pHDU().addKey("BETA",lpars[3],"lower slope"); 
-    pFits->pHDU().addKey("P",lpars[4],"Norm evolution"); 
-    pFits->pHDU().addKey("Q",lpars[5],"Knee evolution"); 
-    pFits->pHDU().addKey("ZCUT",lpars[6],"Z Evolution Cutoff");
-    pFits->pHDU().addKey("CEXP",color_exp,"Color Evolution Param");
-    
+    pFits->pHDU().addKey("PHI0",lpars[LF::parameter::PHI0],"Normalization"); 
+    pFits->pHDU().addKey("L0",lpars[LF::parameter::L0],"Knee location z=0"); 
+    pFits->pHDU().addKey("ALPHA",lpars[LF::parameter::alpha],"upper slope"); 
+    pFits->pHDU().addKey("BETA",lpars[LF::parameter::beta],"lower slope"); 
+    pFits->pHDU().addKey("P",lpars[LF::parameter::p],"Norm evolution"); 
+    pFits->pHDU().addKey("Q",lpars[LF::parameter::q],"Knee evolution"); 
+    pFits->pHDU().addKey("P2",lpars[LF::parameter::p2],"Norm evolution"); 
+    pFits->pHDU().addKey("Q2",lpars[LF::parameter::q2],"Knee evolution"); 
+    pFits->pHDU().addKey("ZBP",lpars[LF::parameter::zbp],"P Evolution Cutoff");
+    pFits->pHDU().addKey("ZBQ",lpars[LF::parameter::zbq],"Q Evolution Cutoff");
+    pFits->pHDU().addKey("CEXP",seds->get_color_exp(),"Color Evolution Param");
+    pFits->pHDU().addKey("ZBC",seds->get_color_zcut(),"Color Evolution Cutoff");
+    pFits->pHDU().addKey("T1",fagns->get_t1(),"AGN Slope 1");
+    pFits->pHDU().addKey("T2",fagns->get_t2(),"AGN Slope 2");
+    pFits->pHDU().addKey("FAGN0",fagns->get_fagn0(),"AGN Knee");
+    pFits->pHDU().addKey("ZBT",fagns->get_zbt(),"AGN Evolution Cutoff");
+
     unsigned long size = sources.size();
     LOG_INFO(printf("%s %lu\n","Sources Being Saved: ",size));
     
