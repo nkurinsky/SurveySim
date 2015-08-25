@@ -29,6 +29,18 @@ class agn_frac{
   void set_t2(double t2);
   void set_fagn0(double fagn0);
   void set_zbt(double zbt);
+  double get_t1(){
+    return _t1;
+  }
+  double get_t2(){
+    return _t2;
+  }
+  double get_fagn0(){
+    return _fagn0;
+  }
+  double get_zbt(){
+    return _zbt;
+  }
   double get_agn_frac(double lum, double redshift);
   int get_sedtype(double lum, double redshift);
 };
