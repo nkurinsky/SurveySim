@@ -13,6 +13,8 @@ colsel_type set_colsel_type(string &keyvalue){
     return ColF1F3;
   else if(scolsel == "ColF2F3")
     return ColF2F3;
+  else if(scolsel == "ColF2F1")
+    return ColF2F1;
   else{
     printf("set_colsel_type: keyvalue \"%s\" invalid\n",keyvalue.c_str());
   throw(-1);
@@ -28,6 +30,8 @@ axis_type set_axis_type(string &keyvalue){
     return ColorF2F3;
   else if(saxis == "colorf1f2")
     return ColorF1F2;
+  else if(saxis == "colorf2f1")
+    return ColorF2F1;
   else if(saxis == "flux1")
     return Flux1;
   else if(saxis == "flux2")
@@ -48,6 +52,8 @@ string get_axis_type(axis_type opt){
     return "ColorF2F3";
   case ColorF1F2:
     return "ColorF1F2";
+  case ColorF2F1:
+    return "ColorF2F1";
   case Flux1:
     return "Flux1";
   case Flux2:
@@ -72,6 +78,8 @@ string get_colsel_type(colsel_type  opt){
     return "ColF1F3";
   case ColF2F3:
     return "ColF2F3";
+  case ColF2F1:
+    return "ColF2F1";
   default:
     printf("get_colsel_type: option %i invalid\n",opt);
   }
@@ -87,6 +95,8 @@ double metric_value(const double& f1,const double &f2,const double &f3,const axi
     return log10(f3/f2);
   case ColorF1F2:
     return log10(f2/f1);
+  case ColorF2F1:
+    return log10(f1/f2);
   case Flux1:
     return log10(f1);
   case Flux2:

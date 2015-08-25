@@ -56,6 +56,7 @@ enum axis_type{
   ColorF1F3,
   ColorF2F3,
   ColorF1F2,
+  ColorF2F1,
   Flux1,
   Flux2,
   Flux3
@@ -66,7 +67,8 @@ enum colsel_type{
   mag1_mag2,
   ColF1F2,
   ColF1F3,
-  ColF2F3
+  ColF2F3,
+  ColF2F1
 };
 
 namespace LF{

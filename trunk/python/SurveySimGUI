@@ -2,7 +2,7 @@
 
 if [ -z $SURVEYSIMPATH ]
 then
-    python /usr/local/surveysim/python/SurveySim.py
+    python /usr/local/surveysim/python/SurveySim_v2.py
 else
-    python ${SURVEYSIMPATH}/python/SurveySim.py
+    python ${SURVEYSIMPATH}/python/SurveySim_v2.py
 fi

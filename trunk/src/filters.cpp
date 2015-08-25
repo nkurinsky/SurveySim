@@ -196,8 +196,8 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     try{
       head.readKey(limitKeys[i],limits[i]);
       if(limits[i]<0){
-	LOG_CRITICAL(printf("Warning: keyword \"%s\" contains negative value, defaulting to standard value 0\n",limitKeys[i].c_str()));
-	limits[i]=0.0;
+      	LOG_CRITICAL(printf("Warning: keyword \"%s\" contains negative value, defaulting to standard value 0\n",limitKeys[i].c_str()));
+      limits[i]=0.0;
       }
       else
 	limits[i]*=units[i];
@@ -210,11 +210,11 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     //reading errors, converting units
     try{
       head.readKey(errorKeys[i],errors[i]);
-      if(errors[i]<0){
-	LOG_CRITICAL(printf("Warning: keyword \"%s\" contains negative value, defaulting to standard value 0\n",errorKeys[i].c_str()));
-	errors[i]=0.0;
-      }
-      else
+      //if(errors[i]<0){
+      //	LOG_CRITICAL(printf("Warning: keyword \"%s\" contains negative value, defaulting to standard value 0\n",errorKeys[i].c_str()));
+      // errors[i]=0.0;
+      //}
+      //else
 	errors[i]*=units[i];
     }
     catch(...){

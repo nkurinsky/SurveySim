@@ -284,7 +284,7 @@ products simulator::simulate(){
   static bool detected = true;    
 
   static double tL,tZ;
-  
+
   unsigned long srcTotal=0;
   unsigned long detTotal=0;
   //NOTE templates are given in W/Hz
@@ -344,52 +344,13 @@ products simulator::simulate(){
 	for (int i=0;i<3;i++){
 	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
 	}
-	
+
 	for (int i=0;i<3;i++){
-	  // adding in option to force non-detections
-	  // to 3sigma limit on a band
-	  //
-	  // procedure: -  if band error is positive: execute normally
-	  //            -  if band error is negative & flux is above
-	  //               limit, do normally, but pass rng.gaussian()
-	  //               the absolute value of band_errs[i]
-	  //            -  if band error is negative & flux is below
-	  //               limit, then do not call rng.gaussian() or 
-	  //               rng.poisson(). Instead, set flux_sim[i]
-	  //               equal to flux_limits[i] and set detected
-	  //               to true
-
-	  if(band_errs[i] >= 0.0){ // normal/expected 
-	    flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
-	    if(hasSkewErr[i])
-	      flux_sim[i] += rng.poisson(skew_errs[i]);
-	    if(flux_sim[i] < flux_limits[i])
-	      detected = false;
-	  }
-	  
-	  // negative band error but raw_flux is detectable 
-	  if ((band_errs[i] < 0.0) and (flux_raw[i] > flux_limits[i])){
-	    flux_sim[i] = rng.gaussian(flux_raw[i],-1*(band_errs[i]),0.0,1e5);
-	    if(hasSkewErr[i])
-	      flux_sim[i] += rng.poisson(skew_errs[i]);
-	    if(flux_sim[i] < flux_limits[i])
-	      // force to detection threshold 
-	      flux_sim[i] = flux_limits[i]; 
-	   
-	  }
-	  // negative band error, but raw flux is not detectable 
-	  if ((band_errs[i] < 0.0) and (flux_raw[i] < flux_limits[i])){ // flagged condition 
-	    flux_sim[i] = flux_limits[i]; // force simulated flux detection threshold
-	  }
-	    
-
-
-	  // stuff that was already here 
-	  //flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
-	  //if(hasSkewErr[i])
-	  //  flux_sim[i] += rng.poisson(skew_errs[i]);
-	  //if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
-	  //  detected = false;
+	  flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
+	  if(hasSkewErr[i])
+	    flux_sim[i] += rng.poisson(skew_errs[i]);
+	  if (flux_sim[i] < flux_limits[i]) //reject sources below flux limit
+	    detected = false;
 	}
 	
 	//check for detectability, if "Yes" add to list
