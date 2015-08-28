@@ -29,7 +29,8 @@ public:
   const valarray<double>& counts() const;
   const valarray<double>& bins() const;
 private:  
-  valarray<double> _bin_center;
+  valarray<double> _bin_min;
+  valarray<double> _bin_max;
   valarray<double> _scale_factors;
   valarray<double> _counts;
   double _range[2];
