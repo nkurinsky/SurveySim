@@ -15,9 +15,9 @@ agn_frac::agn_frac(int agn_types){
       hasComposites=true;
     else if(agn_types > 3){
       printf("Warning: AGN Types larger than expected limit of 3\n");
-      printf("Number of AGN Types: %d \n",agn_types);
-      // still have composites
-      hasComposites=true; 
+      //printf("Number of AGN Types: %d \n",agn_types);
+      // probably need to add the line below
+      //hasComposites=true; 
 
     }
     
@@ -93,17 +93,11 @@ double agn_frac::get_agn_frac(double lum, double redshift){
 }
 
 //assume half of the AGN are composites
-//assume half of the SFG are cold 
 int agn_frac::get_sedtype(double lum, double redshift){
   if(generate){
-    
     static const float compFrac=0.5;
-    static const float coldFrac=0.5;
-    
     float fagn,fcomp,fsfg,rnd;
     int stype;
-
-    
     fagn=get_agn_frac(lum,redshift);
     fsfg=1-fagn; //fagn here is agn+composites
     //compute separate fractions based on fraction of AGN which are composites
@@ -112,9 +106,7 @@ int agn_frac::get_sedtype(double lum, double redshift){
     
     rnd=rng.flat(0,1);
     stype= rnd < fsfg ? 0 : 1;
-
-    
-    if(hasComposites){
+    if(hasComposites)
       if(stype == 1){
 	stype=rnd < fsfg+fcomp ? 1 : 2;
         //e.g. fsfg=0.4, fcomp=0.3 and fagn=0.3
@@ -122,22 +114,8 @@ int agn_frac::get_sedtype(double lum, double redshift){
         //rnd < 0.7 (0.4+0.3) stype=1 i.e. composite
         //rnd > 0.7 stype = 2 i.e. agn
       }
-      if(stype == 0){ // sfg
-	// force all sfg to cold 
-	// stype = 3;
-	
-	// also have option to make 1/2 sfgs cold 
-	// rudimentary, but works for now.. 
-	rnd=rng.flat(0,1);
-	stype = rnd < coldFrac ? 0 : 3; 
-	// rnd < (0.5) --> sfg
-	// rnd > (0.5) --> cold 
-      }
-    }
-
     return stype;
   }
   else
-    // return sfg 
     return 0;
 }

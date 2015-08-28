@@ -14,7 +14,7 @@ else:
     output=OutputFile(file)
     output.info()
 #    output.saveCounts('spire_counts.pdf')
-#    output.show()
+    output.show()
 #    if(output.fit()):
 #        output.MCMC.showFit()
 #        output.MCMC.showChains()

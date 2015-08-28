@@ -69,6 +69,12 @@ class sed_lib{
   double get_flux(double lum, double redshift, short sedtype, double band);
   double get_filter_flux(double lum, double redshift, short sedtype, short filter_id);
   void set_color_evolution(double exp, double zcut=1000);
+  double get_color_exp(){
+    return color_exp;
+  }
+  double get_color_zcut(){
+    return color_zcut;
+  }
   int get_lnum(){
     return lnum;}
   double get_dl();
