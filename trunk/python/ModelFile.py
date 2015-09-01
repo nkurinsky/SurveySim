@@ -118,8 +118,12 @@ class ModelFile:
             'burnRatio':10,
             'verbosity':2}
 
+#flags whether or not to include Composite and/or Cold Starbursts in model
+        self.comp=0
+        self.cold=0
+
         self.params={
-            #values based on Gruppioni+2013
+            #values based on Gruppioni+2013 plus some additions (fa0)
             'Phi0':parameter(-2.29,-3.0,-1.0,1,"Log Normalization"),
             'L0':parameter(10.12,9.0,11.0,1,"Log Luminosity Knee"),
             'Alpha':parameter(3.0,2.8,3.2,1,"Primary Slope"),
@@ -179,121 +183,10 @@ class ModelFile:
         self.filename=filename
         hdus=fits.open(filename)
         phdr=hdus[0].header
-        #phdr_long=hdus[0].header.keys()
-        #print phdr_long[6]
-#temporary, add these keywords to default_model.fits
-#        del phdr['FAGNO_FI']
-#        del phdr['FAGN0_mi']
-#        del phdr['FAGN0_ma']
-        phdr['FA0'] = 0.08  
-        phdr['FA0_MIN']=0
-        phdr['FA0_MAX']=0.2
-        phdr['FA0_FIX']=1
-        phdr['zbt']=1
-        phdr['zbt_min']=0.5        
-        phdr['zbt_max']=1.5      
-        phdr['zbt_fix']=1
-        phdr['t1']=-0.5
-        phdr['t1_min']=-1.0
-        phdr['t1_max']=1.0
-        phdr['t1_fix']=1
-        phdr['t2']=1.3
-        phdr['t2_fix']=1
-        phdr['t2_min']=0.5
-        phdr['t2_max']=2.0
 
-#force a more sensible order of parameters
-#        phdr.set('PHI0',value=phdr['PHI0'],comment=phdr.comments['PHI0'],after='LF_FORM')
-#        phdr.set('L0',value=phdr['L0'],comment=phdr.comments['L0'],after='PHI0')
-#        phdr.set('PHI0',value=phdr['PHI0'],comment=phdr.comments['PHI0'],after='LF_FORM')
-#        phdr.set('L0',value=phdr['L0'],comment=phdr.comments['L0'],after='PHI0')
-
-#        print phdr[5:7]
-
- #       print phdr['PHI0'].comment()
- #       phdr_tmp[6]=phdr['PHI0']
- #       #print phdr_tmp[6].comment
- #       #print phdr['PHI0'].keys()
- #       phdr_tmp[7]=phdr['PHI0_MIN']
- #       phdr_tmp[8]=phdr['PHI0_MAX']
- #       phdr_tmp[9]=phdr['PHI0_FIX']
-
-#        phdr_tmp[10]=phdr['L0']
-#        phdr_tmp[11]=phdr['L0_MIN']
-#        phdr_tmp[12]=phdr['L0_MAX']
-#        phdr_tmp[13]=phdr['L0_FIX']
-
-#        phdr_tmp[14]=phdr['ALPHA']
-#        phdr_tmp[15]=phdr['ALPHA_MI']
-#        phdr_tmp[16]=phdr['ALPHA_MA']
-#        phdr_tmp[17]=phdr['ALPHA_FI']
-
-#        phdr_tmp[18]=phdr['BETA']
-#        phdr_tmp[19]=phdr['BETA_MIN']
-#        phdr_tmp[20]=phdr['BETA_MAX']
-#        phdr_tmp[21]=phdr['BETA_FIX']
-
-#        phdr_tmp[22]=phdr['P']
-#        phdr_tmp[23]=phdr['P_MIN']
-#        phdr_tmp[24]=phdr['P_MAX']
-#        phdr_tmp[25]=phdr['P_FIX']
-
-#        phdr_tmp[26]=phdr['Q']
-#        phdr_tmp[27]=phdr['Q_MIN']
-#        phdr_tmp[28]=phdr['Q_MAX']
-#        phdr_tmp[29]=phdr['Q_FIX']
-
-#        phdr_tmp[30]=phdr['P2']
-#        phdr_tmp[31]=phdr['P2_MIN']
-#        phdr_tmp[32]=phdr['P2_MAX']
-#        phdr_tmp[33]=phdr['P2_FIX']
-
-#        phdr_tmp[34]=phdr['Q2']
-#        phdr_tmp[35]=phdr['Q2_MIN']
-#        phdr_tmp[36]=phdr['Q2_MAX']
-#        phdr_tmp[37]=phdr['Q2_FIX']
-
-#        phdr_tmp[38]=phdr['ZBP']
-#        phdr_tmp[39]=phdr['ZBP_MIN']
-#        phdr_tmp[40]=phdr['ZBP_MAX']
-#        phdr_tmp[41]=phdr['ZBP_FIX']
-
-#        phdr_tmp[42]=phdr['ZBQ']
-#        phdr_tmp[43]=phdr['ZBQ_MIN']
-#        phdr_tmp[44]=phdr['ZBQ_MAX']
-#        phdr_tmp[45]=phdr['ZBQ_FIX']
-
-#        phdr_tmp[46]=phdr['FA0']
-#        phdr_tmp[47]=phdr['FA0_MIN']
-#        phdr_tmp[48]=phdr['FA0_MAX']
-#        phdr_tmp[49]=phdr['FA0_FIX']
-
-#        phdr_tmp[50]=phdr['T1']
-#        phdr_tmp[51]=phdr['T1_MIN']
-#        phdr_tmp[52]=phdr['T1_MAX']
-#        phdr_tmp[53]=phdr['T1_FIX']
-
-#        phdr_tmp[54]=phdr['T2']
-#        phdr_tmp[55]=phdr['T2_MIN']
-#        phdr_tmp[56]=phdr['T2_MAX']
-#        phdr_tmp[57]=phdr['T2_FIX']
-
-#        phdr_tmp[58]=phdr['ZBT']
-#        phdr_tmp[59]=phdr['ZBT_MIN']
-#        phdr_tmp[60]=phdr['ZBT_MAX']
-#        phdr_tmp[61]=phdr['ZBT_FIX']
-
-#        phdr_tmp[62]=phdr['CEXP']
-#        phdr_tmp[63]=phdr['CEXP_MIN']
-#        phdr_tmp[64]=phdr['CEXP_MAX']
-#        phdr_tmp[65]=phdr['CEXP_FIX']
-
-#        phdr_tmp[66]=phdr['ZBC']
-#        phdr_tmp[67]=phdr['ZBC_MIN']
-#        phdr_tmp[68]=phdr['ZBC_MAX']
-#        phdr_tmp[69]=phdr['ZBC_FIX']
-
-#        phdr=phdr_tmp
+#structure needed to be run once if new parameters are to be added to model.fits
+#        phdr['comp']=0
+#        phdr['cold']=0
 
         #load LF parameters
         for n,p in self.params.iteritems() : p.loadKeys(phdr,n)
@@ -332,7 +225,6 @@ class ModelFile:
     def update(self):
         #creating filter table
         lam1,lam2,lam3,trans1,trans2,trans3=fill_filters(self.filterIDs());
-        #print self.filterIDs(),lam1[0],trans1[0]#lam1[trans1 == max(trans1)]
         col1=fits.Column(name='lambda1',format='FLOAT',array=lam1)
         col2=fits.Column(name='transmission1',format='FLOAT',array=trans1)
         col3=fits.Column(name='lambda2',format='FLOAT',array=lam2)
@@ -349,6 +241,12 @@ class ModelFile:
 
         #create/update luminosity function parameters in model file header
         hdr.set('DATE',datetime.date.today().strftime("%B %d, %Y"),'Date of creation')
+
+        #====================================================================
+        # SED library properties 
+        #--------------------------------------------------------------------   
+        hdr.set('COMP',self.comp,'Flag to include Composites in model')
+        hdr.set('COLD',self.cold,'Flag to include Cold Starubrsts in model')
 
         #====================================================================
         # LF properties 
@@ -396,9 +294,6 @@ class ModelFile:
             print 'Replacing existing model file'
             os.remove(self.filename)
             thdulist.writeto(self.filename);
-            #test=fits.open(self.filename);
-            #tbdata=test[1].data;
-            #print tbdata['lambda1'];
         else:
             print 'Writing a new model file'
             thdulist.writeto(self.filename);

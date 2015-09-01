@@ -11,12 +11,12 @@ NumberCounts::NumberCounts(const valarray<double> &fluxes, const double area, co
 bool NumberCounts::initialize(const valarray<double> &fluxes, const double area, const string &name){
 
   if(fluxes.min() > 0){
-    double mean,N,sigma;
+    double mean,N,sigma,tmp;
     double diff,nbins,binlow;
     valarray<double> logf(log10(fluxes));
     
-    //_range[0] = logf.min(); //-0.3; //accept sources 0.5 times dimmer than minimum
-    _range[0] = 1.1038; //as current file includes <12.7mJy sources
+    _range[0] = logf.min(); //-0.3; //accept sources 0.5 times dimmer than minimum
+    //_range[0] = 1.1038; //as current file includes <12.7mJy sources
     _range[1] = logf.max(); //+1.0; //accept sources 10 times brighter than maximum
     
     N=static_cast<double>(logf.size());
@@ -33,18 +33,20 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
       _range[1] = _range[1] + diff;
     }    
 
-    //_bin_center.resize(_nbins,0.0);
+    _bin_center.resize(_nbins,0.0);
     _bin_min.resize(_nbins,0.0);
     _bin_max.resize(_nbins,0.0);
     _scale_factors.resize(_nbins,1.0);
     for(int i=0.0;i<_nbins;i++){
       binlow = static_cast<double>(i)*_dS+_range[0];
-      _bin_min[i]=binlow;
-      _bin_max[i]=binlow+_dS;
+      _bin_min[i]=pow(10,binlow);
+      _bin_max[i]=pow(10,binlow)+pow(10,_dS);
+      _bin_center[i]=pow((pow(_bin_min[i],-0.5)+pow(_bin_max[i],-0.5))/2.0,-2.0);
       //_bin_center[i] = binlow+_dS/2;
-      //the factor 2.303 is becaue dlog10(S)=ln(10)*S*dS
       //_scale_factors[i] = pow(pow(10,_bin_center[i])/1e3,2.5)/((pow(10,binlow)*(pow(10,_dS)-1))/1e3);
-      _scale_factors[i] = 1.0/(2.303*((pow(10,binlow)*(pow(10,_dS)-1))/1e3));
+      //the factor 2.303 is becaue dlog10(S)=ln(10)*S*dS
+      tmp=(_dS/(2.303*_bin_center[i])/1.e3);
+      _scale_factors[i]=pow((_bin_center[i]/1e3),2.5)/tmp;
     }
     
     compute(fluxes,area,_counts);
@@ -71,9 +73,9 @@ void NumberCounts::setName(string &name){
 }
 
 void NumberCounts::compute(const valarray<double> &fluxes_nolog, const double area, valarray<double> &counts){
-  valarray<double> fluxes(log10(fluxes_nolog));
+  valarray<double> logf(log10(fluxes_nolog));
   
-  if(fluxes.min() < _range[0] or fluxes.max() > _range[1]){
+  if(logf.min() < _range[0] or logf.max() > _range[1]){
     _range_violations++;
     if(_verbose and _range_violations == 1){
       printf("NumberCounts::compute: Input fluxes exceed counts histogram range\n");
@@ -85,8 +87,8 @@ void NumberCounts::compute(const valarray<double> &fluxes_nolog, const double ar
   
   counts.resize(_nbins,EMPTYBIN);
   int j;
-  for(unsigned int i = 0; i < fluxes.size(); i++){
-    j = static_cast<int>( ceil((fluxes[i] - _range[0]) / _dS ) );
+  for(unsigned int i = 0; i < logf.size(); i++){
+    j = static_cast<int>( ceil((logf[i] - _range[0]) / _dS ) );
     if(j >= 0 and j < counts.size())
       counts[j]++;
     else

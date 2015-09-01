@@ -140,6 +140,8 @@ class SurveySimGUI:
         self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
         self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
         self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
+        self.comp_check=IntVar()
+        self.cold_check=IntVar()
         self.obsfile_set=StringVar()
         self.lfform_set=StringVar()
         self.sedfile_set=StringVar()
@@ -152,17 +154,11 @@ class SurveySimGUI:
         self.defband=[StringVar(),StringVar(),StringVar()]
         self.settings_on='no' #a switch to say whether or not the SettingsWindow was used
 
+#the grid layout
         self.master=master
         master.title("SurveySim")
-        self.labelframe_top = LabelFrame(master, text="Data files",bg='grey')
-        self.labelframe_top.grid(column=2,row=0,sticky=N)#,sticky=W+E)
-        #self.labelframe_top.grid(column)
-
-#        self.labelframe_agn=LabelFrame(master,text="AGN fraction",bg='blue')
-#        self.labelframe_agn.grid(columnspan=3,sticky=E)
-
         self.labelframe_lf = LabelFrame(master, text="Luminosity Function Parameters",bg='light blue') 
-        self.labelframe_lf.grid(column=0,row=0,rowspan=2)
+        self.labelframe_lf.grid(column=0,row=0,rowspan=2,sticky=N+S)
         self.label_lf=Label(self.labelframe_lf,text="Initial/Min/Max/Fix",bg='light blue')
         self.label_lf.grid(in_=self.labelframe_lf,row=2,column=1)
 
@@ -171,8 +167,11 @@ class SurveySimGUI:
         self.label_survey=Label(self.labelframe_survey,text="Filter/Limit/Units",bg='pink') 
         self.label_survey.grid(in_=self.labelframe_survey,row=1,column=1)
 
+        self.labelframe_files = LabelFrame(master, text="Data files",bg='grey')
+        self.labelframe_files.grid(column=2,row=0,rowspan=2,sticky=N)
+
         self.labelframe_seds=LabelFrame(master,text="SEDs",bg='green')
-        self.labelframe_seds.grid(column=2,row=0,pady=100,sticky=W+E)
+        self.labelframe_seds.grid(row=0,rowspan=2,column=2,sticky=W+E)
 
 #the GUI buttons
         self.labelframe_buttons=LabelFrame(master)
@@ -195,7 +194,7 @@ class SurveySimGUI:
 # Data files frame
         ind=0;
         for field0 in fields_files:
-            row=Frame(self.labelframe_top,bg='grey')
+            row=Frame(self.labelframe_files,bg='grey')
             lab=Label(row,text=field0,bg='grey')
             lab.pack(side=LEFT)
             row.pack(side=TOP,padx=1,pady=5)
@@ -218,12 +217,12 @@ class SurveySimGUI:
             self.obsfile_set.set(obsfile)
             self.sedfile_set.set(sedfile)
             ind=ind+1
-#AGN fraction frame
-#        ind=0
-#        row=Frame(self.labelframe_agn,bg='blue')
-        #lab=Label(row,text=field0,bg='blue')
-        #lab.pack(side=LEFT)
-#        row.pack(side=TOP,padx=1,pady=5)
+
+        comp=Checkbutton(self.labelframe_files,text='Include Composites',variable=self.comp_check,bg='grey')
+        comp.pack(side=LEFT)
+
+        cold=Checkbutton(self.labelframe_files,text='Include Cold Starbursts',variable=self.cold_check,bg='grey')
+        cold.pack(side=LEFT)
 
 #  LF frame
         ind=0;
@@ -295,29 +294,12 @@ class SurveySimGUI:
         self.fitaxes[1].set(axes[1])
         ent3_1.grid(in_=self.labelframe_survey,row=ind+5,column=1,pady=2)
 
-#        lab = Label(self.labelframe_survey, width=6, text='fagn0=', anchor='w',bg='pink')
-#        lab.grid(in_=self.labelframe_survey,row=ind+5,column=0,pady=2)
-#        ent4_1=Entry(self.labelframe_survey,textvar=self.fagn0,width=8)
-#        self.fagn0.set(fagn0)
-#        ent4_1.grid(in_=self.labelframe_survey,row=ind+6,column=1,pady=2)
-
-#        lab = Label(self.labelframe_survey, width=6, text='zbt', anchor='w',bg='pink')
-#        lab.grid(in_=self.labelframe_survey,row=ind+5,column=0,pady=2)
-#        ent5_1=Entry(self.labelframe_survey,textvar=self.zbt,width=8)
-#        self.zbt.set(zbt)
-#        ent5_1.grid(in_=self.labelframe_survey,row=ind+7,column=1,pady=2)
-
-#        lab = Label(self.labelframe_survey, width=6, text='t1', anchor='w',bg='pink')
-#        lab.grid(in_=self.labelframe_survey,row=ind+5,column=0,pady=2)
-#        ent6_1=Entry(self.labelframe_survey,textvar=self.t1,width=8)
-#        self.t1.set(t1)
-#        ent6_1.grid(in_=self.labelframe_survey,row=ind+8,column=1,pady=2)
-
-#Plot_SED_templates frame
+#Plot_SED_templates
         fig=plt.Figure(figsize=(4,3)) 
         x = np.arange(0, 2*np.pi, 0.01)        # x-array
         canvas = FigureCanvasTkAgg(fig, master=self.labelframe_seds)
-        canvas.get_tk_widget().grid(in_=self.labelframe_seds,column=0,row=0,sticky=N+S)
+        canvas.get_tk_widget().grid(column=2,row=1)
+        #show_plot=True
         ax = fig.add_subplot(111)
         sfile=fits.open(self.sedfile_set.get())
         shdr=sfile[1].header
@@ -378,7 +360,10 @@ class SurveySimGUI:
         mod.zbc=2.0
         mod.area=self.area.get()
         mod.axis1=self.fitaxes[0].get()
-        mod.axis2=self.fitaxes[1].get() 
+        mod.axis2=self.fitaxes[1].get()
+        mod.comp=self.comp_check.get()
+        mod.cold=self.cold_check.get()
+
         ind=0
         for field in fields_bands:
             mod.filters[ind].setID(self.bands[ind].get())
