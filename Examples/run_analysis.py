@@ -9,7 +9,7 @@ from ModelFile import *
 ssdir="/usr/local/surveysim/"
 
 mfile="spire_model.fits"
-templatefile=ssdir+"templates/default_templates.fits"
+templatefile=ssdir+"templates/default_templates_v2.fits"
 obsfile=ssdir+"obs/spire_cdfs-swire.fits"
 outfile="spire_output.fits"
 
