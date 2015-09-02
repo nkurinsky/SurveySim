@@ -139,7 +139,9 @@ class ModelFile:
             't2':parameter(1.3,0.5,2,1,"T2"),
             'zbt':parameter(1,0.5,2,1,"T Z Break"),
             'cexp':parameter(0.0,-3.0,3.0,1,"SED Redshift Evolution"),
-            'zbc':parameter(2.0,0.0,5.0,1,"SED Redshift Evolution")
+            'zbc':parameter(2.0,0.0,5.0,1,"SED Redshift Evolution"),
+            'fcomp':parameter(0.5,0.0,1.0,1,"Fraction of AGN Composites"),
+            'fcold':parameter(0.5,0.0,1.0,1,"Fraction of Cold SFG")
         }
 
     def info(self):
@@ -163,6 +165,20 @@ class ModelFile:
         print "  Parameters"
         keyPrint(self.params)
         print ""
+
+    def fixParams(self,params):
+        for param in params:
+            self.params[param].fixed=1
+
+    def fitParams(self,params):
+        for param in params:
+            self.params[param].fixed=0
+
+    def fitAllParams(self):
+        self.fitParams(self.params.keys())
+
+    def fixAllParams(self):
+        self.fixParams(self.params.keys())
 
     def filterIDs(self):
         return [self.filters[0].fid,
@@ -241,12 +257,6 @@ class ModelFile:
 
         #create/update luminosity function parameters in model file header
         hdr.set('DATE',datetime.date.today().strftime("%B %d, %Y"),'Date of creation')
-
-        #====================================================================
-        # SED library properties 
-        #--------------------------------------------------------------------   
-        hdr.set('COMP',self.comp,'Flag to include Composites in model')
-        hdr.set('COLD',self.cold,'Flag to include Cold Starubrsts in model')
 
         #====================================================================
         # LF properties 

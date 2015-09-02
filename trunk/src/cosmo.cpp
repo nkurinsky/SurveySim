@@ -15,24 +15,22 @@ double lumdist(double zmax) {
       sum+=1/ez;
     } 
     lumdists[zmax] = (DH*(1.0+zmax)*dz)*sum;
-    //printf("\tLumdist::z=%lf,dist=%le\n",zmax,lumdists[zmax]);
   }
 
   return lumdists[zmax];
 }
 
+//assumes area never changes in a given code iteration
 double dvdz (double zmax, double area)
 {
-  static double ez;
-  static double my_dvdz;
-  static double dl;
-  static double dz2;
+  static std::unordered_map<double,double> dvdzStore;
+  if(dvdzStore.count(zmax) == 0){
+    double dz2 = pow((1+zmax),2);
+    double dl=lumdist(zmax);
+    double ez=sqrt(OL+(OM*dz2*(1+zmax)));
+    dvdzStore[zmax]=(DH*dl*dl*area)/(ez*dz2);
+  }
 
-  dz2 = pow((1+zmax),2);
-  dl=lumdist(zmax);
-  ez=sqrt(OL+(OM*dz2*(1+zmax)));
-  my_dvdz=(DH*dl*dl*area)/(ez*dz2);
-
-  return my_dvdz;
+  return dvdzStore[zmax];
 }
 

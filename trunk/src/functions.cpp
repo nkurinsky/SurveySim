@@ -221,7 +221,7 @@ void Configuration::print(){
   }
   printf("\n");
 
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT"};  
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT","FCOMP","FCOLD"};  
   printf("\nLuminosity Function Parameter Settings:\n");
   printf("Parameter\tStart\t Min \t Max \tFit\n");
   for(int i=0;i<LUMPARS;i++){
@@ -264,7 +264,7 @@ void Configuration::LFparameters(double lpars[], short type){
 void Configuration::load(){
   
   //IO variables
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT"};  
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT","FCOMP","FCOLD"};  
   string suffix[] = {"","_FIX","_MIN","_MAX"};
   string tag;
   

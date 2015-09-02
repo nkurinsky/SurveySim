@@ -8,6 +8,7 @@ Packages needed:
 Classes:
 	ModelFile - instantiate about model.fits file, provides information and i/o functions
 	OutputFile - instantiate about output.fits file, provides information and plots
+	ObsFile - (unimplemented), will be able to format observations for fits file
 
 Functions:
 	(filters.py):

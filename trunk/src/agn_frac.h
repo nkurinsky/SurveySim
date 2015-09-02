@@ -13,6 +13,7 @@ class agn_frac{
   int _types;
   bool generate;
   bool hasComposites;
+  bool hasCold;
   RandomNumberGenerator rng;
   map <tuple<double,double>,double> values;
   map <double,double> lumPower;
@@ -21,6 +22,8 @@ class agn_frac{
   double _t2;
   double _fagn0;
   double _zbt;
+  double _compFrac;
+  double _coldFrac;
  public:
   agn_frac(int agn_types);
   void set_lumfunct(lumfunct *lf);
@@ -29,6 +32,8 @@ class agn_frac{
   void set_t2(double t2);
   void set_fagn0(double fagn0);
   void set_zbt(double zbt);
+  void set_fComp(double fComp);
+  void set_fCold(double fCold);
   double get_t1(){
     return _t1;
   }
@@ -40,6 +45,12 @@ class agn_frac{
   }
   double get_zbt(){
     return _zbt;
+  }
+  double get_fComp(){
+    return _compFrac;
+  }
+  double get_fCold(){
+    return _coldFrac;
   }
   double get_agn_frac(double lum, double redshift);
   int get_sedtype(double lum, double redshift);

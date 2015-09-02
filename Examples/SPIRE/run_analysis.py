@@ -87,11 +87,13 @@ mod.settings['verbosity']=3
 mod.annealing['temp']=.03
 mod.annealing['learningRate']=0.4
 
-mod.convergence['CI']=0.95
+mod.convergence['CI']=0.90
 
 simname="spire_MS_D"
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
+
+#mod.fitAllParams()
 
 mod.params['cexp'].value=0
 mod.params['cexp'].fixed=1

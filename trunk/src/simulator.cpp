@@ -486,6 +486,8 @@ bool simulator::save(string outfile){
     pFits->pHDU().addKey("T2",fagns->get_t2(),"AGN Slope 2");
     pFits->pHDU().addKey("FAGN0",fagns->get_fagn0(),"AGN Knee");
     pFits->pHDU().addKey("ZBT",fagns->get_zbt(),"AGN Evolution Cutoff");
+    pFits->pHDU().addKey("FCOMP",fagns->get_fComp(),"AGN Composite Fraction");
+    pFits->pHDU().addKey("FCOLD",fagns->get_fCold(),"Cold SFG Fraction");
 
     unsigned long size = sources.size();
     LOG_INFO(printf("%s %lu\n","Sources Being Saved: ",size));
@@ -562,9 +564,9 @@ bool simulator::save(string outfile){
       newTable->column(colname[4]).write(luminosity,1);
       newTable->column(colname[5]).write(sedtype,1);
 
-      valarray<double> counts1(pow(10,counts[0]->bins()));
-      valarray<double> counts2(pow(10,counts[1]->bins()));
-      valarray<double> counts3(pow(10,counts[2]->bins()));
+      valarray<double> counts1(counts[0]->bins());
+      valarray<double> counts2(counts[1]->bins());
+      valarray<double> counts3(counts[2]->bins());
 
       newTable->column(colname[6]).write(counts1,1);
       newTable->column(colname[7]).write(counts2,1);

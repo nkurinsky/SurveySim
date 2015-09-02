@@ -3,6 +3,7 @@
 
 agn_frac::agn_frac(int agn_types){
   hasComposites=false;
+  hasCold=false;
   if(agn_types <= 1){
     _types=1;
     generate=false;
@@ -11,20 +12,23 @@ agn_frac::agn_frac(int agn_types){
   else{
     _types=agn_types;
     generate=true;
-    if (agn_types == 3)
+    if (agn_types > 2)
       hasComposites=true;
-    else if(agn_types > 3){
+    
+    if(agn_types > 3)
+      hasCold=true;
+
+    if(agn_types > 4){
       printf("Warning: AGN Types larger than expected limit of 3\n");
       printf("Number of AGN Types: %d \n",agn_types);
-      // still have composites
-      hasComposites=true; 
-
     }
     
   }
   lf=NULL;
 
   _fagn0=0;
+  _compFrac=0.0;
+  _coldFrac=0.0;
   _t1=0;
   _t2=0;
   _zbt=0;
@@ -43,6 +47,8 @@ void agn_frac::set_params(double lpars[]){
   set_t2(lpars[LF::parameter::t2]);
   set_zbt(lpars[LF::parameter::zbt]);
   set_fagn0(lpars[LF::parameter::fa0]);
+  set_fComp(lpars[LF::parameter::fcomp]);
+  set_fCold(lpars[LF::parameter::fcold]);
 }
 
 void agn_frac::set_t1(double t1){
@@ -68,6 +74,20 @@ void agn_frac::set_zbt(double zbt){
     _zbt=zbt;
     evolZ.clear();
   }
+}
+
+void agn_frac::set_fComp(double fComp){
+  if(fComp < 0.0)
+    _compFrac=0.0;
+  else if(fComp > 1.0)
+    _compFrac=1.0;
+}
+
+void agn_frac::set_fCold(double fCold){
+  if(fCold < 0.0)
+    _coldFrac=0.0;
+  else if(fCold > 1.0)
+    _coldFrac=1.0;
 }
 
 double agn_frac::get_agn_frac(double lum, double redshift){
@@ -96,48 +116,26 @@ double agn_frac::get_agn_frac(double lum, double redshift){
 //assume half of the SFG are cold 
 int agn_frac::get_sedtype(double lum, double redshift){
   if(generate){
-    
-    static const float compFrac=0.5;
-    static const float coldFrac=0.5;
-    
-    float fagn,fcomp,fsfg,rnd;
-    int stype;
-
-    
+    float fagn, rnd;    
     fagn=get_agn_frac(lum,redshift);
-    fsfg=1-fagn; //fagn here is agn+composites
-    //compute separate fractions based on fraction of AGN which are composites
-    fcomp=fagn*compFrac;
-    fagn=fagn*(1.0-compFrac);
-    
     rnd=rng.flat(0,1);
-    stype= rnd < fsfg ? 0 : 1;
-
-    
-    if(hasComposites){
-      if(stype == 1){
-	stype=rnd < fsfg+fcomp ? 1 : 2;
-        //e.g. fsfg=0.4, fcomp=0.3 and fagn=0.3
-        //rnd<0.4 -> stype=0 i.e. sfg
-        //rnd < 0.7 (0.4+0.3) stype=1 i.e. composite
-        //rnd > 0.7 stype = 2 i.e. agn
-      }
-      if(stype == 0){ // sfg
-	// force all sfg to cold 
-	// stype = 3;
-	
-	// also have option to make 1/2 sfgs cold 
-	// rudimentary, but works for now.. 
+    if(rnd > fagn){
+      if(hasCold){
 	rnd=rng.flat(0,1);
-	stype = rnd < coldFrac ? 0 : 3; 
-	// rnd < (0.5) --> sfg
-	// rnd > (0.5) --> cold 
+	return rnd > _coldFrac ? 0 : 3; 
       }
+      else
+	return 0;
     }
-
-    return stype;
+    else{
+      if(hasComposites){
+	rnd=rng.flat(0,1);
+	return rnd > _compFrac ? 1 : 2;
+      }
+      else
+	return 1;
+    }
   }
-  else
-    // return sfg 
-    return 0;
+  // return sfg 
+  return 0;
 }

@@ -53,7 +53,7 @@ int main(int argc,char** argv){
   double ZBCmax = q.colorZCut[q.max];
   q.LFparameters(parfixed,q.fixed);
 
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ"};  
+  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT","FCOMP","FCOLD"};
   string countnames[]= {"dnds1","dnds2","dnds3"};
   
   lumfunct lf(q.lfDist);

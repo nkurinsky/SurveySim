@@ -23,8 +23,8 @@ else:
     counts=numpy.array([2.0e8,6.4e7,1.2e7,3.1e6,2.1e5,1.7e4])*((bins*1e-3)**2.5)
     scatter(bins,counts,marker='v',label="Oliver et. al. 2010",color='red')
 
-    xlim(1,1e3)
-    ylim(10,1e5)
+    #xlim(1,1e3)
+    #ylim(10,1e5)
     ylabel('dN/dS $\mathrm{Jy}^{-1.5}$')
     title("SPIRE 250 $\mu$m")
     legend(loc='lower left')
@@ -37,8 +37,8 @@ else:
     counts=numpy.array([1.1e8,3.5e7,5.3e6,1.1e6,6.2e4,4.7e3])*((bins*1e-3)**2.5)
     scatter(bins,counts,marker='v',label="Oliver et. al. 2010",color='red')
 
-    xlim(1,1e3)
-    ylim(10,1e5)
+    #xlim(1,1e3)
+    #ylim(10,1e5)
     ylabel('dN/dS $\mathrm{Jy}^{-1.5}$')
     title("SPIRE 350 $\mu$m")
     legend(loc='lower left')
@@ -50,8 +50,8 @@ else:
     counts=numpy.array([3.6e7,1.1e7,1.6e6,2.3e5,1.3e4,1.3e3])*((bins*1e-3)**2.5)
     scatter(bins,counts,marker='v',label="Oliver et. al. 2010",color='red')
     
-    xlim(1,1e3)
-    ylim(10,1e5)
+    #xlim(1,1e3)
+    #ylim(10,1e5)
     ylabel('dN/dS $\mathrm{Jy}^{-1.5}$')
     title("SPIRE 500 $\mu$m")
     savefig('counts_500')

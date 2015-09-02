@@ -320,7 +320,7 @@ class MCMCInfo:
         pnames=np.unique(pnames)
         for i in range(0,len(pnames)):
             p0=pnames[i]
-            if((p0 == "PHI") | (p0 == "L")):
+            if((p0 == "PHI") | (p0 == "L") | (p0 == "FA")):
                 p0=p0+str(0)
             self.Parameters[p0]=list()
             for i in range(0,self.ChainNum):
@@ -345,7 +345,7 @@ class MCMCInfo:
     def plotFit(self):
         pnames=self.Parameters.keys()    
         #want to re-order these as they do not appear in the most sensible order
-        pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','ZBP','ZBQ','P2','Q2','CEXP','ZBC']
+        pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','ZBP','ZBQ','P2','Q2','CEXP','ZBC','FA0','T1','T2','ZBT','FCOMP','FCOLD']
         pnames_sorted=[]
         for p in pnames_default:
             if p in pnames:
