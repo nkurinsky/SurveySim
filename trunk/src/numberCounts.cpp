@@ -11,12 +11,11 @@ NumberCounts::NumberCounts(const valarray<double> &fluxes, const double area, co
 bool NumberCounts::initialize(const valarray<double> &fluxes, const double area, const string &name){
 
   if(fluxes.min() > 0){
-    double mean,N,sigma,tmp;
+    double mean,N,sigma;
     double diff,nbins,binlow;
     valarray<double> logf(log10(fluxes));
     
     _range[0] = logf.min(); //-0.3; //accept sources 0.5 times dimmer than minimum
-    //_range[0] = 1.1038; //as current file includes <12.7mJy sources
     _range[1] = logf.max(); //+1.0; //accept sources 10 times brighter than maximum
     
     N=static_cast<double>(logf.size());
@@ -27,6 +26,7 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
     nbins = ceil((_range[1]-_range[0])/_dS);
     _nbins = static_cast<int>(nbins);
     
+    //making range whole bin number
     diff = (_dS*nbins-(_range[1]-_range[0]))/2.0;
     if(diff > 0){
       _range[0] = _range[0] - diff;
@@ -40,13 +40,9 @@ bool NumberCounts::initialize(const valarray<double> &fluxes, const double area,
     for(int i=0.0;i<_nbins;i++){
       binlow = static_cast<double>(i)*_dS+_range[0];
       _bin_min[i]=pow(10,binlow);
-      _bin_max[i]=pow(10,binlow)+pow(10,_dS);
+      _bin_max[i]=pow(10,binlow+_dS);
       _bin_center[i]=pow((pow(_bin_min[i],-0.5)+pow(_bin_max[i],-0.5))/2.0,-2.0);
-      //_bin_center[i] = binlow+_dS/2;
-      //_scale_factors[i] = pow(pow(10,_bin_center[i])/1e3,2.5)/((pow(10,binlow)*(pow(10,_dS)-1))/1e3);
-      //the factor 2.303 is becaue dlog10(S)=ln(10)*S*dS
-      tmp=(_dS/(2.303*_bin_center[i])/1.e3);
-      _scale_factors[i]=pow((_bin_center[i]/1e3),2.5)/tmp;
+      _scale_factors[i] = pow((_bin_center[i]/1e3),2.5)/((_bin_max[i]-_bin_min[i])/1e3);
     }
     
     compute(fluxes,area,_counts);
