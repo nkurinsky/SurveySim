@@ -122,9 +122,6 @@ class ModelFile:
         self.comp=0
         self.cold=0
 
-	#self.fcold=0
-	#self.fcomp=0
-
         self.params={
             #values based on Gruppioni+2013 plus some additions (fa0)
             'Phi0':parameter(-2.29,-3.0,-1.0,1,"Log Normalization"),
@@ -206,16 +203,6 @@ class ModelFile:
 #structure needed to be run once if new parameters are to be added to model.fits
 #        phdr['comp']=0
 #        phdr['cold']=0
-
-	phdr['fcomp']=0
-	phdr['fcold']=0
-
-	phdr['fcomp_fi']=1
-	phdr['fcold_fi']=1
-	phdr['fcomp_mi']=0
-	phdr['fcomp_ma']=0
-	phdr['fcold_mi']=1
-	phdr['fcold_ma']=1
 
         #load LF parameters
         for n,p in self.params.iteritems() : p.loadKeys(phdr,n)
