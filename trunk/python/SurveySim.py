@@ -136,10 +136,16 @@ conv_con1=mod.convergence['CI'] #Convergence confidence interval
 class SurveySimGUI:
     def __init__(self, master):
         #local variables to hold the entries in the GUI
-        self.v_fixed=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar(),IntVar()] 
-        self.v_min=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
-        self.v_max=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()] 
-        self.v_init=[DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar(),DoubleVar()]
+        self.v_fixed=list()
+        self.v_min=list()
+        self.v_max=list() 
+        self.v_init=list()
+        for i in range(len(fields_lf)):
+            self.v_fixed.append(IntVar())
+            self.v_min.append(DoubleVar())
+            self.v_max.append(DoubleVar())
+            self.v_init.append(DoubleVar())
+
         self.comp_check=IntVar()
         self.cold_check=IntVar()
         self.obsfile_set=StringVar()
