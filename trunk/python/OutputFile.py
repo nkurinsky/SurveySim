@@ -241,6 +241,8 @@ class NumberCounts:
         medians=np.zeros(len(bins))
         errlow=np.zeros(len(bins))
         errhigh=np.zeros(len(bins))
+        errlow2=np.zeros(len(bins))
+        errhigh2=np.zeros(len(bins))
         for i in range(0,len(chainCounts[0])):
             link=chainCounts[:,i]
             medians[i]=np.median(link)
@@ -249,6 +251,10 @@ class NumberCounts:
             highind=int((1.0-0.159)*len(sortpts))
             errlow[i]=medians[i]-link[sortpts[lowind]]
             errhigh[i]=link[sortpts[highind]]-medians[i]
+            lowind=int(0.025*len(sortpts))
+            highind=int((1.0-0.025)*len(sortpts))
+            errlow2[i]=medians[i]-link[sortpts[lowind]]
+            errhigh2[i]=link[sortpts[highind]]-medians[i]
 
         if(self.fitted):            
             model=self.best['modeled'][bi]
@@ -269,6 +275,7 @@ class NumberCounts:
 
         plt.plot(bins[mpts],medians[mpts],':',label="Median",color='black')
         plt.fill_between(bins[mpts],medians[mpts]-errlow[mpts],medians[mpts]+errhigh[mpts],color='gray',alpha=0.2)
+        plt.fill_between(bins[mpts],medians[mpts]-errlow2[mpts],medians[mpts]+errhigh2[mpts],color='gray',alpha=0.2)
         #this needs to be made non-run specific perhaps by repeating the band keywords from the model into this 
         plt.title("Counts Band "+str(band))
 
