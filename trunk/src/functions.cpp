@@ -597,7 +597,6 @@ bool CompletenessCurve::accept(double flux){
   double tFlux=round(flux);
 
   if(valueStore.count(tFlux) == 0){
-    cout << "Here: " << tFlux << " " << _M << " " << _B << " " << _n << endl;
     valueStore[tFlux]=pow(1.0+exp((_M-tFlux)/_B),-_n);
   }
   return valueStore[tFlux] >= crng.flat(0.0,1.0);

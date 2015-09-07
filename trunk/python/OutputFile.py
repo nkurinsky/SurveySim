@@ -255,8 +255,8 @@ class NumberCounts:
             obs=self.best['observed'][bi]
             opts=np.where(obs > 1e-10)
             pts=np.where(model > 1e-10)
-            plt.plot(bins[opts],obs[opts],'o',label="Observation",color='black')
-            plt.plot(bins[pts],model[pts],'d',label="Best",color='black')
+            plt.plot(bins[opts],obs[opts],'-',label="Observation",color='black')
+            plt.plot(bins[pts],model[pts],'--',label="Best",color='black')
         else:
             model=self.single['modeled'][bi]
             pts=np.where(model > 1e-10)
@@ -267,8 +267,8 @@ class NumberCounts:
         sns.set(style='white',font_scale=1.5,palette='Set2')
         #sns.despine()
 
-        plt.plot(bins[mpts],medians[mpts],'s',label="Median",color='black')
-        plt.errorbar(bins[mpts],medians[mpts],yerr=[errlow[mpts],errhigh[mpts]],linestyle="None",color='gray')
+        plt.plot(bins[mpts],medians[mpts],':',label="Median",color='black')
+        plt.fill_between(bins[mpts],medians[mpts]-errlow[mpts],medians[mpts]+errhigh[mpts],color='gray',alpha=0.2)
         #this needs to be made non-run specific perhaps by repeating the band keywords from the model into this 
         plt.title("Counts Band "+str(band))
 
