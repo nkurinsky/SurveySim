@@ -10,15 +10,19 @@ from astropy.io import fits
         
 class filterOptions:
 
-    def __init__(self,fid,limit,err,serr,unit):
+    def __init__(self,fid,limit,err,serr,unit,compN=-1.0,compB=-1.0,compM=0.0):
         self.fid=fid
         self.limit=limit
         self.err=err
         self.serr=serr
         self.unit=unit
 
+        self.compN=compN
+        self.compB=compB
+        self.compM=compM
+
     def __str__(self):
-        return self.name()+", Limit="+str(self.limit)+" "+self.unit+", Error="+str(self.err)+", Skew Error="+str(self.serr)+", "+self.unit
+        return self.name()+", Limit="+str(self.limit)+" "+self.unit+", Error="+str(self.err)+", Skew Error="+str(self.serr)+", "+self.unit+", Completeness Params: ("+str(self.compN)+","+str(self.compB)+","+str(self.compM)+")"
 
     def loadKeys(self,hdr,number):
         name=hdr['Filter'+str(number)]
@@ -27,6 +31,9 @@ class filterOptions:
         self.limit=hdr['limit'+str(number)]
         self.err=hdr['error'+str(number)]
         self.serr=hdr['serror'+str(number)]
+        self.compN=hdr['comp'+str(number)+'n']
+        self.compB=hdr['comp'+str(number)+'b']
+        self.compM=hdr['comp'+str(number)+'m']
 
     def setID(self,name):
         res=getFilterID(name)
@@ -41,6 +48,9 @@ class filterOptions:
         hdr.set('limit'+str(number),self.limit,'flux/magnitude limit')
         hdr.set('error'+str(number),self.err,'flux/magnitude error')
         hdr.set('serror'+str(number),self.serr,'flux/magnitude skew error')
+        hdr.set('comp'+str(number)+'n',self.compN,'Power of Completeness Curve')
+        hdr.set('comp'+str(number)+'b',self.compB,'Slope of Completeness Curve')
+        hdr.set('comp'+str(number)+'m',self.compM,'Median of Completeness Curve')
 
 class parameter:
 
@@ -199,10 +209,6 @@ class ModelFile:
         self.filename=filename
         hdus=fits.open(filename)
         phdr=hdus[0].header
-
-#structure needed to be run once if new parameters are to be added to model.fits
-#        phdr['comp']=0
-#        phdr['cold']=0
 
         #load LF parameters
         for n,p in self.params.iteritems() : p.loadKeys(phdr,n)

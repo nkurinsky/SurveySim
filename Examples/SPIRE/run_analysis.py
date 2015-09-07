@@ -23,6 +23,9 @@ mod.survey['area']=11.1
 mod.filters[0].setID("SPIRE_250")
 mod.filters[0].limit=12.7
 mod.filters[0].err=2.5
+mod.filters[0].compN=2.0
+mod.filters[0].compB=7.5
+mod.filters[0].compM=9.1
 
 mod.filters[1].setID("SPIRE_350")
 mod.filters[1].limit=0.01

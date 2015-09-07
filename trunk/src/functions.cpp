@@ -443,6 +443,28 @@ void Configuration::load(){
     vary_zbc = false;
   
   burn_num = runs/burn_ratio;
+
+
+  //completeness information
+  char cnum[2];
+  string num;
+  for (int i=0;i<3;i++){
+    sprintf(cnum,"%i",i+1);
+    num = cnum;
+    try{tab.readKey("COMP"+num+"N",completeness_n[i]);}
+    catch(CCfits::HDU::NoSuchKeyword){
+      completeness_n[i]=-1.0;
+    }
+    try{tab.readKey("COMP"+num+"B",completeness_b[i]);}
+    catch(CCfits::HDU::NoSuchKeyword){
+      completeness_b[i]=-1.0;
+    }
+    try{tab.readKey("COMP"+num+"M",completeness_m[i]);}
+    catch(CCfits::HDU::NoSuchKeyword){
+      completeness_m[i]=0.0;
+    }
+  }
+
 }
 
 RandomNumberGenerator::RandomNumberGenerator(){
@@ -534,3 +556,49 @@ void RandomNumberGenerator::gaussian_mv(const vector<double> &mean, const vector
   return;
 }
 
+CompletenessCurve::CompletenessCurve(double n, double m, double b){
+  //invalid to have -n
+  if(n > 0.0){
+    _n=n;
+    complete=false;
+  }
+  else{
+    _n=0.0;
+    complete=true;
+  }
+  
+  //m has infinite domain
+  _M=m;
+
+  //doesn't make sense to have -b
+  if(b > 0.0)
+    _B=b;
+  else
+    _B=1e-10;
+
+  
+  if(not complete)
+    _ulim=_M-_B*log(pow(0.999,-1.0/_n)-1);
+  else
+    _ulim=0;
+
+  cout << "Completeness: " << _B << " " << _M << " " << _n << ", Max= " << _ulim << endl;
+}
+
+bool CompletenessCurve::accept(double flux){
+  
+  if(complete){
+    return true;
+  }
+
+  if(flux > _ulim)
+    return true;
+
+  double tFlux=round(flux);
+
+  if(valueStore.count(tFlux) == 0){
+    cout << "Here: " << tFlux << " " << _M << " " << _B << " " << _n << endl;
+    valueStore[tFlux]=pow(1.0+exp((_M-tFlux)/_B),-_n);
+  }
+  return valueStore[tFlux] >= crng.flat(0.0,1.0);
+}

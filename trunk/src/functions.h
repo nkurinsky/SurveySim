@@ -143,6 +143,10 @@ public:
 
   LF::distribution lfDist;
 
+  double completeness_n[3];
+  double completeness_b[3];
+  double completeness_m[3];
+
 private:
   void load();
 
@@ -159,6 +163,21 @@ public:
 private:
   const gsl_rng_type *T;
   gsl_rng *r;
+};
+
+//computes logistic function for completeness and returns random acceptance based on logistic probability
+class CompletenessCurve{
+public:
+  CompletenessCurve(double n, double m, double b);
+  bool accept(double flux);
+private:
+  double _B;
+  double _M;
+  double _n;
+  double _ulim;
+  double complete;
+  RandomNumberGenerator crng;
+  map<double,double> valueStore;
 };
 
 #endif

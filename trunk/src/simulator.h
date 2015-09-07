@@ -25,6 +25,7 @@ private:
   std::unique_ptr<obs_lib> observations;
   std::unique_ptr<hist_lib> diagnostic;
   std::unique_ptr<NumberCounts> counts[3];
+  std::unique_ptr<CompletenessCurve> completeness[3];
   string filters[3];
   double band_errs[3];
   double skew_errs[3];
