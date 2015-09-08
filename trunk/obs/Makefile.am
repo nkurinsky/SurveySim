@@ -1,4 +1,4 @@
 AUTOMAKE_OPTIONS=foreign
 
 obsdir = $(prefix)/@PACKAGE@/obs
-dist_obs_DATA = AzTEC_LHE.fits AzTEC_UDS.fits aztec.fits spire.fits spire_cdfs-swire.fits wise.fits wise_selected.fits OBSINFO
+dist_obs_DATA = AzTEC_LHE.fits AzTEC_UDS.fits L2-COSMOS_xID250_DR2.fits L5-Lockman-SWIRE_xID250_DR2.fits aztec.fits wise.fits wise_selected.fits OBSINFO
