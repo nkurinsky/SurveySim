@@ -18,7 +18,6 @@ import time
 import pyfits as fits
 import matplotlib.pyplot as plt
 import numpy as np
-import img_scale
 from pylab import *
 import math
 from functools import partial

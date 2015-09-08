@@ -49,6 +49,46 @@ def maxWindowSize():
     size=root.maxsize()
     return size
 
+def axisLabel(pname):
+    if(pname == 'ALPHA'):
+        return r'$\alpha$'
+    if(pname == 'BETA'):
+        return r'$\beta$'
+    if(pname == 'PHI0'):
+        return r'$\Phi_{*,0}$'
+    if(pname == 'L0'):
+        return r'$L_{*,0}$'
+    if(pname == 'P'):
+        return r'$p_1$'
+    if(pname == 'Q'):
+        return r'$q_1$'
+    if(pname == 'P2'):
+        return r'$p_2$'
+    if(pname == 'Q2'):
+        return r'$q_2$'                           
+    if(pname == 'ZBP'):
+        return r'$z_{break,p}$'
+    if(pname == 'ZBQ'):
+        return r'$z_{break,q}$'
+    if(pname == 'ZBC'):
+        return r'$z_{break,c}$'
+    if(pname == 'CEXP'):
+        return r'$c_{exp}$'
+    if(pname == 'FA0'):
+        return r'$f_{agn,0}$'
+    if(pname == 'T1'):
+        return r'$t_{agn,1}$'
+    if(pname == 'T2'):
+        return r'$t_{agn,2}$'
+    if(pname == 'ZBT'):
+        return r'$z_{break,t}$'
+    if(pname == 'FCOMP'):
+        return r'$f_{comp}$'
+    if(pname == 'FCOLD'):
+        return r'$f_{cold}$'
+    else:
+        return pname
+    
 class FitInfo:
 
     exclude=['SIMPLE',
@@ -227,7 +267,7 @@ class NumberCounts:
         print level2,"Simulated Count Chains (chains)"
         print level3,self.chains.keys()
 
-    def plot(self,band,showLegend=True):
+    def plot(self,band,showLegend=True,xmin=-1,xmax=-1):
         bi=band-1
         if(self.fitted):
             chi=self.chains['chisq']
@@ -238,6 +278,11 @@ class NumberCounts:
             chainCounts=self.chains['counts'][bi]
             
         bins=self.bins[bi]
+        xlims=[np.min(bins),np.max(bins)]
+        if(xmin > 0):
+            xlims[0]=xmin
+        if(xmax > 0):
+            xlims[1]=xmax
         medians=np.zeros(len(bins))
         errlow=np.zeros(len(bins))
         errhigh=np.zeros(len(bins))
@@ -283,6 +328,7 @@ class NumberCounts:
         plt.ylabel(r'$S^{2.5} dN/dSd\Omega*[Jy^{1.5} ster^{-1}]$')
         plt.xscale('log')
         plt.yscale('log')
+        plt.xlim(xlims[0],xlims[1])
 
         if(showLegend):
             plt.legend(loc='lower right')
@@ -349,10 +395,19 @@ class MCMCInfo:
         print level3,"ChiSquares"
         print level3,"Convergence"
 
-    def plotFit(self):
+    def plotFit(self,mode='all'):
         pnames=self.Parameters.keys()    
         #want to re-order these as they do not appear in the most sensible order
-        pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','ZBP','ZBQ','P2','Q2','CEXP','ZBC','FA0','T1','T2','ZBT','FCOMP','FCOLD']
+
+        if(mode == 'all'):
+            pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC','FA0','T1','T2','ZBT','FCOMP','FCOLD']
+        elif(mode == 'lf'):
+            pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC']
+        elif(mode == 'sed'):
+            pnames_default=['FA0','T1','T2','ZBT','FCOMP','FCOLD']
+        else:
+            raise ValueError("Invalid Plot Mode \""+mode+"\"")
+
         pnames_sorted=[]
         for p in pnames_default:
             if p in pnames:
@@ -366,15 +421,13 @@ class MCMCInfo:
                     plt.subplots_adjust(hspace = .05, wspace=0.05)
                 if(i == j):
                     datapts=self.Parameters[pnames[i]]
-                    #plt.hist(datapts,
-                    #     bins=nbins(datapts),
-                    #     normed=True,
-                    #     histtype='step',
-                    #     color="black")
+                    start = np.min(datapts)
+                    end = np.max(datapts)
                     datapts=np.array(datapts)
                     datapts.astype(float)
                     sns.despine()
                     sns.kdeplot(datapts)
+                    plt.xlim(start,end)
                     if(j == 0):
                         plt.ylabel("Probability")
                     else:
@@ -386,102 +439,58 @@ class MCMCInfo:
                     y=np.array(y)
                     x.astype(float)
                     y.astype(float)
-                    #MCMCcontour(self.Parameters[pnames[j]],self.Parameters[pnames[i]])
                     sns.kdeplot(x,y,n_levels=10,cmap="Purples_d")
-                    start, end = ax.get_xlim()
-                    stepsize=(end-start)/5. #force to only show a maximum of 5 tickmarks
+
+                    start = np.min(x)
+                    end = np.max(x)
+                    stepsize=(end-start)/3. #force to only show a maximum of 4 tickmarks
                     if(stepsize >= 1):
                         stepsize=int(stepsize+0.5)
-                    if((stepsize > 0.3) & (stepsize < 1)):
-                        stepsize=0.5
+
                     xticks=np.arange(start, end, stepsize)
-                    xticks=np.around(xticks)
+                    xticks=np.around(xticks,2)
                     ax.xaxis.set_ticks(xticks)
+                    plt.xlim(start,end)
                     
-                    start, end = ax.get_ylim()
-                    stepsize=(end-start)/5. #force to only show a maximum of 5 tickmarks
-                    yticks=np.around(np.arange(start, end, stepsize)+0.5,1)
+                    start=np.min(y)
+                    end=np.max(y)
+                    stepsize=(end-start)/3. #force to only show a maximum of 4 tickmarks
+                    yticks=np.around(np.arange(start, end, stepsize),2)
                     ax.yaxis.set_ticks(yticks)
                     if(j == 0):
-                        tmp=pnames[i]
-                        if(tmp == 'ALPHA'):
-                            plt.ylabel(r'$\alpha$')
-                        if(tmp == 'BETA'):
-                            plt.ylabel(r'$\beta$')
-                        if(tmp == 'PHI0'):
-                             plt.ylabel(r'$\Phi_{*,0}$')
-                        if(tmp == 'L0'):
-                             plt.ylabel(r'$L_{*,0}$')
-                        if(tmp == 'P'):
-                            plt.ylabel(r'$p_1$')
-                        if(tmp == 'Q'):
-                            plt.ylabel(r'$q_1$')
-                        if(tmp == 'P2'):
-                            plt.ylabel(r'$p_2$')
-                        if(tmp == 'Q2'):
-                            plt.ylabel(r'$q_2$')                           
-                        if(tmp == 'ZBP'):
-                            plt.ylabel(r'$z_{break,p}$')
-                        if(tmp == 'ZBQ'):
-                            plt.ylabel(r'$z_{break,q}$')
-                        if(tmp == 'ZBC'):
-                            plt.ylabel(r'$z_{break,c}$')
-                        if(tmp == 'CEXP'):
-                            plt.ylabel(r'$c_{exp}$')
+                        plt.ylabel(axisLabel(pnames[i]))
                     else:
                         plt.setp( plt.gca().get_yticklabels(), visible=False)
+                    plt.ylim(start,end)
                 if(i == (len(pnames)-1)):
-                    tmp=pnames[j]
-                    if(tmp == 'ALPHA'):
-                        plt.xlabel(r'$\alpha$')
-                    if(tmp == 'BETA'):
-                        plt.xlabel(r'$\beta$')
-                    if(tmp == 'PHI0'):
-                        plt.xlabel(r'$\Phi_{*,0}$')
-                    if(tmp == 'L0'):
-                        plt.xlabel(r'$L_{*,0}$')
-                    if(tmp == 'P'):
-                        plt.xlabel(r'$p_1$')
-                    if(tmp == 'Q'):
-                        plt.xlabel(r'$q_1$')
-                    if(tmp == 'P2'):
-                        plt.xlabel(r'$p_2$')
-                    if(tmp == 'Q2'):
-                        plt.xlabel(r'$q_2$')
-                    if(tmp == 'ZBP'):
-                        plt.xlabel(r'$z_{break,p}$')
-                    if(tmp == 'ZBQ'):
-                        plt.xlabel(r'$z_{break,q}$')
-                    if(tmp == 'ZBC'):
-                        plt.xlabel(r'$z_{break,c}$')
-                    if(tmp == 'CEXP'):
-                        plt.xlabel(r'$c_{exp}$')
+                    plt.xlabel(axisLabel(pnames[j]))
                 else:
                     plt.setp( plt.gca().get_xticklabels(), visible=False)
         #add legend with best-fit parameter values
-        ax.annotate('Best-fit values:', xy=(.7, .8),  xycoords='figure fraction',
-                horizontalalignment='center', verticalalignment='center',size=20)
-        yoffset=0.03
-        for k,v in self.BestFit.iteritems(): 
+        #ax.annotate('Best-fit values:', xy=(.7, .8),  xycoords='figure fraction',
+        #        horizontalalignment='center', verticalalignment='center',size=20)
+        #yoffset=0.03
+        #for k,v in self.BestFit.iteritems(): 
         #    print level3,k,'-\t',v
              #ax.annotate(k,'=',xy=(.7,.8-yoffset),xycoords='figure fraction',
              #   horizontalalignment='center', verticalalignment='center',size=20)
-             yoffset=yoffset+0.03
+             #yoffset=yoffset+0.03
         #print self.BestFit(pnames[0])
 
 
-    def showFit(self,block=True):
+    def showFit(self,block=True,mode='all'):
         my_dpi=116
         maxsize=maxWindowSize()
         figsize=(maxsize[0]/float(my_dpi)-0.25,maxsize[1]/float(my_dpi)-0.5)
         #plt.figure(figsize=figsize)
         fig=plt.figure(figsize=[12,12])
-        self.plotFit()
+        self.plotFit(mode=mode)
         plt.show(block=block)
 
-    def saveFit(self,filename):
+    def saveFit(self,filename,mode='all'):
         plt.figure(figsize=(12,12))
-        self.plotFit()
+        plt.clf()
+        self.plotFit(mode=mode)
         plt.savefig(filename)
 
     def plotR(self):

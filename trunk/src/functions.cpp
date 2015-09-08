@@ -557,6 +557,7 @@ void RandomNumberGenerator::gaussian_mv(const vector<double> &mean, const vector
 }
 
 CompletenessCurve::CompletenessCurve(double n, double m, double b){
+  static int bnum=1;
   //invalid to have -n
   if(n > 0.0){
     _n=n;
@@ -582,7 +583,8 @@ CompletenessCurve::CompletenessCurve(double n, double m, double b){
   else
     _ulim=0;
 
-  cout << "Completeness: " << _B << " " << _M << " " << _n << ", Max= " << _ulim << endl;
+  cout << "Completeness (" << bnum << "): " << _B << " " << _M << " " << _n << ", Max= " << _ulim << endl;
+  bnum++;
 }
 
 bool CompletenessCurve::accept(double flux){

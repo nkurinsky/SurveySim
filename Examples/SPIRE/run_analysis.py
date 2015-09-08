@@ -35,8 +35,8 @@ mod.filters[2].setID("SPIRE_500")
 mod.filters[2].limit=0.1
 mod.filters[2].err=3.0
 
-#mod.setLF("ModifiedSchecter")
-mod.setLF("DoublePowerLaw")
+mod.setLF("ModifiedSchecter")
+#mod.setLF("DoublePowerLaw")
 
 mod.params['Alpha'].value=1.15
 mod.params['Alpha'].pmin=0
@@ -95,7 +95,7 @@ simname="spire_MS_D"
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
 
-#mod.fitAllParams()
+mod.fitAllParams()
 
 mod.params['cexp'].value=0
 mod.params['cexp'].fixed=1
@@ -104,4 +104,5 @@ mod.params['zbc'].fixed=1
 mod.write(mfile)
 mod.info()
 
+quit()
 os.system('SurveySim '+mfile+' '+templatefile+' '+obsfile+' -o '+outfile)
