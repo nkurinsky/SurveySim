@@ -10,7 +10,7 @@ ssdir="/usr/local/surveysim/"
 
 mfile="spire_model.fits"
 templatefile=ssdir+"templates/default_templates_v2.fits"
-obsfile=ssdir+"obs/spire_cdfs-swire.fits"
+obsfile=ssdir+"obs/L5-Lockman-SWIRE_xID250_DR2.fits"
 outfile="spire_output.fits"
 
 mod=ModelFile()
@@ -91,7 +91,7 @@ mod.annealing['learningRate']=0.4
 
 mod.convergence['CI']=0.90
 
-simname="spire_MS_D"
+simname="spire"
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
 
@@ -104,5 +104,4 @@ mod.params['zbc'].fixed=1
 mod.write(mfile)
 mod.info()
 
-quit()
 os.system('SurveySim '+mfile+' '+templatefile+' '+obsfile+' -o '+outfile)
