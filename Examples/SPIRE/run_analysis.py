@@ -57,14 +57,14 @@ elif(field == 1):
     mod.survey['area']=11.1
     mod.filters[0].limit=12.7
     mod.filters[0].err=2.5
-    mod.filters[0].compN=1.48
-    mod.filters[0].compB=5.90
-    mod.filters[0].compM=9.27
+    mod.filters[0].compN=3.80
+    mod.filters[0].compB=14.06
+    mod.filters[0].compM=12.72
     mod.filters[1].limit=0.1
     mod.filters[1].err=2.1
-    mod.filters[1].compN=1.48
-    mod.filters[1].compB=4.84
-    mod.filters[1].compM=5.51
+    mod.filters[1].compN=22.58
+    mod.filters[1].compB=13.72
+    mod.filters[1].compM=-19.83
     mod.filters[2].limit=0.1
     mod.filters[2].err=3.0
 else:
