@@ -43,11 +43,11 @@ fields_files='Survey data','SEDs'
 
 #initialize datafiles
 seddir=codedir+'templates/'
-sedfile=seddir+'Kirkpatrick2015_templates.fits'
+sedfile=seddir+'default_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
 modelfile=thisdir+'model.fits'
 obsdir=codedir+'obs/'
-obsfile=obsdir+'wise.fits'
+obsfile=obsdir+'aztec.fits'
 outdir=os.getcwd()+'/OUTPUT/'
 outfile=os.getcwd()+'/output.fits'
 fitcode='/usr/local/bin/SurveySim'
