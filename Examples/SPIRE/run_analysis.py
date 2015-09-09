@@ -16,7 +16,6 @@ else:
 
 #model file locations
 ssdir="/usr/local/surveysim/"
-templatefile=ssdir+"templates/default_templates.fits"
 simname="spire"
 
 #initialize
@@ -167,7 +166,5 @@ mod.params['zbq'].value=1.85
 mod.params['zbp'].fixed=0
 mod.params['zbq'].fixed=0
 
-mod.write(mfile)
-mod.info()
-
-os.system('SurveySim '+mfile+' '+templatefile+' '+obsfile+' -o '+outfile)
+mod.filename=mfile
+mod.run(obsfile,outfile=outfile)

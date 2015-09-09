@@ -313,3 +313,9 @@ class ModelFile:
         else:
             print 'Writing a new model file'
             thdulist.writeto(self.filename);
+
+    def run(self,obsfile,templatefile="/usr/local/surveysim/templates/default_templates.fits",outfile="output.fits",printInfo=True):
+        self.update()
+        if(printInfo):
+            self.info()
+        os.system('SurveySim '+self.filename+' '+templatefile+' '+obsfile+' -o '+outfile)
