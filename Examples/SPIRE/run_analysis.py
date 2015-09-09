@@ -14,10 +14,6 @@ else:
     model=int(sys.argv[2])
     lfForm=int(sys.argv[3])
 
-#model file locations
-ssdir="/usr/local/surveysim/"
-simname="spire"
-
 #initialize
 mod=ModelFile()
 mod.axis1="ColorF1F2"
@@ -35,8 +31,8 @@ mod.filters[2].setID("SPIRE_500")
 
 #set parameters for field, and input file
 if(field == 0):
-    simname=simname+"_COSMOS"
-    obsfile=ssdir+"obs/L2-COSMOS_xID250_DR2.fits"
+    simname="spire_COSMOS"
+    obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID250_DR2.fits"
     mod.survey['area']=11.1
     mod.filters[0].limit=12.7
     mod.filters[0].err=2.5
@@ -51,8 +47,8 @@ if(field == 0):
     mod.filters[2].limit=0.1
     mod.filters[2].err=3.0
 elif(field == 1):
-    simname=simname+"_Lockman-SWIRE"
-    obsfile=ssdir+"obs/L5-Lockman-SWIRE_xID250_DR2.fits"
+    simname="spire_Lockman-SWIRE"
+    obsfile="/usr/local/surveysim/obs/L5-Lockman-SWIRE_xID250_DR2.fits"
     mod.survey['area']=11.1
     mod.filters[0].limit=12.7
     mod.filters[0].err=2.5
