@@ -16,7 +16,7 @@ else:
 
 #model file locations
 ssdir="/usr/local/surveysim/"
-templatefile=ssdir+"templates/default_templates_v2.fits"
+templatefile=ssdir+"templates/default_templates.fits"
 simname="spire"
 
 #initialize

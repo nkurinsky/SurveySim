@@ -1,4 +1,4 @@
 AUTOMAKE_OPTIONS=foreign
 
 templatedir = $(prefix)/@PACKAGE@/templates
-dist_template_DATA = default_templates.fits default_templates_v2.fits README
+dist_template_DATA = default_templates.fits README
