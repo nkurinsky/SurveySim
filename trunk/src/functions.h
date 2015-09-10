@@ -19,7 +19,7 @@
 #include <cctype>
 
 //For FITS input/output
-#include <CCFits/CCfits>
+#include <CCfits/CCfits>
 
 //GNU scientific library includes
 // - for random distributions

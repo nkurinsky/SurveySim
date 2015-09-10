@@ -33,35 +33,35 @@ mod.filters[2].setID("SPIRE_500")
 if(field == 0):
     simname="spire_COSMOS"
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID250_DR2.fits"
-    mod.survey['area']=11.1
-    mod.filters[0].limit=12.7
-    mod.filters[0].err=2.5
+    mod.survey['area']=4.78
+    mod.filters[0].limit=8.0
+    mod.filters[0].err=1.6
     mod.filters[0].compN=1.48
     mod.filters[0].compB=5.90
     mod.filters[0].compM=9.27
     mod.filters[1].limit=0.1
-    mod.filters[1].err=2.1
-    mod.filters[1].compN=1.48
-    mod.filters[1].compB=4.84
-    mod.filters[1].compM=5.51
+    mod.filters[1].err=1.32
+    #mod.filters[1].compN=1.48
+    #mod.filters[1].compB=4.84
+    #mod.filters[1].compM=5.51
     mod.filters[2].limit=0.1
-    mod.filters[2].err=3.0
+    mod.filters[2].err=1.9
 elif(field == 1):
     simname="spire_Lockman-SWIRE"
     obsfile="/usr/local/surveysim/obs/L5-Lockman-SWIRE_xID250_DR2.fits"
-    mod.survey['area']=11.1
-    mod.filters[0].limit=12.7
-    mod.filters[0].err=2.5
+    mod.survey['area']=15.31
+    mod.filters[0].limit=9.6
+    mod.filters[0].err=1.92
     mod.filters[0].compN=3.80
     mod.filters[0].compB=14.06
     mod.filters[0].compM=12.72
     mod.filters[1].limit=0.1
-    mod.filters[1].err=2.1
-    mod.filters[1].compN=22.58
-    mod.filters[1].compB=13.72
-    mod.filters[1].compM=-19.83
+    mod.filters[1].err=1.58
+    #mod.filters[1].compN=22.58
+    #mod.filters[1].compB=13.72
+    #mod.filters[1].compM=-19.83
     mod.filters[2].limit=0.1
-    mod.filters[2].err=3.0
+    mod.filters[2].err=2.3
 else:
     raise ValueError("Invalid field")
 

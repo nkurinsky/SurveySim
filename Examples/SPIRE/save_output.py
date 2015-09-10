@@ -12,9 +12,16 @@ rc('text', usetex=True)
 
 if (len(sys.argv) < 2):
     print "Please provide model file name"
-else:
-    file=sys.argv[1]
-    output=OutputFile(file)
+    quit()
+
+for fname in sys.argv[1:]:
+    print fname
+    newdir=fname.split('.fits')[0]
+    os.mkdir(newdir)
+
+    clf()
+    figure()
+    output=OutputFile(fname)
     output.info()
     output.counts.plot(1,xmin=5,xmax=400)
 
@@ -26,7 +33,7 @@ else:
     title("SPIRE 250 $\mu$m")
     legend(loc='lower right')
     ylim(1,1e5)
-    savefig('counts_250')
+    savefig(newdir+'/counts_250')
     clf()
     output.counts.plot(2,xmin=5,xmax=400)
 
@@ -38,7 +45,7 @@ else:
     title("SPIRE 350 $\mu$m")
     legend(loc='lower right')
     ylim(1,1e5)
-    savefig('counts_350')
+    savefig(newdir+'/counts_350')
 
     clf()
     output.counts.plot(3,xmin=5,xmax=400)
@@ -51,12 +58,12 @@ else:
     title("SPIRE 500 $\mu$m")
     legend(loc='lower right')
     ylim(1,1e5)
-    savefig('counts_500')
+    savefig(newdir+'/counts_500')
 
     clf()
-    output.saveImages('images')
+    output.saveImages(newdir+'/images')
     if(output.fit()):
-        output.MCMC.saveFit('fit')
-        output.MCMC.saveFit('lffit',mode='lf')
-        output.MCMC.saveFit('sedfit',mode='sed')
+        output.MCMC.saveFit(newdir+'/fit')
+        output.MCMC.saveFit(newdir+'/lffit',mode='lf')
+        output.MCMC.saveFit(newdir+'/sedfit',mode='sed')
     print ""

@@ -103,6 +103,7 @@ class FitInfo:
 
     def __init__(self,hdus,fitted):
         phdr=hdus[0].header
+        self.fitstat=phdr['FITSTAT']
         self.initial=dict()
         for key in phdr.keys():
             if not (key in FitInfo.exclude):

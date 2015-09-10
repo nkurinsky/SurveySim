@@ -371,7 +371,7 @@ void Configuration::load(){
     }
 
   }
-  catch(CCfits::FitsException::FitsException e){
+  catch(CCfits::FitsException e){
     printf("Error reading model file\nPlease check that all keywords are present\n");
     cerr << e.message() << endl;
     exit(10);
