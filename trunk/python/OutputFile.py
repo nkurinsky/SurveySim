@@ -122,6 +122,7 @@ class FitInfo:
         self.fluxes=[dists['F1'],dists['F2'],dists['F3']]
 
     def info(self):
+        print level2,"Best Fit ChiSquare: "+str(self.fitstat)
         print level2,"Code Fitted Parameters: (initial)"
         for k,v in self.initial.iteritems(): print level3,k,'-\t',v
         print level2,"Variables:"
@@ -390,11 +391,11 @@ class MCMCInfo:
         print level2,"Fitted Parameters (BestFit)"
         for k,v in self.BestFit.iteritems(): print level3,k,'-\t',v
         print level2,"Number of Chains:",self.ChainNum
-        print level2,"Available Variable Chains:"
-        print level3,"Parameters"
-        print level3,"Acceptance"
-        print level3,"ChiSquares"
-        print level3,"Convergence"
+        #print level2,"Available Variable Chains:"
+        #print level3,"Parameters"
+        #print level3,"Acceptance"
+        #print level3,"ChiSquares"
+        #print level3,"Convergence"
 
     def plotFit(self,mode='all'):
         pnames=self.Parameters.keys()    

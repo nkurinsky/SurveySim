@@ -22,7 +22,7 @@ for fname in sys.argv[1:]:
     clf()
     figure()
     output=OutputFile(fname)
-    output.info()
+    output.MCMC.info()
     output.counts.plot(1,xmin=5,xmax=400)
 
     bins=numpy.array([23.8,37.5,58.9,85.9,166.2,374.1])
