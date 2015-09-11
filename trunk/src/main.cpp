@@ -10,9 +10,6 @@
 #include "mc_util.h"
 #include <stdio.h>
 
-//Array size definitions 
-#define BANDS 3
-
 using namespace std; 
 
 int main(int argc,char** argv){
@@ -115,12 +112,12 @@ int main(int argc,char** argv){
       for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
 	setvars[pi] = &(lpars[*p]);
 	pcurrent[0][pi] = *(setvars[pi]);
-	pset.set(pi,lmin[*p],lmax[*p],(lmax[*p] - lmin[*p])/6.0,lpars[*p]);
+	pset.set(pi,lmin[*p],lmax[*p],(lmax[*p] - lmin[*p])/q.sigmaSize,lpars[*p]);
       }
       if(q.vary_cexp){
 	setvars[q.cind] = &CE;
 	pcurrent[0][q.cind] = *(setvars[pi]);
-	pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/6.0,CE);
+	pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/q.sigmaSize,CE);
 	pi++;
       }
       if(q.vary_zbc){

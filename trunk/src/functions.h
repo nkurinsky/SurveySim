@@ -115,6 +115,7 @@ public:
   unsigned long burn_num;
   unsigned long nparams;
   unsigned long nsim;
+  double sigmaSize;
 
   double area;
   double dz;

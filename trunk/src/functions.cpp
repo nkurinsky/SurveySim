@@ -329,6 +329,13 @@ void Configuration::load(){
     runs=1000;
   }
   try{
+    tab.readKey("SIGSIZE",sigmaSize);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    sigmaSize=12.0;
+  }
+
+  try{
     tab.readKey("ZMIN",zmin);
     tab.readKey("ZMAX",zmax);
     tab.readKey("DZ",dz);

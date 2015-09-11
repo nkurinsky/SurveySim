@@ -365,6 +365,8 @@ class MCMCInfo:
             elif "ACPT" in col:
                 self.Acceptance.append(params[col])                
 
+        cmed=np.median(self.ChiSquares[self.ChiSquares < 50])/3.0
+
         chdu=hdus[5]
         rnames=chdu.data.names
         for i in range(0,len(rnames)):
@@ -379,7 +381,7 @@ class MCMCInfo:
                 p0=p0+str(0)
             self.Parameters[p0]=list()
             for i in range(0,self.ChainNum):
-                gpts=np.where(self.ChiSquares[i] < np.median(self.ChiSquares))
+                gpts=np.where(self.ChiSquares[i] < cmed)
                 self.Parameters[p0].extend(params[p0+str(i)][gpts])
 
         for k,v in self.Parameters.iteritems():
