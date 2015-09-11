@@ -177,17 +177,16 @@ int main(int argc,char** argv){
 	
 	if(((i+1) % q.burn_step) == 0){
 	  LOG_INFO(printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature()));
-	  LOG_INFO(printf("Covariance Matrix:\n"));
-	  for(int pi=0;pi<pset.covar.size();pi++){
-	    LOG_INFO(printf("\t["));
-	    for(int pj=0;pj<pset.covar[pi].size();pj++)
-	      LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
-	    LOG_INFO(printf("]\n"));
-	  }
+	  //for(int pi=0;pi<pset.covar.size();pi++){
+	  //  LOG_INFO(printf("\t["));
+	  //  for(int pj=0;pj<pset.covar[pi].size();pj++)
+	  //    LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
+	  //  LOG_INFO(printf("]\n"));
+	  //}
 	  if(not metrop.anneal())
 	    i = q.runs;
-	  burnchain.get_stdev(pset.sigma.data());
-	  burnchain.get_covariance(pset.covar);
+	  //burnchain.get_stdev(pset.sigma.data());
+	  //burnchain.get_covariance(pset.covar);
 	}
       }
       
