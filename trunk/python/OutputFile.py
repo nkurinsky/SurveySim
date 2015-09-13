@@ -365,7 +365,7 @@ class MCMCInfo:
             elif "ACPT" in col:
                 self.Acceptance.append(params[col])                
 
-        cmed=np.median(self.ChiSquares[self.ChiSquares < 50])/3.0
+        cmed=np.median(self.ChiSquares[self.ChiSquares < 50])
 
         chdu=hdus[5]
         rnames=chdu.data.names
