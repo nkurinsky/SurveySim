@@ -143,6 +143,6 @@ void obs_lib::get_colors(int i,double &c1,double &c2){
 void obs_lib::get_all_colors(vector<double> &c1, vector<double> &c2){
   c1.resize(get_snum());
   c2.resize(get_snum());
-  for(auto i=0;i<observations.size();i++)
+  for(unsigned int i=0;i<observations.size();i++)
     observations[i]->get_colors(c1[i],c2[i]);
 }

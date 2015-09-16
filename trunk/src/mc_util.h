@@ -17,7 +17,7 @@
 class ParameterSettings{
 public:
   ParameterSettings(size_t nparams);
-  void set(short pnum, double Minimum, double Maximum, double standardDeviation, double bestValue);
+  void set(unsigned short pnum, double Minimum, double Maximum, double standardDeviation, double bestValue);
   vector<double> min;
   vector<double> max;
   vector<double> sigma;

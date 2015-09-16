@@ -270,9 +270,9 @@ int main(int argc,char** argv){
       survey.set_color_exp(CE,ZBC);
       survey.set_fagn_pars(lpars);
       LOG_INFO(printf("\nCovariance Matrix:\n"));
-      for(int pi=0;pi<pset.covar.size();pi++){
+      for(unsigned int pi=0;pi<pset.covar.size();pi++){
 	LOG_INFO(printf("\t["));
-	for(int pj=0;pj<pset.covar[pi].size();pj++)
+	for(unsigned int pj=0;pj<pset.covar[pi].size();pj++)
 	  LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
         LOG_INFO(printf("]\n"));
       }

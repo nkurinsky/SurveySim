@@ -355,7 +355,7 @@ products simulator::simulate(){
 	if(((srcTotal % 10000) == 0) and (srcTotal != 0)){
 	  //printf("%lu\t%lu\n",srcTotal,detTotal);
 	  //trying to avoid infinite loops
-	  if(detTotal > 10*observations->get_snum()){
+	  if(detTotal > static_cast<unsigned long>(10*observations->get_snum())){
 	    //printf("Detected sources %lu (%i times obsnum) too high, aborting\n",detTotal,10);
 	    output.chisqr=100;
 	    return output;
@@ -499,7 +499,7 @@ bool simulator::save(string outfile){
     
     using namespace CCfits;
     //FITS::setVerboseMode(true);
-    std::auto_ptr<FITS> pFits(0);
+    std::unique_ptr<FITS> pFits;
     
     try{
       pFits.reset(new FITS(outfile,Write));

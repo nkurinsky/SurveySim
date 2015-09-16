@@ -82,9 +82,9 @@ void NumberCounts::compute(const valarray<double> &fluxes_nolog, const double ar
   }
   
   counts.resize(_nbins,EMPTYBIN);
-  int j;
+  unsigned int j;
   for(unsigned int i = 0; i < logf.size(); i++){
-    j = static_cast<int>( ceil((logf[i] - _range[0]) / _dS ) );
+    j = static_cast<unsigned int>( ceil((logf[i] - _range[0]) / _dS ) );
     if(j >= 0 and j < counts.size())
       counts[j]++;
     else

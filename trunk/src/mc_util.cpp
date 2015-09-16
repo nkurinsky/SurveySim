@@ -13,12 +13,12 @@ ParameterSettings::ParameterSettings(size_t nparams){
   max.resize(nparams);
   sigma.resize(nparams);
   covar.resize(nparams);
-  for(int i=0;i<nparams;i++)
+  for(unsigned int i=0;i<nparams;i++)
     covar[i].resize(nparams,0);
   best.resize(nparams);
 }
 
-void ParameterSettings::set(short pnum, double Minimum, double Maximum, double standardDeviation, double bestValue){
+void ParameterSettings::set(unsigned short pnum, double Minimum, double Maximum, double standardDeviation, double bestValue){
   if(pnum < min.size()){
     min[pnum] = Minimum;
     max[pnum] = Maximum;
@@ -255,7 +255,7 @@ void MCChains::get_covariance(vector<vector<double> > &covar){
   for(int i=0;i<npars;i++){
     for(int j=0;j<npars;j++){
       covar[i][j] = 0.0;
-      for(int k=0;k<values[i].size();k++)
+      for(unsigned int k=0;k<values[i].size();k++)
 	covar[i][j] += values[i][k]*values[j][k];
       covar[i][j] /= static_cast<double>(values[i].size()-1);
     }
@@ -346,7 +346,7 @@ bool MCChains::converged(){
 bool MCChains::save(string filename, string parnames[], string hname){
 
   using namespace CCfits;
-  std::auto_ptr<FITS> pFits(0);
+  std::unique_ptr<FITS> pFits;
   
   try{
     pFits.reset(new FITS(filename,Write));
@@ -442,7 +442,7 @@ bool ResultChain::add_link(valarray<double> arrays[], double chisqr){
 
 bool ResultChain::save(string filename, string resnames[], string hname){
   using namespace CCfits;
-  std::auto_ptr<FITS> pFits(0);
+  std::unique_ptr<FITS> pFits;
 
   try{
     pFits.reset(new FITS(filename,Write));

@@ -123,7 +123,7 @@ filter::~filter(){
 
 double filter::trap_integrate(vector<double> lambda, vector<double> response){
   double tsum = 0;
-  for(int i=1;i<lambda.size();i++){
+  for(unsigned int i=1;i<lambda.size();i++){
     tsum += (lambda[i] - lambda[i-1])*(response[i]+response[i-1]);
   }
   return tsum/2.0;
@@ -254,15 +254,13 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     filters.column(i).read(band,1,tablelength,&nullvalue);
     filters.column(i+1).read(transmission,1,tablelength);
     int num = floor(i/2);
-    int newlength=tablelength;
     if(band.back() <= 0.0){
       while(band.back() <= 0.0){
 	band.pop_back();
 	transmission.pop_back();
       }
-      newlength = band.size();      
     }
-    for(int j=0;j<band.size();j++){
+    for(unsigned int j=0;j<band.size();j++){
       band[j]*=exp_scale;
     }
     LOG_INFO(printf("Loaded Filter %i (Lambda: %8.2e m -> %8.2e m, limit: %5.2e, error: %5.2e, skew error: %5.2e)\n",num+1,band.front(),band.back(),limits[num],errors[num],skew_errors[num]));
