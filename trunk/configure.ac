@@ -30,10 +30,10 @@ AC_CHECK_LIB([CCfits],[main],[],[
 	echo "Error:CCFits library required, not found"; exit 1])
 
 # Checks for header files.
+AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([stdlib.h])
 AC_CHECK_HEADERS([fitsio.h],[],[
 	echo "Error: fitsio.h header file required, not found"; exit 1])
-AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([CCfits/CCfits.h],[],[
         echo "Error: CCfits/CCfits.h header file required, not found"; exit 1])
 AC_CHECK_HEADERS([gsl/gsl_rng.h],[],[
