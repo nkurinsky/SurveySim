@@ -65,6 +65,15 @@ elif(field == 1):
 else:
     raise ValueError("Invalid field")
 
+#default to all fit
+mod.fitAllParams()
+
+#remove color evolution
+mod.params['cexp'].value=0
+mod.params['cexp'].fixed=1
+mod.params['zbc'].value=0
+mod.params['zbc'].fixed=1
+
 #set luminosity function form
 if(lfForm == 0):
     mod.setLF("ModifiedSchecter")
@@ -75,17 +84,9 @@ elif(lfForm == 1):
 elif(lfForm == 2):
     mod.setLF("Schechter")
     simname=simname+"_S"
+
 else:
     raise ValueError("Invalid lfForm")
-
-#default to all fit
-mod.fitAllParams()
-
-#remove color evolution
-mod.params['cexp'].value=0
-mod.params['cexp'].fixed=1
-mod.params['zbc'].value=0
-mod.params['zbc'].fixed=1
 
 if(model == 0):
     simname=simname+"_agnOnly"
@@ -113,28 +114,28 @@ outfile=simname+"_output.fits"
 
 #parameters below should be the same regardless of model
 mod.params['Alpha'].value=1.15
-mod.params['Alpha'].pmin=0
+mod.params['Alpha'].pmin=-0.5
 mod.params['Alpha'].pmax=3
 mod.params['Alpha'].fixed=0
 
 mod.params['Beta'].value=0.5
-mod.params['Beta'].pmin=0
+mod.params['Beta'].pmin=-0.5
 mod.params['Beta'].pmax=2.0
 mod.params['Beta'].fixed=0
 
-mod.params['Phi0'].value=-3.1
+mod.params['Phi0'].value=-2.2
 mod.params['Phi0'].pmin=-5.0
-mod.params['Phi0'].pmax=-2.0
+mod.params['Phi0'].pmax=-0.5
 mod.params['Phi0'].fixed=0
 
 mod.params['L0'].value=11.2
-mod.params['L0'].pmin=10.0
+mod.params['L0'].pmin=9.5
 mod.params['L0'].pmax=12.0
 mod.params['L0'].fixed=0
 
 mod.params['P'].value=-0.57
-mod.params['P'].pmax=-1
-mod.params['P'].pmin=-8
+mod.params['P'].pmax=1.0
+mod.params['P'].pmin=-8.0
 mod.params['P'].fixed=0
 
 mod.params['P2'].pmax=2
