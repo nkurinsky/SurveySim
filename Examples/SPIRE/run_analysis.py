@@ -65,6 +65,8 @@ elif(field == 1):
 else:
     raise ValueError("Invalid field")
 
+print mod.survey['area']
+
 #default to all fit
 mod.fitAllParams()
 
@@ -113,54 +115,54 @@ mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
 
 #parameters below should be the same regardless of model
-mod.params['Alpha'].value=1.15
-mod.params['Alpha'].pmin=-0.5
-mod.params['Alpha'].pmax=3
+mod.params['Alpha'].value=3.00
+mod.params['Alpha'].pmin=1.00
+mod.params['Alpha'].pmax=3.50
 mod.params['Alpha'].fixed=0
 
-mod.params['Beta'].value=0.5
-mod.params['Beta'].pmin=-0.5
-mod.params['Beta'].pmax=2.0
+mod.params['Beta'].value=0.52
+mod.params['Beta'].pmin=0.01
+mod.params['Beta'].pmax=0.55
 mod.params['Beta'].fixed=0
 
-mod.params['Phi0'].value=-2.2
-mod.params['Phi0'].pmin=-5.0
-mod.params['Phi0'].pmax=-0.5
+mod.params['Phi0'].value=-2.239
+mod.params['Phi0'].pmin=-4.239
+mod.params['Phi0'].pmax=-0.739
 mod.params['Phi0'].fixed=0
 
-mod.params['L0'].value=11.2
-mod.params['L0'].pmin=9.5
-mod.params['L0'].pmax=12.0
+mod.params['L0'].value=9.949
+mod.params['L0'].pmin=8.449
+mod.params['L0'].pmax=10.400
 mod.params['L0'].fixed=0
 
 mod.params['P'].value=-0.57
-mod.params['P'].pmax=1.0
-mod.params['P'].pmin=-8.0
+mod.params['P'].pmin=-4.57
+mod.params['P'].pmax=3.43
 mod.params['P'].fixed=0
 
-mod.params['P2'].pmax=2
-mod.params['P2'].pmin=-10
-mod.params['P2'].value=-3.92
+mod.params['P2'].value=-2.40
+mod.params['P2'].pmin=-6.40
+mod.params['P2'].pmax=1.60
 mod.params['P2'].fixed=0
 
 mod.params['Q'].value=3.55
-mod.params['Q'].pmax=8
-mod.params['Q'].pmin=-2
+mod.params['Q'].pmin=3.05
+mod.params['Q'].pmax=6.05
 mod.params['Q'].fixed=0
 
-mod.params['Q2'].pmax=5
-mod.params['Q2'].pmin=-5
-mod.params['Q2'].value=1.62
+mod.params['Q2'].value=0.80
+mod.params['Q2'].pmin=-2.20
+mod.params['Q2'].pmax=1.50
 mod.params['Q2'].fixed=0
 
-mod.params['zbp'].pmax=4
-mod.params['zbp'].pmin=0
-mod.params['zbq'].pmax=4
-mod.params['zbq'].pmin=0
-
-mod.params['zbp'].value=1.1
-mod.params['zbq'].value=1.85
+mod.params['zbp'].value=1.10
+mod.params['zbp'].pmin=0.10
+mod.params['zbp'].pmax=3.10
 mod.params['zbp'].fixed=0
+
+mod.params['zbq'].value=1.85
+mod.params['zbq'].pmin=0.85
+mod.params['zbq'].pmax=3.85
 mod.params['zbq'].fixed=0
 
 mod.filename=mfile
