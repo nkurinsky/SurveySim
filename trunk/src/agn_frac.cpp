@@ -108,7 +108,7 @@ double agn_frac::get_agn_frac(double lum, double redshift){
   }
 
   if(lumPower.count(lum) == 0){
-    lumPower[lum]=pow((lum/12.0),4);
+    lumPower[lum]=pow((lum/12.0),12.0);
   }
 
   //the agn fraction for a given L,z bin

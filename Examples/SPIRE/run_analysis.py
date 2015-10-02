@@ -98,13 +98,19 @@ if(model == 0):
 elif(model == 1):
     simname=simname+"_fComp"
     fixKeys=['fcold']
-    mod.params['fcold'].value=0.0
+    mod.params['fcold'].value=0
     mod.params['fcomp'].value=0.5
+    mod.params['fcomp'].pmin=0.01
+    mod.params['fcomp'].pmax=0.99
 elif(model == 2):
     simname=simname+"_fCompfCold"
     fixKeys=[]
     mod.params['fcold'].value=0.5
+    mod.params['fcold'].pmin=0.01
+    mod.params['fcold'].pmax=0.99
     mod.params['fcomp'].value=0.5
+    mod.params['fcomp'].pmin=0.01
+    mod.params['fcomp'].pmax=0.99
 else:
     raise ValueError("Invalid model")
 
@@ -113,6 +119,7 @@ for key in fixKeys:
 
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
+
 
 #parameters below should be the same regardless of model
 mod.params['Alpha'].value=3.00
