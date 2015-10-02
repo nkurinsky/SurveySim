@@ -11,7 +11,7 @@ from ModelFile import *
 
 
 if(len(sys.argv) < 4):
-    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=nominal,1=composites,2=cold) lfForm(0=MS,1=DPL,2=S)"
+    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=onlySFG,1=agn,2=composites,3=cold) lfForm(0=MS,1=DPL,2=S)"
     quit()
 else:
     field=int(sys.argv[1])
@@ -95,18 +95,24 @@ else:
     raise ValueError("Invalid lfForm")
 
 if(model == 0):
+    simname=simname+"_onlySFG"
+    fixKeys=['fa0','fcomp','fcold']
+    mod.params['fa0'].value=0
+    mod.params['fcomp'].value=0
+    mod.params['fcold'].value=0
+elif(model == 1):
     simname=simname+"_agnOnly"
     fixKeys=['fcomp','fcold']
     mod.params['fcold'].value=0
     mod.params['fcomp'].value=0
-elif(model == 1):
+elif(model == 2):
     simname=simname+"_fComp"
     fixKeys=['fcold']
     mod.params['fcold'].value=0
     mod.params['fcomp'].value=0.5
     mod.params['fcomp'].pmin=0.01
     mod.params['fcomp'].pmax=0.99
-elif(model == 2):
+elif(model == 3):
     simname=simname+"_fCompfCold"
     fixKeys=[]
     mod.params['fcold'].value=0.5
