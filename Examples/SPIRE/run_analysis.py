@@ -4,7 +4,11 @@ import os
 import sys
 import datetime
 import time
+
+sys.path.append('/usr/local/surveysim/python')
+
 from ModelFile import *
+
 
 if(len(sys.argv) < 4):
     print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=nominal,1=composites,2=cold) lfForm(0=MS,1=DPL,2=S)"
