@@ -88,8 +88,11 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[], double flim[]){
       try{
 	unit = table.column(column[i]).unit();
 	table.column(column[i]).read(col[i],1,tablesize);
+	//	std::cout << unit << std::endl;
 	if(unit == "Jy")
 	  col[i] *= 1e3; //convert to mJy
+	if(unit == "uJy")
+	  col[i] /= 1e3; //convert to mJy
 	if(unit == "mag") //works for AB magnitudes only, should consider including Vega and appropriate zero points
 	  if(i < 3) col[i] = 1e3*pow(10,0.4*(zp[i]-col[i])); //convert to mJy
 	  if(i >= 3) col[i] = 1e3*pow(10,0.4*(zp[i-3]-col[i])); //convert to mJy

@@ -284,7 +284,6 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
 }
 
 bool sed_lib::load_filters(string file,int lflag_tmp){
-  
   if(filters.load_filters(file,lflag_tmp)){
     logflag=lflag_tmp;
     w = gsl_integration_workspace_alloc(SL_INT_SIZE);

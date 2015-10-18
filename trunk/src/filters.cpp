@@ -184,6 +184,9 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
       else if(toLower(stemp) == "mjy"){
 	units[i]=1.0;
       }
+      else if(toLower(stemp) == "ujy"){
+	units[i]=1000.0;
+      }
       else{
 	LOG_CRITICAL(printf("Keyword \"%s\" contains unknown unit, defaulting to standard units mJy\n",unitKeys[i].c_str()));
       }
