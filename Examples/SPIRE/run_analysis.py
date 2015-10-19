@@ -11,11 +11,7 @@ from ModelFile import *
 
 
 if(len(sys.argv) < 4):
-<<<<<<< HEAD
-    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=onlySFG,1=agn,2=composites,3=cold,4=SFG+Cold) lfForm(0=MS,1=DPL,2=S)"
-=======
     print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
->>>>>>> origin/master
     quit()
 else:
     field=int(sys.argv[1])
@@ -129,12 +125,6 @@ elif(model == 3):
     mod.params['fcomp'].pmin=0.01
     mod.params['fcomp'].pmax=0.99
 elif(model == 4):
-<<<<<<< HEAD
-    simname=simname+"_onlySFGCold"
-    fixKeys=['fa0','fcomp']
-    mod.params['fa0'].value=0
-    mod.params['fcomp'].value=0    
-=======
     simname=simname+"_SFG_cold"
     fixKeys=['fa0','zbt','t1','t2','fcomp']
     mod.params['fa0'].value=0
@@ -145,7 +135,6 @@ elif(model == 4):
     mod.params['fcold'].value=0.5
     mod.params['fcold'].pmin=0.01
     mod.params['fcold'].pmax=0.99
->>>>>>> origin/master
 else:
     raise ValueError("Invalid model")
 

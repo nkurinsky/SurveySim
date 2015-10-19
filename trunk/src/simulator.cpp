@@ -52,8 +52,6 @@ void simulator::configure(const Configuration &config){
       
       vector<double> x,y;
       int osize = observations->get_snum();
-      std::cout << "hello1" << std::endl;
-      std::cout << osize << std::endl;
       observations->get_all_colors(x,y);
       diagnostic->init_obs(x.data(),y.data(),osize);
     
