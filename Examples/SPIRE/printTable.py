@@ -24,9 +24,9 @@ for fname in sys.argv[1:]:
     output=OutputFile(fname)
     model=fname.split('_output')[0]
     field=fname.split('_')[1]
-    if(field == "COSMOS"):
+    if(field == "A-C"):
         best=0.14224
-    elif(field == "Lockman-SWIRE"):
+    elif(field == "A-LS"):
         best=0.16784
     else:
         raise ValueError("Unknown Field "+field)

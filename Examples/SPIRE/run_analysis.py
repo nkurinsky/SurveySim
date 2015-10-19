@@ -11,7 +11,11 @@ from ModelFile import *
 
 
 if(len(sys.argv) < 4):
+<<<<<<< HEAD
     print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=onlySFG,1=agn,2=composites,3=cold,4=SFG+Cold) lfForm(0=MS,1=DPL,2=S)"
+=======
+    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
+>>>>>>> origin/master
     quit()
 else:
     field=int(sys.argv[1])
@@ -96,8 +100,11 @@ else:
 
 if(model == 0):
     simname=simname+"_onlySFG"
-    fixKeys=['fa0','fcomp','fcold']
+    fixKeys=['fa0','zbt','t1','t2','fcomp','fcold']
     mod.params['fa0'].value=0
+    mod.params['zbt'].value=0
+    mod.params['t1'].value=0
+    mod.params['t2'].value=0
     mod.params['fcomp'].value=0
     mod.params['fcold'].value=0
 elif(model == 1):
@@ -122,15 +129,91 @@ elif(model == 3):
     mod.params['fcomp'].pmin=0.01
     mod.params['fcomp'].pmax=0.99
 elif(model == 4):
+<<<<<<< HEAD
     simname=simname+"_onlySFGCold"
     fixKeys=['fa0','fcomp']
     mod.params['fa0'].value=0
     mod.params['fcomp'].value=0    
+=======
+    simname=simname+"_SFG_cold"
+    fixKeys=['fa0','zbt','t1','t2','fcomp']
+    mod.params['fa0'].value=0
+    mod.params['zbt'].value=0
+    mod.params['t1'].value=0
+    mod.params['t2'].value=0
+    mod.params['fcomp'].value=0
+    mod.params['fcold'].value=0.5
+    mod.params['fcold'].pmin=0.01
+    mod.params['fcold'].pmax=0.99
+>>>>>>> origin/master
 else:
     raise ValueError("Invalid model")
 
 for key in fixKeys:
     mod.params[key].fixed=1
+
+
+if(model == 0 and lfForm == 2 and field == 0):
+    simname="A-C"
+if(model == 0 and lfForm == 1 and field == 0):
+    simname="B-C"
+if(model == 0 and lfForm == 0 and field == 0):
+    simname="C-C"
+if(model == 1 and lfForm == 2 and field == 0):
+    simname="D-C"
+if(model == 1 and lfForm == 1 and field == 0):
+    simname="E-C"
+if(model == 1 and lfForm == 0 and field == 0):
+    simname="F-C"
+if(model == 2 and lfForm == 2 and field == 0):
+    simname="G-C"
+if(model == 2 and lfForm == 1 and field == 0):
+    simname="H-C"
+if(model == 2 and lfForm == 0 and field == 0):
+    simname="I-C"
+if(model == 3 and lfForm == 2 and field == 0):
+    simname="J-C"
+if(model == 3 and lfForm == 1 and field == 0):
+    simname="K-C"
+if(model == 3 and lfForm == 0 and field == 0):
+    simname="L-C"
+if(model == 4 and lfForm == 2 and field == 0):
+    simname="M-C"
+if(model == 4 and lfForm == 1 and field == 0):
+    simname="N-C"
+if(model == 4 and lfForm == 0 and field == 0):
+    simname="O-C"
+if(model == 0 and lfForm == 2 and field == 1):
+    simname="A-LS"
+if(model == 0 and lfForm == 1 and field == 1):
+    simname="B-LS"
+if(model == 0 and lfForm == 0 and field == 1):
+    simname="C-LS"
+if(model == 1 and lfForm == 2 and field == 1):
+    simname="D-LS"
+if(model == 1 and lfForm == 1 and field == 1):
+    simname="E-LS"
+if(model == 1 and lfForm == 0 and field == 1):
+    simname="F-LS"
+if(model == 2 and lfForm == 2 and field == 1):
+    simname="G-LS"
+if(model == 2 and lfForm == 1 and field == 1):
+    simname="H-LS"
+if(model == 2 and lfForm == 0 and field == 1):
+    simname="I-LS"
+if(model == 3 and lfForm == 2 and field == 1):
+    simname="J-LS"
+if(model == 3 and lfForm == 1 and field == 1):
+    simname="K-LS"
+if(model == 3 and lfForm == 0 and field == 1):
+    simname="L-LS"
+if(model == 4 and lfForm == 2 and field == 1):
+    simname="M-LS"
+if(model == 4 and lfForm == 1 and field == 1):
+    simname="N-LS"
+if(model == 4 and lfForm == 0 and field == 1):
+    simname="O-LS"
+
 
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
@@ -138,8 +221,8 @@ outfile=simname+"_output.fits"
 
 #parameters below should be the same regardless of model
 mod.params['Alpha'].value=3.00
-mod.params['Alpha'].pmin=1.00
-mod.params['Alpha'].pmax=3.50
+mod.params['Alpha'].pmin=0.80
+mod.params['Alpha'].pmax=3.20
 mod.params['Alpha'].fixed=0
 
 mod.params['Beta'].value=0.52
@@ -158,18 +241,18 @@ mod.params['L0'].pmax=10.400
 mod.params['L0'].fixed=0
 
 mod.params['P'].value=-0.57
-mod.params['P'].pmin=-4.57
-mod.params['P'].pmax=3.43
+mod.params['P'].pmin=-4.60
+mod.params['P'].pmax=-0.01
 mod.params['P'].fixed=0
 
 mod.params['P2'].value=-2.40
-mod.params['P2'].pmin=-6.40
+mod.params['P2'].pmin=-3.00
 mod.params['P2'].pmax=1.60
 mod.params['P2'].fixed=0
 
 mod.params['Q'].value=3.55
 mod.params['Q'].pmin=3.05
-mod.params['Q'].pmax=6.05
+mod.params['Q'].pmax=5.50
 mod.params['Q'].fixed=0
 
 mod.params['Q2'].value=0.80
@@ -183,8 +266,8 @@ mod.params['zbp'].pmax=3.10
 mod.params['zbp'].fixed=0
 
 mod.params['zbq'].value=1.85
-mod.params['zbq'].pmin=0.85
-mod.params['zbq'].pmax=3.85
+mod.params['zbq'].pmin=1.40
+mod.params['zbq'].pmax=4.00
 mod.params['zbq'].fixed=0
 
 mod.filename=mfile
