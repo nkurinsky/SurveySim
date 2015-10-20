@@ -11,7 +11,7 @@ from ModelFile import *
 
 
 if(len(sys.argv) < 4):
-    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
+    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE,2=COSMOS+MIPS) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
     quit()
 else:
     field=int(sys.argv[1])
@@ -66,6 +66,11 @@ elif(field == 1):
     #mod.filters[1].compM=-19.83
     mod.filters[2].limit=0.1
     mod.filters[2].err=2.3
+elif(field == 2):
+    simname="spire_mips_COSMOS"
+    obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
+    #load limits and filters from pre-made model file
+    mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
 else:
     raise ValueError("Invalid field")
 
