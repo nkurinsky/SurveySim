@@ -99,6 +99,26 @@ elif(lfForm == 2):
 else:
     raise ValueError("Invalid lfForm")
 
+mod.params['fa0'].value=0.60
+mod.params['fa0'].pmin=0.20
+mod.params['fa0'].pmax=1.00
+mod.params['fa0'].fixed=0
+
+mod.params['t1'].value=-1.30
+mod.params['t1'].pmin=-2.60
+mod.params['t1'].pmax=-0.10
+mod.params['t1'].fixed=0
+
+mod.params['t2'].value=6.50
+mod.params['t2'].pmin=4.50
+mod.params['t2'].pmax=8.50
+mod.params['t2'].fixed=0
+
+mod.params['zbt'].value=2.50
+mod.params['zbt'].pmin=0.80
+mod.params['zbt'].pmax=4.00
+mod.params['zbt'].fixed=0
+
 if(model == 0):
     simname=simname+"_onlySFG"
     fixKeys=['fa0','zbt','t1','t2','fcomp','fcold']
@@ -177,6 +197,7 @@ if(model == 4 and lfForm == 1 and field == 0):
     simname="N-C"
 if(model == 4 and lfForm == 0 and field == 0):
     simname="O-C"
+    
 if(model == 0 and lfForm == 2 and field == 1):
     simname="A-LS"
 if(model == 0 and lfForm == 1 and field == 1):
@@ -207,10 +228,41 @@ if(model == 4 and lfForm == 1 and field == 1):
     simname="N-LS"
 if(model == 4 and lfForm == 0 and field == 1):
     simname="O-LS"
+    
+if(model == 0 and lfForm == 2 and field == 2):
+    simname="A"
+if(model == 0 and lfForm == 1 and field == 2):
+    simname="B"
+if(model == 0 and lfForm == 0 and field == 2):
+    simname="C"
+if(model == 1 and lfForm == 2 and field == 2):
+    simname="D"
+if(model == 1 and lfForm == 1 and field == 2):
+    simname="E"
+if(model == 1 and lfForm == 0 and field == 2):
+    simname="F"
+if(model == 2 and lfForm == 2 and field == 2):
+    simname="G"
+if(model == 2 and lfForm == 1 and field == 2):
+    simname="H"
+if(model == 2 and lfForm == 0 and field == 2):
+    simname="I"
+if(model == 3 and lfForm == 2 and field == 2):
+    simname="J"
+if(model == 3 and lfForm == 1 and field == 2):
+    simname="K"
+if(model == 3 and lfForm == 0 and field == 2):
+    simname="L"
+if(model == 4 and lfForm == 2 and field == 2):
+    simname="M"
+if(model == 4 and lfForm == 1 and field == 2):
+    simname="N"
+if(model == 4 and lfForm == 0 and field == 2):
+    simname="O"
 
 
-mfile=simname+"_model.fits"
-outfile=simname+"_output.fits"
+mfile=simname+"6_model.fits"
+outfile=simname+"6_output.fits"
 
 
 #parameters below should be the same regardless of model
