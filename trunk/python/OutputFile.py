@@ -215,13 +215,25 @@ class FitImage:
         return "Image: "+self.name
 
     def plot(self,interpolation='nearest',cmap=cm.Greys,labelCbar=True):
+        #fnamecore=filename.split('output.fits')[0]
+        #self.modelfile=fnamecore+'_model.fits'
+        #self.mhdus=fits.open(modelfile)
+        #prihdr=self.mhdus[0].header
+        #self.axis1=prihdr['AXIS1']
+        #self.axis2=prihdr['AXIS2']
+        print self.axis1,self.axis2
+
+        self.axis1=['log(F24/uJy)']
+        self.axis2=['log(F250/F24)']
         plt.imshow(self.img, interpolation=interpolation, cmap=cmap, extent=self.extent, aspect='auto')
         cbar=plt.colorbar()
         if(labelCbar):
             cbar.set_label("Normalized Density")
         plt.contour(self.img, interpolation=interpolation, colors='grey', extent=self.extent, origin='image', aspect='auto')
-        plt.xlabel("AXIS 1")
-        plt.ylabel("AXIS 2")
+        plt.xlabel(self.axis1)
+        plt.ylabel(self.axis2)
+        plt.xlim(0,2)
+        plt.ylim(-2,2)
         plt.title(self.name)
 
     def show(self):
@@ -404,11 +416,11 @@ class MCMCInfo:
         #want to re-order these as they do not appear in the most sensible order
 
         if(mode == 'all'):
-            pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC','FA0','T1','T2','ZBT','FCOMP','FCOLD']
+            pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC','FAO','FAGN0','T1','T2','ZBT','FCOMP','FCOLD']
         elif(mode == 'lf'):
             pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC']
         elif(mode == 'sed'):
-            pnames_default=['FA0','T1','T2','ZBT','FCOMP','FCOLD']
+            pnames_default=['FAO','FAGN0','T1','T2','ZBT','FCOMP','FCOLD']
         else:
             raise ValueError("Invalid Plot Mode \""+mode+"\"")
 
@@ -553,6 +565,13 @@ class MCMCInfo:
 class OutputFile:
 
     def __init__(self,filename):
+        fnamecore=filename.split('output.fits')[0]
+        self.modelfile=fnamecore+'_model.fits'
+        self.mhdus=fits.open(modelfile)
+        prihdr=self.mhdus[0].header
+        self.axis1=prihdr['AXIS1']
+        self.axis2=prihdr['AXIS2']
+        print self.axis1,self.axis2
         self.filename=filename
         self.hdus=fits.open(filename)
         self.images=dict()
