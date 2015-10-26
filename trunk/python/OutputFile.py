@@ -232,8 +232,8 @@ class FitImage:
         plt.contour(self.img, interpolation=interpolation, colors='grey', extent=self.extent, origin='image', aspect='auto')
         plt.xlabel(self.axis1)
         plt.ylabel(self.axis2)
-        plt.xlim(0,2)
-        plt.ylim(-2,2)
+        plt.xlim(self.xmin,self.xmax)
+        plt.ylim(self.ymin,self.ymax)
         plt.title(self.name)
 
     def show(self):
