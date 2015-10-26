@@ -51,6 +51,10 @@ def main(argv):
        thdr.set('EF2COL', ef2)
        thdr.set('EF3COL',ef3)
 
+# uncomment if need to fix something that already has the above keywords set
+#   thdr.set('F3COL', 'F250')
+#   thdr.set('EF3COL','e_F250')
+
    hdulist.flush()
    hdulist.close()
 
