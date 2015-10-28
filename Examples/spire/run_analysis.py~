@@ -121,6 +121,13 @@ mod.params['zbt'].pmin=0.80
 mod.params['zbt'].pmax=4.00
 mod.params['zbt'].fixed=0
 
+#AS-change
+mod.params['fa0'].pmin=0.0
+mod.params['zbt'].pmin=0.50
+mod.params['zbt'].pmax=4.0
+mod.params['t2'].pmin=0.0
+mod.params['t1'].pmax=0.5
+
 if(model == 0):
     simname=simname+"_onlySFG"
     fixKeys=['fa0','zbt','t1','t2','fcomp','fcold']
@@ -273,6 +280,9 @@ mod.params['Alpha'].pmin=0.80
 mod.params['Alpha'].pmax=3.20
 mod.params['Alpha'].fixed=0
 
+#AS-change
+mod.params['Alpha'].pmin=0.5
+
 mod.params['Beta'].value=0.52
 mod.params['Beta'].pmin=0.01
 mod.params['Beta'].pmax=0.55
@@ -288,15 +298,27 @@ mod.params['L0'].pmin=8.449
 mod.params['L0'].pmax=10.400
 mod.params['L0'].fixed=0
 
+#AS-change
+mod.params['L0'].pmin=9.0
+mod.params['L0'].pmax=11.0
+
 mod.params['P'].value=-0.57
 mod.params['P'].pmin=-4.60
 mod.params['P'].pmax=-0.01
 mod.params['P'].fixed=0
 
+#AS-change
+mod.params['P'].pmin=-4.0
+mod.params['P'].max=0.5
+
 mod.params['P2'].value=-2.40
 mod.params['P2'].pmin=-3.00
 mod.params['P2'].pmax=1.60
 mod.params['P2'].fixed=0
+
+#AS-change
+mod.params['P2'].pmin=-4
+mod.params['P2'].pmax=2
 
 mod.params['Q'].value=3.55
 mod.params['Q'].pmin=3.05
