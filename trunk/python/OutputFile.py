@@ -221,7 +221,7 @@ class FitImage:
         #prihdr=self.mhdus[0].header
         #self.axis1=prihdr['AXIS1']
         #self.axis2=prihdr['AXIS2']
-        print self.axis1,self.axis2
+        #print self.axis1,self.axis2
 
         self.axis1=['log(F24/uJy)']
         self.axis2=['log(F250/F24)']
@@ -566,12 +566,12 @@ class OutputFile:
 
     def __init__(self,filename):
         fnamecore=filename.split('output.fits')[0]
-        self.modelfile=fnamecore+'_model.fits'
-        self.mhdus=fits.open(modelfile)
-        prihdr=self.mhdus[0].header
-        self.axis1=prihdr['AXIS1']
-        self.axis2=prihdr['AXIS2']
-        print self.axis1,self.axis2
+        #self.modelfile=fnamecore+'_model.fits'
+        #self.mhdus=fits.open(self.modelfile)
+        #prihdr=self.mhdus[0].header
+        #self.axis1=prihdr['AXIS1']
+        #self.axis2=prihdr['AXIS2']
+        #print self.axis1,self.axis2
         self.filename=filename
         self.hdus=fits.open(filename)
         self.images=dict()
