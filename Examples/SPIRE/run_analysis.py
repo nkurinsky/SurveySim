@@ -71,20 +71,10 @@ elif(field == 2):
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
     #load limits and filters from pre-made model file
     mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
-<<<<<<< HEAD
-    # mod.filters[1].limit=0.1
-    # mod.filters[2].limit=0.1
+
     mod.filters[0].compN=2110.4
     mod.filters[0].compB=0.111
     mod.filters[0].compM=-0.894
-=======
-    mod.filters[0].compN=1.0
-    mod.filters[0].compB=0.01
-    mod.filters[0].compM=0.08
-
-   # mod.filters[1].limit=0.1
-   # mod.filters[2].limit=0.1
->>>>>>> 9e961357219762991788e8d314c93394199dcecf
 else:
     raise ValueError("Invalid field")
 

@@ -176,6 +176,8 @@ private:
   double _M;
   double _n;
   double _ulim;
+  double _fScale;
+  bool scaled;
   double complete;
   RandomNumberGenerator crng;
   map<double,double> valueStore;
