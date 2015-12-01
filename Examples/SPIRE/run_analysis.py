@@ -71,10 +71,30 @@ elif(field == 2):
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
     #load limits and filters from pre-made model file
     mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
-
+<<<<<<< HEAD
     mod.filters[0].compN=2110.4
     mod.filters[0].compB=0.111
     mod.filters[0].compM=-0.894
+
+    mod.filters[0].err=12.0 #assume 5sigma limit on the 24um
+    mod.filters[1].err=3.0 #assume 250um 1sigma confusion
+    mod.filters[2].err=3.0 #assume 250um 1sigma confusion
+=======
+<<<<<<< HEAD
+    # mod.filters[1].limit=0.1
+    # mod.filters[2].limit=0.1
+    mod.filters[0].compN=2110.4
+    mod.filters[0].compB=0.111
+    mod.filters[0].compM=-0.894
+=======
+    mod.filters[0].compN=1.0
+    mod.filters[0].compB=0.01
+    mod.filters[0].compM=0.08
+>>>>>>> origin/master
+
+   # mod.filters[1].limit=0.1
+   # mod.filters[2].limit=0.1
+>>>>>>> 9e961357219762991788e8d314c93394199dcecf
 else:
     raise ValueError("Invalid field")
 
@@ -277,21 +297,26 @@ outfile=simname+"6_output.fits"
 
 
 #parameters below should be the same regardless of model
-mod.params['Alpha'].value=3.00
-mod.params['Alpha'].pmin=0.80
-mod.params['Alpha'].pmax=3.20
-mod.params['Alpha'].fixed=0
+#mod.params['Alpha'].value=3.00
+#mod.params['Alpha'].pmin=0.80
+#mod.params['Alpha'].pmax=3.20
+#mod.params['Alpha'].fixed=0
 
 #AS-change
-mod.params['Alpha'].pmin=0.5
+mod.params['Alpha'].value=1.2
+mod.params['Alpha'].fixed=1
 
-mod.params['Beta'].value=0.52
-mod.params['Beta'].pmin=0.01
-mod.params['Beta'].pmax=0.55
-mod.params['Beta'].fixed=0
+#mod.params['Beta'].value=0.52
+#mod.params['Beta'].pmin=0.01
+#mod.params['Beta'].pmax=0.55
+#mod.params['Beta'].fixed=0
+
+#AS-change
+mod.params['Beta'].value=0.5
+mod.params['Beta'].fixed=1
 
 mod.params['Phi0'].value=-2.239
-mod.params['Phi0'].pmin=-4.239
+mod.params['Phi0'].pmin=-3.239
 mod.params['Phi0'].pmax=-0.739
 mod.params['Phi0'].fixed=0
 
@@ -301,17 +326,17 @@ mod.params['L0'].pmax=10.400
 mod.params['L0'].fixed=0
 
 #AS-change
-mod.params['L0'].pmin=9.0
-mod.params['L0'].pmax=11.0
+#mod.params['L0'].pmin=9.0
+#mod.params['L0'].pmax=11.0
 
 mod.params['P'].value=-0.57
-mod.params['P'].pmin=-4.60
+mod.params['P'].pmin=-1.00
 mod.params['P'].pmax=-0.01
 mod.params['P'].fixed=0
 
 #AS-change
-mod.params['P'].pmin=-4.0
-mod.params['P'].max=0.5
+mod.params['P'].pmin=-1.0
+mod.params['P'].max=-0.13
 
 mod.params['P2'].value=-2.40
 mod.params['P2'].pmin=-3.00
@@ -319,27 +344,31 @@ mod.params['P2'].pmax=1.60
 mod.params['P2'].fixed=0
 
 #AS-change
-mod.params['P2'].pmin=-4
-mod.params['P2'].pmax=2
+#mod.params['P2'].pmin=-4
+#mod.params['P2'].pmax=2
 
 mod.params['Q'].value=3.55
 mod.params['Q'].pmin=3.05
 mod.params['Q'].pmax=5.50
 mod.params['Q'].fixed=0
 
+#AS-change
+mod.params['Q'].pmin=3.35
+mod.params['Q'].pmax=3.75
+
 mod.params['Q2'].value=0.80
 mod.params['Q2'].pmin=-2.20
 mod.params['Q2'].pmax=1.50
 mod.params['Q2'].fixed=0
 
-mod.params['zbp'].value=1.10
-mod.params['zbp'].pmin=0.10
-mod.params['zbp'].pmax=3.10
+mod.params['zbp'].value=1.00
+mod.params['zbp'].pmin=0.8
+mod.params['zbp'].pmax=1.5
 mod.params['zbp'].fixed=0
 
-mod.params['zbq'].value=1.85
-mod.params['zbq'].pmin=1.40
-mod.params['zbq'].pmax=4.00
+mod.params['zbq'].value=2.0
+mod.params['zbq'].pmin=1.50
+mod.params['zbq'].pmax=2.50
 mod.params['zbq'].fixed=0
 
 mod.filename=mfile

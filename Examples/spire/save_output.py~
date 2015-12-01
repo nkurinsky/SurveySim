@@ -68,5 +68,5 @@ for fname in sys.argv[1:]:
     if(output.fit()):
         output.MCMC.saveFit(newdir+'/fit')
         output.MCMC.saveFit(newdir+'/lffit',mode='lf')
-        output.MCMC.saveFit(newdir+'/sedfit',mode='sed_short')
+        output.MCMC.saveFit(newdir+'/sedfit',mode='sed')
     print ""
