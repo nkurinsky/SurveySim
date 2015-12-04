@@ -572,7 +572,7 @@ class OutputFile:
 
     def __init__(self,filename):
         fnamecore=filename.split('output.fits')[0]
-<<<<<<< HEAD
+#<<<<<<< HEAD
         self.modelfile=fnamecore+'model.fits'
         print self.modelfile
         self.mhdus=fits.open(self.modelfile)
@@ -580,14 +580,14 @@ class OutputFile:
         self.axis1=prihdr['AXIS1']
         self.axis2=prihdr['AXIS2']
         print self.axis1,self.axis2
-=======
+#=======
         #self.modelfile=fnamecore+'_model.fits'
         #self.mhdus=fits.open(self.modelfile)
         #prihdr=self.mhdus[0].header
         #self.axis1=prihdr['AXIS1']
         #self.axis2=prihdr['AXIS2']
         #print self.axis1,self.axis2
->>>>>>> origin/master
+        #origin/master
         self.filename=filename
         self.hdus=fits.open(filename)
         self.images=dict()

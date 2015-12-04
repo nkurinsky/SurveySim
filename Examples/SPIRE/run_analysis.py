@@ -37,7 +37,7 @@ mod.filters[2].setID("SPIRE_500")
 if(field == 0):
     simname="spire_COSMOS"
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID250_DR2.fits"
-    mod.survey['area']=4.78
+    mod.survey['area']=4.78  #4.38
     mod.filters[0].limit=8.0
     mod.filters[0].err=1.6
     mod.filters[0].compN=1.48
@@ -71,30 +71,27 @@ elif(field == 2):
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
     #load limits and filters from pre-made model file
     mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
-<<<<<<< HEAD
-    mod.filters[0].compN=2110.4
-    mod.filters[0].compB=0.111
-    mod.filters[0].compM=-0.894
-
-    mod.filters[0].err=12.0 #assume 5sigma limit on the 24um
+    mod.filters[0].err=12.0 #16.0#12.0 #assume 5sigma limit on the 24um
     mod.filters[1].err=3.0 #assume 250um 1sigma confusion
-    mod.filters[2].err=3.0 #assume 250um 1sigma confusion
-=======
-<<<<<<< HEAD
-    # mod.filters[1].limit=0.1
-    # mod.filters[2].limit=0.1
-    mod.filters[0].compN=2110.4
-    mod.filters[0].compB=0.111
-    mod.filters[0].compM=-0.894
-=======
-    mod.filters[0].compN=1.0
-    mod.filters[0].compB=0.01
-    mod.filters[0].compM=0.08
->>>>>>> origin/master
+    mod.filters[2].err=3.0 #assume 350um 1sigma confusion
+    ##mod.filters[1].limit=0.1
+    ##mod.filters[2].limit=0.1
+    #mod.filters[0].compN=2110.4
+    #mod.filters[0].compB=0.111
+    #mod.filters[0].compM=-0.894
+    ##mod.filters[0].compN=1.0
+    ##mod.filters[0].compB=0.01
+    ##mod.filters[0].compM=0.08
+    mod.survey['area']=2.09
+    #mod.filters[1].limit=12.0
 
-   # mod.filters[1].limit=0.1
-   # mod.filters[2].limit=0.1
->>>>>>> 9e961357219762991788e8d314c93394199dcecf
+    mod.axis1="ColorF2F3"
+    mod.axis2="Flux2"
+    mod.filters[1].limit=8.0
+    mod.filters[1].err=1.6
+    mod.filters[2].limit=0.1
+    mod.filters[2].err=1.32
+    
 else:
     raise ValueError("Invalid field")
 
@@ -124,31 +121,33 @@ else:
     raise ValueError("Invalid lfForm")
 
 mod.params['fa0'].value=0.60
-mod.params['fa0'].pmin=0.20
+#mod.params['fa0'].pmin=0.20
 mod.params['fa0'].pmax=1.00
 mod.params['fa0'].fixed=0
 
 mod.params['t1'].value=-1.30
 mod.params['t1'].pmin=-2.60
-mod.params['t1'].pmax=-0.10
+mod.params['t1'].pmax=-0.01
 mod.params['t1'].fixed=0
 
-mod.params['t2'].value=6.50
-mod.params['t2'].pmin=4.50
-mod.params['t2'].pmax=8.50
+mod.params['t2'].value=4.50#6.50
+mod.params['t2'].pmin=1.50#4.50
+mod.params['t2'].pmax=7.50#8.50
 mod.params['t2'].fixed=0
 
 mod.params['zbt'].value=2.50
-mod.params['zbt'].pmin=0.80
+mod.params['zbt'].pmin=0.50
 mod.params['zbt'].pmax=4.00
 mod.params['zbt'].fixed=0
 
 #AS-change
-mod.params['fa0'].pmin=0.0
-mod.params['zbt'].pmin=0.50
-mod.params['zbt'].pmax=4.0
-mod.params['t2'].pmin=0.0
-mod.params['t1'].pmax=0.5
+mod.params['fa0'].pmin=0.01
+#mod.params['zbt'].pmin=0.50
+#mod.params['t2'].pmin=0.01
+#mod.params['t1'].pmax=0.5
+
+#MB-change
+#mod.params['fa0'].pmax=0.80
 
 if(model == 0):
     simname=simname+"_onlySFG"
@@ -197,6 +196,7 @@ else:
 for key in fixKeys:
     mod.params[key].fixed=1
 
+    
 
 if(model == 0 and lfForm == 2 and field == 0):
     simname="A-C"
@@ -292,8 +292,8 @@ if(model == 4 and lfForm == 0 and field == 2):
     simname="O"
 
 
-mfile=simname+"6_model.fits"
-outfile=simname+"6_output.fits"
+mfile=simname+"3_model.fits"
+outfile=simname+"3_output.fits"
 
 
 #parameters below should be the same regardless of model
@@ -302,9 +302,24 @@ outfile=simname+"6_output.fits"
 #mod.params['Alpha'].pmax=3.20
 #mod.params['Alpha'].fixed=0
 
+
+
 #AS-change
-mod.params['Alpha'].value=1.2
+mod.params['Alpha'].value=1.20
+#mod.params['Alpha'].pmin=0.9#0.96#-0.80
+#mod.params['Alpha'].pmax=1.5#1.44#1.50
+#mod.params['Alpha'].fixed=0
 mod.params['Alpha'].fixed=1
+
+#mod.params['Alpha'].pmin=0.90
+#mod.params['Alpha'].pmax=1.50
+#mod.params['Alpha'].fixed=0
+
+#DPL
+#mod.params['Alpha'].value=1.70
+#mod.params['Alpha'].pmin=1.4#-0.80
+#mod.params['Alpha'].pmax=2.0#1.50
+#mod.params['Alpha'].fixed=0
 
 #mod.params['Beta'].value=0.52
 #mod.params['Beta'].pmin=0.01
@@ -312,64 +327,112 @@ mod.params['Alpha'].fixed=1
 #mod.params['Beta'].fixed=0
 
 #AS-change
-mod.params['Beta'].value=0.5
+mod.params['Beta'].value=0.50
+#mod.params['Beta'].pmin=0.3#0.4#0.10
+#mod.params['Beta'].pmax=0.7#0.6#0.80
+#mod.params['Beta'].fixed=0
 mod.params['Beta'].fixed=1
 
-mod.params['Phi0'].value=-2.239
-mod.params['Phi0'].pmin=-3.239
-mod.params['Phi0'].pmax=-0.739
+#mod.params['Beta'].pmin=0.2
+#mod.params['Beta'].pmax=0.8
+#mod.params['Beta'].fixed=0
+
+#DPL
+#mod.params['Beta'].value=0.2
+#mod.params['Beta'].pmin=0.1#0.10
+#mod.params['Beta'].pmax=0.3#0.80
+#mod.params['Beta'].fixed=0
+
+mod.params['Phi0'].value=-2.24
+mod.params['Phi0'].pmin=-3.24
+mod.params['Phi0'].pmax=-0.74
 mod.params['Phi0'].fixed=0
 
-mod.params['L0'].value=9.949
-mod.params['L0'].pmin=8.449
-mod.params['L0'].pmax=10.400
+mod.params['L0'].value=9.95
+mod.params['L0'].pmin=8.45
+mod.params['L0'].pmax=10.45
 mod.params['L0'].fixed=0
 
-#AS-change
-#mod.params['L0'].pmin=9.0
-#mod.params['L0'].pmax=11.0
-
-mod.params['P'].value=-0.57
-mod.params['P'].pmin=-1.00
-mod.params['P'].pmax=-0.01
+mod.params['P'].value=-0.5
+mod.params['P'].pmin=-1.0
+mod.params['P'].pmax=0.5
 mod.params['P'].fixed=0
 
-#AS-change
-mod.params['P'].pmin=-1.0
-mod.params['P'].max=-0.13
+#DPL
+#mod.params['P'].value=-0.5#-2.5#-3.5
+#mod.params['P'].pmin=-0.7#-3.5#-5.0
+#mod.params['P'].pmax=-0.3#-2.0#-0.01
+#mod.params['P'].fixed=0
 
-mod.params['P2'].value=-2.40
-mod.params['P2'].pmin=-3.00
-mod.params['P2'].pmax=1.60
+#AS-change
+#mod.params['P'].pmin=-1.0
+#mod.params['P'].max=-0.13
+
+#mod.params['P2'].value=-2.40
+#mod.params['P2'].pmin=-2.88#-3.20
+#mod.params['P2'].pmax=-1.92#-1.80
 mod.params['P2'].fixed=0
 
-#AS-change
-#mod.params['P2'].pmin=-4
-#mod.params['P2'].pmax=2
+#MB-change
+mod.params['P2'].value=-3.25
+mod.params['P2'].pmin=-3.75
+mod.params['P2'].pmax=-2.75
+#mod.params['P2'].pmin=-4.75
+#mod.params['P2'].pmax=-1.75
 
 mod.params['Q'].value=3.55
-mod.params['Q'].pmin=3.05
-mod.params['Q'].pmax=5.50
+#mod.params['Q'].pmin=2.84#3.05
+#mod.params['Q'].pmax=4.26#4.2
 mod.params['Q'].fixed=0
 
 #AS-change
 mod.params['Q'].pmin=3.35
-mod.params['Q'].pmax=3.75
+mod.params['Q'].pmax=3.85
 
-mod.params['Q2'].value=0.80
-mod.params['Q2'].pmin=-2.20
-mod.params['Q2'].pmax=1.50
-mod.params['Q2'].fixed=0
+#mod.params['Q2'].value=0.80
+#mod.params['Q2'].pmin=0.64#0.10
+#mod.params['Q2'].pmax=0.96#1.50
+#mod.params['Q2'].fixed=0
 
-mod.params['zbp'].value=1.00
-mod.params['zbp'].pmin=0.8
-mod.params['zbp'].pmax=1.5
+#MB-change
+mod.params['Q2'].value=1.2
+mod.params['Q2'].pmin=0.8
+mod.params['Q2'].pmax=1.6
+#mod.params['Q2'].pmin=-0.20
+#mod.params['Q2'].pmax=2.6
+
+#mod.params['zbp'].value=1.10
+#mod.params['zbp'].pmin=0.10
+#mod.params['zbp'].pmax=3.10
 mod.params['zbp'].fixed=0
 
-mod.params['zbq'].value=2.0
-mod.params['zbq'].pmin=1.50
-mod.params['zbq'].pmax=2.50
+#AS-change
+#mod.params['zbp'].value=1.00
+#mod.params['zbp'].pmin=0.8
+#mod.params['zbp'].pmax=1.5
+
+#MB-change
+mod.params['zbp'].value=1.00
+mod.params['zbp'].pmin=0.50
+mod.params['zbp'].pmax=2.50
+
+
+#mod.params['zbq'].value=1.85
+#mod.params['zbq'].pmin=1.40
+#mod.params['zbq'].pmax=4.00
 mod.params['zbq'].fixed=0
 
+#AS-change
+#mod.params['zbq'].value=2.0
+#mod.params['zbq'].pmin=1.50
+#mod.params['zbq'].pmax=3.3#2.50
+
+#MB-change
+mod.params['zbq'].value=1.75
+mod.params['zbq'].pmin=1.40#1.50
+mod.params['zbq'].pmax=2.10#2.00
+
+
+
 mod.filename=mfile
-mod.run(obsfile,outfile=outfile)
+mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates_v2.fits")
