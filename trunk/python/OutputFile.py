@@ -453,7 +453,7 @@ class MCMCInfo:
                     if(j == 0):
                         plt.ylabel("Probability",fontsize=22)
                     else:
-                        plt.setp( plt.gca().get_yticklabels(), fontsize=22, visible=False)
+                        plt.setp( plt.gca().get_yticklabels(), fontsize=28, visible=False)
                 elif(i > j):
                     x=self.Parameters[pnames[j]]
                     y=self.Parameters[pnames[i]]
@@ -480,14 +480,14 @@ class MCMCInfo:
                     yticks=np.around(np.arange(start, end, stepsize),2)
                     ax.yaxis.set_ticks(yticks)
                     if(j == 0):
-                        plt.ylabel(axisLabel(pnames[i]),fontsize=22)
+                        plt.ylabel(axisLabel(pnames[i]),fontsize=28)
                     else:
                         plt.setp( plt.gca().get_yticklabels(), visible=False)
                     plt.ylim(start,end)
                 if(i == (len(pnames)-1)):
-                    plt.xlabel(axisLabel(pnames[j]),fontsize=22)
+                    plt.xlabel(axisLabel(pnames[j]),fontsize=28)
                 else:
-                    plt.setp( plt.gca().get_xticklabels(), fontsize=22,visible=False)
+                    plt.setp( plt.gca().get_xticklabels(), fontsize=28,visible=False)
         #add legend with best-fit parameter values
         #ax.annotate('Best-fit values:', xy=(.7, .8),  xycoords='figure fraction',
         #        horizontalalignment='center', verticalalignment='center',size=20)
@@ -572,7 +572,7 @@ class OutputFile:
 
     def __init__(self,filename):
         fnamecore=filename.split('output.fits')[0]
-<<<<<<< HEAD
+#<<<<<<< HEAD
         self.modelfile=fnamecore+'model.fits'
         print self.modelfile
         self.mhdus=fits.open(self.modelfile)
@@ -580,14 +580,14 @@ class OutputFile:
         self.axis1=prihdr['AXIS1']
         self.axis2=prihdr['AXIS2']
         print self.axis1,self.axis2
-=======
+#=======
         #self.modelfile=fnamecore+'_model.fits'
         #self.mhdus=fits.open(self.modelfile)
         #prihdr=self.mhdus[0].header
         #self.axis1=prihdr['AXIS1']
         #self.axis2=prihdr['AXIS2']
         #print self.axis1,self.axis2
->>>>>>> origin/master
+#>>>>>>> origin/master
         self.filename=filename
         self.hdus=fits.open(filename)
         self.images=dict()
