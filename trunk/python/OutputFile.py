@@ -587,7 +587,11 @@ class OutputFile:
         #self.axis1=prihdr['AXIS1']
         #self.axis2=prihdr['AXIS2']
         #print self.axis1,self.axis2
+<<<<<<< HEAD
+        #origin/master
+=======
 #>>>>>>> origin/master
+>>>>>>> 8f9497ad3c5221321c5d4c9d8c4a0dd59b894e01
         self.filename=filename
         self.hdus=fits.open(filename)
         self.images=dict()
