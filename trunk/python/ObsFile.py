@@ -10,18 +10,18 @@ def main(argv):
    try:
       opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
    except getopt.GetoptError:
-      print 'test.py -i <obsfile> -o <outputfile>'
+      print 'ObsFile.py -i <obsfile> -o <outputfile>'
       sys.exit(2)
    for opt, arg in opts:
       if opt == '-h':
-         print 'test.py -i <obsfile> -o <outputfile>'
+         print 'ObsFile.py -i <obsfile> -o <outputfile>'
          sys.exit()
       elif opt in ("-i", "--ifile"):
          obsfile = arg
       elif opt in ("-o", "--ofile"):
          outputfile = arg
    print 'Observations file is ', obsfile
-   #print 'Output file is ', outputfile
+   print 'Output file is ', outputfile
 
    hdulist = fits.open(obsfile,mode='update')
    hdulist.info()
@@ -52,8 +52,14 @@ def main(argv):
        thdr.set('EF3COL',ef3)
 
 # uncomment if need to fix something that already has the above keywords set
-#   thdr.set('F3COL', 'F250')
-#   thdr.set('EF3COL','e_F250')
+#   thdr.set('F3COL','F350')
+   thdr.set('EF1COL', 'e_F24')
+#   thdr.set('EF2COL','et_F250')
+#   thdr.set('EF3COL','et_F350')
+
+#   thdr.set('EF1COL','et_F250')
+#   thdr.set('EF2COL','et_F350')
+#   thdr.set('EF3COL','et_F500')
 
    hdulist.flush()
    hdulist.close()

@@ -39,17 +39,17 @@ if(field == 0):
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID250_DR2.fits"
     mod.survey['area']=4.78  #4.38
     mod.filters[0].limit=8.0
-    mod.filters[0].err=1.6
+    mod.filters[0].err=6.95 #1.6
     mod.filters[0].compN=1.48
     mod.filters[0].compB=5.90
     mod.filters[0].compM=9.27
     mod.filters[1].limit=0.1
-    mod.filters[1].err=1.32
+    mod.filters[1].err=6.63 #1.32
     #mod.filters[1].compN=1.48
     #mod.filters[1].compB=4.84
     #mod.filters[1].compM=5.51
     mod.filters[2].limit=0.1
-    mod.filters[2].err=1.9
+    mod.filters[2].err=6.63 #1.9
 elif(field == 1):
     simname="spire_Lockman-SWIRE"
     obsfile="/usr/local/surveysim/obs/L5-Lockman-SWIRE_xID250_DR2.fits"
@@ -71,9 +71,9 @@ elif(field == 2):
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
     #load limits and filters from pre-made model file
     mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
-    mod.filters[0].err=12.0 #16.0#12.0 #assume 5sigma limit on the 24um
-    mod.filters[1].err=3.0 #assume 250um 1sigma confusion
-    mod.filters[2].err=3.0 #assume 350um 1sigma confusion
+    mod.filters[0].err=16.0 #median error in F24um
+    mod.filters[1].err=2.0 #median total error in 250um (inst+conf)
+    mod.filters[2].err=2.7 #median total error in 350um (inst+conf)
     ##mod.filters[1].limit=0.1
     ##mod.filters[2].limit=0.1
     #mod.filters[0].compN=2110.4
@@ -84,13 +84,10 @@ elif(field == 2):
     ##mod.filters[0].compM=0.08
     mod.survey['area']=2.09
     #mod.filters[1].limit=12.0
-
-    mod.axis1="ColorF2F3"
-    mod.axis2="Flux2"
+    #mod.axis1="ColorF2F3"
+    #mod.axis2="Flux2"
     mod.filters[1].limit=8.0
-    mod.filters[1].err=1.6
     mod.filters[2].limit=0.1
-    mod.filters[2].err=1.32
     
 else:
     raise ValueError("Invalid field")
