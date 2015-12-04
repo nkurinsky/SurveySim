@@ -453,7 +453,7 @@ class MCMCInfo:
                     if(j == 0):
                         plt.ylabel("Probability",fontsize=22)
                     else:
-                        plt.setp( plt.gca().get_yticklabels(), fontsize=22, visible=False)
+                        plt.setp( plt.gca().get_yticklabels(), fontsize=28, visible=False)
                 elif(i > j):
                     x=self.Parameters[pnames[j]]
                     y=self.Parameters[pnames[i]]
@@ -480,14 +480,14 @@ class MCMCInfo:
                     yticks=np.around(np.arange(start, end, stepsize),2)
                     ax.yaxis.set_ticks(yticks)
                     if(j == 0):
-                        plt.ylabel(axisLabel(pnames[i]),fontsize=22)
+                        plt.ylabel(axisLabel(pnames[i]),fontsize=28)
                     else:
                         plt.setp( plt.gca().get_yticklabels(), visible=False)
                     plt.ylim(start,end)
                 if(i == (len(pnames)-1)):
-                    plt.xlabel(axisLabel(pnames[j]),fontsize=22)
+                    plt.xlabel(axisLabel(pnames[j]),fontsize=28)
                 else:
-                    plt.setp( plt.gca().get_xticklabels(), fontsize=22,visible=False)
+                    plt.setp( plt.gca().get_xticklabels(), fontsize=28,visible=False)
         #add legend with best-fit parameter values
         #ax.annotate('Best-fit values:', xy=(.7, .8),  xycoords='figure fraction',
         #        horizontalalignment='center', verticalalignment='center',size=20)
@@ -587,7 +587,11 @@ class OutputFile:
         #self.axis1=prihdr['AXIS1']
         #self.axis2=prihdr['AXIS2']
         #print self.axis1,self.axis2
+<<<<<<< HEAD
         #origin/master
+=======
+#>>>>>>> origin/master
+>>>>>>> 8f9497ad3c5221321c5d4c9d8c4a0dd59b894e01
         self.filename=filename
         self.hdus=fits.open(filename)
         self.images=dict()
