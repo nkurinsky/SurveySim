@@ -583,14 +583,26 @@ CompletenessCurve::CompletenessCurve(double n, double m, double b){
     _B=b;
   else
     _B=1e-10;
-
   
-  if(not complete)
+  scaled=false;
+  if(not complete){
     _ulim=_M-_B*log(pow(0.999,-1.0/_n)-1);
-  else
+    _fScale=50.0/_ulim;
+    if(_fScale < 1.0)
+      _fScale=1.0;   
+    else
+      scaled=true;
+  }
+  else{
     _ulim=0;
+    _fScale=1.0;
+  }
 
-  cout << "Completeness (" << bnum << "): " << _B << " " << _M << " " << _n << ", Max= " << _ulim << endl;
+  cout << "Completeness (" << bnum << "): " << _B << " " << _M << " " << _n << ", Max= " << _ulim << ", Scale=" << 1.0/_fScale << endl;
+  if(scaled){
+    _M*=_fScale;
+    _B*=_fScale;
+  }
   bnum++;
 }
 
@@ -603,7 +615,11 @@ bool CompletenessCurve::accept(double flux){
   if(flux > _ulim)
     return true;
 
-  double tFlux=round(flux);
+  double tFlux;
+  if(scaled)
+    tFlux=round(flux*_fScale);
+  else
+    tFlux=round(flux);  
 
   if(valueStore.count(tFlux) == 0){
     valueStore[tFlux]=pow(1.0+exp((_M-tFlux)/_B),-_n);
