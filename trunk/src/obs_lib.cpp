@@ -114,7 +114,7 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[], double flim[]){
     for (unsigned int i=0;i<tablesize;i++){
       accepted = true;
       for (int j=0;j<3;j++){
-	if((col[j][i] < flim[j]) or isnan(col[j][i])){
+	if((col[j][i] < flim[j]) or std::isnan(col[j][i])){
 	  accepted = false;
 	  break;
 	}
