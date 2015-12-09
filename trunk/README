@@ -67,3 +67,46 @@ compiler is very buggy and the gsl checks will fail. To do this, add
 	 CC=clang CXX=clang++
 to your ./configure commands. This is not necessary for the final program but is 
 important for make check in gsl.
+
+====================================================================================
+
+Local installation guide:
+(For users without root access)
+
+Extract each tarball as normal with the following command
+
+	 tar xzvf [file.tar.gz]
+
+Execute the following three commands begginning in GSL, then moving to cfitsio and
+finally in CCFits (cfitsio must be installed before CCFits).
+
+	./configure --prefix=/path/to/SurveySim
+	make
+	make install 
+
+Note: CCFits will only install if it can find cfitsio. If you get an error that it
+cannot, retry with ./configure accordingly
+
+    	 ./configure --prefix=/path/to/SurveySim --with-cfitsio=/path/to/cfitsio
+
+Before attempting the main compilation in SurveySim/trunk, you will need to set
+a series of flags. This can be done with the following two commands
+
+  	 export CPPFLAGS='-I/path/to/SurveySim/include'
+	 export LDFLAGS='-L/path/to/SurveySim/lib/'
+
+After which execute
+
+      	./configure --prefix=/path/to/SurveySim
+
+Or in one command with ./configure,
+
+      env CPPFLAGS='-I/path/to/SurveySim/include' LDFLAGS='-L/path/to/SurveySim/lib/' ./configure --prefix=/path/to/SurveySim
+
+make will fail unless your current compiler supports c++11, we recommend gcc 4.8.2
+or higher for best (tested) results. To complete the installation procedure, execute
+
+   	  make
+	  make install
+	  
+====================================================================================
