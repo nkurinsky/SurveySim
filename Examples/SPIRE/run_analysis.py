@@ -317,8 +317,8 @@ mod.params['P'].pmax=0.5
 mod.params['P'].fixed=0
 
 mod.params['Q'].value=3.55
-mod.params['Q'].pmin=2.84#3.05
-mod.params['Q'].pmax=4.26#4.2
+mod.params['Q'].pmin=0 #2.84#3.05
+mod.params['Q'].pmax=5 #4.26#4.2
 mod.params['Q'].fixed=0
 
 mod.params['P2'].value=-3.25
