@@ -58,8 +58,9 @@ Important Notes for Mac OSX:
 Make sure to install command line tools, using XCode for 10.8 and earlier and the 
 command
 	xcode-select --install
-for 10.9. Without these, the ./configure script will not be able to find user
-libraries and will fail.
+for 10.9 and higher. Without these, the ./configure script will not be able to find user
+libraries and will fail. Each time the OS is upgraded, these may need to be re-installed
+to be able to rebuild this and other packages.
 
 OSX 10.7:
 You should use clang and clang++ to compile and link all three libraries, as the llvm

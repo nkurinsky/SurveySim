@@ -179,10 +179,13 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
       string stemp;
       head.readKey(unitKeys[i],stemp);
       if(toLower(stemp) == "jy"){
-	units[i]=0.001;
+	units[i]=1e3;
       }
       else if(toLower(stemp) == "mjy"){
 	units[i]=1.0;
+      }
+      else if(toLower(stemp) == "ujy"){
+	units[i]=1e-3;
       }
       else{
 	LOG_CRITICAL(printf("Keyword \"%s\" contains unknown unit, defaulting to standard units mJy\n",unitKeys[i].c_str()));

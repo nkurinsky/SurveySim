@@ -27,7 +27,7 @@ void simulator::configure(const Configuration &config){
   seds.reset(new sed_lib(config.sedfile, nz, zmin, dz));
   seds->load_filters(modelFile,logflag);
   seds->get_filter_info(filters,flux_limits,band_errs,skew_errs);
-  
+
   for(int i=0;i<3;i++)
     hasSkewErr[i]=(skew_errs[i]>0.0);
   

@@ -11,7 +11,7 @@ from ModelFile import *
 
 
 if(len(sys.argv) < 4):
-    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
+    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE,2=COSMOS+MIPS) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
     quit()
 else:
     field=int(sys.argv[1])
@@ -37,19 +37,19 @@ mod.filters[2].setID("SPIRE_500")
 if(field == 0):
     simname="spire_COSMOS"
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID250_DR2.fits"
-    mod.survey['area']=4.78
+    mod.survey['area']=4.78  #4.38
     mod.filters[0].limit=8.0
-    mod.filters[0].err=1.6
+    mod.filters[0].err=6.95 #1.6
     mod.filters[0].compN=1.48
     mod.filters[0].compB=5.90
     mod.filters[0].compM=9.27
     mod.filters[1].limit=0.1
-    mod.filters[1].err=1.32
+    mod.filters[1].err=6.63 #1.32
     #mod.filters[1].compN=1.48
     #mod.filters[1].compB=4.84
     #mod.filters[1].compM=5.51
     mod.filters[2].limit=0.1
-    mod.filters[2].err=1.9
+    mod.filters[2].err=6.63 #1.9
 elif(field == 1):
     simname="spire_Lockman-SWIRE"
     obsfile="/usr/local/surveysim/obs/L5-Lockman-SWIRE_xID250_DR2.fits"
@@ -66,6 +66,29 @@ elif(field == 1):
     #mod.filters[1].compM=-19.83
     mod.filters[2].limit=0.1
     mod.filters[2].err=2.3
+elif(field == 2):
+    simname="spire_mips_COSMOS"
+    obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
+    #load limits and filters from pre-made model file
+    mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
+    mod.filters[0].err=16.0 #median error in F24um
+    mod.filters[1].err=2.0 #median total error in 250um (inst+conf)
+    mod.filters[2].err=2.7 #median total error in 350um (inst+conf)
+    ##mod.filters[1].limit=0.1
+    ##mod.filters[2].limit=0.1
+    #mod.filters[0].compN=2110.4
+    #mod.filters[0].compB=0.111
+    #mod.filters[0].compM=-0.894
+    ##mod.filters[0].compN=1.0
+    ##mod.filters[0].compB=0.01
+    ##mod.filters[0].compM=0.08
+    mod.survey['area']=2.09
+    #mod.filters[1].limit=12.0
+    #mod.axis1="ColorF2F3"
+    #mod.axis2="Flux2"
+    mod.filters[1].limit=8.0
+    mod.filters[2].limit=0.1
+    
 else:
     raise ValueError("Invalid field")
 
@@ -93,6 +116,35 @@ elif(lfForm == 2):
 
 else:
     raise ValueError("Invalid lfForm")
+
+mod.params['fa0'].value=0.60
+#mod.params['fa0'].pmin=0.20
+mod.params['fa0'].pmax=1.00
+mod.params['fa0'].fixed=0
+
+mod.params['t1'].value=-1.30
+mod.params['t1'].pmin=-2.60
+mod.params['t1'].pmax=-0.01
+mod.params['t1'].fixed=0
+
+mod.params['t2'].value=4.50#6.50
+mod.params['t2'].pmin=1.50#4.50
+mod.params['t2'].pmax=7.50#8.50
+mod.params['t2'].fixed=0
+
+mod.params['zbt'].value=2.50
+mod.params['zbt'].pmin=0.50
+mod.params['zbt'].pmax=4.00
+mod.params['zbt'].fixed=0
+
+#AS-change
+mod.params['fa0'].pmin=0.01
+#mod.params['zbt'].pmin=0.50
+#mod.params['t2'].pmin=0.01
+#mod.params['t1'].pmax=0.5
+
+#MB-change
+#mod.params['fa0'].pmax=0.80
 
 if(model == 0):
     simname=simname+"_onlySFG"
@@ -141,123 +193,84 @@ else:
 for key in fixKeys:
     mod.params[key].fixed=1
 
+    
+if(model == 0 and lfForm == 1):
+    simname="A"
+if(model == 0 and lfForm == 0):
+    simname="B"
+if(model == 1 and lfForm == 1):
+    simname="C"
+if(model == 1 and lfForm == 0):
+    simname="D"
+if(model == 2 and lfForm == 1):
+    simname="E"
+if(model == 2 and lfForm == 0):
+    simname="F"
 
-if(model == 0 and lfForm == 2 and field == 0):
-    simname="A-C"
-if(model == 0 and lfForm == 1 and field == 0):
-    simname="B-C"
-if(model == 0 and lfForm == 0 and field == 0):
-    simname="C-C"
-if(model == 1 and lfForm == 2 and field == 0):
-    simname="D-C"
-if(model == 1 and lfForm == 1 and field == 0):
-    simname="E-C"
-if(model == 1 and lfForm == 0 and field == 0):
-    simname="F-C"
-if(model == 2 and lfForm == 2 and field == 0):
-    simname="G-C"
-if(model == 2 and lfForm == 1 and field == 0):
-    simname="H-C"
-if(model == 2 and lfForm == 0 and field == 0):
-    simname="I-C"
-if(model == 3 and lfForm == 2 and field == 0):
-    simname="J-C"
-if(model == 3 and lfForm == 1 and field == 0):
-    simname="K-C"
-if(model == 3 and lfForm == 0 and field == 0):
-    simname="L-C"
-if(model == 4 and lfForm == 2 and field == 0):
-    simname="M-C"
-if(model == 4 and lfForm == 1 and field == 0):
-    simname="N-C"
-if(model == 4 and lfForm == 0 and field == 0):
-    simname="O-C"
-if(model == 0 and lfForm == 2 and field == 1):
-    simname="A-LS"
-if(model == 0 and lfForm == 1 and field == 1):
-    simname="B-LS"
-if(model == 0 and lfForm == 0 and field == 1):
-    simname="C-LS"
-if(model == 1 and lfForm == 2 and field == 1):
-    simname="D-LS"
-if(model == 1 and lfForm == 1 and field == 1):
-    simname="E-LS"
-if(model == 1 and lfForm == 0 and field == 1):
-    simname="F-LS"
-if(model == 2 and lfForm == 2 and field == 1):
-    simname="G-LS"
-if(model == 2 and lfForm == 1 and field == 1):
-    simname="H-LS"
-if(model == 2 and lfForm == 0 and field == 1):
-    simname="I-LS"
-if(model == 3 and lfForm == 2 and field == 1):
-    simname="J-LS"
-if(model == 3 and lfForm == 1 and field == 1):
-    simname="K-LS"
-if(model == 3 and lfForm == 0 and field == 1):
-    simname="L-LS"
-if(model == 4 and lfForm == 2 and field == 1):
-    simname="M-LS"
-if(model == 4 and lfForm == 1 and field == 1):
-    simname="N-LS"
-if(model == 4 and lfForm == 0 and field == 1):
-    simname="O-LS"
+    
 
+if(field == 0):
+    simname=simname+'_spire'
+if(field == 2):
+    simname=simname+'_mips'
 
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
 
-
 #parameters below should be the same regardless of model
-mod.params['Alpha'].value=3.00
-mod.params['Alpha'].pmin=0.80
-mod.params['Alpha'].pmax=3.20
-mod.params['Alpha'].fixed=0
 
-mod.params['Beta'].value=0.52
-mod.params['Beta'].pmin=0.01
-mod.params['Beta'].pmax=0.55
-mod.params['Beta'].fixed=0
+#AS-change
+mod.params['Alpha'].value=1.20
+mod.params['Alpha'].fixed=1
 
-mod.params['Phi0'].value=-2.239
-mod.params['Phi0'].pmin=-4.239
-mod.params['Phi0'].pmax=-0.739
+mod.params['Beta'].value=0.50
+mod.params['Beta'].fixed=1
+
+mod.params['Phi0'].value=-2.24
+mod.params['Phi0'].pmin=-3.24
+mod.params['Phi0'].pmax=-0.74
 mod.params['Phi0'].fixed=0
 
-mod.params['L0'].value=9.949
-mod.params['L0'].pmin=8.449
-mod.params['L0'].pmax=10.400
+mod.params['L0'].value=9.95
+mod.params['L0'].pmin=8.45
+mod.params['L0'].pmax=10.45
 mod.params['L0'].fixed=0
 
-mod.params['P'].value=-0.57
-mod.params['P'].pmin=-4.60
-mod.params['P'].pmax=-0.01
+mod.params['P'].value=-0.5
+mod.params['P'].pmin=-1.0
+mod.params['P'].pmax=0.5
 mod.params['P'].fixed=0
 
-mod.params['P2'].value=-2.40
-mod.params['P2'].pmin=-3.00
-mod.params['P2'].pmax=1.60
-mod.params['P2'].fixed=0
-
 mod.params['Q'].value=3.55
-mod.params['Q'].pmin=3.05
-mod.params['Q'].pmax=5.50
+mod.params['Q'].pmin=0 #2.84#3.05
+mod.params['Q'].pmax=5 #4.26#4.2
 mod.params['Q'].fixed=0
 
-mod.params['Q2'].value=0.80
-mod.params['Q2'].pmin=-2.20
-mod.params['Q2'].pmax=1.50
+mod.params['P2'].value=-3.25
+mod.params['P2'].pmin=-3.75
+mod.params['P2'].pmax=-2.75
+mod.params['P2'].fixed=0
+
+mod.params['Q2'].value=1.2
+mod.params['Q2'].pmin=0.8
+mod.params['Q2'].pmax=1.6
 mod.params['Q2'].fixed=0
 
-mod.params['zbp'].value=1.10
-mod.params['zbp'].pmin=0.10
-mod.params['zbp'].pmax=3.10
+mod.params['zbp'].value=1.00
+mod.params['zbp'].pmin=0.50
+mod.params['zbp'].pmax=2.50
 mod.params['zbp'].fixed=0
 
-mod.params['zbq'].value=1.85
-mod.params['zbq'].pmin=1.40
-mod.params['zbq'].pmax=4.00
+mod.params['zbq'].value=1.75
+mod.params['zbq'].pmin=1.40#1.50
+mod.params['zbq'].pmax=2.10#2.00
 mod.params['zbq'].fixed=0
 
+#DPL
+#mod.params['P'].value=-0.5#-2.5#-3.5
+#mod.params['P'].pmin=-0.7#-3.5#-5.0
+#mod.params['P'].pmax=-0.3#-2.0#-0.01
+#mod.params['P'].fixed=0
+
 mod.filename=mfile
-mod.run(obsfile,outfile=outfile)
+mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates_v2.fits")
