@@ -289,8 +289,8 @@ if(model == 4 and lfForm == 0 and field == 2):
     simname="O"
 
 
-mfile=simname+"_larger_model.fits"
-outfile=simname+"_larger_output.fits"
+mfile=simname+"_model.fits"
+outfile=simname+"_output.fits"
 
 
 #parameters below should be the same regardless of model
