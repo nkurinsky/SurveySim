@@ -194,81 +194,19 @@ for key in fixKeys:
     mod.params[key].fixed=1
 
     
-
-if(model == 0 and lfForm == 2 and field == 0):
-    simname="A-C"
-if(model == 0 and lfForm == 1 and field == 0):
-    simname="B-C"
-if(model == 0 and lfForm == 0 and field == 0):
-    simname="C-C"
-if(model == 1 and lfForm == 2 and field == 0):
-    simname="D-C"
-if(model == 1 and lfForm == 1 and field == 0):
-    simname="E-C"
-if(model == 1 and lfForm == 0 and field == 0):
-    simname="F-C"
-if(model == 2 and lfForm == 2 and field == 0):
-    simname="G-C"
-if(model == 2 and lfForm == 1 and field == 0):
-    simname="H-C"
-if(model == 2 and lfForm == 0 and field == 0):
-    simname="I-C"
-if(model == 3 and lfForm == 2 and field == 0):
-    simname="J-C"
-if(model == 3 and lfForm == 1 and field == 0):
-    simname="K-C"
-if(model == 3 and lfForm == 0 and field == 0):
-    simname="L-C"
-if(model == 4 and lfForm == 2 and field == 0):
-    simname="M-C"
-if(model == 4 and lfForm == 1 and field == 0):
-    simname="N-C"
-if(model == 4 and lfForm == 0 and field == 0):
-    simname="O-C"
-    
-if(model == 0 and lfForm == 2 and field == 1):
-    simname="A-LS"
-if(model == 0 and lfForm == 1 and field == 1):
-    simname="B-LS"
-if(model == 0 and lfForm == 0 and field == 1):
-    simname="C-LS"
-if(model == 1 and lfForm == 2 and field == 1):
-    simname="D-LS"
-if(model == 1 and lfForm == 1 and field == 1):
-    simname="E-LS"
-if(model == 1 and lfForm == 0 and field == 1):
-    simname="F-LS"
-if(model == 2 and lfForm == 2 and field == 1):
-    simname="G-LS"
-if(model == 2 and lfForm == 1 and field == 1):
-    simname="H-LS"
-if(model == 2 and lfForm == 0 and field == 1):
-    simname="I-LS"
-if(model == 3 and lfForm == 2 and field == 1):
-    simname="J-LS"
-if(model == 3 and lfForm == 1 and field == 1):
-    simname="K-LS"
-if(model == 3 and lfForm == 0 and field == 1):
-    simname="L-LS"
-if(model == 4 and lfForm == 2 and field == 1):
-    simname="M-LS"
-if(model == 4 and lfForm == 1 and field == 1):
-    simname="N-LS"
-if(model == 4 and lfForm == 0 and field == 1):
-    simname="O-LS"
-    
-if(model == 0 and lfForm == 2 and field == 2):
+if(model == 0 and lfForm == 1):
     simname="A"
-if(model == 0 and lfForm == 1 and field == 2):
+if(model == 0 and lfForm == 0):
     simname="B"
-if(model == 0 and lfForm == 0 and field == 2):
+if(model == 1 and lfForm == 1):
     simname="C"
-if(model == 1 and lfForm == 2 and field == 2):
+if(model == 1 and lfForm == 0):
     simname="D"
-if(model == 1 and lfForm == 1 and field == 2):
+if(model == 2 and lfForm == 1):
     simname="E"
-if(model == 1 and lfForm == 0 and field == 2):
+if(model == 2 and lfForm == 0):
     simname="F"
+<<<<<<< HEAD
 if(model == 2 and lfForm == 2 and field == 2):
     simname="G"
 if(model == 2 and lfForm == 1 and field == 2):
@@ -291,17 +229,23 @@ if(model == 4 and lfForm == 0 and field == 2):
 
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
+=======
+>>>>>>> origin/master
 
+    
+
+if(field == 0):
+    simname=simname+'_spire'
+if(field == 2):
+    simname=simname+'_mips'
+
+mfile=simname+"_model.fits"
+outfile=simname+"_output.fits"
 
 #parameters below should be the same regardless of model
-#mod.params['Alpha'].value=3.00
-#mod.params['Alpha'].pmin=0.80
-#mod.params['Alpha'].pmax=3.20
-#mod.params['Alpha'].fixed=0
-
-
 
 #AS-change
+<<<<<<< HEAD
 #mod.params['Alpha'].value=1.20
 #mod.params['Alpha'].pmin=0.9#0.96#-0.80
 #mod.params['Alpha'].pmax=1.5#1.44#1.50
@@ -340,6 +284,14 @@ mod.params['Beta'].value=0.1#0.2
 ##mod.params['Beta'].pmax=0.3#0.80
 #mod.params['Beta'].fixed=1
 
+=======
+mod.params['Alpha'].value=1.20
+mod.params['Alpha'].fixed=1
+
+mod.params['Beta'].value=0.50
+mod.params['Beta'].fixed=1
+
+>>>>>>> origin/master
 mod.params['Phi0'].value=-2.24
 mod.params['Phi0'].pmin=-3.24
 mod.params['Phi0'].pmax=-0.74
@@ -355,6 +307,7 @@ mod.params['P'].pmin=-1.0
 mod.params['P'].pmax=0.5
 mod.params['P'].fixed=0
 
+<<<<<<< HEAD
 #Larger range
 mod.params['P'].pmin=-2.5
 mod.params['P'].pmax=1.5
@@ -373,11 +326,17 @@ mod.params['P'].pmax=1.5
 #mod.params['P2'].pmin=-2.88#-3.20
 #mod.params['P2'].pmax=-1.92#-1.80
 mod.params['P2'].fixed=0
+=======
+mod.params['Q'].value=3.55
+mod.params['Q'].pmin=0 #2.84#3.05
+mod.params['Q'].pmax=5 #4.26#4.2
+mod.params['Q'].fixed=0
+>>>>>>> origin/master
 
-#MB-change
 mod.params['P2'].value=-3.25
 mod.params['P2'].pmin=-3.75
 mod.params['P2'].pmax=-2.75
+<<<<<<< HEAD
 #mod.params['P2'].pmin=-4.75
 #mod.params['P2'].pmax=-1.75
 
@@ -398,46 +357,30 @@ mod.params['Q'].pmax=5.55
 #mod.params['Q2'].pmin=0.64#0.10
 #mod.params['Q2'].pmax=0.96#1.50
 #mod.params['Q2'].fixed=0
+=======
+mod.params['P2'].fixed=0
+>>>>>>> origin/master
 
-#MB-change
 mod.params['Q2'].value=1.2
 mod.params['Q2'].pmin=0.8
 mod.params['Q2'].pmax=1.6
-#mod.params['Q2'].pmin=-0.20
-#mod.params['Q2'].pmax=2.6
+mod.params['Q2'].fixed=0
 
-#mod.params['zbp'].value=1.10
-#mod.params['zbp'].pmin=0.10
-#mod.params['zbp'].pmax=3.10
-mod.params['zbp'].fixed=0
-
-#AS-change
-#mod.params['zbp'].value=1.00
-#mod.params['zbp'].pmin=0.8
-#mod.params['zbp'].pmax=1.5
-
-#MB-change
 mod.params['zbp'].value=1.00
 mod.params['zbp'].pmin=0.50
 mod.params['zbp'].pmax=2.50
+mod.params['zbp'].fixed=0
 
-
-#mod.params['zbq'].value=1.85
-#mod.params['zbq'].pmin=1.40
-#mod.params['zbq'].pmax=4.00
-mod.params['zbq'].fixed=0
-
-#AS-change
-#mod.params['zbq'].value=2.0
-#mod.params['zbq'].pmin=1.50
-#mod.params['zbq'].pmax=3.3#2.50
-
-#MB-change
 mod.params['zbq'].value=1.75
 mod.params['zbq'].pmin=1.40#1.50
 mod.params['zbq'].pmax=2.10#2.00
+mod.params['zbq'].fixed=0
 
-
+#DPL
+#mod.params['P'].value=-0.5#-2.5#-3.5
+#mod.params['P'].pmin=-0.7#-3.5#-5.0
+#mod.params['P'].pmax=-0.3#-2.0#-0.01
+#mod.params['P'].fixed=0
 
 mod.filename=mfile
 mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates_v2.fits")

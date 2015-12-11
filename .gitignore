@@ -51,3 +51,25 @@ Examples/SPIRE/joint_contours_old.py
 *.py
 
 *.fits
+
+Examples/spire/I_mips_model.fits
+
+*.fits
+
+Examples/spire/I_mips_model.fits
+
+Examples/spire/I_spire_model.fits
+
+Examples/spire/F_spire_model.fits
+
+Examples/spire/I_mips_model.fits
+
+Examples/spire/F_mips_model.fits
+
+Examples/spire/I-C3_model.fits
+
+Examples/spire/I-Ctest_model.fits
+
+Examples/spire/Itest_model.fits
+
+Examples/spire/I3_model.fits
