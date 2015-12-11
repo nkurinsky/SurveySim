@@ -194,103 +194,28 @@ for key in fixKeys:
     mod.params[key].fixed=1
 
     
-
-if(model == 0 and lfForm == 2 and field == 0):
-    simname="A-C"
-if(model == 0 and lfForm == 1 and field == 0):
-    simname="B-C"
-if(model == 0 and lfForm == 0 and field == 0):
-    simname="C-C"
-if(model == 1 and lfForm == 2 and field == 0):
-    simname="D-C"
-if(model == 1 and lfForm == 1 and field == 0):
-    simname="E-C"
-if(model == 1 and lfForm == 0 and field == 0):
-    simname="F-C"
-if(model == 2 and lfForm == 2 and field == 0):
-    simname="G-C"
-if(model == 2 and lfForm == 1 and field == 0):
-    simname="H-C"
-if(model == 2 and lfForm == 0 and field == 0):
-    simname="I-C"
-if(model == 3 and lfForm == 2 and field == 0):
-    simname="J-C"
-if(model == 3 and lfForm == 1 and field == 0):
-    simname="K-C"
-if(model == 3 and lfForm == 0 and field == 0):
-    simname="L-C"
-if(model == 4 and lfForm == 2 and field == 0):
-    simname="M-C"
-if(model == 4 and lfForm == 1 and field == 0):
-    simname="N-C"
-if(model == 4 and lfForm == 0 and field == 0):
-    simname="O-C"
-    
-if(model == 0 and lfForm == 2 and field == 1):
-    simname="A-LS"
-if(model == 0 and lfForm == 1 and field == 1):
-    simname="B-LS"
-if(model == 0 and lfForm == 0 and field == 1):
-    simname="C-LS"
-if(model == 1 and lfForm == 2 and field == 1):
-    simname="D-LS"
-if(model == 1 and lfForm == 1 and field == 1):
-    simname="E-LS"
-if(model == 1 and lfForm == 0 and field == 1):
-    simname="F-LS"
-if(model == 2 and lfForm == 2 and field == 1):
-    simname="G-LS"
-if(model == 2 and lfForm == 1 and field == 1):
-    simname="H-LS"
-if(model == 2 and lfForm == 0 and field == 1):
-    simname="I-LS"
-if(model == 3 and lfForm == 2 and field == 1):
-    simname="J-LS"
-if(model == 3 and lfForm == 1 and field == 1):
-    simname="K-LS"
-if(model == 3 and lfForm == 0 and field == 1):
-    simname="L-LS"
-if(model == 4 and lfForm == 2 and field == 1):
-    simname="M-LS"
-if(model == 4 and lfForm == 1 and field == 1):
-    simname="N-LS"
-if(model == 4 and lfForm == 0 and field == 1):
-    simname="O-LS"
-    
-if(model == 0 and lfForm == 2 and field == 2):
+if(model == 0 and lfForm == 1):
     simname="A"
-if(model == 0 and lfForm == 1 and field == 2):
+if(model == 0 and lfForm == 0):
     simname="B"
-if(model == 0 and lfForm == 0 and field == 2):
+if(model == 1 and lfForm == 1):
     simname="C"
-if(model == 1 and lfForm == 2 and field == 2):
+if(model == 1 and lfForm == 0):
     simname="D"
-if(model == 1 and lfForm == 1 and field == 2):
+if(model == 2 and lfForm == 1):
     simname="E"
-if(model == 1 and lfForm == 0 and field == 2):
+if(model == 2 and lfForm == 0):
     simname="F"
-if(model == 2 and lfForm == 2 and field == 2):
-    simname="G"
-if(model == 2 and lfForm == 1 and field == 2):
-    simname="H"
-if(model == 2 and lfForm == 0 and field == 2):
-    simname="I"
-if(model == 3 and lfForm == 2 and field == 2):
-    simname="J"
-if(model == 3 and lfForm == 1 and field == 2):
-    simname="K"
-if(model == 3 and lfForm == 0 and field == 2):
-    simname="L"
-if(model == 4 and lfForm == 2 and field == 2):
-    simname="M"
-if(model == 4 and lfForm == 1 and field == 2):
-    simname="N"
-if(model == 4 and lfForm == 0 and field == 2):
-    simname="O"
 
+    
 
-mfile=simname+"3_model.fits"
-outfile=simname+"3_output.fits"
+if(field == 0):
+    simname=simname+'_spire'
+if(field == 2):
+    simname=simname+'_mips'
+
+mfile=simname+"_model.fits"
+outfile=simname+"_output.fits"
 
 #parameters below should be the same regardless of model
 
