@@ -119,7 +119,7 @@ else:
 
 mod.params['fa0'].value=0.60
 #mod.params['fa0'].pmin=0.20
-mod.params['fa0'].pmax=1.00
+mod.params['fa0'].pmax=0.99
 mod.params['fa0'].fixed=0
 
 mod.params['t1'].value=-1.30
@@ -127,9 +127,9 @@ mod.params['t1'].pmin=-2.60
 mod.params['t1'].pmax=-0.01
 mod.params['t1'].fixed=0
 
-mod.params['t2'].value=4.50#6.50
-mod.params['t2'].pmin=1.50#4.50
-mod.params['t2'].pmax=7.50#8.50
+mod.params['t2'].value=4.50
+mod.params['t2'].pmin=1.50
+mod.params['t2'].pmax=7.50
 mod.params['t2'].fixed=0
 
 mod.params['zbt'].value=2.50
@@ -194,104 +194,189 @@ for key in fixKeys:
     mod.params[key].fixed=1
 
     
-if(model == 0 and lfForm == 1):
-    simname="A"
-if(model == 0 and lfForm == 0):
-    simname="B"
-if(model == 1 and lfForm == 1):
-    simname="C"
-if(model == 1 and lfForm == 0):
-    simname="D"
-if(model == 2 and lfForm == 1):
-    simname="E"
-if(model == 2 and lfForm == 0):
-    simname="F"
-<<<<<<< HEAD
-if(model == 2 and lfForm == 2 and field == 2):
-    simname="G"
-if(model == 2 and lfForm == 1 and field == 2):
-    simname="H"
-if(model == 2 and lfForm == 0 and field == 2):
-    simname="I"
-if(model == 3 and lfForm == 2 and field == 2):
-    simname="J"
-if(model == 3 and lfForm == 1 and field == 2):
-    simname="K"
-if(model == 3 and lfForm == 0 and field == 2):
-    simname="L"
-if(model == 4 and lfForm == 2 and field == 2):
-    simname="M"
-if(model == 4 and lfForm == 1 and field == 2):
-    simname="N"
-if(model == 4 and lfForm == 0 and field == 2):
-    simname="O"
 
-
-mfile=simname+"_model.fits"
-outfile=simname+"_output.fits"
-=======
->>>>>>> origin/master
-
+if(model == 0 and lfForm == 2 and field == 0):
+    #simname="A-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 0):
+    simname="A-C"
+if(model == 0 and lfForm == 0 and field == 0):
+    simname="B-C"
+if(model == 1 and lfForm == 2 and field == 0):
+    #simname="D-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 0):
+    simname="C-C"
+if(model == 1 and lfForm == 0 and field == 0):
+    simname="D-C"
+if(model == 2 and lfForm == 2 and field == 0):
+    #simname="G-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 0):
+    simname="E-C"
+if(model == 2 and lfForm == 0 and field == 0):
+    simname="F-C"
+if(model == 3 and lfForm == 2 and field == 0):
+    #simname="J-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 0):
+    #simname="K-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 0):
+    #simname="L-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 0):
+    #simname="M-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 0):
+    #simname="N-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 0):
+    #simname="O-C"
+    print 'Attention, non in the paper'
+    quit()
     
+if(model == 0 and lfForm == 2 and field == 1):
+    #simname="A-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 1):
+    #simname="B-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 0 and field == 1):
+    #simname="C-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 2 and field == 1):
+    #simname="D-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 1):
+    #simname="E-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 0 and field == 1):
+    #simname="F-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 2 and field == 1):
+    #simname="G-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 1):
+    #simname="H-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 0 and field == 1):
+    #simname="I-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 2 and field == 1):
+    #simname="J-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 1):
+    #simname="K-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 1):
+    #simname="L-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 1):
+    #simname="M-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 1):
+    #simname="N-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 1):
+    #simname="O-LS"
+    print 'Attention, non in the paper'
+    quit()
+    
+if(model == 0 and lfForm == 2 and field == 2):
+    #simname="A"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 2):
+    simname="A"
+if(model == 0 and lfForm == 0 and field == 2):
+    simname="B"
+if(model == 1 and lfForm == 2 and field == 2):
+    #simname="D"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 2):
+    simname="C"
+if(model == 1 and lfForm == 0 and field == 2):
+    simname="D"
+if(model == 2 and lfForm == 2 and field == 2):
+    #simname="G"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 2):
+    simname="E"
+if(model == 2 and lfForm == 0 and field == 2):
+    simname="F"
+if(model == 3 and lfForm == 2 and field == 2):
+    #simname="J"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 2):
+    #simname="K"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 2):
+    #simname="L"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 2):
+    #simname="M"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 2):
+    #simname="N"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 2):
+    #simname="O"
+    print 'Attention, non in the paper'
+    quit()
 
-if(field == 0):
-    simname=simname+'_spire'
-if(field == 2):
-    simname=simname+'_mips'
 
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
+
 
 #parameters below should be the same regardless of model
 
-#AS-change
-<<<<<<< HEAD
-#mod.params['Alpha'].value=1.20
-#mod.params['Alpha'].pmin=0.9#0.96#-0.80
-#mod.params['Alpha'].pmax=1.5#1.44#1.50
-#mod.params['Alpha'].fixed=0
 mod.params['Alpha'].fixed=1
 
-#mod.params['Alpha'].pmin=0.90
-#mod.params['Alpha'].pmax=1.50
-#mod.params['Alpha'].fixed=0
+if(lfForm == 0):
+    mod.params['Alpha'].value=1.20
 
-#DPL
-mod.params['Alpha'].value=2.2#1.70
-##mod.params['Alpha'].pmin=1.4#-0.80
-##mod.params['Alpha'].pmax=2.0#1.50
-#mod.params['Alpha'].fixed=1
+if(lfForm == 1):
+    mod.params['Alpha'].value=2.2
 
-#mod.params['Beta'].value=0.52
-#mod.params['Beta'].pmin=0.01
-#mod.params['Beta'].pmax=0.55
-#mod.params['Beta'].fixed=0
-
-#AS-change
-#mod.params['Beta'].value=0.50
-#mod.params['Beta'].pmin=0.3#0.4#0.10
-#mod.params['Beta'].pmax=0.7#0.6#0.80
-#mod.params['Beta'].fixed=0
 mod.params['Beta'].fixed=1
 
-#mod.params['Beta'].pmin=0.2
-#mod.params['Beta'].pmax=0.8
-#mod.params['Beta'].fixed=0
+if(lfForm == 0):
+    mod.params['Beta'].value=0.5
 
-#DPL
-mod.params['Beta'].value=0.1#0.2
-##mod.params['Beta'].pmin=0.1#0.10
-##mod.params['Beta'].pmax=0.3#0.80
-#mod.params['Beta'].fixed=1
+if(lfForm == 1):
+    mod.params['Beta'].value=0.1   
 
-=======
-mod.params['Alpha'].value=1.20
-mod.params['Alpha'].fixed=1
-
-mod.params['Beta'].value=0.50
-mod.params['Beta'].fixed=1
-
->>>>>>> origin/master
 mod.params['Phi0'].value=-2.24
 mod.params['Phi0'].pmin=-3.24
 mod.params['Phi0'].pmax=-0.74
@@ -303,84 +388,42 @@ mod.params['L0'].pmax=10.45
 mod.params['L0'].fixed=0
 
 mod.params['P'].value=-0.5
-mod.params['P'].pmin=-1.0
-mod.params['P'].pmax=0.5
+#mod.params['P'].pmin=-1.0
+#mod.params['P'].pmax=0.5
 mod.params['P'].fixed=0
-
-<<<<<<< HEAD
 #Larger range
 mod.params['P'].pmin=-2.5
 mod.params['P'].pmax=1.5
 
-#DPL
-#mod.params['P'].value=-0.5#-2.5#-3.5
-#mod.params['P'].pmin=-0.7#-3.5#-5.0
-#mod.params['P'].pmax=-0.3#-2.0#-0.01
-#mod.params['P'].fixed=0
-
-#AS-change
-#mod.params['P'].pmin=-1.0
-#mod.params['P'].max=-0.13
-
-#mod.params['P2'].value=-2.40
-#mod.params['P2'].pmin=-2.88#-3.20
-#mod.params['P2'].pmax=-1.92#-1.80
 mod.params['P2'].fixed=0
-=======
-mod.params['Q'].value=3.55
-mod.params['Q'].pmin=0 #2.84#3.05
-mod.params['Q'].pmax=5 #4.26#4.2
-mod.params['Q'].fixed=0
->>>>>>> origin/master
-
 mod.params['P2'].value=-3.25
 mod.params['P2'].pmin=-3.75
 mod.params['P2'].pmax=-2.75
-<<<<<<< HEAD
-#mod.params['P2'].pmin=-4.75
-#mod.params['P2'].pmax=-1.75
 
 mod.params['Q'].value=3.55
-#mod.params['Q'].pmin=2.84#3.05
-#mod.params['Q'].pmax=4.26#4.2
 mod.params['Q'].fixed=0
-
-#AS-change
-mod.params['Q'].pmin=3.35
-mod.params['Q'].pmax=3.85
-
+#mod.params['Q'].pmin=3.35
+#mod.params['Q'].pmax=3.85
 #Larger range
 mod.params['Q'].pmin=1.55
 mod.params['Q'].pmax=5.55
 
-#mod.params['Q2'].value=0.80
-#mod.params['Q2'].pmin=0.64#0.10
-#mod.params['Q2'].pmax=0.96#1.50
-#mod.params['Q2'].fixed=0
-=======
-mod.params['P2'].fixed=0
->>>>>>> origin/master
-
+mod.params['Q2'].fixed=0
 mod.params['Q2'].value=1.2
 mod.params['Q2'].pmin=0.8
 mod.params['Q2'].pmax=1.6
-mod.params['Q2'].fixed=0
 
+mod.params['zbp'].fixed=0
 mod.params['zbp'].value=1.00
 mod.params['zbp'].pmin=0.50
 mod.params['zbp'].pmax=2.50
-mod.params['zbp'].fixed=0
 
-mod.params['zbq'].value=1.75
-mod.params['zbq'].pmin=1.40#1.50
-mod.params['zbq'].pmax=2.10#2.00
 mod.params['zbq'].fixed=0
+mod.params['zbq'].value=1.75
+mod.params['zbq'].pmin=1.40
+mod.params['zbq'].pmax=2.10
 
-#DPL
-#mod.params['P'].value=-0.5#-2.5#-3.5
-#mod.params['P'].pmin=-0.7#-3.5#-5.0
-#mod.params['P'].pmax=-0.3#-2.0#-0.01
-#mod.params['P'].fixed=0
+
 
 mod.filename=mfile
 mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates_v2.fits")
