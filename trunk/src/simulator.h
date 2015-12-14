@@ -42,6 +42,8 @@ private:
   axis_type axes[2];
   RandomNumberGenerator rng;
   long num_sources(double z, double l, double dl);
+  double randomLuminosity(double lmin, double lmax, double zmid);
+  double randomZ(double zmin, double zmax, double lmid);
   void reset();
   bool simflag; //if true, observations ignored
   void initial_simulation();

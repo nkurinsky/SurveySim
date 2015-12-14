@@ -426,4 +426,4 @@ mod.params['zbq'].pmax=2.10
 
 
 mod.filename=mfile
-mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates_v2.fits")
+mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
