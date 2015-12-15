@@ -161,6 +161,7 @@ public:
   double poisson(double lambda);
   void gaussian_mv(const vector<double> &mean, const vector<vector<double> > &covar, const vector<double> &min, const vector<double> &max, vector<double> &result);
   double flat(double min, double max);
+  double triangular(double min, double max, double fmin, double fmax);
 private:
   const gsl_rng_type *T;
   gsl_rng *r;

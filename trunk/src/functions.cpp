@@ -510,6 +510,14 @@ double RandomNumberGenerator::flat(double min, double max){
   return gsl_ran_flat(r,min,max);
 }
 
+double RandomNumberGenerator::triangular(double min, double max, double fmin, double fmax){
+  double u = gsl_ran_flat(r,0,1);
+  double r = (fmax/fmin);
+  double slope = (sqrt(1.0+(pow(r,2.0)-1.0)*u)-1.0)/(r-1.0);
+
+  return slope*(max-min)+min;
+}
+
 void RandomNumberGenerator::gaussian_mv(const vector<double> &mean, const vector<vector<double> > &covar, const vector<double> &min, const vector<double> &max, vector<double> &result){
   
   /* multivariate normal distribution random number generator */
