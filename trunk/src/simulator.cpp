@@ -127,16 +127,16 @@ long simulator::num_sources(double z, double l, double dl){
   return retval;
 }
 
-double simulator::randomLuminosity(double lmin, double lmax, double zmid){
-  double fmin = lf->get_phi(zmid,lmin);
-  double fmax = lf->get_phi(zmin,lmax);
-  return rng.triangular(lmin,lmax,fmin,fmax);
+double simulator::randomLuminosity(double lMin, double lMax, double zMid){
+  double fmin = lf->get_phi(zMid,lMin);
+  double fmax = lf->get_phi(zMid,lMax);
+  return rng.triangular(lMin,lMax,fmin,fmax);
 }
 
-double simulator::randomZ(double zmin, double zmax, double lmid){
-  double fmin = lf->get_phi(zmin,lmid);
-  double fmax = lf->get_phi(zmax,lmid);
-  return rng.triangular(zmin,zmax,fmin,fmax);
+double simulator::randomZ(double zMin, double zMax, double lMid){
+  double fmin = lf->get_phi(zMin,lMid);
+  double fmax = lf->get_phi(zMax,lMid);
+  return rng.triangular(zMin,zMax,fmin,fmax);
 }
 
 void simulator::initial_simulation(){

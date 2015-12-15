@@ -513,7 +513,7 @@ double RandomNumberGenerator::flat(double min, double max){
 double RandomNumberGenerator::triangular(double min, double max, double fmin, double fmax){
   double u = gsl_ran_flat(r,0,1);
   double r = (fmax/fmin);
-  double slope = (sqrt(1+(pow(r,2.0)-1)*u)-1.0)/(r-1.0);
+  double slope = (sqrt(1.0+(pow(r,2.0)-1.0)*u)-1.0)/(r-1.0);
 
   return slope*(max-min)+min;
 }
