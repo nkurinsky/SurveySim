@@ -207,8 +207,6 @@ if(model == 2 and lfForm == 1):
 if(model == 2 and lfForm == 0):
     simname="F"
 
-    
-
 if(field == 0):
     simname=simname+'_spire'
 if(field == 2):
