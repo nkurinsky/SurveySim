@@ -257,12 +257,12 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
     }
     LOG_INFO(printf("\n"));
       
-    for(int i=2;i<lnum+2;i++){
+    for(unsigned int i=2;i<lnum+2;i++){
       vector<double> fluxtemp;
       vector<double> fluxes;
       for(auto eitr=type_exts[*itr].begin();eitr!=type_exts[*itr].end();eitr++){
 	extensions.find(*eitr)->second->column(i).read(fluxtemp,0,tablelength);
-	for(int i=0;i<fluxtemp.size();i++){
+	for(unsigned int i=0;i<fluxtemp.size();i++){
 	  fluxes.push_back(fluxtemp[i]);
 	}
       }
@@ -284,7 +284,6 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
 }
 
 bool sed_lib::load_filters(string file,int lflag_tmp){
-  
   if(filters.load_filters(file,lflag_tmp)){
     logflag=lflag_tmp;
     w = gsl_integration_workspace_alloc(SL_INT_SIZE);
@@ -330,7 +329,7 @@ double sed_lib::get_flux(double lum, double band, short sedtype, double redshift
 
 double sed_lib::get_filter_flux(double lum, double redshift, short sedtype, short filter_id){
 
-  if((sedtype < 0) or (sedtype >= tnum)){
+  if((sedtype < 0) or (static_cast<unsigned int>(sedtype) >= tnum)){
     printf("ERROR: Invalid sedtype \"%i\" out of possible range (0,%i)\n",sedtype,tnum);
     return -1;
   }
@@ -395,10 +394,10 @@ void sed_lib::initialize_filter_fluxes(int logflag){
     zs[zi] = static_cast<double>(zi)*interp_dz+interp_zmin;
   fs.setlength(lnum*interp_znum);
   
-  for (int type=0;type<tnum;type++){
+  for (unsigned int type=0;type<tnum;type++){
     for (int filter=0;filter<3;filter++){
       for(int zi=0;zi<interp_znum;zi++){  
-	for(int li=0;li<lnum;li++){
+	for(unsigned int li=0;li<lnum;li++){
 	  fs[li+zi*lnum]=convolve_filter(li,zs[zi],type,filter);
 	}
       }

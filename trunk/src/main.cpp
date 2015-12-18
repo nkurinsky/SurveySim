@@ -10,9 +10,6 @@
 #include "mc_util.h"
 #include <stdio.h>
 
-//Array size definitions 
-#define BANDS 3
-
 using namespace std; 
 
 int main(int argc,char** argv){
@@ -115,12 +112,12 @@ int main(int argc,char** argv){
       for(pi=0, p = q.param_inds.begin(); p != q.param_inds.end(); ++p,++pi){
 	setvars[pi] = &(lpars[*p]);
 	pcurrent[0][pi] = *(setvars[pi]);
-	pset.set(pi,lmin[*p],lmax[*p],(lmax[*p] - lmin[*p])/6.0,lpars[*p]);
+	pset.set(pi,lmin[*p],lmax[*p],(lmax[*p] - lmin[*p])/q.sigmaSize,lpars[*p]);
       }
       if(q.vary_cexp){
 	setvars[q.cind] = &CE;
 	pcurrent[0][q.cind] = *(setvars[pi]);
-	pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/6.0,CE);
+	pset.set(q.cind,CEmin,CEmax,(CEmax - CEmin)/q.sigmaSize,CE);
 	pi++;
       }
       if(q.vary_zbc){
@@ -180,17 +177,16 @@ int main(int argc,char** argv){
 	
 	if(((i+1) % q.burn_step) == 0){
 	  LOG_INFO(printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature()));
-	  LOG_INFO(printf("Covariance Matrix:\n"));
-	  for(int pi=0;pi<pset.covar.size();pi++){
-	    LOG_INFO(printf("\t["));
-	    for(int pj=0;pj<pset.covar[pi].size();pj++)
-	      LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
-	    LOG_INFO(printf("]\n"));
-	  }
+	  //for(int pi=0;pi<pset.covar.size();pi++){
+	  //  LOG_INFO(printf("\t["));
+	  //  for(int pj=0;pj<pset.covar[pi].size();pj++)
+	  //    LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
+	  //  LOG_INFO(printf("]\n"));
+	  //}
 	  if(not metrop.anneal())
 	    i = q.runs;
-	  burnchain.get_stdev(pset.sigma.data());
-	  burnchain.get_covariance(pset.covar);
+	  //burnchain.get_stdev(pset.sigma.data());
+	  //burnchain.get_covariance(pset.covar);
 	}
       }
       
@@ -274,9 +270,9 @@ int main(int argc,char** argv){
       survey.set_color_exp(CE,ZBC);
       survey.set_fagn_pars(lpars);
       LOG_INFO(printf("\nCovariance Matrix:\n"));
-      for(int pi=0;pi<pset.covar.size();pi++){
+      for(unsigned int pi=0;pi<pset.covar.size();pi++){
 	LOG_INFO(printf("\t["));
-	for(int pj=0;pj<pset.covar[pi].size();pj++)
+	for(unsigned int pj=0;pj<pset.covar[pi].size();pj++)
 	  LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
         LOG_INFO(printf("]\n"));
       }

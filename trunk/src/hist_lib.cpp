@@ -89,7 +89,7 @@ bool hist_lib::write_fits(string filename){
   static long naxes[] = {xysize,xysize};
 
   using namespace CCfits;
-  std::auto_ptr<FITS> pFits(0);
+  std::unique_ptr<FITS> pFits;
   try{
     pFits.reset(new FITS(filename,DOUBLE_IMG,naxis,naxes));
   }

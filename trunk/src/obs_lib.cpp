@@ -88,11 +88,18 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[], double flim[]){
       try{
 	unit = table.column(column[i]).unit();
 	table.column(column[i]).read(col[i],1,tablesize);
+	//	std::cout << unit << std::endl;
 	if(unit == "Jy")
 	  col[i] *= 1e3; //convert to mJy
-	if(unit == "mag") //works for AB magnitudes only, should consider including Vega and appropriate zero points
+	else if(unit == "uJy")
+	  col[i] /= 1e3; //convert to mJy
+	else if(unit == "mag"){ //works for AB magnitudes only, should consider including Vega and appropriate zero points
 	  if(i < 3) col[i] = 1e3*pow(10,0.4*(zp[i]-col[i])); //convert to mJy
 	  if(i >= 3) col[i] = 1e3*pow(10,0.4*(zp[i-3]-col[i])); //convert to mJy
+	}
+	else if(unit != "mJy"){
+	  printf("Warning: Unknown unit \"%s\" in input file",unit.c_str());
+	}
       }
       catch(Table::NoSuchColumn){
 	printf("Column %s does not exist in %s\n",column[i].c_str(),fitsfile.c_str());
@@ -107,7 +114,7 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[], double flim[]){
     for (unsigned int i=0;i<tablesize;i++){
       accepted = true;
       for (int j=0;j<3;j++){
-	if(col[j][i] < flim[j]){
+	if((col[j][i] < flim[j]) or std::isnan(col[j][i])){
 	  accepted = false;
 	  break;
 	}
@@ -143,6 +150,6 @@ void obs_lib::get_colors(int i,double &c1,double &c2){
 void obs_lib::get_all_colors(vector<double> &c1, vector<double> &c2){
   c1.resize(get_snum());
   c2.resize(get_snum());
-  for(auto i=0;i<observations.size();i++)
+  for(unsigned int i=0;i<observations.size();i++)
     observations[i]->get_colors(c1[i],c2[i]);
 }

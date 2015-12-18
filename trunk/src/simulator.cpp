@@ -27,7 +27,7 @@ void simulator::configure(const Configuration &config){
   seds.reset(new sed_lib(config.sedfile, nz, zmin, dz));
   seds->load_filters(modelFile,logflag);
   seds->get_filter_info(filters,flux_limits,band_errs,skew_errs);
-  
+
   for(int i=0;i<3;i++)
     hasSkewErr[i]=(skew_errs[i]>0.0);
   
@@ -127,11 +127,25 @@ long simulator::num_sources(double z, double l, double dl){
   return retval;
 }
 
+double simulator::randomLuminosity(double lMin, double lMax, double zMid){
+  double fmin = lf->get_phi(zMid,lMin);
+  double fmax = lf->get_phi(zMid,lMax);
+  return rng.triangular(lMin,lMax,fmin,fmax);
+}
+
+double simulator::randomZ(double zMin, double zMax, double lMid){
+  double fmin = lf->get_phi(zMin,lMid);
+  double fmax = lf->get_phi(zMax,lMid);
+  return rng.triangular(zMin,zMax,fmin,fmax);
+}
+
 void simulator::initial_simulation(){
   
   int is,js,jsmin;
   int lnum = seds->get_lnum();
   double dl = seds->get_dl();
+  double hdl=dl/2.0;
+  double hdz=dz/2.0;
   long nsrcs;
   double lums[lnum];
   double zarray[nz];
@@ -181,15 +195,16 @@ void simulator::initial_simulation(){
 	//determine sedtype (agn type)
 	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
 	
-	//get uniformly distributed luminosity and redshift
+	//get triangular distributed luminosity 
 	if(js == 0)
-	  tL=rng.flat(lums[js],lums[js]+dl/2.0);
+	  tL=randomLuminosity(lums[js],lums[js]+hdl,zarray[is]+hdz);
 	else if (js == lnum-1)
-	  tL=rng.flat(lums[js]-dl/2.0,lums[js]);
+	  tL=randomLuminosity(lums[js]-hdl,lums[js],zarray[is]+hdz);
 	else
-	  tL=rng.flat(lums[js]-dl/2.0,lums[js]+dl/2.0);
+	  tL=randomLuminosity(lums[js]-hdl,lums[js]+hdl,zarray[is]+hdz);
 	
-	tZ=rng.flat(zarray[is],zarray[is]+dz);
+	//get triangular distributed redshift
+	tZ=randomZ(zarray[is],zarray[is]+dz,tL);
 
 	for (int i=0;i<3;i++){
 	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
@@ -304,6 +319,8 @@ products simulator::simulate(){
   
   int lnum = seds->get_lnum();
   double dl = seds->get_dl();
+  double hdl=dl/2.0;
+  double hdz=dz/2.0;
   static long nsrcs;
   double lums[lnum];
   double zarray[nz];
@@ -355,7 +372,7 @@ products simulator::simulate(){
 	if(((srcTotal % 10000) == 0) and (srcTotal != 0)){
 	  //printf("%lu\t%lu\n",srcTotal,detTotal);
 	  //trying to avoid infinite loops
-	  if(detTotal > 10*observations->get_snum()){
+	  if(detTotal > static_cast<unsigned long>(10*observations->get_snum())){
 	    //printf("Detected sources %lu (%i times obsnum) too high, aborting\n",detTotal,10);
 	    output.chisqr=100;
 	    return output;
@@ -371,15 +388,16 @@ products simulator::simulate(){
 	//determine sedtype (agn type)
 	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
 	
-	//get uniformly distributed luminosity and redshift
+	//get triangular distributed luminosity 
 	if(js == 0)
-	  tL=rng.flat(lums[js],lums[js]+dl/2.0);
+	  tL=randomLuminosity(lums[js],lums[js]+hdl,zarray[is]+hdz);
 	else if (js == lnum-1)
-	  tL=rng.flat(lums[js]-dl/2.0,lums[js]);
+	  tL=randomLuminosity(lums[js]-hdl,lums[js],zarray[is]+hdz);
 	else
-	  tL=rng.flat(lums[js]-dl/2.0,lums[js]+dl/2.0);
+	  tL=randomLuminosity(lums[js]-hdl,lums[js]+hdl,zarray[is]+hdz);
 	
-	tZ=rng.flat(zarray[is],zarray[is]+dz);
+	//get triangular distributed redshift
+	tZ=randomZ(zarray[is],zarray[is]+dz,tL);
 
 	for (int i=0;i<3;i++){
 	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
@@ -499,7 +517,7 @@ bool simulator::save(string outfile){
     
     using namespace CCfits;
     //FITS::setVerboseMode(true);
-    std::auto_ptr<FITS> pFits(0);
+    std::unique_ptr<FITS> pFits;
     
     try{
       pFits.reset(new FITS(outfile,Write));

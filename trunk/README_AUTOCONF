@@ -5,3 +5,4 @@ added to the obs/model/templates directories, the following commands should be r
 ./update_makefiles.sh
 autoreconf
 sudo make install
+

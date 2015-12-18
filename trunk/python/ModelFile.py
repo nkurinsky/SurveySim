@@ -144,14 +144,14 @@ class ModelFile:
             'Q2':parameter(1.62,0.0,5.0,0,"High Z Luminosity Evolution"),
             'zbp':parameter(1.1,0.0,5.0,1,"P Z Break"),
             'zbq':parameter(1.85,0.0,5.0,1,"Q Z Break"),
-            'fa0':parameter(0.08,0,0.2,1,"AGN fraction at logL=12,z=0"),
-            't1':parameter(-0.5,-1,1,1,"T1"),
-            't2':parameter(1.3,0.5,2,1,"T2"),
-            'zbt':parameter(1,0.5,2,1,"T Z Break"),
+            'fa0':parameter(0.6,0.2,1.0,0,"AGN fraction at logL=12,z=0"),
+            't1':parameter(-1.3,-2.6,-0.1,0,"T1"),
+            't2':parameter(6.5,5.5,8.5,0,"T2"),
+            'zbt':parameter(2.0,0.8,3.5,0,"T Z Break"),
             'cexp':parameter(0.0,-3.0,3.0,1,"SED Redshift Evolution"),
             'zbc':parameter(2.0,0.0,5.0,1,"SED Redshift Evolution"),
-            'fcomp':parameter(0.5,0.0,1.0,1,"Fraction of AGN Composites"),
-            'fcold':parameter(0.5,0.0,1.0,1,"Fraction of Cold SFG")
+            'fcomp':parameter(0.5,0.01,0.99,0,"Fraction of AGN Composites"),
+            'fcold':parameter(0.5,0.01,0.99,0,"Fraction of Cold SFG")
         }
 
     def info(self):

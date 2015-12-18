@@ -103,6 +103,7 @@ class FitInfo:
 
     def __init__(self,hdus,fitted):
         phdr=hdus[0].header
+        self.fitstat=phdr['FITSTAT']
         self.initial=dict()
         for key in phdr.keys():
             if not (key in FitInfo.exclude):
@@ -121,6 +122,7 @@ class FitInfo:
         self.fluxes=[dists['F1'],dists['F2'],dists['F3']]
 
     def info(self):
+        print level2,"Best Fit ChiSquare: "+str(self.fitstat)
         print level2,"Code Fitted Parameters: (initial)"
         for k,v in self.initial.iteritems(): print level3,k,'-\t',v
         print level2,"Variables:"
@@ -213,13 +215,25 @@ class FitImage:
         return "Image: "+self.name
 
     def plot(self,interpolation='nearest',cmap=cm.Greys,labelCbar=True):
+        #fnamecore=filename.split('output.fits')[0]
+        #self.modelfile=fnamecore+'_model.fits'
+        #self.mhdus=fits.open(modelfile)
+        #prihdr=self.mhdus[0].header
+        #self.axis1=prihdr['AXIS1']
+        #self.axis2=prihdr['AXIS2']
+        #print self.axis1,self.axis2
+
+        self.axis1=['log(F24/uJy)']
+        self.axis2=['log(F250/F24)']
         plt.imshow(self.img, interpolation=interpolation, cmap=cmap, extent=self.extent, aspect='auto')
         cbar=plt.colorbar()
         if(labelCbar):
             cbar.set_label("Normalized Density")
         plt.contour(self.img, interpolation=interpolation, colors='grey', extent=self.extent, origin='image', aspect='auto')
-        plt.xlabel("AXIS 1")
-        plt.ylabel("AXIS 2")
+        plt.xlabel(self.axis1)
+        plt.ylabel(self.axis2)
+        plt.xlim(self.xmin,self.xmax)
+        plt.ylim(self.ymin,self.ymax)
         plt.title(self.name)
 
     def show(self):
@@ -363,6 +377,9 @@ class MCMCInfo:
             elif "ACPT" in col:
                 self.Acceptance.append(params[col])                
 
+        print pnames
+        cmed=np.median(self.ChiSquares[self.ChiSquares < 50])
+
         chdu=hdus[5]
         rnames=chdu.data.names
         for i in range(0,len(rnames)):
@@ -377,7 +394,7 @@ class MCMCInfo:
                 p0=p0+str(0)
             self.Parameters[p0]=list()
             for i in range(0,self.ChainNum):
-                gpts=np.where(self.ChiSquares[i] < np.median(self.ChiSquares))
+                gpts=np.where(self.ChiSquares[i] < cmed)
                 self.Parameters[p0].extend(params[p0+str(i)][gpts])
 
         for k,v in self.Parameters.iteritems():
@@ -389,30 +406,35 @@ class MCMCInfo:
         print level2,"Fitted Parameters (BestFit)"
         for k,v in self.BestFit.iteritems(): print level3,k,'-\t',v
         print level2,"Number of Chains:",self.ChainNum
-        print level2,"Available Variable Chains:"
-        print level3,"Parameters"
-        print level3,"Acceptance"
-        print level3,"ChiSquares"
-        print level3,"Convergence"
+        #print level2,"Available Variable Chains:"
+        #print level3,"Parameters"
+        #print level3,"Acceptance"
+        #print level3,"ChiSquares"
+        #print level3,"Convergence"
 
     def plotFit(self,mode='all'):
         pnames=self.Parameters.keys()    
         #want to re-order these as they do not appear in the most sensible order
 
         if(mode == 'all'):
-            pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC','FA0','T1','T2','ZBT','FCOMP','FCOLD']
+            pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC','FAO','FAGN0','T1','T2','ZBT','FCOMP','FCOLD']
         elif(mode == 'lf'):
             pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC']
         elif(mode == 'sed'):
-            pnames_default=['FA0','T1','T2','ZBT','FCOMP','FCOLD']
+            pnames_default=['FAO','FAGN0','T1','T2','ZBT','FCOMP','FCOLD']
+        elif(mode == 'sed_short'):
+            pnames_default=['FA0','FCOMP']
+
         else:
             raise ValueError("Invalid Plot Mode \""+mode+"\"")
 
+        
         pnames_sorted=[]
         for p in pnames_default:
             if p in pnames:
                 pnames_sorted.append(p)
         pnames=pnames_sorted
+        
         dim=len(pnames)
         for i in range(0,dim):
             for j in range(0,dim):
@@ -429,9 +451,9 @@ class MCMCInfo:
                     sns.kdeplot(datapts)
                     plt.xlim(start,end)
                     if(j == 0):
-                        plt.ylabel("Probability")
+                        plt.ylabel("Probability",fontsize=22)
                     else:
-                        plt.setp( plt.gca().get_yticklabels(), visible=False)
+                        plt.setp( plt.gca().get_yticklabels(), fontsize=28, visible=False)
                 elif(i > j):
                     x=self.Parameters[pnames[j]]
                     y=self.Parameters[pnames[i]]
@@ -458,14 +480,14 @@ class MCMCInfo:
                     yticks=np.around(np.arange(start, end, stepsize),2)
                     ax.yaxis.set_ticks(yticks)
                     if(j == 0):
-                        plt.ylabel(axisLabel(pnames[i]))
+                        plt.ylabel(axisLabel(pnames[i]),fontsize=28)
                     else:
                         plt.setp( plt.gca().get_yticklabels(), visible=False)
                     plt.ylim(start,end)
                 if(i == (len(pnames)-1)):
-                    plt.xlabel(axisLabel(pnames[j]))
+                    plt.xlabel(axisLabel(pnames[j]),fontsize=28)
                 else:
-                    plt.setp( plt.gca().get_xticklabels(), visible=False)
+                    plt.setp( plt.gca().get_xticklabels(), fontsize=28,visible=False)
         #add legend with best-fit parameter values
         #ax.annotate('Best-fit values:', xy=(.7, .8),  xycoords='figure fraction',
         #        horizontalalignment='center', verticalalignment='center',size=20)
@@ -549,6 +571,27 @@ class MCMCInfo:
 class OutputFile:
 
     def __init__(self,filename):
+        fnamecore=filename.split('output.fits')[0]
+#<<<<<<< HEAD
+        self.modelfile=fnamecore+'model.fits'
+        print self.modelfile
+        self.mhdus=fits.open(self.modelfile)
+        prihdr=self.mhdus[0].header
+        self.axis1=prihdr['AXIS1']
+        self.axis2=prihdr['AXIS2']
+        print self.axis1,self.axis2
+#=======
+        #self.modelfile=fnamecore+'_model.fits'
+        #self.mhdus=fits.open(self.modelfile)
+        #prihdr=self.mhdus[0].header
+        #self.axis1=prihdr['AXIS1']
+        #self.axis2=prihdr['AXIS2']
+        #print self.axis1,self.axis2
+#<<<<<<< HEAD
+        #origin/master
+#=======
+#>>>>>>> origin/master
+#>>>>>>> 8f9497ad3c5221321c5d4c9d8c4a0dd59b894e01
         self.filename=filename
         self.hdus=fits.open(filename)
         self.images=dict()

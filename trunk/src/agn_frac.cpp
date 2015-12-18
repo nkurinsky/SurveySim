@@ -81,6 +81,8 @@ void agn_frac::set_fComp(double fComp){
     _compFrac=0.0;
   else if(fComp > 1.0)
     _compFrac=1.0;
+  else
+    _compFrac=fComp;
 }
 
 void agn_frac::set_fCold(double fCold){
@@ -88,6 +90,8 @@ void agn_frac::set_fCold(double fCold){
     _coldFrac=0.0;
   else if(fCold > 1.0)
     _coldFrac=1.0;
+  else
+    _coldFrac=fCold;
 }
 
 double agn_frac::get_agn_frac(double lum, double redshift){
@@ -104,7 +108,7 @@ double agn_frac::get_agn_frac(double lum, double redshift){
   }
 
   if(lumPower.count(lum) == 0){
-    lumPower[lum]=pow((lum/12.0),4);
+    lumPower[lum]=pow((lum/12.000),12.000);
   }
 
   //the agn fraction for a given L,z bin

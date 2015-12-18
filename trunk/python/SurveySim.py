@@ -102,6 +102,10 @@ band_units=[mod.filters[0].unit,mod.filters[1].unit,mod.filters[2].unit]
 flim=[mod.filters[0].limit,mod.filters[1].limit,mod.filters[2].limit]
 ferr=[mod.filters[0].err,mod.filters[1].err,mod.filters[2].err]
 
+fcompN=[mod.filters[0].compN,mod.filters[1].compN,mod.filters[2].compN]
+fcompB=[mod.filters[0].compB,mod.filters[1].compB,mod.filters[2].compB]
+fcompM=[mod.filters[0].compM,mod.filters[1].compM,mod.filters[2].compM]
+
 f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
 
@@ -156,6 +160,9 @@ class SurveySimGUI:
         self.limits=[DoubleVar(),DoubleVar(),DoubleVar()]
         self.units=[StringVar(),StringVar(),StringVar()]
         self.bands=[StringVar(),StringVar(),StringVar()]
+        self.compNs=[DoubleVar(),DoubleVar(),DoubleVar()] # completeness parameters 
+        self.compBs=[DoubleVar(),DoubleVar(),DoubleVar()]
+        self.compMs=[DoubleVar(),DoubleVar(),DoubleVar()]
         self.defband=[StringVar(),StringVar(),StringVar()]
         self.settings_on='no' #a switch to say whether or not the SettingsWindow was used
 
@@ -169,7 +176,7 @@ class SurveySimGUI:
 
         self.labelframe_survey = LabelFrame(master, text="Survey fitting properties",bg='pink') 
         self.labelframe_survey.grid(column=1,row=0,sticky=W+N+S)
-        self.label_survey=Label(self.labelframe_survey,text="Filter/Limit/Units",bg='pink') 
+        self.label_survey=Label(self.labelframe_survey,text="Filter/Limit/Units/compN/compB/compM",bg='pink') 
         self.label_survey.grid(in_=self.labelframe_survey,row=1,column=1)
 
         self.labelframe_files = LabelFrame(master, text="Data files",bg='grey')
@@ -258,20 +265,31 @@ class SurveySimGUI:
             self.v_fixed[ind].set(value_fix[ind])
             ent0.grid(in_=self.labelframe_lf,row=ind+3,column=4)
             ind=ind+1;
-        
-# Survey frame
+
+# Survey frame 
         ind=0;
         for field in fields_bands:
             option1=OptionMenu(self.labelframe_survey,self.bands[ind],*filter_choices)
             self.bands[ind].set(band[ind])
             option1.grid(in_=self.labelframe_survey,row=ind+2,column=0)
+            
             ent0_1=Entry(self.labelframe_survey,textvar=self.limits[ind],width=5)
             ent1_1=Entry(self.labelframe_survey,textvar=self.units[ind],width=5)
+            entN=Entry(self.labelframe_survey,textvar=self.compNs[ind],width=3)
+            entB=Entry(self.labelframe_survey,textvar=self.compBs[ind],width=3)
+            entM=Entry(self.labelframe_survey,textvar=self.compMs[ind],width=3)
+            
             self.limits[ind].set(flim[ind])
             self.units[ind].set(band_units[ind])
+            
             ent0_1.grid(in_=self.labelframe_survey,row=ind+2,column=1)
             ent1_1.grid(in_=self.labelframe_survey,row=ind+2,column=2)
+            entN.grid(in_=self.labelframe_survey,row=ind+2,column=3)
+            entB.grid(in_=self.labelframe_survey,row=ind+2,column=4)
+            entM.grid(in_=self.labelframe_survey,row=ind+2,column=5)
+            
             ind=ind+1;
+
 
         lab = Label(self.labelframe_survey, width=10, text='Color cut:', anchor='w',bg='pink')
         lab.grid(in_=self.labelframe_survey,row=ind+2,column=0)

@@ -329,6 +329,13 @@ void Configuration::load(){
     runs=1000;
   }
   try{
+    tab.readKey("SIGSIZE",sigmaSize);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    sigmaSize=12.0;
+  }
+
+  try{
     tab.readKey("ZMIN",zmin);
     tab.readKey("ZMAX",zmax);
     tab.readKey("DZ",dz);
@@ -371,7 +378,7 @@ void Configuration::load(){
     }
 
   }
-  catch(CCfits::FitsException::FitsException e){
+  catch(CCfits::FitsException e){
     printf("Error reading model file\nPlease check that all keywords are present\n");
     cerr << e.message() << endl;
     exit(10);
@@ -503,6 +510,14 @@ double RandomNumberGenerator::flat(double min, double max){
   return gsl_ran_flat(r,min,max);
 }
 
+double RandomNumberGenerator::triangular(double min, double max, double fmin, double fmax){
+  double u = gsl_ran_flat(r,0,1);
+  double r = (fmax/fmin);
+  double slope = (sqrt(1.0+(pow(r,2.0)-1.0)*u)-1.0)/(r-1.0);
+
+  return slope*(max-min)+min;
+}
+
 void RandomNumberGenerator::gaussian_mv(const vector<double> &mean, const vector<vector<double> > &covar, const vector<double> &min, const vector<double> &max, vector<double> &result){
   
   /* multivariate normal distribution random number generator */
@@ -576,14 +591,26 @@ CompletenessCurve::CompletenessCurve(double n, double m, double b){
     _B=b;
   else
     _B=1e-10;
-
   
-  if(not complete)
+  scaled=false;
+  if(not complete){
     _ulim=_M-_B*log(pow(0.999,-1.0/_n)-1);
-  else
+    _fScale=50.0/_ulim;
+    if(_fScale < 1.0)
+      _fScale=1.0;   
+    else
+      scaled=true;
+  }
+  else{
     _ulim=0;
+    _fScale=1.0;
+  }
 
-  cout << "Completeness (" << bnum << "): " << _B << " " << _M << " " << _n << ", Max= " << _ulim << endl;
+  cout << "Completeness (" << bnum << "): " << _B << " " << _M << " " << _n << ", Max= " << _ulim << ", Scale=" << 1.0/_fScale << endl;
+  if(scaled){
+    _M*=_fScale;
+    _B*=_fScale;
+  }
   bnum++;
 }
 
@@ -596,7 +623,11 @@ bool CompletenessCurve::accept(double flux){
   if(flux > _ulim)
     return true;
 
-  double tFlux=round(flux);
+  double tFlux;
+  if(scaled)
+    tFlux=round(flux*_fScale);
+  else
+    tFlux=round(flux);  
 
   if(valueStore.count(tFlux) == 0){
     valueStore[tFlux]=pow(1.0+exp((_M-tFlux)/_B),-_n);

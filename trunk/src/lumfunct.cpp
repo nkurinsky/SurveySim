@@ -170,7 +170,7 @@ double lumfunct::get_phi(double redshift,double lum){
   case LF::distribution::DoublePowerLaw:
     return t1/(pow(ratio,alpha)+pow(ratio,beta));
   case LF::distribution::ModifiedSchecter:
-    return t1*pow(ratio,1-alpha)*exp(-1*pow(log(1-ratio),2)/(2*pow(beta,2)));
+    return t1*pow(ratio,1-alpha)*exp(-1*pow(log10(1+ratio),2)/(2*pow(beta,2)));
   default:
     static int logflag=3;
     LOG_CRITICAL(printf("ERROR: Invalid LF dist (%i) requested\n",_dist));

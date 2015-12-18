@@ -19,7 +19,7 @@
 #include <cctype>
 
 //For FITS input/output
-#include <CCFits/CCfits>
+#include <CCfits/CCfits>
 
 //GNU scientific library includes
 // - for random distributions
@@ -115,6 +115,7 @@ public:
   unsigned long burn_num;
   unsigned long nparams;
   unsigned long nsim;
+  double sigmaSize;
 
   double area;
   double dz;
@@ -160,6 +161,7 @@ public:
   double poisson(double lambda);
   void gaussian_mv(const vector<double> &mean, const vector<vector<double> > &covar, const vector<double> &min, const vector<double> &max, vector<double> &result);
   double flat(double min, double max);
+  double triangular(double min, double max, double fmin, double fmax);
 private:
   const gsl_rng_type *T;
   gsl_rng *r;
@@ -175,6 +177,8 @@ private:
   double _M;
   double _n;
   double _ulim;
+  double _fScale;
+  bool scaled;
   double complete;
   RandomNumberGenerator crng;
   map<double,double> valueStore;
