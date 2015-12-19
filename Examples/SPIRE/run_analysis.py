@@ -354,17 +354,13 @@ if(model == 4 and lfForm == 0 and field == 2):
     print 'Attention, non in the paper'
     quit()
 
-<<<<<<< HEAD
 if(field == 0):
     simname=simname+'_spire'
 if(field == 2):
     simname=simname+'_mips'
-=======
->>>>>>> origin/master
 
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
-
 
 #parameters below should be the same regardless of model
 
