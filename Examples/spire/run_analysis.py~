@@ -193,27 +193,178 @@ else:
 for key in fixKeys:
     mod.params[key].fixed=1
 
-simname="temp" #to keep any combination that isn't in the paper
-if(model == 0 and lfForm == 1):
-    simname="A"
-if(model == 0 and lfForm == 0):
-    simname="B"
-if(model == 1 and lfForm == 1):
-    simname="C"
-if(model == 1 and lfForm == 0):
-    simname="D"
-if(model == 2 and lfForm == 1):
-    simname="E"
-if(model == 2 and lfForm == 0):
-    simname="F"
+    
 
+if(model == 0 and lfForm == 2 and field == 0):
+    #simname="A-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 0):
+    simname="A-C"
+if(model == 0 and lfForm == 0 and field == 0):
+    simname="B-C"
+if(model == 1 and lfForm == 2 and field == 0):
+    #simname="D-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 0):
+    simname="C-C"
+if(model == 1 and lfForm == 0 and field == 0):
+    simname="D-C"
+if(model == 2 and lfForm == 2 and field == 0):
+    #simname="G-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 0):
+    simname="E-C"
+if(model == 2 and lfForm == 0 and field == 0):
+    simname="F-C"
+if(model == 3 and lfForm == 2 and field == 0):
+    #simname="J-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 0):
+    #simname="K-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 0):
+    #simname="L-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 0):
+    #simname="M-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 0):
+    #simname="N-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 0):
+    #simname="O-C"
+    print 'Attention, non in the paper'
+    quit()
+    
+if(model == 0 and lfForm == 2 and field == 1):
+    #simname="A-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 1):
+    #simname="B-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 0 and field == 1):
+    #simname="C-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 2 and field == 1):
+    #simname="D-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 1):
+    #simname="E-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 0 and field == 1):
+    #simname="F-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 2 and field == 1):
+    #simname="G-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 1):
+    #simname="H-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 0 and field == 1):
+    #simname="I-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 2 and field == 1):
+    #simname="J-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 1):
+    #simname="K-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 1):
+    #simname="L-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 1):
+    #simname="M-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 1):
+    #simname="N-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 1):
+    #simname="O-LS"
+    print 'Attention, non in the paper'
+    quit()
+    
+if(model == 0 and lfForm == 2 and field == 2):
+    #simname="A"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 2):
+    simname="A"
+if(model == 0 and lfForm == 0 and field == 2):
+    simname="B"
+if(model == 1 and lfForm == 2 and field == 2):
+    #simname="D"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 2):
+    simname="C"
+if(model == 1 and lfForm == 0 and field == 2):
+    simname="D"
+if(model == 2 and lfForm == 2 and field == 2):
+    #simname="G"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 2):
+    simname="E"
+if(model == 2 and lfForm == 0 and field == 2):
+    simname="F"
+if(model == 3 and lfForm == 2 and field == 2):
+    #simname="J"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 2):
+    #simname="K"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 2):
+    #simname="L"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 2):
+    #simname="M"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 2):
+    #simname="N"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 2):
+    #simname="O"
+    print 'Attention, non in the paper'
+    quit()
+
+<<<<<<< HEAD
 if(field == 0):
     simname=simname+'_spire'
 if(field == 2):
     simname=simname+'_mips'
+=======
+>>>>>>> origin/master
 
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
+
 
 #parameters below should be the same regardless of model
 
@@ -282,4 +433,4 @@ mod.params['zbq'].pmax=2.10
 
 
 mod.filename=mfile
-#mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
+mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
