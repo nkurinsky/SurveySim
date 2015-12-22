@@ -48,8 +48,6 @@ Examples/spire/F_mips_model.fits
 
 Examples/SPIRE/joint_contours_old.py
 
-*.py
-
 *.fits
 
 Examples/spire/I_mips_model.fits
