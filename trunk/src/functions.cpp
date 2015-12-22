@@ -511,9 +511,19 @@ double RandomNumberGenerator::flat(double min, double max){
 }
 
 double RandomNumberGenerator::triangular(double min, double max, double fmin, double fmax){
+  static const double ratio_high = 100.0;
+  static const double ratio_low = 1.0/ratio_high;
+
   double u = gsl_ran_flat(r,0,1);
-  double r = (fmax/fmin);
-  double slope = (sqrt(1.0+(pow(r,2.0)-1.0)*u)-1.0)/(r-1.0);
+  double ratio = (fmax/fmin);
+  double slope;
+  //evaluate limits if ratio high enough (to save compute time)
+  if(ratio > ratio_high)
+    slope = sqrt(u);
+  else if(ratio < ratio_low)
+    slope = 1.0-sqrt(1.0-u);
+  else
+    slope = (sqrt(1.0+(pow(ratio,2.0)-1.0)*u)-1.0)/(ratio-1.0);
 
   return slope*(max-min)+min;
 }
