@@ -118,7 +118,7 @@ else:
     raise ValueError("Invalid lfForm")
 
 mod.params['fa0'].value=0.60
-#mod.params['fa0'].pmin=0.20
+mod.params['fa0'].pmin=0.01
 mod.params['fa0'].pmax=0.99
 mod.params['fa0'].fixed=0
 
@@ -137,14 +137,11 @@ mod.params['zbt'].pmin=0.50
 mod.params['zbt'].pmax=4.00
 mod.params['zbt'].fixed=0
 
-#AS-change
-mod.params['fa0'].pmin=0.01
-#mod.params['zbt'].pmin=0.50
-#mod.params['t2'].pmin=0.01
-#mod.params['t1'].pmax=0.5
-
 #MB-change
-#mod.params['fa0'].pmax=0.80
+mod.params['fa0'].value=0.20
+mod.params['fa0'].pmin=0.03
+mod.params['fa0'].pmax=0.85
+
 
 if(model == 0):
     simname=simname+"_onlySFG"
@@ -212,8 +209,8 @@ if(field == 0):
 if(field == 2):
     simname=simname+'_mips'
 
-mfile=simname+"_model.fits"
-outfile=simname+"_output.fits"
+mfile=simname+"1_model.fits"
+outfile=simname+"1_output.fits"
 
 #parameters below should be the same regardless of model
 
@@ -280,4 +277,5 @@ mod.params['zbq'].pmin=1.40
 mod.params['zbq'].pmax=2.10
 
 mod.filename=mfile
-#mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
+mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
+
