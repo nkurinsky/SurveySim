@@ -190,7 +190,6 @@ else:
 for key in fixKeys:
     mod.params[key].fixed=1
 
-simname="temp" #to keep any combination that isn't in the paper
 if(model == 0 and lfForm == 1):
     simname="A"
 if(model == 0 and lfForm == 0):

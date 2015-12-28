@@ -189,6 +189,8 @@ void Configuration::print(){
   printf("  Main Settings:  %s\n",modfile.c_str());
   printf("  SED library:    %s\n",sedfile.c_str());
   printf("  Observations:   %s\n",obsfile.c_str());
+  printf("  Output:   %s\n",outfile.c_str());
+
 
   printf("\nMCMC Settings:\n");
   printf("  Chain Number         : %lu\n", nchain);
