@@ -69,18 +69,21 @@ int main(int argc,char** argv){
     //run number of simulations to get counts range
 
     LOG_CRITICAL(printf("Beginning Simulation Loop (%lu runs)\n",q.nsim));
+    fflush(stdout);
     for(unsigned long simi=1;simi<q.nsim;simi++){      
       output=survey.simulate();
       final_counts.add_link(output.dnds,output.chisqr);
       if((simi % 20) == 0){
 	LOG_CRITICAL(printf("Current Iteration: %lu\n",simi));
       }
+      fflush(stdout);
     }
     
     LOG_DEBUG(printf("\nSaving Output\n"));
     saved = survey.save(q.outfile);
     LOG_DEBUG(printf("Saving Counts\n"));
     saved &= final_counts.save(q.outfile,countnames,"Simulated Counts");
+    fflush(stdout);
   }
   else{    
 
@@ -132,10 +135,10 @@ int main(int argc,char** argv){
       }
       
       LOG_INFO(printf("\n ---------- Beginning MC Burn-in Phase ---------- \n"));
+      fflush(stdout);
       i=0;
       for (i=0;i<q.burn_num;i++){
 	for (m=0;m<q.nchain;m++){
-	  
 	  vector<double> results;
 	  for(pi=0;pi<q.nparams;pi++)
 	    means[pi] = pcurrent[m][pi];
@@ -173,6 +176,7 @@ int main(int argc,char** argv){
 	      pcurrent[m][pi]=ptemp[m][pi];
 	  
 	  burnchain.add_link(m,ptemp[m],trial,accept);
+	  fflush(stdout);
 	}
 	
 	if(((i+1) % q.burn_step) == 0){
@@ -188,6 +192,7 @@ int main(int argc,char** argv){
 	  //burnchain.get_stdev(pset.sigma.data());
 	  //burnchain.get_covariance(pset.covar);
 	}
+	fflush(stdout);
       }
       
       for(m=0;m<q.nchain;m++)
@@ -197,7 +202,8 @@ int main(int argc,char** argv){
       metrop.reset();
       
       LOG_INFO(printf("\n\n ---------------- Fitting Start ---------------- \n Total Run Number: %ld\n\n",q.runs));
-      
+      fflush(stdout);
+
       for (i=0;i<q.runs;i++){
 	for (m=0;m<q.nchain;m++){
 	  
@@ -234,6 +240,8 @@ int main(int argc,char** argv){
 	  }
 	  else
 	    LOG_DEBUG(printf(" -- Rejected\n"));
+
+	  fflush(stdout);
 	}
 	
 	if(((i+1) % q.conv_step) == 0){
@@ -248,6 +256,7 @@ int main(int argc,char** argv){
 	  else
 	    LOG_INFO(printf("Chains Have Not Converged\n"));
 	} 
+	fflush(stdout);
       }
       
       mcchain.get_best_link(pset.best.data(),chi_min);
@@ -279,11 +288,13 @@ int main(int argc,char** argv){
       
       LOG_INFO(printf("Final Acceptance Rate: %lf%%\n",metrop.mean_acceptance()*100));
     }
+    fflush(stdout);
     
     LOG_INFO(printf("\nRunning Best Fit...\n"));
     output=survey.simulate();
     tchi_min = output.chisqr;
     LOG_INFO(printf("Saving Initial Survey\n"));
+    fflush(stdout);
     saved = survey.save(q.outfile);
 
     for(pi = 0;pi<q.nparams;pi++)
@@ -306,6 +317,7 @@ int main(int argc,char** argv){
 	saved = survey.save(q.outfile);
       }
       final_counts.add_link(output.dnds,output.chisqr);
+      fflush(stdout);
     }
     LOG_INFO(printf("Saved Chi2: %lf (%lf)\n",tchi_min,chi_min));
     
@@ -316,6 +328,7 @@ int main(int argc,char** argv){
     if(q.vary_zbc)
       parnames[q.zbcind] = "ZBC";
 
+    fflush(stdout);
     LOG_DEBUG(printf("Saving Chains\n"));
     saved &= mcchain.save(q.outfile,parnames.get(),"MCMC Chain Record");
     LOG_DEBUG(printf("Saving Counts\n"));

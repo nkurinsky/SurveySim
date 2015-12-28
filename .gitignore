@@ -19,5 +19,3 @@ trunk/src/alg_lib/libalglib.a
 *Makefile
 Examples/SPIRE/*model.fits
 *.pyc
-
-*.fits
