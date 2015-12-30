@@ -401,10 +401,6 @@ products simulator::simulate(){
 
 	for (int i=0;i<3;i++){
 	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
-	}
-	
-	for (int i=0;i<3;i++){
-	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
 	  detected = detected and completeness[i]->accept(flux_raw[i]);
 	}
 
