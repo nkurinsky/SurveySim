@@ -66,6 +66,8 @@ elif(field == 1):
     #mod.filters[1].compM=-19.83
     mod.filters[2].limit=0.1
     mod.filters[2].err=2.3
+
+    mod.annealing['temp']=.002
 elif(field == 2):
     simname="spire_mips_COSMOS"
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
@@ -88,7 +90,8 @@ elif(field == 2):
     #mod.axis2="Flux2"
     mod.filters[1].limit=8.0
     mod.filters[2].limit=0.1
-    
+
+    mod.annealing['temp']=.002
 else:
     raise ValueError("Invalid field")
 
@@ -275,6 +278,7 @@ mod.params['zbq'].value=1.75
 mod.params['zbq'].pmin=1.40
 mod.params['zbq'].pmax=2.10
 
+mod.settings['verbosity']=3
 mod.filename=mfile
 mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
 

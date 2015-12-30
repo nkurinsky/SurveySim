@@ -181,12 +181,6 @@ int main(int argc,char** argv){
 	
 	if(((i+1) % q.burn_step) == 0){
 	  LOG_INFO(printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature()));
-	  //for(int pi=0;pi<pset.covar.size();pi++){
-	  //  LOG_INFO(printf("\t["));
-	  //  for(int pj=0;pj<pset.covar[pi].size();pj++)
-	  //    LOG_INFO(printf("%6.2lf ",pset.covar[pi][pj]));
-	  //  LOG_INFO(printf("]\n"));
-	  //}
 	  if(not metrop.anneal())
 	    i = q.runs;
 	  //burnchain.get_stdev(pset.sigma.data());
@@ -313,10 +307,15 @@ int main(int argc,char** argv){
       output=survey.simulate();
       if(output.chisqr < tchi_min){
 	tchi_min = output.chisqr;
-	LOG_INFO(printf("Saving new minimum (%lu/%lu)...",i,q.nsim));
+	LOG_INFO(printf("  Saving new minimum (%lu/%lu)\n",i,q.nsim));
 	saved = survey.save(q.outfile);
       }
       final_counts.add_link(output.dnds,output.chisqr);
+
+      if( i % 100 == 0){
+	LOG_DEBUG(printf("  (%lu/%lu)\n",i,q.nsim));
+      }
+
       fflush(stdout);
     }
     LOG_INFO(printf("Saved Chi2: %lf (%lf)\n",tchi_min,chi_min));

@@ -425,10 +425,12 @@ double sed_lib::interpolate_flux(double lum, double redshift, short sedtype, sho
   try{
     retval =  alglib::spline2dcalc(flux_interpolator[sedtype*FILTER_NUM+filter_id],lum,redshift);
     
-    if(redshift < color_zcut)
-      retval *= pow((1.0+redshift),color_exp);
-    else
-      retval *= color_evolution;
+    if(color_zcut > 0.0){
+      if(redshift < color_zcut)
+	retval *= pow((1.0+redshift),color_exp);
+      else
+	retval *= color_evolution;
+    }
   }
   catch(alglib::ap_error e){
     printf("ERROR: Failed to interpolate for z=%lf, lum=%lf, sed=%i, filter=%i\n",redshift,lum,sedtype,filter_id);

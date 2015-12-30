@@ -4,11 +4,8 @@ import os
 import sys
 import datetime
 import time
-
-coredir='/usr/local/surveysim/'
-sys.path.append(coredir+'python')
-
 from ModelFile import *
+
 
 if(len(sys.argv) < 4):
     print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE,2=COSMOS+MIPS) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
@@ -36,7 +33,7 @@ mod.filters[2].setID("SPIRE_500")
 #set parameters for field, and input file
 if(field == 0):
     simname="spire_COSMOS"
-    obsfile=coredir+"obs/L2-COSMOS_xID250_DR2.fits"
+    obsfile="/u/ki/kurinsky/local/surveysim/obs/L2-COSMOS_xID250_DR2.fits"
     mod.survey['area']=4.78  #4.38
     mod.filters[0].limit=8.0
     mod.filters[0].err=6.95 #1.6
@@ -52,7 +49,7 @@ if(field == 0):
     mod.filters[2].err=6.63 #1.9
 elif(field == 1):
     simname="spire_Lockman-SWIRE"
-    obsfile="/usr/local/surveysim/obs/L5-Lockman-SWIRE_xID250_DR2.fits"
+    obsfile="/u/ki/kurinsky/local/surveysim/obs/L5-Lockman-SWIRE_xID250_DR2.fits"
     mod.survey['area']=15.31
     mod.filters[0].limit=9.6
     mod.filters[0].err=1.92
@@ -68,9 +65,9 @@ elif(field == 1):
     mod.filters[2].err=2.3
 elif(field == 2):
     simname="spire_mips_COSMOS"
-    obsfile=coredir+"obs/L2-COSMOS_xID24_DR3.fits"
+    obsfile="/u/ki/kurinsky/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
     #load limits and filters from pre-made model file
-    mod.load(coredir+"model/spire_mips_model.fits")
+    mod.load("/u/ki/kurinsky/local/surveysim/model/spire_mips_model.fits")
     mod.filters[0].err=16.0 #median error in F24um
     mod.filters[1].err=2.0 #median total error in 250um (inst+conf)
     mod.filters[2].err=2.7 #median total error in 350um (inst+conf)
@@ -92,7 +89,7 @@ elif(field == 2):
 else:
     raise ValueError("Invalid field")
 
-#print mod.survey['area']
+print mod.survey['area']
 
 #default to all fit
 mod.fitAllParams()
@@ -193,18 +190,166 @@ else:
 for key in fixKeys:
     mod.params[key].fixed=1
 
-if(model == 0 and lfForm == 1):
+    
+
+if(model == 0 and lfForm == 2 and field == 0):
+    #simname="A-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 0):
+    simname="A-C"
+if(model == 0 and lfForm == 0 and field == 0):
+    simname="B-C"
+if(model == 1 and lfForm == 2 and field == 0):
+    #simname="D-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 0):
+    simname="C-C"
+if(model == 1 and lfForm == 0 and field == 0):
+    simname="D-C"
+if(model == 2 and lfForm == 2 and field == 0):
+    #simname="G-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 0):
+    simname="E-C"
+if(model == 2 and lfForm == 0 and field == 0):
+    simname="F-C"
+if(model == 3 and lfForm == 2 and field == 0):
+    #simname="J-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 0):
+    #simname="K-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 0):
+    #simname="L-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 0):
+    #simname="M-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 0):
+    #simname="N-C"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 0):
+    #simname="O-C"
+    print 'Attention, non in the paper'
+    quit()
+    
+if(model == 0 and lfForm == 2 and field == 1):
+    #simname="A-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 1):
+    #simname="B-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 0 and field == 1):
+    #simname="C-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 2 and field == 1):
+    #simname="D-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 1):
+    #simname="E-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 0 and field == 1):
+    #simname="F-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 2 and field == 1):
+    #simname="G-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 1):
+    #simname="H-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 0 and field == 1):
+    #simname="I-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 2 and field == 1):
+    #simname="J-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 1):
+    #simname="K-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 1):
+    #simname="L-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 1):
+    #simname="M-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 1):
+    #simname="N-LS"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 1):
+    #simname="O-LS"
+    print 'Attention, non in the paper'
+    quit()
+    
+if(model == 0 and lfForm == 2 and field == 2):
+    #simname="A"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 0 and lfForm == 1 and field == 2):
     simname="A"
-if(model == 0 and lfForm == 0):
+if(model == 0 and lfForm == 0 and field == 2):
     simname="B"
-if(model == 1 and lfForm == 1):
+if(model == 1 and lfForm == 2 and field == 2):
+    #simname="D"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 1 and lfForm == 1 and field == 2):
     simname="C"
-if(model == 1 and lfForm == 0):
+if(model == 1 and lfForm == 0 and field == 2):
     simname="D"
-if(model == 2 and lfForm == 1):
+if(model == 2 and lfForm == 2 and field == 2):
+    #simname="G"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 2 and lfForm == 1 and field == 2):
     simname="E"
-if(model == 2 and lfForm == 0):
+if(model == 2 and lfForm == 0 and field == 2):
     simname="F"
+if(model == 3 and lfForm == 2 and field == 2):
+    #simname="J"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 1 and field == 2):
+    #simname="K"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 3 and lfForm == 0 and field == 2):
+    #simname="L"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 2 and field == 2):
+    #simname="M"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 1 and field == 2):
+    #simname="N"
+    print 'Attention, non in the paper'
+    quit()
+if(model == 4 and lfForm == 0 and field == 2):
+    #simname="O"
+    print 'Attention, non in the paper'
+    quit()
 
 if(field == 0):
     simname=simname+'_spire'
@@ -278,7 +423,6 @@ mod.params['zbq'].value=1.75
 mod.params['zbq'].pmin=1.40
 mod.params['zbq'].pmax=2.10
 
-
-
+mod.settings['verbosity']=3
 mod.filename=mfile
-mod.run(obsfile,outfile=outfile,templatefile=coredir+"templates/default_templates.fits")
+mod.run(obsfile,outfile=outfile,templatefile="/u/ki/kurinsky/local/surveysim/templates/default_templates.fits")
