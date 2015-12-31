@@ -104,7 +104,7 @@ void lumfunct::set_params(double lpars[]){
   // break redshift in "p"
   zbp = lpars[LF::parameter::zbp];
   // break redshift in "q"
-  zbq= lpars[LF::parameter::zbq];
+  zbq = lpars[LF::parameter::zbq];
 }
 
 //this function returns the number of sources (per Mpc^3 per dlogL) for a given L-z pair
