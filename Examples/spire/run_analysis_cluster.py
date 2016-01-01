@@ -85,7 +85,8 @@ elif(field == 2):
     #mod.axis2="Flux2"
     mod.filters[1].limit=8.0
     mod.filters[2].limit=0.1
-    
+
+    mod.annealing['temp']=.002
 else:
     raise ValueError("Invalid field")
 

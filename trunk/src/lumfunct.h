@@ -7,6 +7,8 @@
 
 #include "functions.h"
 
+#define MULTIPLIER 128.0
+
 using namespace std;
 
 //==============================================================================

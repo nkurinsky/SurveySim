@@ -208,6 +208,7 @@ void Configuration::print(){
   printf("  Number Redshift Bins : %i\n",nz);
   printf("  Redshift Bin Width   : %f\n",dz);
   printf("  Area [square deg]    : %f\n",area);
+  printf("  AGN Fraction Power   : %f\n",AGNexp);
 
   printf("\nLuminosity Function Form: ");
   switch(lfDist){
@@ -335,6 +336,12 @@ void Configuration::load(){
   }
   catch(CCfits::HDU::NoSuchKeyword){
     sigmaSize=12.0;
+  }
+  try{
+    tab.readKey("AGNEXP",AGNexp);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    AGNexp=12.0;
   }
 
   try{

@@ -32,6 +32,7 @@ agn_frac::agn_frac(int agn_types){
   _t1=0;
   _t2=0;
   _zbt=0;
+  _agnPower=6.0;
 }
 
 void agn_frac::set_lumfunct(lumfunct *lf){
@@ -94,6 +95,13 @@ void agn_frac::set_fCold(double fCold){
     _coldFrac=fCold;
 }
 
+void agn_frac::set_agnPower(double agnPower){
+  if(agnPower != _agnPower){
+    _agnPower=agnPower;
+    lumPower.clear();
+  }
+}
+
 double agn_frac::get_agn_frac(double lum, double redshift){
 
   //here fagn0 gives the fraction of AGN at L_ir=10^12 at z=0
@@ -108,7 +116,7 @@ double agn_frac::get_agn_frac(double lum, double redshift){
   }
 
   if(lumPower.count(lum) == 0){
-    lumPower[lum]=pow((lum/12.000),6.000);
+    lumPower[lum]=pow((lum/12.000),_agnPower);
   }
 
   //the agn fraction for a given L,z bin

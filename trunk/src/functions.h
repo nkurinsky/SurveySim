@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <cctype>
 
@@ -117,6 +118,7 @@ public:
   unsigned long nsim;
   double sigmaSize;
 
+  double AGNexp;
   double area;
   double dz;
   double zmax;

@@ -24,6 +24,7 @@ class agn_frac{
   double _zbt;
   double _compFrac;
   double _coldFrac;
+  double _agnPower;
  public:
   agn_frac(int agn_types);
   void set_lumfunct(lumfunct *lf);
@@ -34,6 +35,7 @@ class agn_frac{
   void set_zbt(double zbt);
   void set_fComp(double fComp);
   void set_fCold(double fCold);
+  void set_agnPower(double agnPower);
   double get_t1(){
     return _t1;
   }
@@ -51,6 +53,9 @@ class agn_frac{
   }
   double get_fCold(){
     return _coldFrac;
+  }
+  double get_agnPower(){
+    return _agnPower;
   }
   double get_agn_frac(double lum, double redshift);
   int get_sedtype(double lum, double redshift);

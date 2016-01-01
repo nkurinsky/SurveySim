@@ -27,6 +27,10 @@ void simulator::configure(const Configuration &config){
   seds.reset(new sed_lib(config.sedfile, nz, zmin, dz));
   seds->load_filters(modelFile,logflag);
   seds->get_filter_info(filters,flux_limits,band_errs,skew_errs);
+  lnum = seds->get_lnum();
+  dl = seds->get_dl();
+  hdl=dl/2.0;
+  hdz=dz/2.0;
 
   for(int i=0;i<3;i++)
     hasSkewErr[i]=(skew_errs[i]>0.0);
@@ -34,6 +38,7 @@ void simulator::configure(const Configuration &config){
   axes[0] = config.axes[0];
   axes[1] = config.axes[1];
   fagns.reset(new agn_frac(seds->get_tnum()));
+  fagns->set_agnPower(config.AGNexp);
   
   simflag=config.simflag;
 
@@ -142,10 +147,6 @@ double simulator::randomZ(double zMin, double zMax, double lMid){
 void simulator::initial_simulation(){
   
   int is,js,jsmin;
-  int lnum = seds->get_lnum();
-  double dl = seds->get_dl();
-  double hdl=dl/2.0;
-  double hdz=dz/2.0;
   long nsrcs;
   double lums[lnum];
   double zarray[nz];
@@ -316,11 +317,6 @@ products simulator::simulate(){
   products output(nz,ns);
   
   static int is,js,jsmin;
-  
-  int lnum = seds->get_lnum();
-  double dl = seds->get_dl();
-  double hdl=dl/2.0;
-  double hdz=dz/2.0;
   static long nsrcs;
   double lums[lnum];
   double zarray[nz];
@@ -544,6 +540,7 @@ bool simulator::save(string outfile){
     pFits->pHDU().addKey("ZBT",fagns->get_zbt(),"AGN Evolution Cutoff");
     pFits->pHDU().addKey("FCOMP",fagns->get_fComp(),"AGN Composite Fraction");
     pFits->pHDU().addKey("FCOLD",fagns->get_fCold(),"Cold SFG Fraction");
+    pFits->pHDU().addKey("AGNEXP",fagns->get_agnPower(),"AGN Fraction Power");
 
     unsigned long size = sources.size();
     LOG_INFO(printf("%s %lu\n","Sources Being Saved: ",size));

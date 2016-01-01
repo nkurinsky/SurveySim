@@ -278,7 +278,7 @@ mod.params['zbq'].value=1.75
 mod.params['zbq'].pmin=1.40
 mod.params['zbq'].pmax=2.10
 
+mod.survey['AGNexp']=6.0
 mod.settings['verbosity']=3
 mod.filename=mfile
 mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
-

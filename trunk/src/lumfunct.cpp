@@ -158,11 +158,12 @@ double lumfunct::get_phi(double redshift,double lum){
     t2*=zbqtoq*pow((1.+redshift-zbq),q2);
   }
   
-  static map<double,double> luminosity;
-  if(luminosity.count(lum) == 0)
-    luminosity[lum]=pow(10,lum);
-
-  ratio=luminosity[lum]/t2;
+  static unordered_map<int,double> luminosity;
+  int mapped_lum = static_cast<int>(floor(lum*MULTIPLIER));
+  if(luminosity.count(mapped_lum) == 0)
+    luminosity[mapped_lum]=pow(10,lum);
+  
+  ratio=luminosity[mapped_lum]/t2;
   
   switch(_dist){
   case LF::distribution::Schecter:

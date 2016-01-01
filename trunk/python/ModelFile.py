@@ -109,7 +109,8 @@ class ModelFile:
                       filterOptions(100,13.5,4.5,0,'mJy')]
         self.survey={
             'area': 4.0,
-            'lfForm':0}
+            'lfForm':0,
+            'AGNexp':12.0}
         self.axis1='ColorF1F2'
         self.axis2='Flux1'
         self.colsel='None'
@@ -214,7 +215,9 @@ class ModelFile:
         for n,p in self.params.iteritems() : p.loadKeys(phdr,n)
 
         self.survey['lfForm']=phdr['LF_FORM']
-        
+        if('AGNEXP' in phdr.keys()):
+            self.survey['AGNexp']=phdr['AGNEXP']
+
         self.survey['area']=phdr['AREA']
         self.colsel=phdr['COLSEL']
         self.axis1=phdr['AXIS1']
@@ -268,6 +271,7 @@ class ModelFile:
         # LF properties 
         #--------------------------------------------------------------------   
         hdr.set('LF_FORM',self.survey['lfForm'],'The functional form of the LF')
+        hdr.set('AGNEXP',self.survey['AGNexp'],'Power of AGN Fraction law')
 
         for n,p in self.params.iteritems() : p.writeKeys(hdr,n)
 

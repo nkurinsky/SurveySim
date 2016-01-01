@@ -36,6 +36,10 @@ private:
   double dz;
   double zmin;
   int nz;
+  int lnum;
+  double dl;
+  double hdl;
+  double hdz;
   int logflag;
   string obsFile;
   string modelFile;
