@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fields="2"
+fields="0"
 agnFracs="6.0 12.0"
 
 hosts=$(bhosts | grep bullet | awk '{print $1}')
