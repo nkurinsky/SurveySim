@@ -8,12 +8,18 @@ from ModelFile import *
 
 
 if(len(sys.argv) < 4):
-    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE,2=COSMOS+MIPS) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
+    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE,2=COSMOS+MIPS) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S) [agnPower]"
     quit()
 else:
     field=int(sys.argv[1])
     model=int(sys.argv[2])
-    lfForm=int(sys.argv[3])
+    lfForm=int(sys.argv[3])    
+
+agnStr=''
+agnExp=6.0
+if(len(sys.argv) >= 5):
+    agnExp=float(sys.argv[4])
+    agnStr='_pagn'+str(agnExp)
 
 #initialize
 mod=ModelFile()
@@ -357,6 +363,8 @@ if(field == 0):
 if(field == 2):
     simname=simname+'_mips'
 
+simname=simname+agnStr
+
 mfile=simname+"_model.fits"
 outfile=simname+"_output.fits"
 
@@ -424,6 +432,7 @@ mod.params['zbq'].value=1.75
 mod.params['zbq'].pmin=1.40
 mod.params['zbq'].pmax=2.10
 
+mod.survey['AGNexp']=agnExp
 mod.settings['verbosity']=3
 mod.filename=mfile
 mod.run(obsfile,outfile=outfile,templatefile="/u/ki/kurinsky/local/surveysim/templates/default_templates.fits")
