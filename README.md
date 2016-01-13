@@ -1,5 +1,7 @@
 Last updated: June 23, 2015 by Anna Sajina
 
+***** Out of date, to be updated soon *****
+
 SurveySim is an MCMC-based code to fit the luminosity function (LF) evolution based on infrared surveys or simulate such surveys by adopting a particular form of the LF evolution. This code was developed by Noah Kurinsky and Anna Sajina primarily as part of Noah Kurinsky's Tufts undergraduate senior thesis. Details on the code structure and usage are found in trunk/manual/UsersGuide.pdf. Please cite Kurinsky et al. 2015 (in prep) whenever making use of SurveySim or parts therein. 
 
 In this main directory:
