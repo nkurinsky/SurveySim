@@ -46,6 +46,8 @@ seddir=codedir+'templates/'
 sedfile=seddir+'default_templates.fits'
 dmodelfile=codedir+'model/default_model.fits'
 modelfile=thisdir+'model.fits'
+modelfile='/Users/annie/students/noah_kurinsky/SurveySim/Examples/spire/E_mips_model.fits'
+dmodelfile=modelfile
 obsdir=codedir+'obs/'
 obsfile=obsdir+'aztec.fits'
 outdir=os.getcwd()+'/OUTPUT/'
@@ -75,13 +77,11 @@ if(not os.path.exists(outdir)):
 
 lfform_tmp=mod.survey['lfForm']
 if(lfform_tmp == 0):
-    lfform='DoublePowerLaw'
+    lfform='DPL'
 if(lfform_tmp == 1):
-    lfform='ModifiedSchecter'
+    lfform='MS'
 if(lfform_tmp == 2):
-    lfform='Schecter'
-if(lfform_tmp == 3):
-    lfform='DoubleExponential'
+    lfform='S'
 
 #initialize luminosity function parameters (GUI middle frame)
 fields_lf=mod.params.keys()
@@ -171,37 +171,40 @@ class SurveySimGUI:
         master.title("SurveySim")
         self.labelframe_lf = LabelFrame(master, text="Luminosity Function Parameters",bg='light blue') 
         self.labelframe_lf.grid(column=0,row=0,rowspan=2,sticky=N+S)
-        self.label_lf=Label(self.labelframe_lf,text="Initial/Min/Max/Fix",bg='light blue')
-        self.label_lf.grid(in_=self.labelframe_lf,row=2,column=1)
+        self.label_lf=Label(self.labelframe_lf,text="Value/Min/Max/Fix",bg='light blue')
+        self.label_lf.grid(in_=self.labelframe_lf,row=2)#,rowspan=2)
 
         self.labelframe_survey = LabelFrame(master, text="Survey fitting properties",bg='pink') 
         self.labelframe_survey.grid(column=1,row=0,sticky=W+N+S)
         self.label_survey=Label(self.labelframe_survey,text="Filter/Limit/Units/compN/compB/compM",bg='pink') 
-        self.label_survey.grid(in_=self.labelframe_survey,row=1,column=1)
+        self.label_survey.grid(in_=self.labelframe_survey,row=1,column=0)
+
+        self.labelframe_sedmix=LabelFrame(master,text="SED mix",bg='cyan')
+        self.labelframe_sedmix.grid(row=1,rowspan=2,column=1,columnspan=2,sticky=W+E)
 
         self.labelframe_files = LabelFrame(master, text="Data files",bg='grey')
         self.labelframe_files.grid(column=2,row=0,rowspan=2,sticky=N)
 
         self.labelframe_seds=LabelFrame(master,text="SEDs",bg='green')
-        self.labelframe_seds.grid(row=0,rowspan=2,column=2,sticky=W+E)
+        self.labelframe_seds.grid(row=1,rowspan=2,column=2,columnspan=2,sticky=W+E)
 
 #the GUI buttons
         self.labelframe_buttons=LabelFrame(master)
-        self.labelframe_buttons.grid(column=1,columnspan=2,row=1,sticky=S+E+W)
+        self.labelframe_buttons.grid(column=0,row=2,sticky=S+E+W)
         row=Frame(self.labelframe_buttons)
         row.pack(side=LEFT)
-        self.settings_button = Button(row,text='Settings',command=self.settings)
-        self.settings_button.pack(side=LEFT,padx=5,pady=5)
+        self.settings_button = Button(row,text='MCMC',command=self.settings)
+        self.settings_button.pack(side=LEFT,padx=4,pady=4)
         self.update_button = Button(self.labelframe_buttons, text='Update',command=self.update_mfile)
-        self.update_button.pack(side=LEFT,padx=5,pady=5)
+        self.update_button.pack(side=LEFT,padx=4,pady=4)
         self.run_button = Button(self.labelframe_buttons, text='Run',command=self.runcode)
-        self.run_button.pack(side=LEFT,padx=5,pady=5)
-        self.results_button = Button(self.labelframe_buttons, text='Show results',command=self.showresults)
-        self.results_button.pack(side=LEFT,padx=5,pady=5)
-        self.mcmc_button = Button(self.labelframe_buttons, text='MCMC diagnostics',command=self.mcmcdiag)
-        self.mcmc_button.pack(side=LEFT,padx=5,pady=5)
-        self.quit_button = Button(self.labelframe_buttons, text='Quit', command=self.quit)
-        self.quit_button.pack(side=LEFT, padx=5, pady=5)
+        self.run_button.pack(side=LEFT,padx=4,pady=4)
+        self.results_button = Button(self.labelframe_buttons, text='Output',command=self.showresults)
+        self.results_button.pack(side=LEFT,padx=4,pady=4)
+#        self.mcmc_button = Button(self.labelframe_buttons, text='MCMC',command=self.mcmcdiag)
+#        self.mcmc_button.pack(side=LEFT,padx=5,pady=5)
+        self.quit_button = Button(self.labelframe_buttons, text='X', command=self.quit,bg="red")
+        self.quit_button.pack(side=LEFT, padx=4, pady=4)
 
 # Data files frame
         ind=0;
@@ -229,6 +232,20 @@ class SurveySimGUI:
             self.obsfile_set.set(obsfile)
             self.sedfile_set.set(sedfile)
             ind=ind+1
+        
+        row=Frame(self.labelframe_files,bg='grey')
+        lab=Label(row,text='Area[sq.deg.]=',bg='grey')
+        lab.pack(side=LEFT)
+        row.pack(side=TOP,padx=1,pady=5)
+#        lab = Label(self.labelframe_files, width=10, text='Area[sq.deg.]=', anchor='w',bg='grey')
+#        lab.grid(in_=self.labelframe_files,row=ind+1,column=0,pady=2)
+        ent_area=Entry(row,textvar=self.area)
+        ent_area.pack(side='left',padx=0,pady=0)
+        self.area.set(area)
+        #ent_area.grid(in_=self.labelframe_files,row=ind+1,column=1,pady=2)
+
+        comp=Checkbutton(self.labelframe_files,text='Include AGN',variable=self.comp_check,bg='grey')
+        comp.pack(side=LEFT)
 
         comp=Checkbutton(self.labelframe_files,text='Include Composites',variable=self.comp_check,bg='grey')
         comp.pack(side=LEFT)
@@ -240,12 +257,15 @@ class SurveySimGUI:
         ind=0;
         lab=Label(self.labelframe_lf,text='LF form',bg='light blue')
         lab.grid(in_=self.labelframe_lf,row=ind+1,column=0)
-        lfforms=['DoublePowerLaw','ModifiedSchecter','Schecter']
+        lfforms=['DPL','MS','S']
         lf_option=OptionMenu(self.labelframe_lf,self.lfform_set,*lfforms)
         self.lfform_set.set(lfform)
         lf_option.grid(in_=self.labelframe_lf,row=ind+1,column=1)
  
-        for field in fields_lf:
+        #print fields_lf
+        fields_lf_new=['Phi0','L0','Alpha','Beta','P','Q','P2','Q2','zbp','zbq']
+        #print fields_lf_new
+        for field in fields_lf_new:
             lab = Label(self.labelframe_lf, text=field,bg='light blue')
             lab.grid(in_=self.labelframe_lf,row=ind+3,column=0)
 
@@ -274,7 +294,7 @@ class SurveySimGUI:
             option1.grid(in_=self.labelframe_survey,row=ind+2,column=0)
             
             ent0_1=Entry(self.labelframe_survey,textvar=self.limits[ind],width=5)
-            ent1_1=Entry(self.labelframe_survey,textvar=self.units[ind],width=5)
+            ent1_1=Entry(self.labelframe_survey,textvar=self.units[ind],width=3)
             entN=Entry(self.labelframe_survey,textvar=self.compNs[ind],width=3)
             entB=Entry(self.labelframe_survey,textvar=self.compBs[ind],width=3)
             entM=Entry(self.labelframe_survey,textvar=self.compMs[ind],width=3)
@@ -289,22 +309,7 @@ class SurveySimGUI:
             entM.grid(in_=self.labelframe_survey,row=ind+2,column=5)
             
             ind=ind+1;
-
-
-        lab = Label(self.labelframe_survey, width=10, text='Color cut:', anchor='w',bg='pink')
-        lab.grid(in_=self.labelframe_survey,row=ind+2,column=0)
-        ent2_0=Entry(self.labelframe_survey,textvar=self.colsel,width=8)
-        self.colsel.set('None')
-        ent2_0.grid(in_=self.labelframe_survey,row=ind+2,column=1,pady=2)
-        self.info_button = Button(self.labelframe_survey, text='?',command=self.colsel_info)
-        self.info_button.grid(row=ind+2,column=2)
-
-        lab = Label(self.labelframe_survey, width=10, text='Area[sq.deg.]=', anchor='w',bg='pink')
-        lab.grid(in_=self.labelframe_survey,row=ind+3,column=0,pady=2)
-        ent2_0=Entry(self.labelframe_survey,textvar=self.area,width=8)
-        self.area.set(area)
-        ent2_0.grid(in_=self.labelframe_survey,row=ind+3,column=1,pady=2)
-
+        
         lab = Label(self.labelframe_survey, width=6, text='AXIS1=', anchor='w',bg='pink')
         lab.grid(in_=self.labelframe_survey,row=ind+4,column=0,pady=2)
         ent2_1=Entry(self.labelframe_survey,textvar=self.fitaxes[0],width=8)
@@ -317,8 +322,26 @@ class SurveySimGUI:
         self.fitaxes[1].set(axes[1])
         ent3_1.grid(in_=self.labelframe_survey,row=ind+5,column=1,pady=2)
 
+#Plot AGN fraction 
+        fig=plt.Figure(figsize=(3,1.8)) 
+        x = np.arange(0, 2*np.pi, 0.01)        # x-array
+        canvas = FigureCanvasTkAgg(fig, master=self.labelframe_sedmix)
+        canvas.get_tk_widget().grid(column=1,row=1)
+        #show_plot=True
+        ax = fig.add_subplot(111)
+
+        lums=np.arange(8,14,0.1)
+        fagn0=0.6
+        fagn=fagn0*(lums/12)**6.0
+        bad=(fagn > 1)
+        fagn[bad]=1
+        ax.plot(lums,fagn)
+        ax.set_xlabel('log(L/Lsun')
+        ax.set_ylabel('F(AGN)')
+        show()
+
 #Plot_SED_templates
-        fig=plt.Figure(figsize=(4,3)) 
+        fig=plt.Figure(figsize=(3,1.8)) 
         x = np.arange(0, 2*np.pi, 0.01)        # x-array
         canvas = FigureCanvasTkAgg(fig, master=self.labelframe_seds)
         canvas.get_tk_widget().grid(column=2,row=1)
@@ -363,11 +386,11 @@ class SurveySimGUI:
         return
 
     def update_mfile(self):
-        if(self.lfform_set.get() == "DoublePowerLaw"):
+        if(self.lfform_set.get() == "DPL"):
             mod.survey['lfForm']=0
-        if(self.lfform_set.get() == "ModifiedSchecter"):
+        if(self.lfform_set.get() == "MS"):
             mod.survey['lfForm']=1
-        if(self.lfform_set.get() == "Schecter"):
+        if(self.lfform_set.get() == "S"):
             mod.survey['lfForm']=2
         mod.survey['area']=self.area.get()
         ind=0
