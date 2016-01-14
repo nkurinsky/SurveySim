@@ -4,8 +4,8 @@ SurveySim is an MCMC-based code to fit the luminosity function (LF) evolution ba
 
 In this main directory:
  
- Examples      contains pre-built model files as well as their associated output files and figures. these contain the examples discussed in Kurinsky et al. 2016
- tags          contains frozen release tar files for official SurveySim releases
- trunk         contains code in active development
+* Examples      contains pre-built model files as well as their associated output files and figures. these contain the examples discussed in Kurinsky et al. 2016
+* tags          contains frozen release tar files for official SurveySim releases
+* trunk         contains code in active development
 
 Please refer to the README file in the trunk directory for compilation instructions.
