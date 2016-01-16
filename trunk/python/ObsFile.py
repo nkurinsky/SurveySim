@@ -53,10 +53,9 @@ def main(argv):
 
 # uncomment if need to fix something that already has the above keywords set
 #   thdr.set('F3COL','F350')
-   thdr.set('EF1COL', 'e_F24')
+#   thdr.set('EF1COL', 'e_F24')
 #   thdr.set('EF2COL','et_F250')
 #   thdr.set('EF3COL','et_F350')
-
 #   thdr.set('EF1COL','et_F250')
 #   thdr.set('EF2COL','et_F350')
 #   thdr.set('EF3COL','et_F500')

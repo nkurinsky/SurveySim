@@ -472,7 +472,6 @@ class SurveySimGUI:
         print("Runnning fitter code....")
         obsfile=self.obsfile_set.get()
         sedfile=self.sedfile_set.get()
-#        os.system(fitcode+' '+obsfile+' '+modelfile+' '+sedfile+' '+outfile)
         os.system(fitcode+' '+modelfile+' '+sedfile+' '+obsfile+' -o '+outfile)
 
     def quit(self):
