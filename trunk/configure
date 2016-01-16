@@ -5396,7 +5396,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile lib_aux/Makefile src/alg_lib/Makefile python/Makefile model/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile filters/Makefile templates/Makefile obs/Makefile lib_aux/Makefile src/alg_lib/Makefile python/Makefile model/Makefile examples/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6157,6 +6157,7 @@ do
     "src/alg_lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/alg_lib/Makefile" ;;
     "python/Makefile") CONFIG_FILES="$CONFIG_FILES python/Makefile" ;;
     "model/Makefile") CONFIG_FILES="$CONFIG_FILES model/Makefile" ;;
+    "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
