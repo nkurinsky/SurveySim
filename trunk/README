@@ -109,5 +109,6 @@ or higher for best (tested) results. To complete the installation procedure, exe
 
    	  make
 	  make install
-	  
+
+The local install has been tested succesfully on RedHat 6 Enterprise. 
 ====================================================================================
