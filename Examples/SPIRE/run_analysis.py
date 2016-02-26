@@ -120,30 +120,25 @@ elif(lfForm == 2):
 else:
     raise ValueError("Invalid lfForm")
 
-mod.params['fa0'].value=0.60
-mod.params['fa0'].pmin=0.01
-mod.params['fa0'].pmax=0.99
+mod.params['fa0'].value=0.25#1.30
+mod.params['fa0'].pmin=0.10#0.20
+mod.params['fa0'].pmax=0.50#5.00
 mod.params['fa0'].fixed=0
 
-mod.params['t1'].value=-1.30
-mod.params['t1'].pmin=-2.60
-mod.params['t1'].pmax=-0.01
+mod.params['t1'].value=-1.40#-1.30
+mod.params['t1'].pmin=-6.00#-2.60
+mod.params['t1'].pmax=6.00#1.00#-0.01
 mod.params['t1'].fixed=0
 
-mod.params['t2'].value=4.50
-mod.params['t2'].pmin=1.50
-mod.params['t2'].pmax=7.50
+mod.params['t2'].value=5.00#4.50
+mod.params['t2'].pmin=-6.00#-2.00#1.50
+mod.params['t2'].pmax=6.00#7.50
 mod.params['t2'].fixed=0
 
 mod.params['zbt'].value=2.50
 mod.params['zbt'].pmin=0.50
-mod.params['zbt'].pmax=4.00
+mod.params['zbt'].pmax=3.50#4.00
 mod.params['zbt'].fixed=0
-
-#MB-change
-mod.params['fa0'].value=0.20
-mod.params['fa0'].pmin=0.03
-mod.params['fa0'].pmax=0.85
 
 
 if(model == 0):
@@ -211,74 +206,65 @@ if(field == 0):
 if(field == 2):
     simname=simname+'_mips'
 
-mfile=simname+"1_model.fits"
-outfile=simname+"1_output.fits"
+mfile=simname+"_model.fits"
+outfile=simname+"_output.fits"
 
 #parameters below should be the same regardless of model
 
 mod.params['Alpha'].fixed=1
-
-if(lfForm == 0):
-    mod.params['Alpha'].value=1.20
-
-if(lfForm == 1):
-    mod.params['Alpha'].value=2.2
-
 mod.params['Beta'].fixed=1
 
 if(lfForm == 0):
-    mod.params['Beta'].value=0.5
+    mod.params['Alpha'].value=1.15
+    mod.params['Beta'].value=0.52
+    mod.params['Phi0'].value=-2.348#-2.95
+    mod.params['L0'].value=10.10
 
 if(lfForm == 1):
-    mod.params['Beta'].value=0.1   
-
-mod.params['Phi0'].value=-2.24
-mod.params['Phi0'].pmin=-3.24
-mod.params['Phi0'].pmax=-0.74
+    mod.params['Alpha'].value=2.6
+    mod.params['Beta'].value=0.8   
+    mod.params['Phi0'].value=-3.248
+    mod.params['L0'].value=10.85
+    
+mod.params['Phi0'].pmin=-3.45#-4.05
+mod.params['Phi0'].pmax=-2.15#-2.75
 mod.params['Phi0'].fixed=0
 
-mod.params['L0'].value=9.95
-mod.params['L0'].pmin=8.45
-mod.params['L0'].pmax=10.45
+mod.params['L0'].pmin=9.90
+mod.params['L0'].pmax=11.05
 mod.params['L0'].fixed=0
 
-mod.params['P'].value=-0.5
-#mod.params['P'].pmin=-1.0
-#mod.params['P'].pmax=0.5
+mod.params['P'].value=-0.57
 mod.params['P'].fixed=0
-#Larger range
-mod.params['P'].pmin=-2.5
-mod.params['P'].pmax=1.5
+mod.params['P'].pmin=-6.00#-6.7#-2.5
+mod.params['P'].pmax=6.00#0.5#1.5
 
 mod.params['P2'].fixed=0
-mod.params['P2'].value=-3.25
-mod.params['P2'].pmin=-3.75
-mod.params['P2'].pmax=-2.75
+mod.params['P2'].value=-2.40#-3.92
+mod.params['P2'].pmin=-6.00#-6.0
+mod.params['P2'].pmax=6.00#-0.1#0.5
 
 mod.params['Q'].value=3.55
 mod.params['Q'].fixed=0
-#mod.params['Q'].pmin=3.35
-#mod.params['Q'].pmax=3.85
-#Larger range
-mod.params['Q'].pmin=1.55
-mod.params['Q'].pmax=5.55
+mod.params['Q'].pmin=-6.00#0.5#1.55
+mod.params['Q'].pmax=6.00#6.0#5.55
 
 mod.params['Q2'].fixed=0
-mod.params['Q2'].value=1.2
-mod.params['Q2'].pmin=0.8
-mod.params['Q2'].pmax=1.6
+mod.params['Q2'].value=0.8#1.62
+mod.params['Q2'].pmin=-6.00#0.1#0.5
+mod.params['Q2'].pmax=6.00#6.0
 
 mod.params['zbp'].fixed=0
-mod.params['zbp'].value=1.00
+mod.params['zbp'].value=1.10
 mod.params['zbp'].pmin=0.50
-mod.params['zbp'].pmax=2.50
+mod.params['zbp'].pmax=3.5#2.50
 
 mod.params['zbq'].fixed=0
-mod.params['zbq'].value=1.75
-mod.params['zbq'].pmin=1.40
-mod.params['zbq'].pmax=2.10
+mod.params['zbq'].value=1.85#1.75
+mod.params['zbq'].pmin=0.50#1.40
+mod.params['zbq'].pmax=3.5#2.10
 
-mod.survey['AGNexp']=6.0
+mod.survey['AGNexp']=12.00
 mod.settings['verbosity']=3
 mod.filename=mfile
 mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
