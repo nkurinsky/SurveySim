@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -z $SURVEYSIMPATH ]
+then
+    python /usr/local/surveysim/python/ObsFile.py
+else
+    python ${SURVEYSIMPATH}/python/ObsFile.py
+fi
