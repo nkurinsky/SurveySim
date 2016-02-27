@@ -44,9 +44,9 @@ fields_files='Survey data','SEDs'
 #initialize datafiles
 seddir=codedir+'templates/'
 sedfile=seddir+'default_templates.fits'
-dmodelfile=codedir+'model/default_model.fits'
-modelfile=thisdir+'model.fits'
-modelfile='/Users/annie/students/noah_kurinsky/SurveySim/Examples/spire/E_mips_model.fits'
+modelfile=codedir+'model/default_model.fits'
+#modelfile=thisdir+'model.fits'
+#modelfile='/Users/annie/students/noah_kurinsky/SurveySim/Examples/spire/E_mips_model.fits'
 dmodelfile=modelfile
 obsdir=codedir+'obs/'
 obsfile=obsdir+'aztec.fits'
