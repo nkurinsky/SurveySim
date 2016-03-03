@@ -4,18 +4,27 @@
 import sys, getopt
 from astropy.io import fits
 
+def printHelp(exitCode=0):
+   if(exitCode > 0):
+      print 'Error: Please Specify Input Parameters'
+   print 'ObsFile.py -i <obsfile> -o <outputfile>'
+   sys.exit(exitCode)
+
 def main(argv):
    obsfile = ''
    outputfile = ''
+
+   if(len(argv) == 0):
+      printHelp(1)
+
    try:
       opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
    except getopt.GetoptError:
-      print 'ObsFile.py -i <obsfile> -o <outputfile>'
-      sys.exit(2)
+      printHelp(2)
+
    for opt, arg in opts:
       if opt == '-h':
-         print 'ObsFile.py -i <obsfile> -o <outputfile>'
-         sys.exit()
+         printHelp(0)
       elif opt in ("-i", "--ifile"):
          obsfile = arg
       elif opt in ("-o", "--ofile"):
