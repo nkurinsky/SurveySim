@@ -1,22 +1,17 @@
 #!/bin/bash
 
-fields="0"
+fields="0 2"
+lfs="0 1"
 agnFracs="6.0 12.0"
 
 hosts=$(bhosts | grep bullet | awk '{print $1}')
 echo -e Hosts:\"$hosts\"
 
-for frac in $agnFracs
+for field in $fields
 do
-    for field in $fields
+    for lf in $lfs
     do
-	for lf in {0..1}
-	do
-	    for model in {0..2}
-	    do
-		echo "./run_analysis_cluster.py $field $model $lf $frac"
-		bsub -W 24:00 -q medium -m "$hosts" ./run_analysis_cluster.py $field $model $lf $frac
-	    done
-	done
+	echo "./run_analysis_cluster.py $field 2 $lf"
+	#bsub -W 24:00 -q medium -m "$hosts" ./run_analysis_cluster.py $field 2 $lf
     done
 done
