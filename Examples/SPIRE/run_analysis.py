@@ -27,7 +27,8 @@ mod.axis2="Flux1"
 mod.settings['verbosity']=3
 mod.annealing['temp']=.03
 mod.annealing['learningRate']=0.4
-mod.convergence['CI']=0.90
+#mod.convergence['CI']=0.90
+mod.convergence['CI']=0.95
 
 mod.filters[0].setID("SPIRE_250")
 mod.filters[1].setID("SPIRE_350")
@@ -73,6 +74,7 @@ elif(field == 2):
     obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
     #load limits and filters from pre-made model file
     mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
+    mod.convergence['CI']=0.95
     mod.filters[0].err=16.0 #median error in F24um
     mod.filters[1].err=2.0 #median total error in 250um (inst+conf)
     mod.filters[2].err=2.7 #median total error in 350um (inst+conf)
@@ -136,8 +138,8 @@ mod.params['t2'].pmax=6.00#7.50
 mod.params['t2'].fixed=0
 
 mod.params['zbt'].value=2.50
-mod.params['zbt'].pmin=0.50
-mod.params['zbt'].pmax=3.50#4.00
+mod.params['zbt'].pmin=1.5#0.50
+mod.params['zbt'].pmax=3.5#3.50
 mod.params['zbt'].fixed=0
 
 
@@ -217,23 +219,27 @@ mod.params['Beta'].fixed=1
 if(lfForm == 0):
     mod.params['Alpha'].value=1.15
     mod.params['Beta'].value=0.52
-    mod.params['Phi0'].value=-2.348#-2.95
+    mod.params['Phi0'].value=-2.348
     mod.params['L0'].value=10.10
+    mod.params['Phi0'].pmin=-2.4
+    mod.params['Phi0'].pmax=-2.2
+    mod.params['Phi0'].fixed=0
+    mod.params['L0'].pmin=10.0
+    mod.params['L0'].pmax=10.2
+    mod.params['L0'].fixed=0
 
 if(lfForm == 1):
     mod.params['Alpha'].value=2.6
-    mod.params['Beta'].value=0.8   
+    mod.params['Beta'].value=0.75#0.8   
     mod.params['Phi0'].value=-3.248
-    mod.params['L0'].value=10.85
+    mod.params['L0'].value=10.85    
+    mod.params['Phi0'].pmin=-3.35#-3.45
+    mod.params['Phi0'].pmax=-3.15#-2.15
+    mod.params['Phi0'].fixed=0
+    mod.params['L0'].pmin=10.75#9.90
+    mod.params['L0'].pmax=10.95#11.05
+    mod.params['L0'].fixed=0
     
-mod.params['Phi0'].pmin=-3.45#-4.05
-mod.params['Phi0'].pmax=-2.15#-2.75
-mod.params['Phi0'].fixed=0
-
-mod.params['L0'].pmin=9.90
-mod.params['L0'].pmax=11.05
-mod.params['L0'].fixed=0
-
 mod.params['P'].value=-0.57
 mod.params['P'].fixed=0
 mod.params['P'].pmin=-6.00#-6.7#-2.5
