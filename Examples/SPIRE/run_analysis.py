@@ -5,7 +5,8 @@ import sys
 import datetime
 import time
 
-sys.path.append('/usr/local/surveysim/python')
+basedir='/usr/local/surveysim/'
+sys.path.append(basedir+'python')
 
 from ModelFile import *
 
@@ -23,12 +24,13 @@ mod=ModelFile()
 mod.axis1="ColorF1F2"
 mod.axis2="Flux1"
 
+convergence=0.99
 #run settings; should be same regardless of model
 mod.settings['verbosity']=3
+mod.settings['nchain']=50
 mod.annealing['temp']=.03
 mod.annealing['learningRate']=0.4
-#mod.convergence['CI']=0.90
-mod.convergence['CI']=0.95
+mod.convergence['CI']=convergence
 
 mod.filters[0].setID("SPIRE_250")
 mod.filters[1].setID("SPIRE_350")
@@ -37,7 +39,7 @@ mod.filters[2].setID("SPIRE_500")
 #set parameters for field, and input file
 if(field == 0):
     simname="spire_COSMOS"
-    obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID250_DR2.fits"
+    obsfile=basedir+"obs/L2-COSMOS_xID250_DR2.fits"
     mod.survey['area']=4.78  #4.38
     mod.filters[0].limit=8.0
     mod.filters[0].err=6.95 #1.6
@@ -53,7 +55,7 @@ if(field == 0):
     mod.filters[2].err=6.63 #1.9
 elif(field == 1):
     simname="spire_Lockman-SWIRE"
-    obsfile="/usr/local/surveysim/obs/L5-Lockman-SWIRE_xID250_DR2.fits"
+    obsfile=basedir+"obs/L5-Lockman-SWIRE_xID250_DR2.fits"
     mod.survey['area']=15.31
     mod.filters[0].limit=9.6
     mod.filters[0].err=1.92
@@ -71,10 +73,10 @@ elif(field == 1):
     mod.annealing['temp']=.002
 elif(field == 2):
     simname="spire_mips_COSMOS"
-    obsfile="/usr/local/surveysim/obs/L2-COSMOS_xID24_DR3.fits"
+    obsfile=basedir+"obs/L2-COSMOS_xID24_DR3.fits"
     #load limits and filters from pre-made model file
-    mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
-    mod.convergence['CI']=0.95
+    mod.load(basedir+"model/spire_mips_model.fits")
+    mod.convergence['CI']=convergence
     mod.filters[0].err=16.0 #median error in F24um
     mod.filters[1].err=2.0 #median total error in 250um (inst+conf)
     mod.filters[2].err=2.7 #median total error in 350um (inst+conf)
@@ -273,4 +275,4 @@ mod.params['zbq'].pmax=3.5#2.10
 mod.survey['AGNexp']=12.00
 mod.settings['verbosity']=3
 mod.filename=mfile
-mod.run(obsfile,outfile=outfile,templatefile="/usr/local/surveysim/templates/default_templates.fits")
+mod.run(obsfile,outfile=outfile,templatefile=basedir+"templates/default_templates.fits")
