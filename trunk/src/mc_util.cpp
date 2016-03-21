@@ -368,7 +368,7 @@ bool MCChains::save(string filename, string parnames[], string hname){
   
   for(int j=0;j<nchains;j++){
     sprintf(ctemp,"%i",j);
-    cnum = string(ctemp);
+    cnum = "C"+string(ctemp);
     for (i=0;i<npars;i++){
       colnames[j*chainwidth+i] = parnames[i]+cnum;
     }
@@ -376,7 +376,7 @@ bool MCChains::save(string filename, string parnames[], string hname){
   }
   for (int i=allwidth;i<tablewidth;i++){
     sprintf(ctemp,"%i",i-allwidth);
-    cnum = string(ctemp);
+    cnum = "C"+string(ctemp);
     colnames[i] = "ACPT"+cnum;
   }
 

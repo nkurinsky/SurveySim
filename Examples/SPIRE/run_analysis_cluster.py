@@ -5,7 +5,7 @@ import sys
 import datetime
 import time
 
-basedir='${HOME}/usr/local/surveysim/'
+basedir="/u/ki/kurinsky/local/surveysim/"
 sys.path.append(basedir+'python')
 
 from ModelFile import *
@@ -25,11 +25,8 @@ mod.axis2="Flux1"
 
 convergence=0.99
 #run settings; should be same regardless of model
-mod.settings['verbosity']=3
-mod.settings['nchain']=50
 mod.annealing['temp']=.03
 mod.annealing['learningRate']=0.4
-mod.convergence['CI']=convergence
 
 mod.filters[0].setID("SPIRE_250")
 mod.filters[1].setID("SPIRE_350")
@@ -272,6 +269,10 @@ mod.params['zbq'].pmin=0.50#1.40
 mod.params['zbq'].pmax=3.5#2.10
 
 mod.survey['AGNexp']=12.00
-mod.settings['verbosity']=3
 mod.filename=mfile
+
+mod.settings['verbosity']=3
+mod.settings['nchain']=20
+mod.convergence['CI']=convergence
+
 mod.run(obsfile,outfile=outfile,templatefile=basedir+"templates/default_templates.fits")
