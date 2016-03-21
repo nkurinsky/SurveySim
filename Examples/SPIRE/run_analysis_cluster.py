@@ -272,7 +272,7 @@ mod.survey['AGNexp']=12.00
 mod.filename=mfile
 
 mod.settings['verbosity']=3
-mod.settings['nchain']=20
+mod.settings['nchain']=10
 mod.convergence['CI']=convergence
 
 mod.run(obsfile,outfile=outfile,templatefile=basedir+"templates/default_templates.fits")
