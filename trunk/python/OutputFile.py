@@ -367,9 +367,9 @@ class MCMCInfo:
         params=hdus[4].data
         pnames=list()
         for col in params.names:
-            if "0" in col:
+            if "C0" in col:
                 if not (("CHISQ" in col) | ("ACPT" in col)):
-                    ptemp=col.split('0')[0]
+                    ptemp=col.split('C')[0]
                     pnames.append(ptemp)
             if "CHISQ" in col:
                 self.ChainNum+=1
@@ -395,7 +395,7 @@ class MCMCInfo:
             self.Parameters[p0]=list()
             for i in range(0,self.ChainNum):
                 gpts=np.where(self.ChiSquares[i] < cmed)
-                self.Parameters[p0].extend(params[p0+str(i)][gpts])
+                self.Parameters[p0].extend(params[p0+"C"+str(i)][gpts])
 
         for k,v in self.Parameters.iteritems():
             self.BestFit[k]={'mean':np.mean(self.Parameters[k]),
