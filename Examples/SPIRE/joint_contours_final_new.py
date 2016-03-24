@@ -6,7 +6,9 @@ from scipy.stats import gaussian_kde
 
 
 type_model=['A','B','C','D','E','F']
+type_model=['E','F']
 comp=[7,7,11,11,12,12]
+comp=[12,12]
 cmaps=['Paired','Paired']
 
 ymin_par=range(12)
@@ -156,6 +158,8 @@ plt.rc('text', usetex=True)
 params = {'text.latex.preamble' : [r'\usepackage{siunitx}', r'\usepackage{sfmath}']}
 plt.rcParams.update(params)
 
+rcut=1.05
+
 for i_j in range (len(type_model)):
     print ' '
     print 'Model',type_model[i_j]
@@ -189,34 +193,97 @@ for i_j in range (len(type_model)):
         
         for im in range(0,len(models)):
             filename=outputdir+models[im]+'_output.fits'
-            #print 'For model: ',models[im]
             hdus=fits.open(filename)
             phdr=hdus[0].header
+            converge=hdus[5].data
+            r0=converge['R0']
+            r1=converge['R1']
+            r2=converge['R2']
+            r3=converge['R3']
+            r4=converge['R4']
+            r5=converge['R5']
+            r6=converge['R6']
+            r7=converge['R7']
+            r8=converge['R8']
+            r9=converge['R9']
+            r10=converge['R10']
+            r11=converge['R11']
+            r12=converge['R12']
+
+            gpts_r=(r0 > 0)
+            conv_len=len(r0[gpts_r])
+            half_len = -1
+            for iconv in range(0,conv_len):
+                if(half_len == -1):
+                    if((r0[iconv] <= rcut) & (r1[iconv] <= rcut) & (r2[iconv] <= rcut) & (r3[iconv] <= rcut) & (r4[iconv] <= rcut) & (r5[iconv] <= rcut) & (r6[iconv] <= rcut) & (r7[iconv] <= rcut) & (r8[iconv] <= rcut) & (r9[iconv] <= rcut) & (r10[iconv] <= rcut) & (r11[iconv] <= rcut) & (r12[iconv] <= rcut)):
+                       half_len=iconv
+
+            half_len=half_len*20
+            print half_len
             chain1=hdus[4].data
-            half_el_col=len(chain1['ACPT0'])/2
-            par1=chain1[toshow1[i_pam]+'0'][half_el_col:]
-            par1=np.append(par1,chain1[toshow1[i_pam]+'1'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'2'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'3'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'4'][half_el_col:])
+            full_len=len(chain1['ACPT0'])
+            #half_len=len(chain1['ACPT0'])*0.5
+            #print full_len,half_len
+            chi2_0=chain1['CHISQ'+'0']
+            par1=chain1[toshow1[i_pam]+'0']
+            chi2_1=chain1['CHISQ'+'1']
+            par1_1=chain1[toshow1[i_pam]+'1']
+            chi2_2=chain1['CHISQ'+'2']
+            par1_2=chain1[toshow1[i_pam]+'2']
+            chi2_3=chain1['CHISQ'+'3']
+            par1_3=chain1[toshow1[i_pam]+'3']
+            chi2_4=chain1['CHISQ'+'4']
+            par1_4=chain1[toshow1[i_pam]+'4']
+            par1=par1[half_len:full_len]
+            gpts0=(chi2_0[half_len:full_len] <= 90.)
+            par1=par1[gpts0]
+            par1_1=par1_1[half_len:full_len] 
+            gpts1=(chi2_1[half_len:full_len] <= 90.)
+            par1_1=par1_1[gpts1]           
+            par1_2=par1_2[half_len:full_len]  
+            gpts2=(chi2_2[half_len:full_len] <= 90.)
+            par1_2=par1_2[gpts2]
+            par1_3=par1_3[half_len:full_len]
+            gpts3=(chi2_3[half_len:full_len] <= 90.)
+            par1_3=par1_3[gpts3]
+            par1_4=par1_4[half_len:full_len]
+            gpts4=(chi2_4[half_len:full_len] <= 90.)
+            par1_4=par1_4[gpts4]
 
-            par2=chain1[toshow2[i_pam]+'0'][half_el_col:]
-            par2=np.append(par2,chain1[toshow2[i_pam]+'1'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'2'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'3'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'4'][half_el_col:])
+            par1=np.append(par1,par1_1)
+            par1=np.append(par1,par1_2)
+            par1=np.append(par1,par1_3)
+            par1=np.append(par1,par1_4)
 
-            #ac=chain1['ACPT0']
-            #ac=np.append(ac,chain1['ACPT1'])
-            #ac=np.append(ac,chain1['ACPT2'])
-            #ac=np.append(ac,chain1['ACPT3'])
-            #ac=np.append(ac,chain1['ACPT4'])
+            par2=chain1[toshow2[i_pam]+'0']
+            par2_1=chain1[toshow2[i_pam]+'1']
+            par2_2=chain1[toshow2[i_pam]+'2']
+            par2_3=chain1[toshow2[i_pam]+'3']
+            par2_4=chain1[toshow2[i_pam]+'4']
 
-            #chisq=chain1['CHISQ0']
-            #chisq=np.append(chisq,chain1['CHISQ1'])
-            #chisq=np.append(chisq,chain1['CHISQ2'])
-            #chisq=np.append(chisq,chain1['CHISQ3'])
-            #chisq=np.append(chisq,chain1['CHISQ4'])
+            par2=par2[half_len:full_len]
+            par2_1=par2_1[half_len:full_len]            
+            par2_2=par2_2[half_len:full_len]            
+            par2_3=par2_3[half_len:full_len]
+            par2_4=par2_4[half_len:full_len]
+            par2=par2[gpts0]
+            par2_1=par2_1[gpts1]
+            par2_2=par2_2[gpts2]
+            par2_3=par2_3[gpts3]
+            par2_4=par2_4[gpts4]
+
+            par2=np.append(par2,par2_1)
+            par2=np.append(par2,par2_2)
+            par2=np.append(par2,par2_3)
+            par2=np.append(par2,par2_4)
+
+            if(im == 0):
+                xmin=min(par1)-0.2
+                xmax=max(par1)+0.2
+                ymin=min(par2)-0.2
+                ymax=max(par2)+0.2
+                x, y = np.mgrid[xmin:xmax:50j, ymin:ymax:50j]
+                positions = np.vstack([x.ravel(), y.ravel()])
 
             values = np.vstack([par1, par2])
             kernel = stats.gaussian_kde(values)
@@ -230,15 +297,15 @@ for i_j in range (len(type_model)):
             conf95_level=0
             f_tmp=f_tmp/np.sum(f_tmp)
             for i in range(0,50):
-                test_cut=i*0.0001 #need to play with the steps here a bit to ensure good sampling of f
+                test_cut=i*0.00003 #need to play with the steps here a bit to ensure good sampling of f
                 gpts=(f_tmp > test_cut)
                 frac=np.sum(f_tmp[gpts])/np.sum(f_tmp)
             #print gpts
                 if((frac <= 0.95) and (conf95_level == 0)):
-                    #print '95% confidence: ',frac,test_cut
+                    print '95% confidence: ',frac,test_cut
                     conf95_level=test_cut
                 if((frac <= 0.68) and (conf68_level == 0)):
-                    #print '68% confidence: ',frac,test_cut
+                    print '68% confidence: ',frac,test_cut
                     conf68_level=test_cut
 
             if(im == 0):
@@ -376,7 +443,7 @@ for i_j in range (len(type_model)):
         g = g.annotate(stats.pearsonr)
         plt.subplots_adjust(left=0.2, right=0.9, top=0.9, bottom=0.2)
 
-#plt.show()
+plt.show()
 
 print ' '
 print 'parameter_array=[',L0_mean,',$'

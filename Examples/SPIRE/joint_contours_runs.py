@@ -6,8 +6,11 @@ from scipy.stats import gaussian_kde
 
 
 type_model=['A','B','C','D','E','F']
+type_model=['E']
 comp=[7,7,11,11,12,12]
+comp=[12]
 cmaps=['Paired','Paired']
+n_run=['1','2','3','4','5','6','7','8','9','10']
 
 ymin_par=range(12)
 ymax_par=range(12)
@@ -57,7 +60,7 @@ fcomp_max=[0.0 for x in range(len(type_model))]
 toshow1=['L0' for x in range(12)]
 toshow2=["" for x in range(12)]
 
-outputdir='Final_output_2/'
+outputdir='Final_output_2/10_runs/'
 
 xmin_par=[8.45 for x in range(12)]
 xmax_par=[10.45 for x in range(12)]
@@ -188,23 +191,32 @@ for i_j in range (len(type_model)):
         positions = np.vstack([x.ravel(), y.ravel()])
         
         for im in range(0,len(models)):
-            filename=outputdir+models[im]+'_output.fits'
-            #print 'For model: ',models[im]
-            hdus=fits.open(filename)
-            phdr=hdus[0].header
-            chain1=hdus[4].data
-            half_el_col=len(chain1['ACPT0'])/2
-            par1=chain1[toshow1[i_pam]+'0'][half_el_col:]
-            par1=np.append(par1,chain1[toshow1[i_pam]+'1'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'2'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'3'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'4'][half_el_col:])
+            #print models[im]
+            for ir in range(0,len(n_run)):
+                #print n_run[ir]
+                filename=outputdir+models[im]+n_run[ir]+'_output.fits'
+                #print 'For model: ',models[im]
+                hdus=fits.open(filename)
+                phdr=hdus[0].header
+                chain1=hdus[4].data
+                half_el_col=len(chain1['ACPT0'])/2
+                if(n_run[ir] == '1'):
+                    par1=chain1[toshow1[i_pam]+'0'][half_el_col:]
+                if(n_run[ir] != '1'):
+                    par1=np.append(par1,chain1[toshow1[i_pam]+'0'][half_el_col:])
+                par1=np.append(par1,chain1[toshow1[i_pam]+'1'][half_el_col:])
+                par1=np.append(par1,chain1[toshow1[i_pam]+'2'][half_el_col:])
+                par1=np.append(par1,chain1[toshow1[i_pam]+'3'][half_el_col:])
+                par1=np.append(par1,chain1[toshow1[i_pam]+'4'][half_el_col:])
 
-            par2=chain1[toshow2[i_pam]+'0'][half_el_col:]
-            par2=np.append(par2,chain1[toshow2[i_pam]+'1'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'2'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'3'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'4'][half_el_col:])
+                if(n_run[ir] == '1'):
+                    par2=chain1[toshow2[i_pam]+'0'][half_el_col:]
+                if(n_run[ir] != '1'):
+                    par2=np.append(par2,chain1[toshow2[i_pam]+'0'][half_el_col:])
+                par2=np.append(par2,chain1[toshow2[i_pam]+'1'][half_el_col:])
+                par2=np.append(par2,chain1[toshow2[i_pam]+'2'][half_el_col:])
+                par2=np.append(par2,chain1[toshow2[i_pam]+'3'][half_el_col:])
+                par2=np.append(par2,chain1[toshow2[i_pam]+'4'][half_el_col:])
 
             #ac=chain1['ACPT0']
             #ac=np.append(ac,chain1['ACPT1'])
@@ -392,6 +404,8 @@ print t1_mean,',$'
 print t2_mean,',$'
 print zbt_mean,',$'
 print fcomp_mean,']'
+
+plt.show()
 
 
 print '      '
