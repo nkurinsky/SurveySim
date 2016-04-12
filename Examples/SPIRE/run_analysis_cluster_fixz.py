@@ -23,7 +23,7 @@ mod=ModelFile()
 mod.axis1="ColorF1F2"
 mod.axis2="Flux1"
 
-convergence=0.95
+convergence=0.99
 #run settings; should be same regardless of model
 mod.annealing['temp']=.03
 mod.annealing['learningRate']=0.4
@@ -206,19 +206,17 @@ if(field == 0):
 if(field == 2):
     simname=simname+'_mips'
 
-mfile=simname+"_betafit_4-12_model.fits"
-outfile=simname+"_betafit_4-12_output.fits"
+mfile=simname+"_lim350_zfixed_model.fits"
+outfile=simname+"_lim350_zfixed_output.fits"
 
 #parameters below should be the same regardless of model
 
 mod.params['Alpha'].fixed=1
-mod.params['Beta'].fixed=0
+mod.params['Beta'].fixed=1
 
 if(lfForm == 0):
     mod.params['Alpha'].value=1.15
     mod.params['Beta'].value=0.52
-    mod.params['Beta'].pmin=0.2
-    mod.params['Beta'].pmax=0.7
     mod.params['Phi0'].value=-2.348
     mod.params['L0'].value=10.10
     mod.params['Phi0'].pmin=-2.4
@@ -230,16 +228,14 @@ if(lfForm == 0):
 
 if(lfForm == 1):
     mod.params['Alpha'].value=2.6
-    mod.params['Beta'].value=0.5#0.8   
-    mod.params['Beta'].pmin=0.2
-    mod.params['Beta'].pmax=0.9
+    mod.params['Beta'].value=0.75#0.8   
     mod.params['Phi0'].value=-3.248
     mod.params['L0'].value=10.85    
-    mod.params['Phi0'].pmin=-4.0#-3.35
-    mod.params['Phi0'].pmax=-1.0#-3.15
+    mod.params['Phi0'].pmin=-3.35#-3.45
+    mod.params['Phi0'].pmax=-3.15#-2.15
     mod.params['Phi0'].fixed=0
-    mod.params['L0'].pmin=10.0#9.90
-    mod.params['L0'].pmax=13.0#11.05
+    mod.params['L0'].pmin=10.75#9.90
+    mod.params['L0'].pmax=10.95#11.05
     mod.params['L0'].fixed=0
     
 mod.params['P'].value=-0.57
@@ -262,12 +258,12 @@ mod.params['Q2'].value=0.8#1.62
 mod.params['Q2'].pmin=-6.00#0.1#0.5
 mod.params['Q2'].pmax=6.00#6.0
 
-mod.params['zbp'].fixed=0
+mod.params['zbp'].fixed=1
 mod.params['zbp'].value=1.10
 mod.params['zbp'].pmin=0.50
 mod.params['zbp'].pmax=3.5#2.50
 
-mod.params['zbq'].fixed=0
+mod.params['zbq'].fixed=1
 mod.params['zbq'].value=1.85#1.75
 mod.params['zbq'].pmin=0.50#1.40
 mod.params['zbq'].pmax=3.5#2.10
@@ -275,8 +271,8 @@ mod.params['zbq'].pmax=3.5#2.10
 mod.survey['AGNexp']=12.00
 mod.filename=mfile
 
-mod.settings['verbosity']=2
-mod.settings['nchain']=5
+mod.settings['verbosity']=3
+mod.settings['nchain']=10
 mod.convergence['CI']=convergence
 
-mod.run(obsfile,outfile=outfile,templatefile=basedir+"templates/default_templates_v2.fits")
+mod.run(obsfile,outfile=outfile,templatefile=basedir+"templates/default_templates.fits")

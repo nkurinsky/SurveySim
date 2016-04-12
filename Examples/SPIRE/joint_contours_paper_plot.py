@@ -2,7 +2,7 @@
 
 
 #type_model=['A','B','C','D','E','F']
-type_model=['E']
+type_model=['F']
 #comp=[4,4,6,6,7,7]
 comp=[7]
 cmaps=['Paired','Paired']
