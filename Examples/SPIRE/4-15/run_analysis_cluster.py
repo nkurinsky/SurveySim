@@ -10,14 +10,13 @@ sys.path.append(basedir+'python')
 
 from ModelFile import *
 
-if(len(sys.argv) < 5):
-    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE,2=COSMOS+MIPS) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S) beta"
+if(len(sys.argv) < 4):
+    print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE,2=COSMOS+MIPS) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
     quit()
 else:
     field=int(sys.argv[1])
     model=int(sys.argv[2])
     lfForm=int(sys.argv[3])
-    beta=float(sys.argv[4])
 
 #initialize
 mod=ModelFile()
@@ -126,20 +125,20 @@ mod.params['fa0'].pmin=0.10#0.20
 mod.params['fa0'].pmax=0.50#5.00
 mod.params['fa0'].fixed=0
 
-mod.params['t1'].value=-1.40#-1.30
-mod.params['t1'].pmin=-6.00#-2.60
-mod.params['t1'].pmax=6.00#1.00#-0.01
+mod.params['t1'].value=1.00#-1.30
+mod.params['t1'].pmin=-1.00#-2.60
+mod.params['t1'].pmax=2.00#1.00#-0.01
 mod.params['t1'].fixed=0
 
-mod.params['t2'].value=5.00#4.50
-mod.params['t2'].pmin=-6.00#-2.00#1.50
-mod.params['t2'].pmax=6.00#7.50
+mod.params['t2'].value=1.00#4.50
+mod.params['t2'].pmin=-1.00#-2.00#1.50
+mod.params['t2'].pmax=2.00#7.50
 mod.params['t2'].fixed=0
 
-mod.params['zbt'].value=2.50
+mod.params['zbt'].value=2.5
 mod.params['zbt'].pmin=1.5#0.50
 mod.params['zbt'].pmax=3.5#3.50
-mod.params['zbt'].fixed=0
+mod.params['zbt'].fixed=1
 
 
 if(model == 0):
@@ -207,17 +206,19 @@ if(field == 0):
 if(field == 2):
     simname=simname+'_mips'
 
-mfile=simname+"_betafix_"+str(beta)+"_model.fits"
-outfile=simname+"_betafix_"+str(beta)+"_output.fits"
+mfile=simname+"_tsmall_beta45_4-15_model.fits"
+outfile=simname+"_tsmall_beta45_4-15_output.fits"
 
 #parameters below should be the same regardless of model
 
 mod.params['Alpha'].fixed=1
 mod.params['Beta'].fixed=1
-mod.params['Beta'].value=beta
 
 if(lfForm == 0):
     mod.params['Alpha'].value=1.15
+    mod.params['Beta'].value=0.52
+    mod.params['Beta'].pmin=0.2
+    mod.params['Beta'].pmax=0.7
     mod.params['Phi0'].value=-2.348
     mod.params['L0'].value=10.10
     mod.params['Phi0'].pmin=-2.4
@@ -229,13 +230,16 @@ if(lfForm == 0):
 
 if(lfForm == 1):
     mod.params['Alpha'].value=2.6
+    mod.params['Beta'].value=0.45#0.8   
+    mod.params['Beta'].pmin=0.2
+    mod.params['Beta'].pmax=0.9
     mod.params['Phi0'].value=-3.248
-    mod.params['L0'].value=10.85
-    mod.params['Phi0'].pmin=-3.5#-3.35
-    mod.params['Phi0'].pmax=-2.9#-3.15
+    mod.params['L0'].value=10.85    
+    mod.params['Phi0'].pmin=-4.0#-3.35
+    mod.params['Phi0'].pmax=-1.0#-3.15
     mod.params['Phi0'].fixed=0
-    mod.params['L0'].pmin=10.5#9.90
-    mod.params['L0'].pmax=11.5#11.05
+    mod.params['L0'].pmin=10.0#9.90
+    mod.params['L0'].pmax=13.0#11.05
     mod.params['L0'].fixed=0
     
 mod.params['P'].value=-0.57
@@ -271,9 +275,8 @@ mod.params['zbq'].pmax=3.5#2.10
 mod.survey['AGNexp']=12.00
 mod.filename=mfile
 
-mod.settings['verbosity']=3
-mod.settings['nchain']=10
+mod.settings['verbosity']=2
+mod.settings['nchain']=5
 mod.convergence['CI']=convergence
 
-mod.info()
 mod.run(obsfile,outfile=outfile,templatefile=basedir+"templates/default_templates_v2.fits")
