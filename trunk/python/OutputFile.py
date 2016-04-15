@@ -417,11 +417,11 @@ class MCMCInfo:
         #want to re-order these as they do not appear in the most sensible order
 
         if(mode == 'all'):
-            pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC','FAO','FAGN0','T1','T2','ZBT','FCOMP','FCOLD']
+            pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC','FA0','T1','T2','ZBT','FCOMP','FCOLD']
         elif(mode == 'lf'):
             pnames_default=['PHI0','L0','BETA','ALPHA','P','Q','P2','Q2','ZBP','ZBQ','CEXP','ZBC']
         elif(mode == 'sed'):
-            pnames_default=['FAO','FAGN0','T1','T2','ZBT','FCOMP','FCOLD']
+            pnames_default=['FA0','T1','T2','ZBT','FCOMP','FCOLD']
         elif(mode == 'sed_short'):
             pnames_default=['FA0','FCOMP']
 
@@ -434,6 +434,10 @@ class MCMCInfo:
             if p in pnames:
                 pnames_sorted.append(p)
         pnames=pnames_sorted
+        if((len(pnames) != len(self.Parameters.keys())) and mode=='all'):
+            raise Warning('Not All Parameters Found')
+
+        print 'pnames',pnames
         
         dim=len(pnames)
         for i in range(0,dim):
