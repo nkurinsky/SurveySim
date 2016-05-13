@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='SurveySim',
       version='1.0',
+      install_requires=['numpy>=1.0','scipy','matplotlib>=1.4','seaborn','astropy','pyfits'],
       py_modules=['SurveySimObsFile','SurveySimGUI'],
       packages=['SurveySim'],
       author='Noah Kurinsky',

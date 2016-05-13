@@ -5,8 +5,9 @@ import os
 import sys
 import datetime
 import time
-from filters import *
 from astropy.io import fits
+
+from SurveySim.filters import *
         
 class filterOptions:
 
