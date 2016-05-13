@@ -4,6 +4,8 @@ Packages needed:
 	 scipy
 	 pyfits (or astropy.io.fits; will need to modify include)
 	 matplotlib
+	 pylab
+	 astropy
 
 Classes:
 	ModelFile - instantiate about model.fits file, provides information and i/o functions
