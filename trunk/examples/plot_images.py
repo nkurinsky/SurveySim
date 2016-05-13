@@ -4,8 +4,7 @@ import os
 import sys
 import datetime
 import time
-sys.path.append("/usr/local/surveysim/python/")
-from OutputFile import *
+from SurveySim.OutputFile import *
 
 if (len(sys.argv) < 2):
     print "Please provide model file name"

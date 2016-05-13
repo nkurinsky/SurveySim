@@ -4,16 +4,6 @@
 import os
 import sys, getopt
 import datetime
-
-thisdir=os.getcwd()+'/'
-if (os.getenv("SURVEYSIMPATH") != None):
-    codedir=os.getenv("SURVEYSIMPATH")+'/'
-else:
-    codedir='/usr/local/surveysim/'
-pydir=codedir+'python'
-#ensure this is in the path
-sys.path.append(pydir)
-
 import time
 import pyfits as fits
 import matplotlib.pyplot as plt
@@ -24,13 +14,11 @@ from functools import partial
 import Tkinter as tk
 from Tkinter import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from ModelFile import *
-from OutputFile import *
-from filters import read_filters
 
-filter_id,filter_choices=read_filters();
-
-mod=ModelFile()
+#SurveySim imports
+from SurveySim.ModelFile import *
+from SurveySim.OutputFile import *
+from SurveySim.filters import read_filters
 
 #=================================================================================
 #SurveySim settings
@@ -41,16 +29,18 @@ print("a MCMC-based galaxy evolution fitter and simulator");
 #GUI top frame
 fields_files='Survey data','SEDs'
 
+if (os.getenv("SURVEYSIMPATH") != None):
+    codedir=os.getenv("SURVEYSIMPATH")+'/'
+else:
+    codedir='/usr/local/surveysim/'
+
 #initialize datafiles
 seddir=codedir+'templates/'
 sedfile=seddir+'default_templates.fits'
 modelfile=codedir+'model/default_model.fits'
-#modelfile=thisdir+'model.fits'
-#modelfile='/Users/annie/students/noah_kurinsky/SurveySim/Examples/spire/E_mips_model.fits'
 dmodelfile=modelfile
 obsdir=codedir+'obs/'
 obsfile=obsdir+'aztec.fits'
-outdir=os.getcwd()+'/OUTPUT/'
 outfile=os.getcwd()+'/output.fits'
 fitcode='/usr/local/bin/SurveySim'
 
@@ -70,10 +60,9 @@ for opt, arg in opts:
 print 'Input file is "', dmodelfile
 print 'Output file is "', outfile
 
+filter_id,filter_choices=read_filters();
+mod=ModelFile()
 mod.load(dmodelfile)
-
-if(not os.path.exists(outdir)):
-    os.makedirs(outdir)
 
 lfform_tmp=mod.survey['lfForm']
 if(lfform_tmp == 0):
@@ -110,7 +99,6 @@ f_id=[0,0,0] #placeholder for the filter ids
 fields_bands=band[0],band[1],band[2]
 
 #initialize MCMC settings parameters
-#fields3='zmin','zmax','dz','Runs','Nchain','verbosity','Tmax','conv_rmax','conv_step','conv_ci'
 fields3='zmin','zmax','dz','Runs','Nchain','verbosity','Tmax','conv_ci'
 
 zmin1=mod.redshift['min'] #Simulation minimum redshift
@@ -122,13 +110,6 @@ nchain1=mod.settings['nchain'] #Chain Number
 mesprint1=mod.settings['verbosity'] #Print Debug MSGs (0=silent,1=critical, 2=info,3=debug)')
 
 tmax1=mod.annealing['temp'] #Starting Anneal Temperature
-#ann_pct=mod.annealing['ideal_pct'] #Ideal acceptance Percentage
-#ann_rng=mod.annealing['range'] #Range to maintain acceptance
-#burn_ste=mod.annealing['burn_step'] #Steps btw anneal calls in burn-in
-#burnvrun=10 #Ratio of normal to burn-in steps
-
-#conv_rma1=mod.convergence['r_max'] #Convergence Rmax Criterion
-#conv_ste1=mod.convergence['step'] #Steps btw convergence checks
 conv_con1=mod.convergence['CI'] #Convergence confidence interval
 
 #-----------------------------------------------------------------------------------------
