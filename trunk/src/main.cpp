@@ -330,10 +330,12 @@ int main(int argc,char** argv){
     fflush(stdout);
     LOG_DEBUG(printf("Saving Chains\n"));
     saved &= mcchain.save(q.outfile,parnames.get(),"MCMC Chain Record");
-    LOG_DEBUG(printf("Saving Counts\n"));
-    saved &= counts.save(q.outfile,countnames,"Simulation Counts");
-    LOG_DEBUG(printf("Saving Final Counts\n"));
-    saved &= final_counts.save(q.outfile,countnames,"Final Monte Carlo Counts");
+    
+    //Unused extensions may be manually reactivated
+    //LOG_DEBUG(printf("Saving Counts\n"));
+    //saved &= counts.save(q.outfile,countnames,"Simulation Counts");
+    //LOG_DEBUG(printf("Saving Final Counts\n"));
+    //saved &= final_counts.save(q.outfile,countnames,"Final Monte Carlo Counts");
   }
   
   saved ? printf("Save Successful") : printf("Save Failed");
