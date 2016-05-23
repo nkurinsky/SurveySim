@@ -10,6 +10,7 @@ try:
     from SurveySim.ModelFile import *
 except:
     os.path.append(codedir+'python/')
+    from SurveySim.ModelFile import *
 
 basedir=codedir+'examples/spire/'
 if(len(sys.argv) < 4):
