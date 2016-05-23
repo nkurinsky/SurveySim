@@ -215,9 +215,12 @@ class OutputFile:
         self.plot()
         plt.show(block=block)
 
-
-ofile='Final_output/E_mips_output.fits'
-mfile='Final_output/E_mips_model.fits'
+#SPIRE
+#ofile='Final_output_2/E_spire_output.fits'
+#mfile='Final_output_2/E_spire_model.fits'
+#MIPS
+ofile='Final_output_2/E_mips_output.fits'
+mfile='Final_output_2/E_mips_model.fits'
 
 output=OutputFile(ofile)
 

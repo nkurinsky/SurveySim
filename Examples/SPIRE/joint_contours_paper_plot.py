@@ -29,15 +29,17 @@ fcomp_mean=[0.0 for x in range(len(type_model))]
 toshow1=["" for x in range(7)]
 toshow2=["" for x in range(7)]
 
-outputdir='Final_output/'
+outputdir='Final_output_2/'
 
 toshow1[0]='L0'
 toshow2[0]='PHI0'
-xmin_par[0]=9.7
+xmin_par[0]=9.8
 xmax_par[0]=11.2
 ymin_par[0]=-3.70
 ymax_par[0]=-1.90
-
+#toshow2[0]='Q'
+#ymin_par[0]=-1.0
+#ymax_par[0]=7.6
 
 toshow1[1]='ZBP'
 toshow2[1]='ZBQ'
@@ -180,6 +182,14 @@ for i_j in range (len(type_model)):
 ##            par2=par2[(np.where(chisq < 100.0)) and (np.where(ac == 1.0))]
 
 
+            if(im == 0):
+                #xmin=min(par1)-0.2
+                #xmax=max(par1)+0.2
+                #ymin=min(par2)-0.2
+                #ymax=max(par2)+0.2
+                x, y = np.mgrid[xmin:xmax:50j, ymin:ymax:50j]
+                positions = np.vstack([x.ravel(), y.ravel()])
+
             values = np.vstack([par1, par2])
             kernel = stats.gaussian_kde(values)
             if(im ==0):
@@ -192,8 +202,7 @@ for i_j in range (len(type_model)):
             conf95_level=0
             f_tmp=f_tmp/np.sum(f_tmp)
             for i in range(0,50):
-            #for p1-q1=use 0.01
-                test_cut=i*0.0001 #need to play with the steps here a bit to ensure good sampling of f
+                test_cut=i*0.00003 #need to play with the steps here a bit to ensure good sampling of f
                 gpts=(f_tmp > test_cut)
                 frac=np.sum(f_tmp[gpts])/np.sum(f_tmp)
             #print gpts
@@ -206,24 +215,41 @@ for i_j in range (len(type_model)):
 
             if(im == 0):
                 g=sns.JointGrid(par1,par2,space=0,xlim=[xmin,xmax],ylim=[ymin,ymax])
-            sns.kdeplot(par1, ax=g.ax_marg_x, legend=False,color='0.3',linewidth=1)
-            sns.kdeplot(par2, ax=g.ax_marg_y, legend=False,vertical=True,color='0.3',linewidth=1)
+                f_m1=f_m1/np.sum(f_m1)
+                dist_par1=f_m1.sum(axis=1)
+                dist_par2=f_m1.sum(axis=0)
+                #transpose arrays for y-margin plot
+                dist_par2_t=dist_par2.T
+                y_t=y.T
+                g.ax_marg_x.plot(x,dist_par1,color='0.3',linewidth=1)
+                g.ax_marg_y.plot(dist_par2_t,y_t,color='0.3',linewidth=1)
+            if(im==1):
+                f_m2=f_m2/np.sum(f_m2)
+                dist_par1=f_m2.sum(axis=1)
+                dist_par2=f_m2.sum(axis=0)
+                #transpose arrays for y-margin plot
+                dist_par2_t=dist_par2.T
+                y_t=y.T
+                g.ax_marg_x.plot(x,dist_par1,color='0.3',linewidth=1)
+                g.ax_marg_y.plot(dist_par2_t,y_t,color='0.3',linewidth=1)
+           # sns.kdeplot(par1, ax=g.ax_marg_x, legend=False,color='0.3',linewidth=1)
+            #sns.kdeplot(par2, ax=g.ax_marg_y, legend=False,vertical=True,color='0.3',linewidth=1)
             cset = g.ax_joint.contourf(x,y,f_tmp,levels=[conf68_level,conf95_level],cmap=plt.cm.bone,alpha=0.4)
             cset = g.ax_joint.contourf(x,y,f_tmp,levels=[conf95_level,conf68_level],cmap=plt.cm.bone,alpha=0.1)
 
         f=(f_m1/np.sum(f_m1))*(f_m2/np.sum(f_m2))
-        f=f/np.sum(f) #normalize
+        
+        f=f/np.sum(f) #the Joint normalized probability distribution
 
-        joint_dist_par1=20*f.sum(axis=1)
-        joint_dist_par2=20*f.sum(axis=0)
+        joint_dist_par1=f.sum(axis=1)
+        joint_dist_par2=f.sum(axis=0)
 
         #transpose arrays for y-margin plot
         joint_dist_par2_t=joint_dist_par2.T
         y_t=y.T
 
-        #g.ax_marg_x.plot(x,joint_dist_par1,color='red')
         g.ax_marg_x.plot(x,joint_dist_par1,color='red',linewidth=3)
-        g.ax_marg_y.plot(joint_dist_par2_t,y_t,color='red',linewidth=3)        
+        g.ax_marg_y.plot(joint_dist_par2_t,y_t,color='red',linewidth=3)
 
         conf68_level=0
         conf95_level=0
@@ -238,18 +264,31 @@ for i_j in range (len(type_model)):
             if((frac <= 0.68) and (conf68_level == 0)):
                 #print '68% confidence: ',frac,test_cut
                 conf68_level=test_cut
-
+    
         # Draw contour lines
         cset = g.ax_joint.contour(x,y,f,levels=[conf68_level,conf95_level],colors=('red','red'))
+
+        ell1 = cset.collections[0].get_paths()[0]
+        ell11 = ell1.vertices
+        ell2 = cset.collections[1].get_paths()[0]
+        ell22 = ell2.vertices
+        par1_68conf=ell11[0:86,0]
+        par2_68conf=ell11[0:86,1]
+
+        #fits_filename_output='Output_ellipses/ellipses_'+type_model[i_j]+'.fits'
+        #pyfits.append(fits_filename_output, ell11)
+        
         fmt = {}
         strs = [ r'68\%', r'95\%' ]
         for l,s in zip( cset.levels, strs ):
             fmt[l] = s
         g.ax_joint.clabel(cset,cset.levels[::],fmt=fmt,inline=1, fontsize=10)
 
+
+        #help(g.ax_joint.contour)
+
         mean_par1=x[np.where(joint_dist_par1 == np.max(joint_dist_par1)),0]
         mean_par2=y[0,np.where(joint_dist_par2 == np.max(joint_dist_par2))]
-
         #print mean_par1,mean_par2
 
         print toshow1[i_pam],'=',mean_par1[0][0]

@@ -273,8 +273,8 @@ for i_j in range (len(type_model)):
         par1_68conf=ell11[0:86,0]
         par2_68conf=ell11[0:86,1]
 
-        fits_filename_output='Output_ellipses2/ellipses_'+type_model2[i_j]+'.fits'
-        pyfits.append(fits_filename_output, ell11)
+        #fits_filename_output='Output_ellipses2/ellipses_'+type_model2[i_j]+'.fits'
+        #pyfits.append(fits_filename_output, ell11)
         
         fmt = {}
         strs = [ r'68\%', r'95\%' ]
