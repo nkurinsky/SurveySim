@@ -2,7 +2,7 @@
 
 if [ -z $SURVEYSIMPATH ]
 then
-    python /usr/local/surveysim/python/SurveySimObsFile.py $@
+    python /usr/local/bin/SurveySimObsFile.py $@
 else
     python ${SURVEYSIMPATH}/python/SurveySimObsFile.py $@
 fi

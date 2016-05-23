@@ -6,8 +6,11 @@ from scipy.stats import gaussian_kde
 
 
 type_model=['A','B','C','D','E','F']
+type_model=['E']
 comp=[7,7,11,11,12,12]
+comp=[12]
 cmaps=['Paired','Paired']
+n_run=['1','2','3','4','5','6','7','8','9','10']
 
 ymin_par=range(12)
 ymax_par=range(12)
@@ -57,7 +60,7 @@ fcomp_max=[0.0 for x in range(len(type_model))]
 toshow1=['L0' for x in range(12)]
 toshow2=["" for x in range(12)]
 
-outputdir='Final_output_2/'
+outputdir='Final_output_2/10_runs/'
 
 xmin_par=[8.45 for x in range(12)]
 xmax_par=[10.45 for x in range(12)]
@@ -77,34 +80,50 @@ ymin_par[2]=-0.1
 ymax_par[2]=4.2
 
 toshow2[3]='P'
+ymin_par[3]=-6.5
+ymax_par[3]=1.7
 ymin_par[3]=-7.0
 ymax_par[3]=7.9
 
 toshow2[4]='Q'
+ymin_par[4]=-0.1
+ymax_par[4]=7.5
 ymin_par[4]=-4.1
 ymax_par[4]=7.6
 
 toshow2[5]='P2'
+ymin_par[5]=-7.2
+ymax_par[5]=1.8
 ymin_par[5]=-7.4
 ymax_par[5]=7.7
 
 toshow2[6]='Q2'
+ymin_par[6]=-0.5
+ymax_par[6]=7.2
 ymin_par[6]=-7.6
 ymax_par[6]=8.4
 
 toshow2[7]='t1'
-ymin_par[7]=-2.0#-7.3
+ymin_par[7]=-3.1
+ymax_par[7]=1.6
+ymin_par[7]=-7.3
 ymax_par[7]=8.2
 
 toshow2[8]='t2'
+ymin_par[8]=-3.0
+ymax_par[8]=9.6
 ymin_par[8]=-7.3
 ymax_par[8]=8.3
 
 toshow2[9]='fa0'
+ymin_par[9]=-0.3
+ymax_par[9]=6.0
 ymin_par[9]=0.05
 ymax_par[9]=0.60
 
 toshow2[10]='zbt'
+ymin_par[10]=0.1
+ymax_par[10]=4.2
 ymin_par[10]=0.9
 ymax_par[10]=4.2
 
@@ -140,17 +159,12 @@ plt.rc('text', usetex=True)
 params = {'text.latex.preamble' : [r'\usepackage{siunitx}', r'\usepackage{sfmath}']}
 plt.rcParams.update(params)
 
-#for i_j in range (len(type_model)):
-for i_j in range (4,6):
+for i_j in range (len(type_model)):
     print ' '
     print 'Model',type_model[i_j]
-    fits_filename_output='Output_ellipses_2/ellipses_'+type_model[i_j]+'.fits'
-
-    if(os.path.isfile(fits_filename_output)):
-        os.remove(fits_filename_output)
     if(type_model[i_j] == 'E'):
-        xmin_par=[10.65 for x in range(12)]#10.65
-        xmax_par=[11.05 for x in range(12)]#11.05
+        xmin_par=[10.65 for x in range(12)]
+        xmax_par=[11.05 for x in range(12)]
         ymin_par[0]=-3.45
         ymax_par[0]=-3.05
         #xmin_par=[9.8 for x in range(12)]
@@ -158,10 +172,10 @@ for i_j in range (4,6):
         #ymin_par[0]=-3.55
         #ymax_par[0]=-2.05
     if(type_model[i_j] == 'F'):
-        xmin_par=[9.95 for x in range(12)]
-        xmax_par=[10.25 for x in range(12)]
-        ymin_par[0]=-2.45
-        ymax_par[0]=-2.15    
+        xmin_par=[9.90 for x in range(12)]
+        xmax_par=[10.30 for x in range(12)]
+        ymin_par[0]=-2.5
+        ymax_par[0]=-2.10    
     models=[type_model[i_j]+'_mips',type_model[i_j]+'_spire']
     #print models
     num_comp=comp[i_j]
@@ -175,26 +189,34 @@ for i_j in range (4,6):
         # Perform a kernel density estimate (KDE) on the data
         x, y = np.mgrid[xmin:xmax:50j, ymin:ymax:50j]
         positions = np.vstack([x.ravel(), y.ravel()])
-            
+        
         for im in range(0,len(models)):
-            filename=outputdir+models[im]+'_output.fits'
-            print filename
-            #print 'For model: ',models[im]
-            hdus=fits.open(filename)
-            phdr=hdus[0].header
-            chain1=hdus[4].data
-            half_el_col=len(chain1['ACPT0'])/2
-            par1=chain1[toshow1[i_pam]+'0'][half_el_col:]
-            par1=np.append(par1,chain1[toshow1[i_pam]+'1'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'2'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'3'][half_el_col:])
-            par1=np.append(par1,chain1[toshow1[i_pam]+'4'][half_el_col:])
+            #print models[im]
+            for ir in range(0,len(n_run)):
+                #print n_run[ir]
+                filename=outputdir+models[im]+n_run[ir]+'_output.fits'
+                #print 'For model: ',models[im]
+                hdus=fits.open(filename)
+                phdr=hdus[0].header
+                chain1=hdus[4].data
+                half_el_col=len(chain1['ACPT0'])/2
+                if(n_run[ir] == '1'):
+                    par1=chain1[toshow1[i_pam]+'0'][half_el_col:]
+                if(n_run[ir] != '1'):
+                    par1=np.append(par1,chain1[toshow1[i_pam]+'0'][half_el_col:])
+                par1=np.append(par1,chain1[toshow1[i_pam]+'1'][half_el_col:])
+                par1=np.append(par1,chain1[toshow1[i_pam]+'2'][half_el_col:])
+                par1=np.append(par1,chain1[toshow1[i_pam]+'3'][half_el_col:])
+                par1=np.append(par1,chain1[toshow1[i_pam]+'4'][half_el_col:])
 
-            par2=chain1[toshow2[i_pam]+'0'][half_el_col:]
-            par2=np.append(par2,chain1[toshow2[i_pam]+'1'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'2'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'3'][half_el_col:])
-            par2=np.append(par2,chain1[toshow2[i_pam]+'4'][half_el_col:])
+                if(n_run[ir] == '1'):
+                    par2=chain1[toshow2[i_pam]+'0'][half_el_col:]
+                if(n_run[ir] != '1'):
+                    par2=np.append(par2,chain1[toshow2[i_pam]+'0'][half_el_col:])
+                par2=np.append(par2,chain1[toshow2[i_pam]+'1'][half_el_col:])
+                par2=np.append(par2,chain1[toshow2[i_pam]+'2'][half_el_col:])
+                par2=np.append(par2,chain1[toshow2[i_pam]+'3'][half_el_col:])
+                par2=np.append(par2,chain1[toshow2[i_pam]+'4'][half_el_col:])
 
             #ac=chain1['ACPT0']
             #ac=np.append(ac,chain1['ACPT1'])
@@ -276,9 +298,8 @@ for i_j in range (4,6):
         par1_68conf=ell11[0:86,0]
         par2_68conf=ell11[0:86,1]
 
-        
+        fits_filename_output='Output_ellipses_2/ellipses_'+type_model[i_j]+'.fits'
         pyfits.append(fits_filename_output, ell11)
-            
         
         fmt = {}
         strs = [ r'68\%', r'95\%' ]
@@ -384,8 +405,7 @@ print t2_mean,',$'
 print zbt_mean,',$'
 print fcomp_mean,']'
 
-matrix=[L0_mean,PHI0_mean,ZBP_mean,ZBQ_mean,P_mean,Q_mean,P2_mean,Q2_mean,fa0_mean,t1_mean,t2_mean,zbt_mean,fcomp_mean]
-np.savetxt('Output_ellipses_2/best_fit_array.txt', matrix)
+plt.show()
 
 
 print '      '
@@ -396,7 +416,7 @@ print "D & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2
 print "E & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ \\\\ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & & & \\\\"% (L0_mean[4],L0_max[4],L0_min[4],PHI0_mean[4],PHI0_max[4],PHI0_min[4],ZBP_mean[4],ZBP_max[4],ZBP_min[4],ZBQ_mean[4],ZBQ_max[4],ZBQ_min[4],P_mean[4],P_max[4],P_min[4],Q_mean[4],Q_max[4],Q_min[4],P2_mean[4],P2_max[4],P2_min[4],Q2_mean[4],Q2_max[4],Q2_min[4],fa0_mean[4],fa0_max[4],fa0_min[4],t1_mean[4],t1_max[4],t1_min[4],t2_mean[4],t2_max[4],t2_min[4],zbt_mean[4],zbt_max[4],zbt_min[4],fcomp_mean[4],fcomp_max[4],fcomp_min[4]) 
 print "F & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ \\\\ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & $%6.2f^{+%6.2f}_{-%6.2f}$ & & & \\\\"% (L0_mean[5],L0_max[5],L0_min[5],PHI0_mean[5],PHI0_max[5],PHI0_min[5],ZBP_mean[5],ZBP_max[5],ZBP_min[5],ZBQ_mean[5],ZBQ_max[5],ZBQ_min[5],P_mean[5],P_max[5],P_min[5],Q_mean[5],Q_max[5],Q_min[5],P2_mean[5],P2_max[5],P2_min[5],Q2_mean[5],Q2_max[5],Q2_min[5],fa0_mean[5],fa0_max[5],fa0_min[5],t1_mean[5],t1_max[5],t1_min[5],t2_mean[5],t2_max[5],t2_min[5],zbt_mean[5],zbt_max[5],zbt_min[5],fcomp_mean[5],fcomp_max[5],fcomp_min[5]) 
 
-quit ()
+
 plt.show()
 #quit()
 

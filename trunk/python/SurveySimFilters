@@ -3,7 +3,7 @@
 #Python prelims
 import os
 import sys
-from filters import *
+from SurveySim.filters import *
 
 if(len(sys.argv) == 1):
     print "Searches filter list for matching filter or instrument"
