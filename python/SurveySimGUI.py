@@ -37,10 +37,10 @@ else:
 #initialize datafiles
 seddir=codedir+'templates/'
 sedfile=seddir+'default_templates.fits'
-modelfile=codedir+'model/default_model.fits'
+modelfile=codedir+'examples/spire/spire_default_model.fits'
 dmodelfile=modelfile
-obsdir=codedir+'obs/'
-obsfile=obsdir+'aztec.fits'
+obsdir=codedir+'examples/spire/'
+obsfile=obsdir+'L2-COSMOS_xID24_DR3.fits'
 outfile=os.getcwd()+'/output.fits'
 fitcode='/usr/local/bin/SurveySim'
 
