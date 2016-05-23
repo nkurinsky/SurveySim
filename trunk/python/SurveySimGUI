@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [ -z $SURVEYSIMPATH ]
-then
-    python /usr/local/bin/SurveySimGUI.py $@
-else
-    python ${SURVEYSIMPATH}/python/SurveySimGUI.py $@
-fi

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [ -z $SURVEYSIMPATH ]
-then
-    python /usr/local/bin/SurveySimObsFile.py $@
-else
-    python ${SURVEYSIMPATH}/python/SurveySimObsFile.py $@
-fi

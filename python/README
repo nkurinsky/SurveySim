@@ -1,0 +1,20 @@
+Packages needed:
+         os
+	 numpy
+	 scipy
+	 pyfits
+	 matplotlib
+	 pylab
+
+Classes:
+	ModelFile - instantiate about model.fits file, provides information and i/o functions
+	OutputFile - instantiate about output.fits file, provides information and plots
+	ObsFile - [work in progress] prepares observations for correct fits file format with necessary header keywords [yet to implement -- include make_fits_file.py here]
+
+Functions:
+	(filters.py):
+	fill_filters(f_id) - pass three filter IDs (preferably obtained with getFilterID) and returns 6 arrays, 3 wavelengths
+			   and three transmission, in the form lam1,t1,lam2,t2,lam3,t3
+    	getFilterID(name) - get ID in filter file of specific filter (does not need to be exact, will return first match)
+    	getFilterName(fid) - get name of specific filter
+    	getFilterIDs(instrument) - get all filters for a given instrument (string matching to names)
