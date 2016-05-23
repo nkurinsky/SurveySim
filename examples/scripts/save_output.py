@@ -4,10 +4,12 @@ import os
 import sys
 import datetime
 import time
+
+sys.path.append('/usr/local/surveysim/python')
+
+from OutputFile import *
 from pylab import *
 import numpy
-
-from SurveySim.OutputFile import *
 
 rc('text', usetex=True)
 
@@ -24,6 +26,8 @@ for fname in sys.argv[1:]:
     figure()
     output=OutputFile(fname)
     output.MCMC.info()
+
+    clf()
     output.saveImages(newdir+'/images')
     if(output.fit()):
         output.MCMC.saveFit(newdir+'/fit')

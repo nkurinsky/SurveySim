@@ -1,4 +1,4 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS = src filters templates lib_aux python examples
+SUBDIRS = src filters templates lib_aux python examples docs
 
-EXTRA_DIST = UserGuide.pdf DATA LICENSE
+EXTRA_DIST = LICENSE README.md

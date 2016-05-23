@@ -77,8 +77,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) README compile \
-	depcomp install-sh missing
+	$(top_srcdir)/configure $(am__configure_deps) compile depcomp \
+	install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -186,12 +186,12 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /Users/kurinsky/Repositories/SurveySim/trunk/missing aclocal-1.14
+ACLOCAL = ${SHELL} /Users/kurinsky/Repositories/SurveySim/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
-AUTOCONF = ${SHELL} /Users/kurinsky/Repositories/SurveySim/trunk/missing autoconf
-AUTOHEADER = ${SHELL} /Users/kurinsky/Repositories/SurveySim/trunk/missing autoheader
-AUTOMAKE = ${SHELL} /Users/kurinsky/Repositories/SurveySim/trunk/missing automake-1.14
+AUTOCONF = ${SHELL} /Users/kurinsky/Repositories/SurveySim/missing autoconf
+AUTOHEADER = ${SHELL} /Users/kurinsky/Repositories/SurveySim/missing autoheader
+AUTOMAKE = ${SHELL} /Users/kurinsky/Repositories/SurveySim/missing automake-1.14
 AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -221,7 +221,7 @@ LIBOBJS =
 LIBS = -lCCfits -lcfitsio -lgsl -lgslcblas -lm 
 LTLIBOBJS = 
 MAINT = #
-MAKEINFO = ${SHELL} /Users/kurinsky/Repositories/SurveySim/trunk/missing makeinfo
+MAKEINFO = ${SHELL} /Users/kurinsky/Repositories/SurveySim/missing makeinfo
 MKDIR_P = ./install-sh -c -d
 OBJEXT = o
 PACKAGE = surveysim
@@ -237,10 +237,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = 
 VERSION = 1.0
-abs_builddir = /Users/kurinsky/Repositories/SurveySim/trunk
-abs_srcdir = /Users/kurinsky/Repositories/SurveySim/trunk
-abs_top_builddir = /Users/kurinsky/Repositories/SurveySim/trunk
-abs_top_srcdir = /Users/kurinsky/Repositories/SurveySim/trunk
+abs_builddir = /Users/kurinsky/Repositories/SurveySim
+abs_srcdir = /Users/kurinsky/Repositories/SurveySim
+abs_top_builddir = /Users/kurinsky/Repositories/SurveySim
+abs_top_srcdir = /Users/kurinsky/Repositories/SurveySim
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
@@ -260,7 +260,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/kurinsky/Repositories/SurveySim/trunk/install-sh
+install_sh = ${SHELL} /Users/kurinsky/Repositories/SurveySim/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -281,8 +281,8 @@ top_build_prefix =
 top_builddir = .
 top_srcdir = .
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src filters templates lib_aux python examples
-EXTRA_DIST = UserGuide.pdf DATA LICENSE
+SUBDIRS = src filters templates lib_aux python examples docs
+EXTRA_DIST = LICENSE README.md
 all: all-recursive
 
 .SUFFIXES:

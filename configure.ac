@@ -47,5 +47,5 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_CHECK_FUNCS([floor pow sqrt])
 
-AC_CONFIG_FILES([Makefile src/Makefile filters/Makefile templates/Makefile lib_aux/Makefile src/alg_lib/Makefile python/Makefile python/SurveySim/Makefile examples/Makefile examples/scripts/Makefile examples/spire/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile filters/Makefile templates/Makefile lib_aux/Makefile src/alg_lib/Makefile python/Makefile python/SurveySim/Makefile examples/Makefile examples/scripts/Makefile examples/spire/Makefile docs/Makefile])
 AC_OUTPUT
