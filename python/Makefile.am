@@ -4,6 +4,6 @@ SUBDIRS = SurveySim
 rundir= $(prefix)/bin
 pythondir = $(prefix)/@PACKAGE@/python
 dist_python_DATA = SurveySimObsFile.py SurveySimGUI.py
-dist_run_SCRIPTS = SurveySimGUI SurveySimFilters SurveySimObsFile
+dist_run_SCRIPTS = SurveySimGUI SurveySimFilters SurveySimObsFile SurveySimInitModel
 
 EXTRA_DIST = README setup.py
