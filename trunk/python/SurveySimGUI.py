@@ -55,6 +55,7 @@ for opt, arg in opts:
         sys.exit()
     elif opt in ("-i", "--ifile"):
         dmodelfile = arg
+        modelfile = dmodelfile
     elif opt in ("-o", "--ofile"):
         outfile = arg
 print 'Input file is "', dmodelfile
