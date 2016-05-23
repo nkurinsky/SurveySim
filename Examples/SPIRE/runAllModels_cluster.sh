@@ -1,12 +1,9 @@
 #!/bin/bash
 
 fields="0 2"
-lfs="0 1"
-agnFracs="6.0 12.0"
+lfs="1"
 
 hosts=$(bhosts | grep bullet | awk '{print $1}')
-echo -e Hosts:\"$hosts\"
-
 for field in $fields
 do
     for lf in $lfs

@@ -4,12 +4,10 @@ import os
 import sys
 import datetime
 import time
-
-sys.path.append('/usr/local/surveysim/python')
-
-from OutputFile import *
 from pylab import *
 import numpy
+
+from SurveySim.OutputFile import *
 
 rc('text', usetex=True)
 

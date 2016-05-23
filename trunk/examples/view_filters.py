@@ -3,10 +3,9 @@
 #Python prelims
 import os
 import sys
-
-from filters import *
 import matplotlib.pyplot as plt
 import numpy as np
+from SurveySim.filters import *
 
 instruments=["ALMA"] #"WISE", "JWST", "Herschel_SPIRE" etc.
 
