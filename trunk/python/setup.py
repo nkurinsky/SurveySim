@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(name='SurveySim',
       version='1.0',
-      install_requires=['numpy','scipy','matplotlib>=1.3','seaborn','astropy>=1.1','pyfits'],
+      install_requires=['numpy','scipy','matplotlib>=1.3','seaborn','pyfits'],
       py_modules=['SurveySimObsFile','SurveySimGUI'],
       packages=['SurveySim'],
       author='Noah Kurinsky',

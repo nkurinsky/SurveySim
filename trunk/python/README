@@ -2,10 +2,9 @@ Packages needed:
          os
 	 numpy
 	 scipy
-	 pyfits (or astropy.io.fits; will need to modify include)
+	 pyfits
 	 matplotlib
 	 pylab
-	 astropy
 
 Classes:
 	ModelFile - instantiate about model.fits file, provides information and i/o functions

@@ -2,7 +2,7 @@
 
 #Python prelims
 import sys, getopt
-from astropy.io import fits
+import pyfits as fits
 
 def printHelp(exitCode=0):
    if(exitCode > 0):
