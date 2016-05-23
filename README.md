@@ -10,4 +10,4 @@ In this main directory:
 * src           contains C++ code for compilation and makefiles
 * python        contains the python interface for the SurveySim executable which builds modelfiles and helps parse output
 
-Please refer to the INSTALL file in for compilation instructions.
+Please refer to the docs/INSTALL file or docs/UsersGuide.pdf for compilation instructions.
