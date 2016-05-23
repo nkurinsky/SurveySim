@@ -2,7 +2,7 @@
 
 
 #type_model=['A','B','C','D','E','F']
-type_model=['E']
+type_model=['F']
 #comp=[4,4,6,6,7,7]
 comp=[7]
 cmaps=['Paired','Paired']
@@ -53,7 +53,7 @@ toshow1[2]='P'
 toshow2[2]='Q'
 xmin_par[2]=-7.0
 xmax_par[2]=7.9
-ymin_par[2]=-0.5
+ymin_par[2]=-4.1
 ymax_par[2]=7.6
 
 

@@ -5,11 +5,10 @@ import sys
 import datetime
 import time
 
-basedir='/usr/local/surveysim/'
+basedir="/u/ki/kurinsky/local/surveysim/"
 sys.path.append(basedir+'python')
 
 from ModelFile import *
-
 
 if(len(sys.argv) < 4):
     print "Calling Sequence: "+sys.argv[0]+" field(0=COSMOS,1=SWIRE,2=COSMOS+MIPS) model(0=onlySFG,1=agn,2=composites,3=cold, 4=SFG_cold) lfForm(0=MS,1=DPL,2=S)"
@@ -24,13 +23,10 @@ mod=ModelFile()
 mod.axis1="ColorF1F2"
 mod.axis2="Flux1"
 
-convergence=0.95
+convergence=0.99
 #run settings; should be same regardless of model
-mod.settings['verbosity']=3
-#mod.settings['nchain']=50
 mod.annealing['temp']=.03
 mod.annealing['learningRate']=0.4
-mod.convergence['CI']=convergence
 
 mod.filters[0].setID("SPIRE_250")
 mod.filters[1].setID("SPIRE_350")
@@ -46,7 +42,7 @@ if(field == 0):
     mod.filters[0].compN=1.48
     mod.filters[0].compB=5.90
     mod.filters[0].compM=9.27
-    mod.filters[1].limit=8.0#0.1
+    mod.filters[1].limit=0.1
     mod.filters[1].err=6.63 #1.32
     #mod.filters[1].compN=1.48
     #mod.filters[1].compB=4.84
@@ -75,7 +71,6 @@ elif(field == 2):
     simname="spire_mips_COSMOS"
     obsfile=basedir+"obs/L2-COSMOS_xID24_DR3.fits"
     #load limits and filters from pre-made model file
-    mod.load("/usr/local/surveysim/model/spire_mips_model.fits")
     mod.load(basedir+"model/spire_mips_model.fits")
     mod.convergence['CI']=convergence
     mod.filters[0].err=16.0 #median error in F24um
@@ -130,9 +125,9 @@ mod.params['fa0'].pmin=0.10#0.20
 mod.params['fa0'].pmax=0.50#5.00
 mod.params['fa0'].fixed=0
 
-mod.params['t1'].value=-0.1#-1.40
-mod.params['t1'].pmin=-1.0#-6.00
-mod.params['t1'].pmax=6.00
+mod.params['t1'].value=-1.40#-1.30
+mod.params['t1'].pmin=-6.00#-2.60
+mod.params['t1'].pmax=6.00#1.00#-0.01
 mod.params['t1'].fixed=0
 
 mod.params['t2'].value=5.00#4.50
@@ -233,7 +228,7 @@ if(lfForm == 0):
 
 if(lfForm == 1):
     mod.params['Alpha'].value=2.6
-    mod.params['Beta'].value=0.60#0.60#0.75#0.75#0.8   
+    mod.params['Beta'].value=0.75#0.8   
     mod.params['Phi0'].value=-3.248
     mod.params['L0'].value=10.85    
     mod.params['Phi0'].pmin=-3.35#-3.45
@@ -274,6 +269,10 @@ mod.params['zbq'].pmin=0.50#1.40
 mod.params['zbq'].pmax=3.5#2.10
 
 mod.survey['AGNexp']=12.00
-mod.settings['verbosity']=3
 mod.filename=mfile
-mod.run(obsfile,outfile=outfile,templatefile="/Users/bonateo/SurveySim/trunk/templates/default_templates_v2.fits")#templatefile=basedir+"templates/default_templates.fits")
+
+mod.settings['verbosity']=3
+mod.settings['nchain']=10
+mod.convergence['CI']=convergence
+
+mod.run(obsfile,outfile=outfile,templatefile=basedir+"templates/default_templates.fits")

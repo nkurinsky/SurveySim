@@ -123,9 +123,9 @@ class FitImage:
             print 'St dev of residual: ',np.std(tmpimg[gpts])
             std_str=np.str(np.std(tmpimg[gpts]))
             #MIPS
-            #plt.annotate('st.dev='+std_str[:4],xy=(-0.5,2.3),fontsize=15)
+            plt.annotate('st.dev='+std_str[:4],xy=(-0.5,2.3),fontsize=15)
             #SPIRE
-            plt.annotate('st.dev='+std_str[:4],xy=(1.5,0.45),fontsize=15)
+            #plt.annotate('st.dev='+std_str[:4],xy=(1.5,0.45),fontsize=15)
         #ax.annotate('local max', xy=(2, 1), xytext=(3, 1.5))
         plt.clim(clim)
         cbar=plt.colorbar()
@@ -191,9 +191,9 @@ class OutputFile:
             plt.xlabel(axis1_name)
             plt.ylabel(axis2_name)
             #MIPS
-            #ax.annotate(lab,xy=(-0.7,yrange[1]*0.85),fontsize=20)
+            ax.annotate(lab,xy=(-0.7,yrange[1]*0.85),fontsize=20)
             #SPIRE
-            ax.annotate(lab,xy=(1.35,0.65),fontsize=20)
+            #ax.annotate(lab,xy=(1.35,0.65),fontsize=20)
         plt.tight_layout(True)
 
     def showImages(self,block=True,xrange=None,yrange=None,axis1_name=None,axis2_name=None):
@@ -216,24 +216,24 @@ class OutputFile:
         plt.show(block=block)
 
 #SPIRE
-ofile='Final_output_2/E_spire_output.fits'
-mfile='Final_output_2/E_spire_model.fits'
+#ofile='Final_output_2/E_spire_output.fits'
+#mfile='Final_output_2/E_spire_model.fits'
 #MIPS
-#ofile='Final_output_2/E_mips_output.fits'
-#mfile='Final_output_2/E_mips_model.fits'
+ofile='Final_output_2/E_mips_output.fits'
+mfile='Final_output_2/E_mips_model.fits'
 
 output=OutputFile(ofile)
 
 #MIPS
-#axis1_name=r'log($S_{24}$/mJy)'
-#axis2_name=r'log($S_{250}/S_{24}$)'
+axis1_name=r'log($S_{24}$/mJy)'
+axis2_name=r'log($S_{250}/S_{24}$)'
 #SPIRE
-axis1_name=r'log($S_{250}$/mJy)'
-axis2_name=r'log($S_{350}/S_{250}$)'
+#axis1_name=r'log($S_{250}$/mJy)'
+#axis2_name=r'log($S_{350}/S_{250}$)'
 
 
 #MIPS
-#output.showImages(xrange=[-1.3,1.0],yrange=[0.5,3],axis1_name=axis1_name,axis2_name=axis2_name)
+output.showImages(xrange=[-1.3,1.0],yrange=[0.5,3],axis1_name=axis1_name,axis2_name=axis2_name)
 #SPIRE
-output.showImages(xrange=[0.9,2.8],yrange=[-1.0,1.0],axis1_name=axis1_name,axis2_name=axis2_name)
+#output.showImages(xrange=[0.9,2.8],yrange=[-1.0,1.0],axis1_name=axis1_name,axis2_name=axis2_name)
 

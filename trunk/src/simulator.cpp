@@ -111,7 +111,7 @@ long simulator::num_sources(double z, double l, double dl){
       nsrcs += lf->get_phi(zval[j],lval[i])*dvdz(zval[j],area);
     }
   }
-  //Multiply by dlogl and dz
+  //Multiply by dlogl and dz, divide by four for average at bin center
   nsrcs*=0.25*dl*dz;
   
   long retval=static_cast<long>(floor(nsrcs));
