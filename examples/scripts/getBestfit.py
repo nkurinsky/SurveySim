@@ -4,7 +4,7 @@ import os
 import sys
 import datetime
 import time
-from OutputFile import *
+from SurveySim.OutputFile import *
 from pylab import *
 import numpy
 

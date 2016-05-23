@@ -6,7 +6,6 @@ def filterDir():
         if(os.path.exists(ssdir)):
             return ssdir+"/filters/"
     instdir='/usr/local/surveysim/filters/'  # change made by Jed
-    #instdir ='/usr/local/SurveySim/trunk/python/filters/'
     instdir2=os.getenv("HOME")+"/local/surveysim/filters/"
     if(os.path.exists(instdir)):
         return instdir

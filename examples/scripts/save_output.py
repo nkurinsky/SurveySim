@@ -4,10 +4,7 @@ import os
 import sys
 import datetime
 import time
-
-sys.path.append('/usr/local/surveysim/python')
-
-from OutputFile import *
+from SurveySim.OutputFile import *
 from pylab import *
 import numpy
 
