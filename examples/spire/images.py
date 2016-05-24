@@ -18,9 +18,6 @@ from matplotlib.colors import Normalize
 from SurveySim.OutputFile import *
 from SurveySim.ModelFile import keyPrint
 
-#Prelims to make prettier colors
-palette=sns.color_palette()
-
 class MidpointNormalize(Normalize):
     def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
         self.midpoint = midpoint

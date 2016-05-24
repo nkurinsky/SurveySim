@@ -12,7 +12,7 @@ import Tkinter as tk
 
 #Prelims to make prettier colors
 import seaborn as sns
-sns.set(style='white')#,font='serif')#,font_scale=1.5,palette='Set2')
+sns.set(style='white')
 
 plt.rc('text', usetex=True)
 
@@ -210,31 +210,47 @@ class FitImage:
         else:
             self.name=hdus[extension].header['EXTNAME']
 
+        self.axis1='Axis 1'
+        self.axis2='Axis 2'
 
     def __str__(self):
         return "Image: "+self.name
 
-    def plot(self,interpolation='nearest',cmap=cm.Greys,labelCbar=True):
-        #fnamecore=filename.split('output.fits')[0]
-        #self.modelfile=fnamecore+'_model.fits'
-        #self.mhdus=fits.open(modelfile)
-        #prihdr=self.mhdus[0].header
-        #self.axis1=prihdr['AXIS1']
-        #self.axis2=prihdr['AXIS2']
-        #print self.axis1,self.axis2
+    def plot(self,interpolation='nearest',cmap=None,labelCbar=True,cmax=None):
 
-        self.axis1=['log(F24/uJy)']
-        self.axis2=['log(F250/F24)']
-        plt.imshow(self.img, interpolation=interpolation, cmap=cmap, extent=self.extent, aspect='auto')
+        tmpimg=np.flipud(self.img)
+        if(cmap == None):
+            cmap=cm.Greys
+            if(self.name == 'Residual'):
+                cmap=cm.bwr
+            elif(self.name == 'Model Diagnostic'):
+                cmap=cm.Blues
+            elif(self.name=='Observation Diagnostic'):
+                cmap=cm.Reds
+
+        if(cmax != None):
+            clim=[0,cmax]
+            if(self.name == 'Residual'):
+                clim=[-cmax,cmax]           
+
+        plt.imshow(tmpimg, interpolation=interpolation, cmap=cmap, extent=self.extent, aspect='auto')
+        if(cmax != None):
+            plt.clim(clim)
+
         cbar=plt.colorbar()
         if(labelCbar):
             cbar.set_label("Normalized Density")
-        plt.contour(self.img, interpolation=interpolation, colors='grey', extent=self.extent, origin='image', aspect='auto')
+        plt.contour(tmpimg, interpolation=interpolation, colors='grey', extent=self.extent, origin='image', aspect='auto')
         plt.xlabel(self.axis1)
         plt.ylabel(self.axis2)
-        plt.xlim(self.xmin,self.xmax)
-        plt.ylim(self.ymin,self.ymax)
-        plt.title(self.name)
+
+        if(self.name == 'Residual'):
+            gpts=(tmpimg > 0)
+            print 'St dev of residual: ',np.std(tmpimg[gpts])
+            std_str=np.str(np.std(tmpimg[gpts]))
+            plt.title(self.name+': st.dev='+std_str[:4])
+        else:
+            plt.title(self.name)
 
     def show(self):
         self.plot()
@@ -603,9 +619,13 @@ class OutputFile:
         #self.counts.info()
 
     def plotImages(self,xrange=None,yrange=None):
-        col=0
         for key in self.images.keys():
-            col=col+1
+            if(key == "Observation Diagnostic"):
+                col=1
+            if(key == "Residual"):
+                col=3
+            if(key == "Model Diagnostic"):
+                col=2
             plt.subplot(1,3,col)
             self.images[key].plot(labelCbar=False)
             if(col > 1):
@@ -614,7 +634,7 @@ class OutputFile:
                 plt.xlim(xrange[0],xrange[1])
             if(yrange != None):
                 plt.ylim(yrange[0],yrange[1])
-        #plt.gcf().set_tight_layout(True)
+
         plt.tight_layout(True)
 
     def showImages(self,block=True,xrange=None,yrange=None):
@@ -685,9 +705,13 @@ class OutputFile:
         plt.subplot(rows,3,3)
         self.simInfo.plotSEDType()
 
-        col=0
         for key in self.images.keys():
-            col=col+1
+            if(key == "Observation Diagnostic"):
+                col=1
+            if(key == "Residual"):
+                col=3
+            if(key == "Model Diagnostic"):
+                col=2
             plt.subplot(rows,3,col+3)
             self.images[key].plot(labelCbar=False)
             if(col > 1):
