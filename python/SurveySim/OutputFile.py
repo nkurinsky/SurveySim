@@ -206,6 +206,7 @@ class FitImage:
 
         if(extension == 0):
             self.name='Residual'
+            self.img=hdus[2].data-hdus[1].data
         else:
             self.name=hdus[extension].header['EXTNAME']
 

@@ -32,7 +32,32 @@ class MidpointNormalize(Normalize):
         x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
         return np.ma.masked_array(np.interp(value, x, y))
 
-def plotImages(obs,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annotateXY=None):
+def plot(self,interpolation='nearest',labelCbar=True,annotateXY=None,cmax=105):
+    print self.name
+    tmpimg=np.flipud(self.img)
+    cmap=cm.Greys
+    clim=[0,cmax]
+    if(self.name == 'Residual'):
+        cmap=cm.bwr
+        clim=[-cmax,cmax]
+    if(self.name == 'Model Diagnostic'):
+        cmap=cm.Blues
+    if(self.name=='Observation Diagnostic'):
+        cmap=cm.Reds
+
+    plt.imshow(tmpimg, interpolation=interpolation, cmap=cmap,extent=self.extent, aspect='auto')
+    if(self.name == 'Residual'):
+        gpts=(tmpimg > 0)
+        print 'St dev of residual: ',np.std(tmpimg[gpts])
+        std_str=np.str(np.std(tmpimg[gpts]))
+        if(annotateXY != None):
+            plt.annotate('st.dev='+std_str[:4],xy=(annotateXY[0]+.15,annotateXY[1]-0.2),fontsize=15)
+    plt.clim(clim)
+    cbar=plt.colorbar()
+    if(labelCbar):
+        cbar.set_label("Normalized Density")
+
+def plotImages(obs,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annotateXY=None,cmax=105):
     col=0
     for key in obs.images.keys():
         if(key == "Observation Diagnostic"):
@@ -50,7 +75,7 @@ def plotImages(obs,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annot
         if(key == 'Observation Diagnostic'):
             obs.norm = MidpointNormalize(midpoint=-150)
 
-        obs.images[key].plot(labelCbar=False)
+        obs.images[key].plot(labelCbar=False,annotateXY=annotateXY,cmax=cmax)
         if(col > 1):
             plt.ylabel("")
         if(xrange != None):
@@ -65,9 +90,9 @@ def plotImages(obs,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annot
             plt.title(lab,fontsize=20)
     plt.tight_layout(True)
 
-def showImages(obs,block=True,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annotateXY=None):
+def showImages(obs,block=True,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annotateXY=None,cmax=105):
     plt.figure(figsize=(12,4))
-    plotImages(xrange=xrange,yrange=yrange,axis1_name=axis1_name,axis2_name=axis2_name,annotateXY=annotateXY)
+    plotImages(xrange=xrange,yrange=yrange,axis1_name=axis1_name,axis2_name=axis2_name,annotateXY=annotateXY,cmax=cmax)
     plt.show(block=block)
 
 toPlot='mips'
