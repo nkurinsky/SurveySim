@@ -32,21 +32,21 @@ class MidpointNormalize(Normalize):
         x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
         return np.ma.masked_array(np.interp(value, x, y))
 
-def plot(self,interpolation='nearest',labelCbar=True,annotateXY=None,cmax=105):
-    print self.name
-    tmpimg=np.flipud(self.img)
+def plotImage(image,interpolation='nearest',labelCbar=True,annotateXY=None,cmax=105):
+    print image.name
+    tmpimg=np.flipud(image.img)
     cmap=cm.Greys
     clim=[0,cmax]
-    if(self.name == 'Residual'):
+    if(image.name == 'Residual'):
         cmap=cm.bwr
         clim=[-cmax,cmax]
-    if(self.name == 'Model Diagnostic'):
+    if(image.name == 'Model Diagnostic'):
         cmap=cm.Blues
-    if(self.name=='Observation Diagnostic'):
+    if(image.name=='Observation Diagnostic'):
         cmap=cm.Reds
 
-    plt.imshow(tmpimg, interpolation=interpolation, cmap=cmap,extent=self.extent, aspect='auto')
-    if(self.name == 'Residual'):
+    plt.imshow(tmpimg, interpolation=interpolation, cmap=cmap,extent=image.extent, aspect='auto')
+    if(image.name == 'Residual'):
         gpts=(tmpimg > 0)
         print 'St dev of residual: ',np.std(tmpimg[gpts])
         std_str=np.str(np.std(tmpimg[gpts]))
@@ -75,7 +75,7 @@ def plotImages(obs,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annot
         if(key == 'Observation Diagnostic'):
             obs.norm = MidpointNormalize(midpoint=-150)
 
-        obs.images[key].plot(labelCbar=False,annotateXY=annotateXY,cmax=cmax)
+        plotImage(obs.images[key],labelCbar=False,annotateXY=annotateXY,cmax=cmax)
         if(col > 1):
             plt.ylabel("")
         if(xrange != None):
@@ -92,29 +92,31 @@ def plotImages(obs,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annot
 
 def showImages(obs,block=True,xrange=None,yrange=None,axis1_name=None,axis2_name=None,annotateXY=None,cmax=105):
     plt.figure(figsize=(12,4))
-    plotImages(xrange=xrange,yrange=yrange,axis1_name=axis1_name,axis2_name=axis2_name,annotateXY=annotateXY,cmax=cmax)
+    plotImages(obs,xrange=xrange,yrange=yrange,axis1_name=axis1_name,axis2_name=axis2_name,annotateXY=annotateXY,cmax=cmax)
     plt.show(block=block)
 
 toPlot='mips'
 if(toPlot == 'mips'):
-    ofile='Final_output_2/E_mips_output.fits'
+    ofile='/Users/kurinsky/Desktop/F_mips_output.fits'
     output=OutputFile(ofile)
     axis1_name=r'log($S_{24}$/mJy)'
     axis2_name=r'log($S_{250}/S_{24}$)'
-    output.showImages(xrange=[-1.3,1.0],
-                      yrange=[0.5,3],
-                      axis1_name=axis1_name,
-                      axis2_name=axis2_name,
-                      annotateXY=(-0.7,3*0.85))
+    showImages(output,
+               xrange=[-1.3,1.0],
+               yrange=[0.5,3],
+               axis1_name=axis1_name,
+               axis2_name=axis2_name,
+               annotateXY=(-0.7,3*0.85))
 
 elif(toPlot == 'spire'):
     ofile='Final_output_2/E_spire_output.fits'
     output=OutputFile(ofile)
     axis1_name=r'log($S_{250}$/mJy)'
     axis2_name=r'log($S_{350}/S_{250}$)'
-    output.showImages(xrange=[0.9,2.8],
-                      yrange=[-1.0,1.0],
-                      axis1_name=axis1_name,
-                      axis2_name=axis2_name,
-                      annotateXY=(1.35,0.65))
+    showImages(output,
+               xrange=[0.9,2.8],
+               yrange=[-1.0,1.0],
+               axis1_name=axis1_name,
+               axis2_name=axis2_name,
+               annotateXY=(1.35,0.65))
 
