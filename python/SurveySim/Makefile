@@ -78,7 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = python/SurveySim
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(dist_ss_DATA)
+	$(dist_ss_DATA) README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -233,6 +233,7 @@ top_srcdir = ../..
 AUTOMAKE_OPTIONS = foreign
 ssdir = $(prefix)/surveysim/python/SurveySim
 dist_ss_DATA = ModelFile.py OutputFile.py __init__.py filters.py
+EXTRA_DIST = README
 all: all-am
 
 .SUFFIXES:

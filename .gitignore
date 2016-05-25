@@ -2,3 +2,5 @@
 *.ipynb_checkpoints*
 *.pyc
 *.o
+src/SurveySim
+src/alg_lib/lib*

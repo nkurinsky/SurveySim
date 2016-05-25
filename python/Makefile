@@ -15,7 +15,6 @@
 
 
 
-
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
   case $${target_option-} in \
@@ -79,7 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = python
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(dist_run_SCRIPTS) $(dist_python_DATA) README
+	$(dist_run_SCRIPTS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -114,7 +113,7 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(rundir)" "$(DESTDIR)$(pythondir)"
+am__installdirs = "$(DESTDIR)$(rundir)"
 SCRIPTS = $(dist_run_SCRIPTS)
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
@@ -143,7 +142,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(dist_python_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -293,12 +291,11 @@ top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = SurveySim
+SUBDIRS = SurveySim examples
 rundir = $(prefix)/bin
 pythondir = $(prefix)/surveysim/python
-dist_python_DATA = SurveySimObsFile.py SurveySimGUI.py
 dist_run_SCRIPTS = SurveySimGUI SurveySimFilters SurveySimObsFile SurveySimInitModel
-EXTRA_DIST = README setup.py
+EXTRA_DIST = setup.py
 all: all-recursive
 
 .SUFFIXES:
@@ -367,27 +364,6 @@ uninstall-dist_runSCRIPTS:
 	files=`for p in $$list; do echo "$$p"; done | \
 	       sed -e 's,.*/,,;$(transform)'`; \
 	dir='$(DESTDIR)$(rundir)'; $(am__uninstall_files_from_dir)
-install-dist_pythonDATA: $(dist_python_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(dist_python_DATA)'; test -n "$(pythondir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(pythondir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(pythondir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pythondir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pythondir)" || exit $$?; \
-	done
-
-uninstall-dist_pythonDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(dist_python_DATA)'; test -n "$(pythondir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(pythondir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -545,10 +521,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(SCRIPTS) $(DATA)
+all-am: Makefile $(SCRIPTS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(rundir)" "$(DESTDIR)$(pythondir)"; do \
+	for dir in "$(DESTDIR)$(rundir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -601,7 +577,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-dist_pythonDATA install-dist_runSCRIPTS
+install-data-am: install-dist_runSCRIPTS
 
 install-dvi: install-dvi-recursive
 
@@ -645,7 +621,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-dist_pythonDATA uninstall-dist_runSCRIPTS
+uninstall-am: uninstall-dist_runSCRIPTS
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
@@ -653,16 +629,14 @@ uninstall-am: uninstall-dist_pythonDATA uninstall-dist_runSCRIPTS
 	check-am clean clean-generic cscopelist-am ctags ctags-am \
 	distclean distclean-generic distclean-tags distdir dvi dvi-am \
 	html html-am info info-am install install-am install-data \
-	install-data-am install-dist_pythonDATA \
-	install-dist_runSCRIPTS install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-dist_pythonDATA \
-	uninstall-dist_runSCRIPTS
+	install-data-am install-dist_runSCRIPTS install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am tags \
+	tags-am uninstall uninstall-am uninstall-dist_runSCRIPTS
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

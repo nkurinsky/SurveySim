@@ -1,9 +1,8 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS = SurveySim
+SUBDIRS = SurveySim examples
 
 rundir= $(prefix)/bin
 pythondir = $(prefix)/@PACKAGE@/python
-dist_python_DATA = SurveySimObsFile.py SurveySimGUI.py
 dist_run_SCRIPTS = SurveySimGUI SurveySimFilters SurveySimObsFile SurveySimInitModel
 
-EXTRA_DIST = README setup.py
+EXTRA_DIST = setup.py
