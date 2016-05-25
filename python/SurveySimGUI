@@ -20,11 +20,14 @@ from SurveySim.ModelFile import *
 from SurveySim.OutputFile import *
 from SurveySim.filters import read_filters
 
+def printCallingStatement():
+    print '>> Command Signature: SurveySim.py -i <modelfile> -o <outputfile> -d <obs directory>'
+
 #=================================================================================
 #SurveySim settings
 #---------------------------------------------------------------------------------
-print("Welcome to SurveySim");
-print("a MCMC-based galaxy evolution fitter and simulator");
+#Note: for now we use globals to simplify communication between functions, will 
+#make class members in future update, during which GUI will be improved
 
 #GUI top frame
 fields_files='Survey data','SEDs'
@@ -37,33 +40,41 @@ else:
 #initialize datafiles
 seddir=codedir+'templates/'
 sedfile=seddir+'default_templates.fits'
-modelfile=codedir+'examples/spire/spire_default_model.fits'
-dmodelfile=modelfile
-obsdir=codedir+'examples/spire/'
-obsfile=obsdir+'L2-COSMOS_xID24_DR3.fits'
+
+#initialize observations directory
+if (os.getenv("SURVEYSIMOBSDIR") != None):
+    obsdir=os.getenv("SURVEYSIMOBSDIR")+'/'
+else:
+    obsdir=codedir+'examples/'
+
+modelfile=os.getcwd()+'/model.fits'
 outfile=os.getcwd()+'/output.fits'
 fitcode='/usr/local/bin/SurveySim'
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"hi:o:",["ifile=","ofile="])
-except getopt.GetoptError:
-    print 'SurveySim.py -i <modelfile> -o <outputfile>'
+    opts, args = getopt.getopt(sys.argv[1:],"hi:o:d:",["ifile=","ofile=","obsdir="])
+except getopt.GetoptError as e:
+    print '>> ERROR: '+e.msg
+    printCallingStatement()
     sys.exit(2)
 for opt, arg in opts:
     if opt == '-h':
-        print 'SurveySim.py -i <modelfile> -o <outputfile>'
+        printCallingStatement()
         sys.exit()
     elif opt in ("-i", "--ifile"):
-        dmodelfile = arg
-        modelfile = dmodelfile
+        modelfile = arg
     elif opt in ("-o", "--ofile"):
         outfile = arg
-print 'Input file is "', dmodelfile
-print 'Output file is "', outfile
+    elif opt in ("-d", "--obsdir"):
+        obsdir= arg
 
 filter_id,filter_choices=read_filters();
 mod=ModelFile()
-mod.load(dmodelfile)
+
+#load parameters from file if it exists. If it doesn't, defaults will be set, and new file will be created
+if(os.path.isfile(modelfile)):
+    print '..Loading settings from existing modelfile "'+modelfile+'"'
+    mod.load(modelfile)
 
 lfform_tmp=mod.survey['lfForm']
 if(lfform_tmp == 0):
@@ -200,7 +211,7 @@ class SurveySimGUI:
                 for file in os.listdir(obsdir):
                     if file.endswith(".fits"):
                         obsfiles.append(obsdir+file)
-                file1=Entry(row,textvariable=obsfile)
+                #file1=Entry(row,textvariable=obsfile)
                 option1=OptionMenu(row,self.obsfile_set,*obsfiles)
                 option1.pack(side='left',padx=0,pady=0)
             if (ind == 1):
@@ -211,7 +222,7 @@ class SurveySimGUI:
                 file1=Entry(row,textvariable=sedfile)
                 option2=OptionMenu(row,self.sedfile_set,*sedfiles)
                 option2.pack(side='left',padx=0,pady=0)
-            self.obsfile_set.set(obsfile)
+            #self.obsfile_set.set(obsfile)
             self.sedfile_set.set(sedfile)
             ind=ind+1
         
@@ -244,9 +255,7 @@ class SurveySimGUI:
         self.lfform_set.set(lfform)
         lf_option.grid(in_=self.labelframe_lf,row=ind+1,column=1)
  
-        #print fields_lf
         fields_lf_new=['Phi0','L0','Alpha','Beta','P','Q','P2','Q2','zbp','zbq']
-        #print fields_lf_new
         for field in fields_lf_new:
             lab = Label(self.labelframe_lf, text=field,bg='light blue')
             lab.grid(in_=self.labelframe_lf,row=ind+3,column=0)
@@ -354,13 +363,13 @@ class SurveySimGUI:
         self.settings_on='yes'
 
     def showresults(self): #read-in the results from output.fits and show plots
-        print("Showing results....")
+        print(">> Showing results....")
         output=OutputFile(outfile)
-        output.show(block=False)
+        output.show(block=True)
         return
 
     def mcmcdiag(self): #show chain behavior
-        print("MCMC diagnostics....")
+        print(">> MCMC diagnostics....")
         output=OutputFile(outfile)
         if(output.fit()):
             output.MCMC.showFit(block=False)
@@ -451,7 +460,7 @@ class SurveySimGUI:
 
 
     def runcode(self):
-        print("Runnning fitter code....")
+        print(">> Runnning SurveySim....")
         obsfile=self.obsfile_set.get()
         sedfile=self.sedfile_set.get()
         os.system(fitcode+' '+modelfile+' '+sedfile+' '+obsfile+' -o '+outfile)
@@ -500,15 +509,21 @@ class SettingsWindow(Frame):
                 self.s_set[ind].set(mesprint1)
             if(ind == 6):
                 self.s_set[ind].set(tmax1)
- #           if(ind == 7):
- #               self.s_set[ind].set(conv_rma1)
- #           if(ind == 8):
- #               self.s_set[ind].set(conv_ste1)
             if(ind == 7):
                 self.s_set[ind].set(conv_con1)
             ind=ind+1;
 
 def main():
+    print("========================================================");
+    print("==             Welcome to SurveySim                   ==");
+    print("== A MCMC-based Galaxy Evolution Fitter and Simulator ==");
+    print("========================================================");
+    print("");
+
+    print '>> Model file is "'+modelfile+'"'
+    print '>> Obs Directory is "'+obsdir+'"'
+    print '>> Output file is "'+outfile+'"'
+
     root=Tk()   
     mygui=SurveySimGUI(root)
     root.mainloop() 
