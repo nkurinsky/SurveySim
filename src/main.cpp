@@ -65,16 +65,16 @@ int main(int argc,char** argv){
   ResultChain final_counts(3,q.nsim);
 
   if(q.simflag){ //observations not provided
-    LOG_CRITICAL(printf("Simulating a survey only \n"));
+    LOG_INFO(printf("Simulating a survey only \n"));
     //run number of simulations to get counts range
 
-    LOG_CRITICAL(printf("Beginning Simulation Loop (%lu runs)\n",q.nsim));
+    LOG_INFO(printf("Beginning Simulation Loop (%lu runs)\n",q.nsim));
     fflush(stdout);
     for(unsigned long simi=1;simi<q.nsim;simi++){      
       output=survey.simulate();
       final_counts.add_link(output.dnds,output.chisqr);
       if((simi % 20) == 0){
-	LOG_CRITICAL(printf("Current Iteration: %lu\n",simi));
+	LOG_INFO(printf("Current Iteration: %lu\n",simi));
       }
       fflush(stdout);
     }
@@ -340,7 +340,7 @@ int main(int argc,char** argv){
   
   saved ? printf("Save Successful") : printf("Save Failed");
 
-  LOG_CRITICAL(printf("\nFitting Complete\n\n"));
+  LOG_INFO(printf("\nFitting Complete\n\n"));
   
   return saved ? 0 : 1;
 }

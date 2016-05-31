@@ -1,4 +1,7 @@
-import pyfits as fits
+try:
+    from astropy.io import fits
+except:
+    import pyfits as fits
 from matplotlib import gridspec
 import matplotlib.cm as cm
 import matplotlib

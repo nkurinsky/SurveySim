@@ -5,7 +5,10 @@ import os
 import sys
 import datetime
 import time
-import pyfits as fits
+try:
+    from astropy.io import fits
+except:
+    import pyfits as fits
 
 from SurveySim.filters import *
         
