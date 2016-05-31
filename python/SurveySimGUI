@@ -5,10 +5,7 @@ import os
 import sys, getopt
 import datetime
 import time
-try:
-    from astropy.io import fits
-except:
-    import pyfits as fits
+from astropy.io import fits
 import matplotlib.pyplot as plt
 import numpy as np
 from pylab import *

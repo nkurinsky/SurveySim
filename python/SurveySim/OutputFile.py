@@ -1,7 +1,4 @@
-try:
-    from astropy.io import fits
-except:
-    import pyfits as fits
+from astropy.io import fits
 from matplotlib import gridspec
 import matplotlib.cm as cm
 import matplotlib
@@ -264,116 +261,6 @@ class FitImage:
         self.plot()
         savefig(imgfile)
 
-# class NumberCounts:
-
-#     def __init__(self,hdus,fitted):
-#         self.chains=dict()
-#         self.fitted=fitted
-#         if(fitted):
-#             chainExt=7
-#             dists=hdus[3].data
-#             self.best=dict()
-#             self.bins=[dists['s1'],dists['s2'],dists['s3']]
-#             self.best['observed']=[dists['obs_dnds1'],dists['obs_dnds2'],dists['obs_dnds3']]
-#             self.best['modeled']=[dists['mod_dnds1'],dists['mod_dnds2'],dists['mod_dnds3']]
-#             self.chains['chisq']=hdus[chainExt].data['chisq']
-#         else:
-#             chainExt=2
-#             dists=hdus[1].data
-#             self.single=dict()
-#             self.bins=[dists['s1'],dists['s2'],dists['s3']]
-#             self.single['modeled']=[dists['mod_dnds1'],dists['mod_dnds2'],dists['mod_dnds3']]
-
-#         self.chains['counts']=[hdus[chainExt].data['dnds1'],
-#                                hdus[chainExt].data['dnds2'],
-#                                hdus[chainExt].data['dnds3']]
-
-#     def info(self):
-#         print level1,"Number Counts"
-#         print level2,"Bins (bins)"
-#         if(self.fitted):
-#             print level2,"Fitted Counts (best)"
-#             print level3,self.best.keys()
-#         else:
-#             print level2,"Single Run Counts (single)"
-#             print level3,self.single.keys()
-#         print level2,"Simulated Count Chains (chains)"
-#         print level3,self.chains.keys()
-
-#     def plot(self,band,showLegend=True,xmin=-1,xmax=-1):
-#         bi=band-1
-#         if(self.fitted):
-#             chi=self.chains['chisq']
-#             chimed=np.median(chi)
-#             gpts=np.where(chi < chimed)
-#             chainCounts=self.chains['counts'][bi][gpts]
-#         else:
-#             chainCounts=self.chains['counts'][bi]
-            
-#         bins=self.bins[bi]
-#         xlims=[np.min(bins),np.max(bins)]
-#         if(xmin > 0):
-#             xlims[0]=xmin
-#         if(xmax > 0):
-#             xlims[1]=xmax
-#         medians=np.zeros(len(bins))
-#         errlow=np.zeros(len(bins))
-#         errhigh=np.zeros(len(bins))
-#         errlow2=np.zeros(len(bins))
-#         errhigh2=np.zeros(len(bins))
-#         for i in range(0,len(chainCounts[0])):
-#             link=chainCounts[:,i]
-#             medians[i]=np.median(link)
-#             sortpts=np.argsort(link)
-#             lowind=int(0.159*len(sortpts))
-#             highind=int((1.0-0.159)*len(sortpts))
-#             errlow[i]=medians[i]-link[sortpts[lowind]]
-#             errhigh[i]=link[sortpts[highind]]-medians[i]
-#             lowind=int(0.025*len(sortpts))
-#             highind=int((1.0-0.025)*len(sortpts))
-#             errlow2[i]=medians[i]-link[sortpts[lowind]]
-#             errhigh2[i]=link[sortpts[highind]]-medians[i]
-
-#         if(self.fitted):            
-#             model=self.best['modeled'][bi]
-#             obs=self.best['observed'][bi]
-#             opts=np.where(obs > 1e-10)
-#             pts=np.where(model > 1e-10)
-#             plt.plot(bins[opts],obs[opts],'-',label="Observation",color='black')
-#             plt.plot(bins[pts],model[pts],'--',label="Best",color='black')
-#         else:
-#             model=self.single['modeled'][bi]
-#             pts=np.where(model > 1e-10)
-#             plt.plot(bins[pts],model[pts],'d',label="Best",color='black')
-        
-#         mpts=np.where(medians > 1e-10)
-#         #sns.set(font='serif',font_scale=1.5,palette='Set2')
-#         sns.set(style='white',font_scale=1.5,palette='Set2')
-#         #sns.despine()
-
-#         plt.plot(bins[mpts],medians[mpts],':',label="Median",color='black')
-#         plt.fill_between(bins[mpts],medians[mpts]-errlow[mpts],medians[mpts]+errhigh[mpts],color='gray',alpha=0.2)
-#         plt.fill_between(bins[mpts],medians[mpts]-errlow2[mpts],medians[mpts]+errhigh2[mpts],color='gray',alpha=0.2)
-#         #this needs to be made non-run specific perhaps by repeating the band keywords from the model into this 
-#         plt.title("Counts Band "+str(band))
-
-#         plt.xlabel(r'Flux [mJy]')
-#         plt.ylabel(r'$S^{2.5} dN/dSd\Omega*[Jy^{1.5} ster^{-1}]$')
-#         plt.xscale('log')
-#         plt.yscale('log')
-#         plt.xlim(xlims[0],xlims[1])
-
-#         if(showLegend):
-#             plt.legend(loc='lower right')
-
-#     def show(self,band):
-#         self.plot(band)
-#         plt.show(block=True)
-
-#     def save(self,band,filename):
-#         self.plot(band)
-#         plt.savefig(filename)
-
 class MCMCInfo:
     def __init__(self,hdus):
         self.Parameters=dict()
@@ -396,7 +283,6 @@ class MCMCInfo:
             elif "ACPT" in col:
                 self.Acceptance.append(params[col])                
 
-        print pnames
         cmed=np.median(self.ChiSquares[self.ChiSquares < 50])
 
         chdu=hdus[5]
@@ -579,12 +465,6 @@ class OutputFile:
 
     def __init__(self,filename):
         fnamecore=filename.split('output.fits')[0]
-        #self.modelfile=fnamecore+'_model.fits'
-        #self.mhdus=fits.open(self.modelfile)
-        #prihdr=self.mhdus[0].header
-        #self.axis1=prihdr['AXIS1']
-        #self.axis2=prihdr['AXIS2']
-        #print self.axis1,self.axis2
         self.filename=filename
         self.hdus=fits.open(filename)
         self.images=dict()
@@ -592,12 +472,10 @@ class OutputFile:
             self.fitExt=False
             self.runtype='Simulation Only'
             self.simInfo=FitInfo(self.hdus,False)
-            #self.counts=NumberCounts(self.hdus,False)
         else:
             self.fitExt=True
             self.runtype='Parameter Fitting'
             self.simInfo=FitInfo(self.hdus,True)
-            #self.counts=NumberCounts(self.hdus,True)
             self.MCMC=MCMCInfo(self.hdus)
             for i in range(0,3):
                 self.images['temp'] = FitImage(self.hdus,i)
@@ -619,7 +497,6 @@ class OutputFile:
         if(self.fitExt):
             print level1,"MCMC Info"
             self.MCMC.info()
-        #self.counts.info()
 
     def plotImages(self,xrange=None,yrange=None):
         for key in self.images.keys():
@@ -649,51 +526,6 @@ class OutputFile:
         plt.figure(figsize=(12,4))
         self.plotImages(xrange=xrange,yrange=yrange)
         plt.savefig(filename)
-
-    #def plotCounts(self):
-        #for i in range(1,4):
-            #plt.subplot(1,3,i)
-            #self.counts.plot(i)
-            #if(i > 1):
-                #plt.ylabel("")
-
-    #def showCounts(self,block=True):
-        #plt.figure(figsize=(16,6))
-        #self.plotCounts()
-        #plt.show(block=block)
-
-    #def saveCounts(self,filename):
-        #plt.figure(figsize=(12,5))
-        #self.plotCounts()
-        #plt.savefig(filename)
-
-    #def plot(self):
-    #    if(self.fit()):
-    #        rows=3
-    #    else:
-    #        rows=2
-    #    for i in range(1,4):
-    #        plt.subplot(rows,3,i)
-    #        self.counts.plot(i,showLegend=False)
-    #        if(i > 1):
-    #            plt.ylabel("")
-    #    
-    #    plt.subplot(rows,3,4)
-    #    self.simInfo.plotRedshift()
-    #    plt.subplot(rows,3,5)
-    #    self.simInfo.plotLuminosity()
-    #    plt.subplot(rows,3,6)
-    #    self.simInfo.plotSEDType()
-
-    #    col=0
-    #    for key in self.images.keys():
-    #        col=col+1
-    #        plt.subplot(rows,3,col+6)
-    #        self.images[key].plot(labelCbar=False)
-    #        if(col > 1):
-    #            plt.ylabel("")
-    #    #plt.gcf().set_tight_layout(True)
-    #    plt.tight_layout(True)
 
     def plot(self):
         if(self.fit()):

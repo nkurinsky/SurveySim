@@ -5,10 +5,7 @@ import os
 import sys
 import datetime
 import time
-try:
-    from astropy.io import fits
-except:
-    import pyfits as fits
+from astropy.io import fits
 
 from SurveySim.filters import *
         
@@ -139,24 +136,24 @@ class ModelFile:
 
         self.params={
             #values based on Gruppioni+2013 plus some additions (fa0)
-            'Phi0':parameter(-2.29,-3.0,-1.0,1,"Log Normalization"),
-            'L0':parameter(10.12,9.0,11.0,1,"Log Luminosity Knee"),
-            'Alpha':parameter(3.0,2.8,3.2,1,"Primary Slope"),
-            'Beta':parameter(0.52,0.4,0.6,1,"Secondary Slope"),
-            'P':parameter(-0.57,-5.0,0.0,0,"Low Z Density Evolution"),
-            'Q':parameter(3.55,0.0,5.0,0,"Low Z Luminosity Evolution"),
-            'P2':parameter(-3.92,-5.0,0.0,0,"High Z Density Evolution"),
-            'Q2':parameter(1.62,0.0,5.0,0,"High Z Luminosity Evolution"),
-            'zbp':parameter(1.1,0.0,5.0,1,"P Z Break"),
-            'zbq':parameter(1.85,0.0,5.0,1,"Q Z Break"),
-            'fa0':parameter(0.6,0.2,1.0,0,"AGN fraction at logL=12,z=0"),
-            't1':parameter(-1.3,-2.6,-0.1,0,"T1"),
-            't2':parameter(6.5,5.5,8.5,0,"T2"),
+            'Phi0':parameter(-3.248,-3.35,-3.15,0,"Log Normalization"),
+            'L0':parameter(10.85,10.75,10.95,0,"Log Luminosity Knee"),
+            'Alpha':parameter(2.6,2.4,3.2,1,"Bright-end Slope"),
+            'Beta':parameter(0.6,0.4,0.8,1,"Faint-end Slope"),
+            'P':parameter(-0.57,-6.0,6.0,0,"Low Z Density Evolution"),
+            'Q':parameter(3.55,-6.0,6.0,0,"Low Z Luminosity Evolution"),
+            'P2':parameter(-2.4,-6.0,6.0,0,"High Z Density Evolution"),
+            'Q2':parameter(0.8,-6.0,6.0,0,"High Z Luminosity Evolution"),
+            'zbp':parameter(1.1,0.5,3.5,0,"P Z Break"),
+            'zbq':parameter(1.85,0.5,3.5,0,"Q Z Break"),
+            'fa0':parameter(0.25,0.1,0.5,0,"AGN fraction at logL=12,z=0"),
+            't1':parameter(0.0,-1.0,5.0,0,"T1"),
+            't2':parameter(0.0,-6.0,6.0,0,"T2"),
             'zbt':parameter(2.0,0.8,3.5,0,"T Z Break"),
             'cexp':parameter(0.0,-3.0,3.0,1,"SED Redshift Evolution"),
             'zbc':parameter(2.0,0.0,5.0,1,"SED Redshift Evolution"),
             'fcomp':parameter(0.5,0.01,0.99,0,"Fraction of AGN Composites"),
-            'fcold':parameter(0.5,0.01,0.99,0,"Fraction of Cold SFG")
+            'fcold':parameter(0.0,0.01,0.99,1,"Fraction of Cold SFG")
         }
 
     def info(self):

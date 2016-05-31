@@ -2,7 +2,7 @@ Packages needed:
          os
 	 numpy
 	 scipy
-	 pyfits
+	 astropy
 	 matplotlib
 	 pylab
 
