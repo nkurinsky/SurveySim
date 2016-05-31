@@ -178,80 +178,89 @@ Configuration::Configuration(int argc, char *argv[]){
 
 void Configuration::print(){
 
-  printf("\n>> Printing Configuration <<\n\n");
+  if(oprint >= 1)
+    printf("\n>> Printing Configuration <<\n\n");
   //output found settings
-  if(oprint)
+  if(oprint >= 2)
     printf("Using Verbose Output\n\n");
   else
     printf("Using Concise Output\n\n");
 
-  printf("File Settings:\n");
-  printf("  Main Settings:  %s\n",modfile.c_str());
-  printf("  SED library:    %s\n",sedfile.c_str());
-  printf("  Observations:   %s\n",obsfile.c_str());
-  printf("  Output:   %s\n",outfile.c_str());
+  if(oprint >= 2){
+    printf("File Settings:\n");
+    printf("  Main Settings:  %s\n",modfile.c_str());
+    printf("  SED library:    %s\n",sedfile.c_str());
+    printf("  Observations:   %s\n",obsfile.c_str());
+    printf("  Output:   %s\n",outfile.c_str());
 
-
-  printf("\nMCMC Settings:\n");
-  printf("  Chain Number         : %lu\n", nchain);
-  printf("  Starting Temp        : %5.2f\n",temp);
-  printf("  Learning Rate        : %5.2f\n",learningRate);
-  printf("  Ideal Accept Pct     : %4.2f\n",idealpct);
-  printf("  Burn-in Step         : %lu\n",burn_step);
-  printf("  Convergence Step     : %lu\n",conv_step);
-  printf("  Run:Burn-In          : %lu\n",burn_ratio);
-  printf("  Convergence Criterion: %4.2f\n",rmax);
-  printf("  Confidence Interval  : %4.2f%%\n",1-a_ci);
- 
-  printf("\nSimulation Settings:\n");
-  printf("  Run Number Max       : %lu\n",runs);
-  printf("  Number Redshift Bins : %i\n",nz);
-  printf("  Redshift Bin Width   : %f\n",dz);
-  printf("  Area [square deg]    : %f\n",area);
-  printf("  AGN Fraction Power   : %f\n",AGNexp);
-
-  printf("\nLuminosity Function Form: ");
+    printf("\nMCMC Settings:\n");
+    printf("  Chain Number         : %lu\n", nchain);
+    printf("  Starting Temp        : %5.2f\n",temp);
+    printf("  Learning Rate        : %5.2f\n",learningRate);
+    printf("  Ideal Accept Pct     : %4.2f\n",idealpct);
+    printf("  Burn-in Step         : %lu\n",burn_step);
+    printf("  Convergence Step     : %lu\n",conv_step);
+    printf("  Run:Burn-In          : %lu\n",burn_ratio);
+    printf("  Convergence Criterion: %4.2f\n",rmax);
+    printf("  Confidence Interval  : %4.2f%%\n",1-a_ci);
+    
+    printf("\nSimulation Settings:\n");
+    printf("  Run Number Max       : %lu\n",runs);
+    printf("  Number Redshift Bins : %i\n",nz);
+    printf("  Redshift Bin Width   : %f\n",dz);
+    printf("  Area [square deg]    : %f\n",area);
+    printf("  AGN Fraction Power   : %f\n",AGNexp);
+  }
+  
+  if(oprint >= 2)
+    printf("\nLuminosity Function Form: ");
   switch(lfDist){
   case LF::distribution::Schecter:
-    printf("Schecter Function");
+    if(oprint >= 2)
+      printf("Schecter Function");
     break;
   case LF::distribution::DoublePowerLaw:
-    printf("Double Power Law");
+    if(oprint >= 2)
+      printf("Double Power Law");
     break;
   case LF::distribution::ModifiedSchecter:
-    printf("Modified Schecter Function");
+    if(oprint >= 2)
+      printf("Modified Schecter Function");
     break;
   }
-  printf("\n");
+  if(oprint >= 2)
+    printf("\n");
 
   string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT","FCOMP","FCOLD"};  
-  printf("\nLuminosity Function Parameter Settings:\n");
-  printf("Parameter\tStart\t Min \t Max \tFit\n");
-  for(int i=0;i<LUMPARS;i++){
+  if(oprint >= 2){
+    printf("\nLuminosity Function Parameter Settings:\n");
+    printf("Parameter\tStart\t Min \t Max \tFit\n");
+    for(int i=0;i<LUMPARS;i++){
+      printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
+	     pnames[i].c_str(),
+	     LFParameters[i][value],
+	     LFParameters[i][min],
+	     LFParameters[i][max],
+	     LFParameters[i][fixed] == 0.0 ? "True" : "False"
+	     );
+    }
     printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
-	   pnames[i].c_str(),
-	   LFParameters[i][value],
-	   LFParameters[i][min],
-	   LFParameters[i][max],
-	   LFParameters[i][fixed] == 0.0 ? "True" : "False"
+	   "CEXP",
+	   colorEvolution[value],
+	   colorEvolution[min],
+	   colorEvolution[max],
+	   colorEvolution[fixed] == 0.0 ? "True" : "False"
 	   );
+    printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
+	   "ZBC",
+	   colorZCut[value],
+	   colorZCut[min],
+	   colorZCut[max],
+	   colorZCut[fixed] == 0.0 ? "True" : "False"
+	   );
+    
+    printf("\nNumber Unfixed Parameters: %lu\n",nparams);
   }
-  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
-  	 "CEXP",
-  	 colorEvolution[value],
-  	 colorEvolution[min],
-  	 colorEvolution[max],
-  	 colorEvolution[fixed] == 0.0 ? "True" : "False"
-	 );
-  printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
-  	 "ZBC",
-  	 colorZCut[value],
-  	 colorZCut[min],
-  	 colorZCut[max],
-  	 colorZCut[fixed] == 0.0 ? "True" : "False"
-	 );
-
-  printf("\nNumber Unfixed Parameters: %lu\n",nparams);
   
 }
 
@@ -615,7 +624,7 @@ CompletenessCurve::CompletenessCurve(double n, double m, double b){
     _fScale=1.0;
   }
 
-  cout << "Completeness (" << bnum << "): " << _B << " " << _M << " " << _n << ", Max= " << _ulim << ", Scale=" << 1.0/_fScale << endl;
+  //cout << "Completeness (" << bnum << "): " << _B << " " << _M << " " << _n << ", Max= " << _ulim << ", Scale=" << 1.0/_fScale << endl;
   if(scaled){
     _M*=_fScale;
     _B*=_fScale;

@@ -226,7 +226,6 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
   }
   tnum=type_exts.size();
   
-  cout << "Finding Types" << endl;
   unique_ptr<sed> new_sed;  
   LOG_INFO(printf("Reading in Types:\n"));
   //for (auto itr=type_exts.begin(); itr != type_exts.end(); ++itr){

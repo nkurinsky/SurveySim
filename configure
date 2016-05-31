@@ -5396,7 +5396,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile filters/Makefile templates/Makefile lib_aux/Makefile src/alg_lib/Makefile python/Makefile python/SurveySim/Makefile python/examples/Makefile examples/Makefile docs/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile filters/Makefile templates/Makefile lib_aux/Makefile src/alg_lib/Makefile python/Makefile python/SurveySim/Makefile examples/Makefile docs/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6156,7 +6156,6 @@ do
     "src/alg_lib/Makefile") CONFIG_FILES="$CONFIG_FILES src/alg_lib/Makefile" ;;
     "python/Makefile") CONFIG_FILES="$CONFIG_FILES python/Makefile" ;;
     "python/SurveySim/Makefile") CONFIG_FILES="$CONFIG_FILES python/SurveySim/Makefile" ;;
-    "python/examples/Makefile") CONFIG_FILES="$CONFIG_FILES python/examples/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
     "docs/Makefile") CONFIG_FILES="$CONFIG_FILES docs/Makefile" ;;
 
