@@ -25,7 +25,7 @@ for fname in sys.argv[1:]:
     output.MCMC.info()
 
     clf()
-    output.saveImages(newdir+'/images')
+    #output.saveImages(newdir+'/images')
     if(output.fit()):
         output.MCMC.saveFit(newdir+'/fit')
         output.MCMC.saveFit(newdir+'/lffit',mode='lf')

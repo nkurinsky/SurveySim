@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import pyfits as fits
+import sys
+from astropy.io import fits
 from matplotlib import gridspec
 import matplotlib.cm as cm
 import matplotlib
@@ -16,7 +17,12 @@ import Tkinter as tk
 from matplotlib.colors import Normalize
 
 from SurveySim.OutputFile import *
-from SurveySim.ModelFile import keyPrint
+
+if(len(sys.argv) < 2):
+    print "Calling Sequence: "+sys.argv[0]+" outputfile"
+    quit()
+else:
+    ofile=sys.argv[1]
 
 class MidpointNormalize(Normalize):
     def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
@@ -92,28 +98,7 @@ def showImages(obs,block=True,xrange=None,yrange=None,axis1_name=None,axis2_name
     plotImages(obs,xrange=xrange,yrange=yrange,axis1_name=axis1_name,axis2_name=axis2_name,annotateXY=annotateXY,cmax=cmax)
     plt.show(block=block)
 
-toPlot='mips'
-if(toPlot == 'mips'):
-    ofile='/Users/kurinsky/Desktop/F_mips_output.fits'
-    output=OutputFile(ofile)
-    axis1_name=r'log($S_{24}$/mJy)'
-    axis2_name=r'log($S_{250}/S_{24}$)'
-    showImages(output,
-               xrange=[-1.3,1.0],
-               yrange=[0.5,3],
-               axis1_name=axis1_name,
-               axis2_name=axis2_name,
-               annotateXY=(-0.7,3*0.85))
-
-elif(toPlot == 'spire'):
-    ofile='Final_output_2/E_spire_output.fits'
-    output=OutputFile(ofile)
-    axis1_name=r'log($S_{250}$/mJy)'
-    axis2_name=r'log($S_{350}/S_{250}$)'
-    showImages(output,
-               xrange=[0.9,2.8],
-               yrange=[-1.0,1.0],
-               axis1_name=axis1_name,
-               axis2_name=axis2_name,
-               annotateXY=(1.35,0.65))
-
+output=OutputFile(ofile)
+axis1_name=r'log($S_{24}$/mJy)'
+axis2_name=r'log($S_{250}/S_{24}$)'
+showImages(output,xrange=[-1.3,1.0],yrange=[0.5,3],axis1_name=axis1_name,axis2_name=axis2_name,annotateXY=(-0.7,3*0.85))
