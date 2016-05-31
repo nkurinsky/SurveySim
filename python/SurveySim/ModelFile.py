@@ -312,11 +312,9 @@ class ModelFile:
 
         thdulist=fits.HDUList([fits.PrimaryHDU(header=hdr),tbhdu])
         if(os.path.isfile(self.filename)):
-            print 'Replacing existing model file'
             os.remove(self.filename)
             thdulist.writeto(self.filename);
         else:
-            print 'Writing a new model file'
             thdulist.writeto(self.filename);
 
     def run(self,obsfile,templatefile="/usr/local/surveysim/templates/default_templates.fits",outfile="output.fits",printInfo=False):

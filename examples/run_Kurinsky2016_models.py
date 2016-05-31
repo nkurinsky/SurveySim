@@ -216,7 +216,7 @@ outfile=simname+"_output.fits"
 #=============================================================================
 #level of verbosity: 0=critical info only -> 3=debug mode
 #-----------------------------------------------------------------------------
-mod.settings['verbosity']=3
+mod.settings['verbosity']=0
 mod.filename=mfile
 mod.update()
 mod.run(obsfile,outfile=outfile,templatefile=codedir+"templates/default_templates.fits")
