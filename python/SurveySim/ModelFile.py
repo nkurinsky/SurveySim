@@ -200,7 +200,7 @@ class ModelFile:
     def setLF(self,type):
         if(type == 'DoublePowerLaw'):
             self.survey['lfForm']=0
-        elif (type == "ModifiedSchecter"):
+        elif (type == "ModifiedSchechter"):
             self.survey['lfForm']=1
         elif (type == "Schechter"):
             self.survey['lfForm']=2
