@@ -126,8 +126,10 @@ class ModelFile:
             'learningRate':1.0}
         self.settings={
             'runs':1e4,
+            'extraRuns':0,
             'nchain':5,
             'burnRatio':10,
+            'adaptive':1,
             'verbosity':2}
 
 #flags whether or not to include Composite and/or Cold Starbursts in model
@@ -230,9 +232,14 @@ class ModelFile:
         self.redshift['delta']=phdr['DZ']
 
         self.settings['runs']=phdr['RUNS']
+        try:
+            self.settings['extraRuns']=phdr['EXRUNS']
+        except ...:
+            self.settings['extraRuns']=0
         self.settings['burnRatio']=phdr['BURNVRUN']
         self.settings['nchain']=phdr['NCHAIN']
         self.settings['verbosity']=phdr['PRINT']
+        self.settings['adaptive']=phdr['ADAPTIVE']
 
         self.annealing['temp']=phdr['TEMP']
         self.annealing['learningRate']=phdr['LRATE']
@@ -293,6 +300,7 @@ class ModelFile:
         hdr.set('ZMAX',self.redshift['max'],'Simulation maximum redshift')
         hdr.set('DZ',self.redshift['delta'],'Redshift Bin Width')
         hdr.set('RUNS',self.settings['runs'],'Number of runs')
+        hdr.set('EXRUNS',self.settings['extraRuns'],'Number of runs past convergence')
 
         hdr.set('NCHAIN',self.settings['nchain'],'Chain Number')
 
@@ -307,6 +315,7 @@ class ModelFile:
         hdr.set('BURN_STE',self.annealing['burn_step'],'Steps btw anneal calls in burn-in')
         hdr.set('BURNVRUN',self.settings['burnRatio'],'Ratio of normal to burn-in steps')
         hdr.set('PRINT',self.settings['verbosity'],'Print level (0=silent,3=debug)')
+        hdr.set('ADAPTIVE',self.settings['adaptive'],'Whether to adjust covariance matrix (0=no,1=yes)')
 
         hdr['HISTORY']='Created on: '+time.strftime("%c") #get current date+time
 
