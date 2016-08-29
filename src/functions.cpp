@@ -337,9 +337,18 @@ void Configuration::load(){
     runs = static_cast<unsigned long>(rtemp);
   }
   catch(CCfits::HDU::NoSuchKeyword){
-    printf("Value of \"RUNS\" invalud, defaulting to 1000\n");
+    printf("Value of \"RUNS\" invalid, defaulting to 1000\n");
     runs=1000;
   }
+
+  try{
+    tab.readKey("EXRUNS",rtemp);
+    extra_runs = static_cast<unsigned long>(rtemp);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    extra_runs=0;
+  }
+
   try{
     tab.readKey("SIGSIZE",sigmaSize);
   }
@@ -351,6 +360,14 @@ void Configuration::load(){
   }
   catch(CCfits::HDU::NoSuchKeyword){
     AGNexp=12.0;
+  }
+
+  try{
+    tab.readKey("ADAPTIVE",rtemp);
+    adaptive = (rtemp == 1);
+  }
+  catch(CCfits::HDU::NoSuchKeyword){
+    adaptive=true;
   }
 
   try{

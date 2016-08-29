@@ -102,6 +102,7 @@ public:
   bool vary_cexp;
   bool vary_zbc;
   bool simflag;
+  bool adaptive;
   int oprint;
 
   int nz;
@@ -109,6 +110,7 @@ public:
   int cind;
   int zbcind;
   unsigned long runs;
+  unsigned long extra_runs;
   unsigned long nchain;
   unsigned long burn_step;
   unsigned long burn_ratio;

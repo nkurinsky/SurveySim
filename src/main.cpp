@@ -175,7 +175,8 @@ int main(int argc,char** argv){
 	    for(pi=0;pi<q.nparams;pi++)
 	      pcurrent[m][pi]=ptemp[m][pi];
 	  
-	  burnchain.add_link(m,ptemp[m],trial,accept);
+	  if(accept)
+	    burnchain.add_link(m,ptemp[m],trial,accept);
 	  fflush(stdout);
 	}
 	
@@ -183,8 +184,6 @@ int main(int argc,char** argv){
 	  LOG_INFO(printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature()));
 	  if(not metrop.anneal())
 	    i = q.runs;
-	  //burnchain.get_stdev(pset.sigma.data());
-	  //burnchain.get_covariance(pset.covar);
 	}
 	fflush(stdout);
       }
@@ -224,8 +223,11 @@ int main(int argc,char** argv){
 	  
 	  accept = metrop.accept(m,trial);
 	  
-	  mcchain.add_link(m,ptemp[m],trial,accept);
-	  counts.add_link(output.dnds,trial);
+	  //DEBUG only track accepted steps
+	  if(accept){
+	    mcchain.add_link(m,ptemp[m],trial,accept);
+	    counts.add_link(output.dnds,trial);
+	  }
 	  
 	  if(accept){
 	    LOG_DEBUG(printf(" -- Accepted\n"));
@@ -243,7 +245,8 @@ int main(int argc,char** argv){
 	  if (i < q.burn_num)
 	    metrop.anneal();
 	  mcchain.get_stdev(pset.sigma.data());
-	  mcchain.get_covariance(pset.covar);
+	  if(q.adaptive)
+	    mcchain.get_covariance(pset.covar);
 	  if(mcchain.converged()){
 	    LOG_INFO(printf("Chains Converged!\n"));
 	    i = q.runs;}
@@ -253,6 +256,50 @@ int main(int argc,char** argv){
 	fflush(stdout);
       }
       
+      for (i=0;i<q.extra_runs;i++){
+	for (m=0;m<q.nchain;m++){
+	  
+	  vector<double> results;
+	  for(pi = 0;pi<q.nparams;pi++)
+	    means[pi] = pcurrent[m][pi];
+	  rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+	  for(pi = 0;pi<q.nparams;pi++){
+	    *(setvars[pi]) = ptemp[m][pi] = results[pi];
+	  }
+	  
+	  LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
+	  for(pi=0;pi<q.nparams;pi++)
+	    LOG_DEBUG(printf(" %lf",ptemp[m][pi]));
+	    LOG_DEBUG(printf(" : "));
+	  
+	  lf.set_params(lpars);
+	  survey.set_color_exp(CE,ZBC);
+	  survey.set_fagn_pars(lpars);
+	  
+	  output=survey.simulate();
+	  trial=output.chisqr;
+	  LOG_DEBUG(printf("Model Chi-Square: %lf",trial));
+	  
+	  accept = metrop.accept(m,trial);
+	  
+	  //DEBUG only track accepted steps
+	  if(accept){
+	    mcchain.add_link(m,ptemp[m],trial,accept);
+	    counts.add_link(output.dnds,trial);
+	  }
+	  
+	  if(accept){
+	    LOG_DEBUG(printf(" -- Accepted\n"));
+	    for(pi=0;pi<q.nparams;pi++)
+	      pcurrent[m][pi]=ptemp[m][pi];
+	  }
+	  else
+	    LOG_DEBUG(printf(" -- Rejected\n"));
+
+	  fflush(stdout);
+	} 
+      }
+
       mcchain.get_best_link(pset.best.data(),chi_min);
       
       LOG_INFO(printf("Best fit:\n"));
