@@ -244,9 +244,12 @@ int main(int argc,char** argv){
 	  LOG_INFO(printf("Checking Convergence\n"));
 	  if (i < q.burn_num)
 	    metrop.anneal();
-	  mcchain.get_stdev(pset.sigma.data());
-	  if(q.adaptive)
+	  printf("Get Sigma\n");
+	  
+	  if(q.adaptive){
+	    mcchain.get_stdev(pset.sigma.data());
 	    mcchain.get_covariance(pset.covar);
+	  }
 	  if(mcchain.converged()){
 	    LOG_INFO(printf("Chains Converged!\n"));
 	    i = q.runs;}

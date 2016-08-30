@@ -234,12 +234,15 @@ class ModelFile:
         self.settings['runs']=phdr['RUNS']
         try:
             self.settings['extraRuns']=phdr['EXRUNS']
-        except ...:
+        except:
             self.settings['extraRuns']=0
         self.settings['burnRatio']=phdr['BURNVRUN']
         self.settings['nchain']=phdr['NCHAIN']
         self.settings['verbosity']=phdr['PRINT']
-        self.settings['adaptive']=phdr['ADAPTIVE']
+        try:
+            self.settings['adaptive']=phdr['ADAPTIVE']
+        except:
+            self.settings['adaptive']=1
 
         self.annealing['temp']=phdr['TEMP']
         self.annealing['learningRate']=phdr['LRATE']
