@@ -246,9 +246,11 @@ void MCChains::get_covariance(vector<vector<double> > &covar){
 	mean += values[i].back();
       }
     }
-    mean /= static_cast<double>(values[i].size());
-    for(vector<double>::iterator val = values[i].begin(); val != values[i].end(); val++){
-      *val = *val-mean;
+    if(values[i].size() > 0){
+      mean /= static_cast<double>(values[i].size());
+      for(vector<double>::iterator val = values[i].begin(); val != values[i].end(); val++){
+	*val = *val-mean;
+      }
     }
   }
 
@@ -289,7 +291,7 @@ bool MCChains::converged(){
   double R, CIt;
   double* pararray;
   double* totarray;
-  int j,k,n,itot,cbase,upper,lower;
+  int j,k,n,m,itot,cbase,upper,lower;
   size_t sortsize;
   int totlength=0;
   double CI,CIm=0;
@@ -304,11 +306,12 @@ bool MCChains::converged(){
     CIm = 0;
     for (j=0;j<nchains;j++){
       n = int(chainlength[j]/2);
+      m = chainlength[j]-n;
       pararray = new double[n];
       cbase = j*chainwidth+i;
-      for (k=n;k<chainlength[j];k++){
+      for (k=m;k<chainlength[j];k++){
 	totarray[itot] = chains[cbase][k];
-	pararray[k-n] = chains[cbase][k];
+	pararray[k-m] = chains[cbase][k];
 	itot++;
       }
       //m chain math
