@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.63])
 
-AC_INIT([SurveySim], [1.0], [nkurinsky91@gmail.com])
+AC_INIT([SurveySim], [1.1], [nkurinsky91@gmail.com])
 AC_CONFIG_SRCDIR([src/constants.h])
 
 AM_MAINTAINER_MODE([disable])
