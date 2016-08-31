@@ -301,6 +301,9 @@ class MCMCInfo:
             for i in range(0,self.ChainNum):
                 gpts=np.where(self.ChiSquares[i] < cmed)
                 self.Parameters[p0].extend(params[p0+str(i)][gpts])
+        gpts=np.where(np.array(self.Parameters[self.Parameters.keys()[0]]) != 0)
+        for k in self.Parameters.keys():
+            self.Parameters[k]=(np.array(self.Parameters[k])[gpts[0]]).tolist()
 
         for k,v in self.Parameters.iteritems():
             self.BestFit[k]={'mean':np.mean(self.Parameters[k]),
