@@ -103,7 +103,7 @@ int main(int argc,char** argv){
     unique_ptr<string[]> parnames (new string[q.nparams]);
     vector<double> results,means(q.nparams);
     
-    ResultChain counts(3,q.nchain*q.runs);
+    //ResultChain counts(3,q.nchain*q.runs);
     MetropSampler metrop(q.nchain,q.temp,q.learningRate,q.idealpct,q.annrng,q.oprint);    
 
     if(q.nparams > 0){ //observations provided, not all parameters fixed
@@ -223,10 +223,10 @@ int main(int argc,char** argv){
 	  
 	  accept = metrop.accept(m,trial);
 	  
-	  //DEBUG only track accepted steps
+	  //only track accepted steps
 	  if(accept){
 	    mcchain.add_link(m,ptemp[m],trial,accept);
-	    counts.add_link(output.dnds,trial);
+	    //counts.add_link(output.dnds,trial);
 	  }
 	  
 	  if(accept){
@@ -285,10 +285,10 @@ int main(int argc,char** argv){
 	  
 	  accept = metrop.accept(m,trial);
 	  
-	  //DEBUG only track accepted steps
+	  //only track accepted steps
 	  if(accept){
 	    mcchain.add_link(m,ptemp[m],trial,accept);
-	    counts.add_link(output.dnds,trial);
+	    //counts.add_link(output.dnds,trial);
 	  }
 	  
 	  if(accept){
@@ -360,7 +360,7 @@ int main(int argc,char** argv){
 	LOG_INFO(printf("  Saving new minimum (%lu/%lu)\n",i,q.nsim));
 	saved = survey.save(q.outfile);
       }
-      final_counts.add_link(output.dnds,output.chisqr);
+      //final_counts.add_link(output.dnds,output.chisqr);
 
       if( i % 100 == 0){
 	LOG_DEBUG(printf("  (%lu/%lu)\n",i,q.nsim));
