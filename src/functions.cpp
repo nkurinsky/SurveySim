@@ -191,6 +191,7 @@ Configuration::Configuration(int argc, char *argv[]){
   }
   
   load();
+  gsl_set_error_handler_off();
 
   if(force_verbose)
     oprint=2;
@@ -596,8 +597,12 @@ void RandomNumberGenerator::gaussian_mv(const vector<double> &mean, const vector
     gsl_vector_set(_mean, k, mean[k]);
   }
 
-  gsl_linalg_cholesky_decomp(_covar);
-  
+  int status = gsl_linalg_cholesky_decomp(_covar);
+  if(status){
+    printf("ERROR: Covariance matrix appears to be un-invertible. Increase your convergence step length to better sample the posterior such that you have enough samples to create a non-singular matrix at first matrix update.\nExiting...\n");
+    exit(1);
+  }
+
   bool in_range;
   do{
     for(k=0; k<n; k++)
