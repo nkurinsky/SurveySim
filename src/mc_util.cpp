@@ -81,14 +81,12 @@ bool MetropSampler::accept(int chainnum, double trial){
   return accepted;
 }
 
-long MetropSampler::min_number_accepted(){
-  long lmin=accept_total[0];
+long MetropSampler::mean_number_accepted(){
+  long ltot=accept_total[0];
   for (int i=1;i<nchains;i++){
-    if(accept_total[i] < lmin){
-      lmin=accept_total[i];
-    }
+    ltot+=accept_total[i];
   }
-  return lmin;
+  return ltot/nchains;
 }
 
 double MetropSampler::acceptance(int chainnum){

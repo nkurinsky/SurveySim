@@ -242,13 +242,15 @@ int main(int argc,char** argv){
 	  fflush(stdout);
 	}
 	
-	acceptMin = metrop.min_number_accepted();
-	if(((acceptMin) % q.conv_step) == 0 and (acceptMin != lastAcceptMin)){
+	if((i+1) % q.conv_step){
+	  if (i < q.burn_num)
+            metrop.anneal();
+	}
+
+	acceptMin = metrop.mean_number_accepted();
+	if(((acceptMin) % q.conv_step == 0) and (acceptMin != lastAcceptMin)){
 	  lastAcceptMin=acceptMin;
 	  LOG_INFO(printf("Checking Convergence\n"));
-	  if (i < q.burn_num)
-	    metrop.anneal();
-	  printf("Get Sigma\n");
 	  
 	  if(q.adaptive){
 	    mcchain.get_stdev(pset.sigma.data());
@@ -305,6 +307,13 @@ int main(int argc,char** argv){
 
 	  fflush(stdout);
 	} 
+
+	acceptMin = metrop.mean_number_accepted();
+        if(((acceptMin) % q.conv_step == 0) and (acceptMin != lastAcceptMin)){
+          lastAcceptMin=acceptMin;
+          LOG_INFO(printf("Checking Convergence\n"));
+	  mcchain.converged();
+        }
       }
 
       mcchain.get_best_link(pset.best.data(),chi_min);
