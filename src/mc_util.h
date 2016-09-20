@@ -45,7 +45,6 @@ class MetropSampler {
   int logflag;
   MetropSampler(int nchains,double initTemp, double learningRate, double idealpct, double acpt_buf,int logflag);
   bool accept(int chainnum, double trial);
-  long min_number_accepted();
   double acceptance(int chainnum);
   double mean_acceptance();
   double acceptance_rate();

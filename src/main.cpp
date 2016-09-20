@@ -29,8 +29,6 @@ int main(int argc,char** argv){
   bool saved=false;
   unsigned long i,m;
   unsigned long pi;
-  long acceptMin=0;
-  long lastAcceptMin=-1;
   double trial;
 
   //this array holds phi0,L0,alpha,beta,p, and q
@@ -242,9 +240,7 @@ int main(int argc,char** argv){
 	  fflush(stdout);
 	}
 	
-	acceptMin = metrop.min_number_accepted();
-	if(((acceptMin) % q.conv_step) == 0 and (acceptMin != lastAcceptMin)){
-	  lastAcceptMin=acceptMin;
+	if(((i+1) % q.conv_step) == 0){
 	  LOG_INFO(printf("Checking Convergence\n"));
 	  if (i < q.burn_num)
 	    metrop.anneal();
