@@ -224,6 +224,7 @@ void Configuration::print(){
     printf("  Run:Burn-In          : %lu\n",burn_ratio);
     printf("  Convergence Criterion: %4.2f\n",rmax);
     printf("  Confidence Interval  : %4.2f%%\n",1-a_ci);
+    printf("  End Extra Runs       : %lu\n", extra_runs);
     
     printf("\nSimulation Settings:\n");
     printf("  Run Number Max       : %lu\n",runs);
