@@ -57,6 +57,7 @@ class sed_lib{
   double color_evolution;
   //filter convolution and interpolation (for speed)
   filter_lib filters;
+  vector<string> types;
   void initialize_filter_fluxes(int logflag);
   double interpolate_flux(double lum, double redshift, short sedtype, short filter_id);
   double convolve_filter(short lum_id, double redshift, short sedtype, short filter_id);
@@ -69,21 +70,14 @@ class sed_lib{
   double get_flux(double lum, double redshift, short sedtype, double band);
   double get_filter_flux(double lum, double redshift, short sedtype, short filter_id);
   void set_color_evolution(double exp, double zcut=1000);
-  double get_color_exp(){
-    return color_exp;
-  }
-  double get_color_zcut(){
-    return color_zcut;
-  }
-  int get_lnum(){
-    return lnum;}
+  double get_color_exp() {return color_exp;}
+  double get_color_zcut() {return color_zcut;}
+  int get_lnum() {return lnum;}
+  unordered_map<string, double> get_fracs();
   double get_dl();
   void get_lums(double luminosities[]);
-  int get_tnum(){
-    return tnum;
-  }
-  int get_snum(){
-    return seds.size();}
+  int get_tnum() {return tnum;}
+  int get_snum() {return seds.size();}
   ~sed_lib();
 };
 

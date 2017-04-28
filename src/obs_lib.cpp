@@ -67,13 +67,13 @@ obs_lib::obs_lib(string fitsfile, axis_type axes[], double flim[]){
       num = cnum;
       try{table.readKey("F"+num+"COL",column[i]);}
       catch(HDU::NoSuchKeyword){
-	printf("Keyword F%sCOL missing from header (%s)\n",num.c_str(),fitsfile.c_str());
-	exit(1);
+	      printf("Keyword F%sCOL missing from header (%s)\n",num.c_str(),fitsfile.c_str());
+	      exit(1);
       }
       try{table.readKey("EF"+num+"COL",column[i+3]);}
       catch(HDU::NoSuchKeyword){
-	printf("Keyword EF%sCOL missing from header (%s)\n",num.c_str(),fitsfile.c_str());
-	exit(1);
+	      printf("Keyword EF%sCOL missing from header (%s)\n",num.c_str(),fitsfile.c_str());
+	      exit(1);
       }
     }
     

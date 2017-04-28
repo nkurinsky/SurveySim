@@ -28,7 +28,7 @@ sed::sed(double * f,double *bands, int bnum, double *z, int znum) : sed(){
   fs.setcontent(bnum*znum,f);
 
   try{
-  alglib::spline2dbuildbilinearv(bs,bnum,zs,znum,fs,1,s);
+    alglib::spline2dbuildbilinearv(bs,bnum,zs,znum,fs,1,s);
   }catch(alglib::ap_error e){
     printf("ERROR: Failed to create interpolation for SED\n");
     printf("error msg: %s\n", e.msg.c_str());
@@ -98,7 +98,7 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
     pfits.reset(new FITS(fitsfile));
   }
   catch(CCfits::FITS::CantOpen){
-    cout << "Cannot open "<< fitsfile << endl;
+    cout << "Cannot open " << fitsfile << endl;
     exit(1);
   }
 
@@ -137,7 +137,6 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
 
   vector<double> zmins;
   vector<double> zmaxs;
-  vector<string> types;
 
   //read SED types
   string type;
@@ -220,7 +219,7 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
     for (auto ext=extensions.begin();ext != extensions.end();++ext){
       std::size_t found = ext->first.find(*itype);
       if (found!=std::string::npos){
-	type_exts[*itype].push_back(ext->first);
+	      type_exts[*itype].push_back(ext->first);
       }      
     }
   }
@@ -232,7 +231,6 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
   for(auto itr=types.begin();itr != types.end();++itr){
     if(type_exts.count(*itr) == 0)
       continue;
-
     int type_len=itr->length();
     vector<double> lambda;
     vector<double> zs;
@@ -260,22 +258,22 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
       vector<double> fluxtemp;
       vector<double> fluxes;
       for(auto eitr=type_exts[*itr].begin();eitr!=type_exts[*itr].end();eitr++){
-	extensions.find(*eitr)->second->column(i).read(fluxtemp,0,tablelength);
-	for(unsigned int i=0;i<fluxtemp.size();i++){
-	  fluxes.push_back(fluxtemp[i]);
-	}
+	      extensions.find(*eitr)->second->column(i).read(fluxtemp,0,tablelength);
+	      for(unsigned int i=0;i<fluxtemp.size();i++){
+	        fluxes.push_back(fluxtemp[i]);
+	      }
       }
       if(zs.size() > 1)
-	new_sed.reset(new sed(fluxes.data(),
+	  	new_sed.reset(new sed(fluxes.data(),
 			      lambda.data(),
 			      lambda.size(),
 			      zs.data(),
 			      zs.size()));
       else
-	new_sed.reset(new sed(fluxes.data(),
+	    new_sed.reset(new sed(fluxes.data(),
 			      lambda.data(),
 			      lambda.size()));
-      seds.push_back(move(new_sed));
+            	  seds.push_back(move(new_sed));
     }
   }
 
@@ -283,13 +281,17 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
 }
 
 bool sed_lib::load_filters(string file,int lflag_tmp){
-  if(filters.load_filters(file,lflag_tmp)){
-    logflag=lflag_tmp;
+  if(filters.load_filters(file, lflag_tmp, types)){
+    logflag = lflag_tmp;
     w = gsl_integration_workspace_alloc(SL_INT_SIZE);
     return true;
   }
   
   return false;
+}
+
+unordered_map<string, double> sed_lib::get_fracs() {
+  return filters.get_fracs();
 }
 
 void sed_lib::get_filter_info(string names[], double limits[], double errors[], double skewErrs[]){
@@ -377,7 +379,7 @@ sed_lib::~sed_lib(){
   
   if(filters.init())
     gsl_integration_workspace_free(w);
-}
+} 
 
 void sed_lib::initialize_filter_fluxes(int logflag){
   //vector contains alg_lib interpolation class
@@ -426,9 +428,9 @@ double sed_lib::interpolate_flux(double lum, double redshift, short sedtype, sho
     
     if(color_zcut > 0.0){
       if(redshift < color_zcut)
-	retval *= pow((1.0+redshift),color_exp);
+	      retval *= pow((1.0+redshift),color_exp);
       else
-	retval *= color_evolution;
+	      retval *= color_evolution;
     }
   }
   catch(alglib::ap_error e){

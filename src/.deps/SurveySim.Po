@@ -1,4 +1,4 @@
-functions.o: functions.cpp functions.h \
+SurveySim.o: SurveySim.cpp SurveySim.h functions.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/cstdio \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__config \
   /usr/include/stdio.h /usr/include/sys/cdefs.h \
@@ -234,7 +234,16 @@ functions.o: functions.cpp functions.h \
   /usr/local/include/gsl/gsl_blas_types.h \
   /usr/local/include/gsl/gsl_cblas.h /usr/local/include/gsl/gsl_linalg.h \
   /usr/local/include/gsl/gsl_mode.h \
-  /usr/local/include/gsl/gsl_permutation.h
+  /usr/local/include/gsl/gsl_permutation.h simulator.h fracs.h \
+  lumfunct.h obs_lib.h sed_lib.h filters.h cosmo.h constants.h \
+  alg_lib/interpolation.h alg_lib/ap.h /usr/include/setjmp.h \
+  alg_lib/alglibinternal.h alg_lib/alglibmisc.h alg_lib/linalg.h \
+  alg_lib/solvers.h alg_lib/optimization.h alg_lib/specialfunctions.h \
+  alg_lib/integration.h hist_lib.h numberCounts.h simulator_utils.h \
+  mc_util.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/deque
+
+SurveySim.h:
 
 functions.h:
 
@@ -843,3 +852,49 @@ functions.h:
 /usr/local/include/gsl/gsl_mode.h:
 
 /usr/local/include/gsl/gsl_permutation.h:
+
+simulator.h:
+
+fracs.h:
+
+lumfunct.h:
+
+obs_lib.h:
+
+sed_lib.h:
+
+filters.h:
+
+cosmo.h:
+
+constants.h:
+
+alg_lib/interpolation.h:
+
+alg_lib/ap.h:
+
+/usr/include/setjmp.h:
+
+alg_lib/alglibinternal.h:
+
+alg_lib/alglibmisc.h:
+
+alg_lib/linalg.h:
+
+alg_lib/solvers.h:
+
+alg_lib/optimization.h:
+
+alg_lib/specialfunctions.h:
+
+alg_lib/integration.h:
+
+hist_lib.h:
+
+numberCounts.h:
+
+simulator_utils.h:
+
+mc_util.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/deque:

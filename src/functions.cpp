@@ -129,12 +129,18 @@ double metric_value(const double& f1,const double &f2,const double &f3,const axi
   }
   
 }
-
+/*
 string toLower(const string &oldstr){
   string newstr(oldstr);
   for(string::iterator it = newstr.begin(); it != newstr.end(); it++)
     *it = tolower(*it);
   return newstr;
+}*/
+
+string toLower(string s) {
+  for (int i = 0; i < s.length(); i++)
+    s[i] = tolower(s[i]);
+  return s;
 }
 
 Configuration::Configuration(int argc, char *argv[]){
@@ -171,12 +177,12 @@ Configuration::Configuration(int argc, char *argv[]){
     }
     else if((argv[i][0] == '-') and (argv[i][1] == 'o')){
       if(i+1 < argc){
-	outfile = argv[i+1];
-	i+=2;
+	      outfile = argv[i+1];
+	      i+=2;
       }
-      else{
-	fprintf(stderr,"ERROR: Please enter output file name after -o\n");
-	exit(1);
+    else{
+    	fprintf(stderr,"ERROR: Please enter output file name after -o\n");
+	    exit(1);
       }
     }
     else if (i >= 3){
@@ -195,6 +201,11 @@ Configuration::Configuration(int argc, char *argv[]){
 
   if(force_verbose)
     oprint=2;
+/*
+  multithread = true;
+  if (multithread) {
+    nthreads = thread::hardware_concurrency() - 1 < 0 ? 0 : thread::hardware_concurrency() - 1;
+  }*/
 }
 
 void Configuration::print(){
