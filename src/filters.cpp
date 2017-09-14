@@ -134,17 +134,16 @@ filter_lib::filter_lib(){
 }
 
 filter_lib::filter_lib(string fitsfile,int logflag){
-  if(load_filters(fitsfile,logflag)){
+  /*if(load_filters(fitsfile, logflag)){
     initialized = true;
-  }
-  else{
-    printf("ERROR: file \"%s\" not read successfully, library not initialized\n",fitsfile.c_str());
+  } else {
+    printf("ERROR: file \"%s\" not read successfully, library not initialized\n", fitsfile.c_str());
     initialized = false;
-  }
+  }*/
+  cout << "Uncomment this function! \n";
 }
 
-bool filter_lib::load_filters(string fitsfile,int logflag){
-
+bool filter_lib::load_filters(string fitsfile, int logflag, vector<string> types) {
   std::unique_ptr<CCfits::FITS> pInfile;
   try{
     pInfile.reset(new CCfits::FITS(fitsfile,CCfits::Read,true));
@@ -167,28 +166,28 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
   double units[] = {1.0,1.0,1.0};
   long tablelength = filters.rows();
   
-  string bands[] = {"BAND_1","BAND_2","BAND_3"};
-  string unitKeys[] = {"UNITS1","UNITS2","UNITS3"};
-  string limitKeys[] = {"LIMIT1","LIMIT2","LIMIT3"};
-  string errorKeys[] = {"ERROR1","ERROR2","ERROR3"};
+  string bands[]      = {"BAND_1","BAND_2","BAND_3"};
+  string unitKeys[]   = {"UNITS1","UNITS2","UNITS3"};
+  string limitKeys[]  = {"LIMIT1","LIMIT2","LIMIT3"};
+  string errorKeys[]  = {"ERROR1","ERROR2","ERROR3"};
   string serrorKeys[] = {"SERROR1","SERROR2","SERROR3"};
-  for(int i=0;i<3;i++){
+  for (int i = 0; i < 3; i++) { 
 
     //reading units, defaults to units in mJy
     try{
       string stemp;
       head.readKey(unitKeys[i],stemp);
       if(toLower(stemp) == "jy"){
-	units[i]=1e3;
+	      units[i]=1e3;
       }
       else if(toLower(stemp) == "mjy"){
-	units[i]=1.0;
+	      units[i]=1.0;
       }
       else if(toLower(stemp) == "ujy"){
-	units[i]=1e-3;
+	      units[i]=1e-3;
       }
       else{
-	LOG_CRITICAL(printf("Keyword \"%s\" contains unknown unit, defaulting to standard units mJy\n",unitKeys[i].c_str()));
+	      LOG_CRITICAL(printf("Keyword \"%s\" contains unknown unit, defaulting to standard units mJy\n",unitKeys[i].c_str()));
       }
     }
     catch(...){
@@ -259,8 +258,8 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     int num = floor(i/2);
     if(band.back() <= 0.0){
       while(band.back() <= 0.0){
-	band.pop_back();
-	transmission.pop_back();
+	      band.pop_back();
+	      transmission.pop_back();
       }
     }
     for(unsigned int j=0;j<band.size();j++){
@@ -270,6 +269,17 @@ bool filter_lib::load_filters(string fitsfile,int logflag){
     if(not this->filters[num].load(bands[num],band,transmission,logflag) ){
       printf("Error loading filter %i from %s, exiting\n",i,fitsfile.c_str());
       exit(1);
+    }
+  }
+
+  // Read in frac data 
+  for (string type : types) {
+    double frac;
+    try {
+      head.readKey("F" + type, frac);
+      fracs[type] = frac;
+    } catch (...) {
+      LOG_CRITICAL(printf("Error reading keyword \"F%s\". Please specify a fraction for every SED type in filters header.\n", type.c_str()));
     }
   }
 

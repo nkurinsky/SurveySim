@@ -3,7 +3,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include "agn_frac.h"
+#include "fracs.h"
 #include "obs_lib.h"
 #include "sed_lib.h"
 #include "lumfunct.h"
@@ -15,12 +15,12 @@
 #include "simulator_utils.h"
 
 class simulator{
-private:
+ private:
   products last_output;
   vector<sprop> sources;
   //bool simulated;
   lumfunct *lf;
-  std::unique_ptr<agn_frac> fagns;
+  std::unique_ptr<fracs> fracData;
   std::unique_ptr<sed_lib> seds;
   std::unique_ptr<obs_lib> observations;
   std::unique_ptr<hist_lib> diagnostic;

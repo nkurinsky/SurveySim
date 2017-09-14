@@ -159,7 +159,7 @@ MCChains::MCChains(int nchains, int npars, int nruns, int convstep){
   alpha = 0.05;
 }
 
-bool MCChains::add_link(int chain, double pars[], double chisqr, bool accpt){
+bool MCChains::add_link(int chain, vector<double> pars, double chisqr, bool accpt){
   static int cbase;
   
   if (chain >= nchains){

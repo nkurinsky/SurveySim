@@ -89,11 +89,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_SurveySim_OBJECTS = agn_frac.$(OBJEXT) main.$(OBJEXT) \
-	cosmo.$(OBJEXT) functions.$(OBJEXT) filters.$(OBJEXT) \
-	hist_lib.$(OBJEXT) lumfunct.$(OBJEXT) mc_util.$(OBJEXT) \
-	obs_lib.$(OBJEXT) sed_lib.$(OBJEXT) simulator.$(OBJEXT) \
-	simulator_utils.$(OBJEXT) numberCounts.$(OBJEXT)
+am_SurveySim_OBJECTS = SurveySim.$(OBJEXT) fracs.$(OBJEXT) \
+	main.$(OBJEXT) cosmo.$(OBJEXT) functions.$(OBJEXT) \
+	filters.$(OBJEXT) hist_lib.$(OBJEXT) lumfunct.$(OBJEXT) \
+	mc_util.$(OBJEXT) obs_lib.$(OBJEXT) sed_lib.$(OBJEXT) \
+	simulator.$(OBJEXT) simulator_utils.$(OBJEXT) \
+	numberCounts.$(OBJEXT)
 SurveySim_OBJECTS = $(am_SurveySim_OBJECTS)
 SurveySim_DEPENDENCIES = ./alg_lib/libalglib.a
 AM_V_P = $(am__v_P_@AM_V@)
@@ -303,7 +304,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTION = foreign
 SUBDIRS = alg_lib
 AM_CXXFLAGS = -Wall -I/usr/local/include -I./ -I./alg_lib -std=c++11 -g
-SurveySim_SOURCES = agn_frac.h constants.h cosmo.h functions.h filters.h hist_lib.h lumfunct.h mc_util.h obs_lib.h sed_lib.h simulator.h simulator_utils.h numberCounts.h agn_frac.cpp main.cpp cosmo.cpp functions.cpp filters.cpp hist_lib.cpp lumfunct.cpp mc_util.cpp obs_lib.cpp sed_lib.cpp simulator.cpp simulator_utils.cpp numberCounts.cpp
+SurveySim_SOURCES = SurveySim.h fracs.h constants.h cosmo.h functions.h filters.h hist_lib.h lumfunct.h mc_util.h obs_lib.h sed_lib.h simulator.h simulator_utils.h numberCounts.h SurveySim.cpp fracs.cpp main.cpp cosmo.cpp functions.cpp filters.cpp hist_lib.cpp lumfunct.cpp mc_util.cpp obs_lib.cpp sed_lib.cpp simulator.cpp simulator_utils.cpp numberCounts.cpp
 SurveySim_LDADD = ./alg_lib/libalglib.a
 all: all-recursive
 
@@ -392,9 +393,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/agn_frac.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SurveySim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cosmo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filters.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fracs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hist_lib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lumfunct.Po@am__quote@

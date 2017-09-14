@@ -89,7 +89,8 @@ string get_colsel_type(axis_type opt);
 
 double metric_value(const double& f1,const double &f2,const double &f3,const axis_type &opt);
 
-string toLower(const string &oldstr);
+//string toLower(const string &oldstr);
+string toLower(string s);
 
 class Configuration{
 public:
@@ -107,6 +108,7 @@ public:
   bool vary_zbc;
   bool simflag;
   bool adaptive;
+  bool multithread;
   int oprint;
 
   int nz;
@@ -122,6 +124,7 @@ public:
   unsigned long burn_num;
   unsigned long nparams;
   unsigned long nsim;
+  unsigned nthreads;
   double sigmaSize;
 
   double AGNexp;

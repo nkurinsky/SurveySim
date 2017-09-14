@@ -48,10 +48,10 @@ class filter_lib{
   int logflag;
   filter_lib();
   filter_lib(string fitsfile,int logflag);
-  bool init(){
-    return initialized;}
-  bool load_filters(string fitsfile,int logflag);
+  bool init() {return initialized;}
+  bool load_filters(string fitsfile, int logflag, vector<string> types);
   void filter_info(string names[], double fluxLimits[], double fluxErrors[], double skewErrors[]);
+  unordered_map<string, double> get_fracs() {return fracs;}
   filter& get(short num);
  private:
   filter filters[3];
@@ -59,6 +59,7 @@ class filter_lib{
   double errors[3];
   double skew_errors[3];
   filter dummy;
+  unordered_map<string, double> fracs;
   bool initialized;
 };
 

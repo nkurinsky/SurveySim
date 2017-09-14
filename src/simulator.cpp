@@ -28,21 +28,21 @@ void simulator::configure(const Configuration &config){
   seds->load_filters(modelFile,logflag);
   seds->get_filter_info(filters,flux_limits,band_errs,skew_errs);
   lnum = seds->get_lnum();
-  dl = seds->get_dl();
-  hdl=dl/2.0;
-  hdz=dz/2.0;
+  dl   = seds->get_dl();
+  hdl  = dl / 2.0;
+  hdz  = dz / 2.0;
 
-  for(int i=0;i<3;i++)
-    hasSkewErr[i]=(skew_errs[i]>0.0);
+  for (int i = 0; i < 3; i++)
+    hasSkewErr[i] = (skew_errs[i] > 0.0);
   
   axes[0] = config.axes[0];
   axes[1] = config.axes[1];
-  fagns.reset(new agn_frac(seds->get_tnum()));
-  fagns->set_agnPower(config.AGNexp);
+  fracData.reset(new fracs(seds->get_tnum(), config.sedfile));
+  fracData->set_fracs(seds->get_fracs());
   
-  simflag=config.simflag;
+  simflag = config.simflag;
 
-  for(int i=0;i<3;i++){
+  for (int i = 0; i < 3; i++) {
     completeness[i].reset(new CompletenessCurve(config.completeness_n[i],
 						config.completeness_m[i],
 						config.completeness_b[i]));
@@ -62,11 +62,11 @@ void simulator::configure(const Configuration &config){
     
       valarray<double> fluxes[3];
       for(int i=0;i<3;i++){
-	fluxes[i].resize(osize,0.0);
-	for(int j=0;j<osize;j++)
-	  fluxes[i][j] = observations->get_flux(j,i);
-	counts[i].reset(new NumberCounts(fluxes[i],area,filters[i]));
-	last_output.dnds[i].resize(counts[i]->bins().size());
+      	fluxes[i].resize(osize,0.0);
+      	for(int j=0;j<osize;j++)
+      	  fluxes[i][j] = observations->get_flux(j,i);
+      	counts[i].reset(new NumberCounts(fluxes[i],area,filters[i]));
+      	last_output.dnds[i].resize(counts[i]->bins().size());
       }
     }
     else{
@@ -87,7 +87,7 @@ void simulator::set_color_exp(double val, double zcut){
 }
 
 void simulator::set_fagn_pars(double lpars[]){
-  fagns->set_params(lpars);
+  fracData->set_params(lpars);
 }
 
 void simulator::set_lumfunct(lumfunct *lf){
@@ -178,87 +178,86 @@ void simulator::initial_simulation(){
     for(int stype=0;stype<seds->get_tnum();stype++){
       jsmin_type[stype] = 0;
       for (js=0;js<lnum;js++){
-	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
-	if(flux_sim[0]>=flux_limits[0]){
-	  jsmin_type[stype] = (js > 0) ? (js-1) : js; //js-1 to allow for noise
-	  js = lnum; //break out of loop
-	}
+	      flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
+	      if(flux_sim[0]>=flux_limits[0]){
+	        jsmin_type[stype] = (js > 0) ? (js-1) : js; //js-1 to allow for noise
+	        js = lnum; //break out of loop
+	      }
       }
       if(jsmin_type[stype] < jsmin)
-	jsmin=jsmin_type[stype];
+	      jsmin=jsmin_type[stype];
     }
 
     for (js=jsmin;js<lnum;js++){
       nsrcs = num_sources(zarray[is],lums[js],dl);
       
       for (src_iter=0;src_iter<nsrcs;src_iter++){
-	detected = true;
-	//determine sedtype (agn type)
-	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
-	
-	//get triangular distributed luminosity 
-	if(js == 0)
-	  tL=randomLuminosity(lums[js],lums[js]+hdl,zarray[is]+hdz);
-	else if (js == lnum-1)
-	  tL=randomLuminosity(lums[js]-hdl,lums[js],zarray[is]+hdz);
-	else
-	  tL=randomLuminosity(lums[js]-hdl,lums[js]+hdl,zarray[is]+hdz);
-	
-	//get triangular distributed redshift
-	tZ=randomZ(zarray[is],zarray[is]+dz,tL);
+        detected = true;
+      	//determine sedtype (agn type)
+      	sedtype=fracData->get_sedtype(lums[js],zarray[is]);
+      	
+      	//get triangular distributed luminosity 
+      	if(js == 0)
+      	  tL=randomLuminosity(lums[js],lums[js]+hdl,zarray[is]+hdz);
+      	else if (js == lnum-1)
+      	  tL=randomLuminosity(lums[js]-hdl,lums[js],zarray[is]+hdz);
+      	else
+      	  tL=randomLuminosity(lums[js]-hdl,lums[js]+hdl,zarray[is]+hdz);
+      	
+      	//get triangular distributed redshift
+      	tZ=randomZ(zarray[is],zarray[is]+dz,tL);
 
-	for (int i=0;i<3;i++){
-	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
-	  detected = detected and completeness[i]->accept(flux_raw[i]);
-	}
+      	for (int i=0;i<3;i++){
+      	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
+      	  detected = detected and completeness[i]->accept(flux_raw[i]);
+      	}
 
-	//if accepted by completeness curve, add error
-	if(detected){
-	  for(int i=0;i<3;i++){
-	    // adding in option to force non-detections
-	    // to 3sigma limit on a band
-	    //
-	    // procedure: -  if band error is positive: execute normally
-	    //            -  if band error is negative & flux is above
-	    //               limit, do normally, but pass rng.gaussian()
-	    //               the absolute value of band_errs[i]
-	    //            -  if band error is negative & flux is below
-	    //               limit, then do not call rng.gaussian() or 
-	    //               rng.poisson(). Instead, set flux_sim[i]
-	    //               equal to flux_limits[i] and set detected
-	    //               to true
-	    
-	    if(band_errs[i] >= 0.0){ // normal/expected 
-	      flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
-	      if(hasSkewErr[i])
-		flux_sim[i] += rng.poisson(skew_errs[i]);
-	      if(flux_sim[i] < flux_limits[i])
-		detected = false;
-	    }
-	    
-	    // negative band error but raw_flux is detectable 
-	    if ((band_errs[i] < 0.0) and (flux_raw[i] > flux_limits[i])){
-	      flux_sim[i] = rng.gaussian(flux_raw[i],-1*(band_errs[i]),0.0,1e5);
-	      if(hasSkewErr[i])
-		flux_sim[i] += rng.poisson(skew_errs[i]);
-	      if(flux_sim[i] < flux_limits[i])
-		// force to detection threshold 
-		flux_sim[i] = flux_limits[i]; 
-	      
-	    }
-	    // negative band error, but raw flux is not detectable 
-	    if ((band_errs[i] < 0.0) and (flux_raw[i] < flux_limits[i])){ // flagged condition 
-	      flux_sim[i] = flux_limits[i]; // force simulated flux detection threshold
-	    }
-	  }
-	  
-	  //check for detectability, if "Yes" add to list
-	  if(detected){
-	    temp_src = new sprop(tZ,flux_sim,tL,axes,sedtype);
-	    sources.push_back(*temp_src);
-	    delete temp_src;
-	  }
-	}
+      	//if accepted by completeness curve, add error
+      	if(detected){
+      	  for(int i=0;i<3;i++){
+      	    // adding in option to force non-detections
+      	    // to 3sigma limit on a band
+      	    //
+      	    // procedure: -  if band error is positive: execute normally
+      	    //            -  if band error is negative & flux is above
+      	    //               limit, do normally, but pass rng.gaussian()
+      	    //               the absolute value of band_errs[i]
+      	    //            -  if band error is negative & flux is below
+      	    //               limit, then do not call rng.gaussian() or 
+      	    //               rng.poisson(). Instead, set flux_sim[i]
+      	    //               equal to flux_limits[i] and set detected
+      	    //               to true
+      	    
+      	    if(band_errs[i] >= 0.0){ // normal/expected 
+      	      flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
+      	      if(hasSkewErr[i])
+      		      flux_sim[i] += rng.poisson(skew_errs[i]);
+      	      if(flux_sim[i] < flux_limits[i])
+      		      detected = false;
+      	    }
+      	    
+      	    // negative band error but raw_flux is detectable 
+      	    if ((band_errs[i] < 0.0) and (flux_raw[i] > flux_limits[i])){
+      	      flux_sim[i] = rng.gaussian(flux_raw[i],-1*(band_errs[i]),0.0,1e5);
+      	      if(hasSkewErr[i])
+      		      flux_sim[i] += rng.poisson(skew_errs[i]);
+      	      if(flux_sim[i] < flux_limits[i])
+      		      // force to detection threshold 
+      		      flux_sim[i] = flux_limits[i];
+      	    }
+      	    // negative band error, but raw flux is not detectable 
+      	    if ((band_errs[i] < 0.0) and (flux_raw[i] < flux_limits[i])){ // flagged condition 
+      	      flux_sim[i] = flux_limits[i]; // force simulated flux detection threshold
+      	    }
+      	  }
+      	  
+      	  //check for detectability, if "Yes" add to list
+      	  if(detected){
+      	    temp_src = new sprop(tZ,flux_sim,tL,axes,sedtype);
+      	    sources.push_back(*temp_src);
+      	    delete temp_src;
+      	  }
+      	}
       }
     }
   }
@@ -282,14 +281,14 @@ void simulator::initial_simulation(){
       //initialize counts based on simulated fluxes
       switch(i){
       case 0:
-	counts[i].reset(new NumberCounts(f1,area,filters[i]));
-	break;
+	      counts[i].reset(new NumberCounts(f1,area,filters[i]));
+	      break;
       case 1:
-	counts[i].reset(new NumberCounts(f2,area,filters[i]));
-	break;
+	      counts[i].reset(new NumberCounts(f2,area,filters[i]));
+	      break;
       case 2:
-	counts[i].reset(new NumberCounts(f3,area,filters[i]));
-	break;
+	      counts[i].reset(new NumberCounts(f3,area,filters[i]));
+	      break;
       }
       //resize output
       last_output.dnds[i].resize(counts[i]->bins().size());
@@ -350,108 +349,105 @@ products simulator::simulate(){
     for(int stype=0;stype<seds->get_tnum();stype++){
       jsmin_type[stype] = 0;
       for (js=0;js<lnum;js++){
-	flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
-	if(flux_sim[0]>=flux_limits[0]){
-	  jsmin_type[stype] = (js > 0) ? (js-1) : js; //js-1 to allow for noise
-	  js = lnum; //break out of loop
-	}
+        flux_sim[0] = seds->get_filter_flux(lums[js],zarray[is],stype,0);
+        if(flux_sim[0]>=flux_limits[0]){
+          jsmin_type[stype] = (js > 0) ? (js-1) : js; //js-1 to allow for noise
+          js = lnum; //break out of loop
+        }
       }
       if(jsmin_type[stype] < jsmin)
-	jsmin=jsmin_type[stype];
+	      jsmin=jsmin_type[stype];
     }
     
     for (js=jsmin;js<lnum;js++){
       nsrcs = num_sources(zarray[is],lums[js],dl);
       
       for (src_iter=0;src_iter<nsrcs;src_iter++){
-	srcTotal++;
-	if(((srcTotal % 10000) == 0) and (srcTotal != 0)){
-	  //printf("%lu\t%lu\n",srcTotal,detTotal);
-	  //trying to avoid infinite loops
-	  if(detTotal > static_cast<unsigned long>(10*observations->get_snum())){
-	    //printf("Detected sources %lu (%i times obsnum) too high, aborting\n",detTotal,10);
-	    output.chisqr=100;
-	    return output;
-	  }
-	  else if (srcTotal > 1e6){
-	    //printf("Simulated sources %lu too high (>1e6), aborting\n",srcTotal);
+      	srcTotal++;
+      	if(((srcTotal % 10000) == 0) and (srcTotal != 0)){
+      	  //printf("%lu\t%lu\n",srcTotal,detTotal);
+      	  //trying to avoid infinite loops
+      	  if(detTotal > static_cast<unsigned long>(10*observations->get_snum())){
+      	    //printf("Detected sources %lu (%i times obsnum) too high, aborting\n",detTotal,10);
+      	    output.chisqr=100;
+      	    return output;
+      	  }
+      	  else if (srcTotal > 1e6){
+      	    //printf("Simulated sources %lu too high (>1e6), aborting\n",srcTotal);
             output.chisqr=100;
             return output; 
-	  }
-	}
-	
-	detected = true;
-	//determine sedtype (agn type)
-	sedtype=fagns->get_sedtype(lums[js],zarray[is]);
-	
-	//get triangular distributed luminosity 
-	if(js == 0)
-	  tL=randomLuminosity(lums[js],lums[js]+hdl,zarray[is]+hdz);
-	else if (js == lnum-1)
-	  tL=randomLuminosity(lums[js]-hdl,lums[js],zarray[is]+hdz);
-	else
-	  tL=randomLuminosity(lums[js]-hdl,lums[js]+hdl,zarray[is]+hdz);
-	
-	//get triangular distributed redshift
-	tZ=randomZ(zarray[is],zarray[is]+dz,tL);
+      	  }
+      	}
+      	
+      	detected = true;
+      	//determine sedtype (agn type)
+      	sedtype=fracData->get_sedtype(lums[js],zarray[is]);
+      	
+      	//get triangular distributed luminosity 
+      	if(js == 0)
+      	  tL=randomLuminosity(lums[js],lums[js]+hdl,zarray[is]+hdz);
+      	else if (js == lnum-1)
+      	  tL=randomLuminosity(lums[js]-hdl,lums[js],zarray[is]+hdz);
+      	else
+      	  tL=randomLuminosity(lums[js]-hdl,lums[js]+hdl,zarray[is]+hdz);
+      	
+      	//get triangular distributed redshift
+      	tZ=randomZ(zarray[is],zarray[is]+dz,tL);
 
-	for (int i=0;i<3;i++){
-	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
-	  detected = detected and completeness[i]->accept(flux_raw[i]);
-	}
+      	for (int i=0;i<3;i++){
+      	  flux_raw[i] = seds->get_filter_flux(tL,tZ,sedtype,i);
+      	  detected = detected and completeness[i]->accept(flux_raw[i]);
+      	}
 
-	//if accepted by completeness curve, add error
-	if(detected){
-	  
-	  for (int i=0;i<3;i++){
-	    // adding in option to force non-detections
-	    // to 3sigma limit on a band
-	    //
-	    // procedure: -  if band error is positive: execute normally
-	    //            -  if band error is negative & flux is above
-	    //               limit, do normally, but pass rng.gaussian()
-	    //               the absolute value of band_errs[i]
-	    //            -  if band error is negative & flux is below
-	    //               limit, then do not call rng.gaussian() or 
-	    //               rng.poisson(). Instead, set flux_sim[i]
-	    //               equal to flux_limits[i] and set detected
-	    //               to true
-	    
-	    if(band_errs[i] >= 0.0){ // normal/expected 
-	      flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
-	      if(hasSkewErr[i])
-		flux_sim[i] += rng.poisson(skew_errs[i]);
-	      if(flux_sim[i] < flux_limits[i])
-		detected = false;
-	    }
-	    
-	    // negative band error but raw_flux is detectable 
-	    if ((band_errs[i] < 0.0) and (flux_raw[i] > flux_limits[i])){
-	      flux_sim[i] = rng.gaussian(flux_raw[i],-1*(band_errs[i]),0.0,1e5);
-	      if(hasSkewErr[i])
-		flux_sim[i] += rng.poisson(skew_errs[i]);
-	      if(flux_sim[i] < flux_limits[i])
-		// force to detection threshold 
-		flux_sim[i] = flux_limits[i]; 
-	      
-	    }
-	    // negative band error, but raw flux is not detectable 
-	    if ((band_errs[i] < 0.0) and (flux_raw[i] < flux_limits[i])){ // flagged condition 
-	      flux_sim[i] = flux_limits[i]; // force simulated flux detection threshold
-	    }
-	    
-	    
-	  }
-	
-	  //check for detectability, if "Yes" add to list
-	  if(detected){
-	    detTotal++;
-	    temp_src = new sprop(tZ,flux_sim,tL,axes,sedtype);
-	    sources.push_back(*temp_src);
-	    output.dndz[is]++; 
-	    delete temp_src;
-	  }
-	}
+      	//if accepted by completeness curve, add error
+      	if(detected){
+      	  
+      	  for (int i=0;i<3;i++){
+      	    // adding in option to force non-detections
+      	    // to 3sigma limit on a band
+      	    //
+      	    // procedure: -  if band error is positive: execute normally
+      	    //            -  if band error is negative & flux is above
+      	    //               limit, do normally, but pass rng.gaussian()
+      	    //               the absolute value of band_errs[i]
+      	    //            -  if band error is negative & flux is below
+      	    //               limit, then do not call rng.gaussian() or 
+      	    //               rng.poisson(). Instead, set flux_sim[i]
+      	    //               equal to flux_limits[i] and set detected
+      	    //               to true
+      	    
+      	    if(band_errs[i] >= 0.0){ // normal/expected 
+      	      flux_sim[i] = rng.gaussian(flux_raw[i],band_errs[i],0.0,1e5);
+      	      if(hasSkewErr[i])
+      		      flux_sim[i] += rng.poisson(skew_errs[i]);
+      	      if(flux_sim[i] < flux_limits[i])
+      		      detected = false;
+      	    }
+      	    
+      	    // negative band error but raw_flux is detectable 
+      	    if ((band_errs[i] < 0.0) and (flux_raw[i] > flux_limits[i])){
+      	      flux_sim[i] = rng.gaussian(flux_raw[i],-1*(band_errs[i]),0.0,1e5);
+      	      if(hasSkewErr[i])
+      		      flux_sim[i] += rng.poisson(skew_errs[i]);
+      	      if(flux_sim[i] < flux_limits[i])
+      		      // force to detection threshold 
+      		      flux_sim[i] = flux_limits[i];
+      	    }
+      	    // negative band error, but raw flux is not detectable 
+      	    if ((band_errs[i] < 0.0) and (flux_raw[i] < flux_limits[i])){ // flagged condition 
+      	      flux_sim[i] = flux_limits[i]; // force simulated flux detection threshold
+      	    }
+      	  }
+      	
+      	  //check for detectability, if "Yes" add to list
+      	  if(detected){
+      	    detTotal++;
+      	    temp_src = new sprop(tZ,flux_sim,tL,axes,sedtype);
+      	    sources.push_back(*temp_src);
+      	    output.dndz[is]++; 
+      	    delete temp_src;
+      	  }
+      	}
       }
     }
   }
@@ -534,13 +530,13 @@ bool simulator::save(string outfile){
     pFits->pHDU().addKey("ZBQ",lpars[LF::parameter::zbq],"Q Evolution Cutoff");
     pFits->pHDU().addKey("CEXP",seds->get_color_exp(),"Color Evolution Param");
     pFits->pHDU().addKey("ZBC",seds->get_color_zcut(),"Color Evolution Cutoff");
-    pFits->pHDU().addKey("T1",fagns->get_t1(),"AGN Slope 1");
-    pFits->pHDU().addKey("T2",fagns->get_t2(),"AGN Slope 2");
-    pFits->pHDU().addKey("FAGN0",fagns->get_fagn0(),"AGN Knee");
-    pFits->pHDU().addKey("ZBT",fagns->get_zbt(),"AGN Evolution Cutoff");
-    pFits->pHDU().addKey("FCOMP",fagns->get_fComp(),"AGN Composite Fraction");
-    pFits->pHDU().addKey("FCOLD",fagns->get_fCold(),"Cold SFG Fraction");
-    pFits->pHDU().addKey("AGNEXP",fagns->get_agnPower(),"AGN Fraction Power");
+    pFits->pHDU().addKey("T1",fracData->get_t1(),"AGN Slope 1");
+    pFits->pHDU().addKey("T2",fracData->get_t2(),"AGN Slope 2");
+    pFits->pHDU().addKey("FAGN0",fracData->get_frac("agn"),"AGN Knee");
+    pFits->pHDU().addKey("ZBT",fracData->get_zbt(),"AGN Evolution Cutoff");
+    pFits->pHDU().addKey("FCOMP",fracData->get_frac("comp"),"AGN Composite Fraction");
+    pFits->pHDU().addKey("FCOLD",fracData->get_frac("cold"),"Cold SFG Fraction");
+    //pFits->pHDU().addKey("AGNEXP",fracData->get_agnPower(),"AGN Fraction Power");
 
     unsigned long size = sources.size();
     LOG_INFO(printf("%s %lu\n","Sources Being Saved: ",size));
@@ -630,9 +626,9 @@ bool simulator::save(string outfile){
       newTable->column(colname[11]).write(last_output.dnds[2],1);
 
       if(not simflag){
-	newTable->column(colname[12]).write(counts[0]->counts(),1);
-	newTable->column(colname[13]).write(counts[1]->counts(),1);
-	newTable->column(colname[14]).write(counts[2]->counts(),1);
+        newTable->column(colname[12]).write(counts[0]->counts(),1);
+        newTable->column(colname[13]).write(counts[1]->counts(),1);
+        newTable->column(colname[14]).write(counts[2]->counts(),1);
       }
     }
     catch(FitsException &except){

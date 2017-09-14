@@ -1,4 +1,4 @@
-#include "lumfunct.h" //See this header for more information on the following funcitons
+#include "lumfunct.h" //See this header for more information on the following functions
 
 lumfunct::lumfunct(LF::distribution dist){
   switch(dist){
