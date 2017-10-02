@@ -1,7 +1,7 @@
 #include "fracs.h"
 #include "lumfunct.h"
 
-fracs::fracs(int numTypes, string fitsfile) {
+fracs::fracs(int numTypes, string fitsfile, int sedflags[4]){
   if (numTypes <= 1) {
     this->numTypes = 1;
     generate = false;
@@ -120,6 +120,10 @@ void fracs::set_fracs(unordered_map<string,double> newFracs) {
   }
 }
 
+//these return the fractions based on
+// fractions for type,L and z read from fitsfile (which is at z=0)
+// x redshift evolution based on fa0, t1, t2, and zbt parameters
+// and fraction determined in fracData array
 double fracs::get_frac(double lum, double redshift, string type) {
   // here fagn0 gives the fraction of AGN at L_ir=10^12 at z=0
   // zbt gives the break redshift for the sed type
@@ -132,22 +136,29 @@ double fracs::get_frac(double lum, double redshift, string type) {
       evolZ[redshift] = pow((1 + (redshift-_zbt)), _t1) * pow((1 + redshift), _t2);
   }
 
+  //the z=0 fraction as read from the fits file
+  //default assumption at L=10.^12 is of fSFG=0.75,fAGN0=0.25, fCOM=0
   double l = sedmix[type][(int)round(lum)];
-
-  //the agn fraction for a given L,z bin
-  double frac = fracData[toLower(type)] * l * evolZ[redshift];
+  //Caution! for now only call this for type AGN
+  //since that's the one that is subject to this evolZ
+  double frac = (fracData[toLower(type)]/0.25) * l * evolZ[redshift];
+  
   return (frac > 1 ? 1.0 : frac);
 }
 
-int fracs::get_sedtype(double lum, double redshift) {
-  // This section needs to be changed to finish generalizing this code
-  double fracArray[numTypes]; 
+int fracs::get_sedtype(double lum, double redshift,int sedflags[NSEDS]) {
+  // This section needs to be changed if any other mix
+  // currently the SED templates are: SFG, COM, AGN, and COLD in that order
+  double fracArray[numTypes];
+
+
+  //Chase's code -- but added explicit suppression of templates if not used
   float fagn   = get_frac(lum, redshift, "agn");
+  if(sedflags[2] == 0) fagn = 0;
   fracArray[0] = 1 - fagn; //SFG
-  fracArray[1] = fagn;     //AGN
-  fracArray[2] = fracData["com"]  * fagn;         //COMP
-  fracArray[3] = fracData["cold"] * fracArray[0]; //COLD
-  // Section ends here
+  fracArray[1] = fracData["com"]  * fagn; //COMPOSITES are a fraction of the AGN
+  if(sedflags[1] == 0) fracArray[1] = 0;  
+  fracArray[2] = fagn;     //AGN
 
   if (!generate) return 0;
 

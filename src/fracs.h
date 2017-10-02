@@ -24,7 +24,7 @@ class fracs {
     unordered_map<string, double>         fracData;
     unordered_map<string, vector<double>> sedmix;
   public:
-    fracs(int types, string fitsfile);
+    fracs(int types, string fitsfile, int sedflags[NSEDS]);
     // Setters
     void set_lumfunct(lumfunct *lf);
     void set_params(double lpars[]);
@@ -40,7 +40,7 @@ class fracs {
     double get_zbt()             {return _zbt;}
     double get_frac(string type) {return fracData[type];}
     double get_frac(double lum, double redshift, string type);
-    int get_sedtype(double lum, double redshift);
+    int get_sedtype(double lum, double redshift, int sedflags[NSEDS]);
 };
 
 

@@ -1,7 +1,8 @@
 #include "functions.h"
+#include "SurveySim.h"
+
 
 colsel_type set_colsel_type(string &keyvalue){
-  //string scolsel(toLower(keyvalue));
   string scolsel=keyvalue;
   if(scolsel == "None")
     return None;
@@ -144,7 +145,7 @@ string toLower(string s) {
 }
 
 Configuration::Configuration(int argc, char *argv[]){
-
+  //std::cout<<"in Configuration"<<endl;
   if((argc > 1) and (argv[1][0] == '-') and (argv[1][1] == 'h')){
     printf("Calling sequence:\"%s modfile sedfile [obsfile] [-o outfile] [-v]\"\n",argv[0]);
     printf("\tmodfile - Model file containing parameters and filters\n");
@@ -161,7 +162,7 @@ Configuration::Configuration(int argc, char *argv[]){
     exit(1);
   }
   
-  //File names passed in by Widget
+  //File names passed in command line
   modfile = argv[1];
   sedfile = argv[2];
   outfile="output.fits";
@@ -242,7 +243,6 @@ void Configuration::print(){
     printf("  Number Redshift Bins : %i\n",nz);
     printf("  Redshift Bin Width   : %f\n",dz);
     printf("  Area [square deg]    : %f\n",area);
-    printf("  AGN Fraction Power   : %f\n",AGNexp);
   }
   
   if(oprint >= 2)
@@ -263,35 +263,25 @@ void Configuration::print(){
   }
   if(oprint >= 2)
     printf("\n");
+    printf("\n SED\tusage\tflags:\n");
+    for(int i=0;i<NSEDS;i++){
+      printf("%1i",seduseflags[i]);
+    }
+    
+    printf("\n");
 
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT","FCOMP","FCOLD"};  
   if(oprint >= 2){
     printf("\nLuminosity Function Parameter Settings:\n");
     printf("Parameter\tStart\t Min \t Max \tFit\n");
-    for(int i=0;i<LUMPARS;i++){
+   for(int i=0;i<LUMPARS;i++){
       printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
-	     pnames[i].c_str(),
-	     LFParameters[i][value],
-	     LFParameters[i][min],
-	     LFParameters[i][max],
+  	     pnames[i].c_str(),
+  	     LFParameters[i][value],
+  	     LFParameters[i][min],
+  	     LFParameters[i][max],
 	     LFParameters[i][fixed] == 0.0 ? "True" : "False"
 	     );
     }
-    printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
-	   "CEXP",
-	   colorEvolution[value],
-	   colorEvolution[min],
-	   colorEvolution[max],
-	   colorEvolution[fixed] == 0.0 ? "True" : "False"
-	   );
-    printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n\n",
-	   "ZBC",
-	   colorZCut[value],
-	   colorZCut[min],
-	   colorZCut[max],
-	   colorZCut[fixed] == 0.0 ? "True" : "False"
-	   );
-    
     printf("\nNumber Unfixed Parameters: %lu\n",nparams);
   }
   
@@ -308,8 +298,6 @@ void Configuration::LFparameters(double lpars[], short type){
 
 void Configuration::load(){
   
-  //IO variables
-  string pnames[] = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT","FCOMP","FCOLD"};  
   string suffix[] = {"","_FIX","_MIN","_MAX"};
   string tag;
   
@@ -389,13 +377,6 @@ void Configuration::load(){
     sigmaSize=12.0;
   }
   try{
-    tab.readKey("AGNEXP",AGNexp);
-  }
-  catch(CCfits::HDU::NoSuchKeyword){
-    AGNexp=12.0;
-  }
-
-  try{
     tab.readKey("ADAPTIVE",rtemp);
     adaptive = (rtemp == 1);
   }
@@ -456,10 +437,58 @@ void Configuration::load(){
   nz = (zmax-zmin)/dz;
 
   //=================================================================  
+  //Read-in SED use flag parameters
+  //-----------------------------------------------------------------
+  int itemp;
+  for(int i=0;i<NSEDS;i++){
+    if( i == 0){
+      try{
+	tab.readKey("SED1",itemp);
+	seduseflags[i]=static_cast<int>(itemp);
+      }
+      catch(CCfits::HDU::NoSuchKeyword){
+	printf("Error reading keyword %i\n",'SED1');
+	exit(12);
+      }
+    }
+    if( i == 1){
+      try{
+	tab.readKey("SED2",itemp);
+	seduseflags[i]=static_cast<int>(itemp);
+      }
+      catch(CCfits::HDU::NoSuchKeyword){
+	printf("Error reading keyword %i\n",'SED2');
+	exit(12);
+      }
+    }
+    if( i == 2){
+      try{
+	tab.readKey("SED3",itemp);
+	seduseflags[i]=static_cast<int>(itemp);
+      }
+      catch(CCfits::HDU::NoSuchKeyword){
+	printf("Error reading keyword %i\n",'SED3');
+	exit(12);
+      }
+    }
+    if( i == 3){
+      try{
+	tab.readKey("SED4",itemp);
+	seduseflags[i]=static_cast<int>(itemp);
+      }
+      catch(CCfits::HDU::NoSuchKeyword){
+	printf("Error reading keyword %i\n",'SED4');
+	exit(12);
+      }
+    }    
+  }
+  
+  //=================================================================  
   //Read-in Luminosity Function Parameters
   //-----------------------------------------------------------------
 
   for(int i=0;i<LUMPARS;i++){
+    std::cout<<pnames[i]<<endl;
     for(int j=0;j<4;j++){
       tag = pnames[i]+suffix[j];
       tag = tag.substr(0,8);
@@ -475,50 +504,10 @@ void Configuration::load(){
       param_inds.push_back(i);
   }
   
-  //color evolution parameters
-  for(int j=0;j<4;j++){
-    tag = "CEXP"+suffix[j];
-    tag = tag.substr(0,8);
-    try{
-      tab.readKey(tag,colorEvolution[j]);
-    }
-    catch(CCfits::HDU::NoSuchKeyword){
-      printf("Error reading keyword %s\n",tag.c_str());
-      exit(12);
-    }
-  }
-
-  for(int j=0;j<4;j++){
-    tag = "ZBC"+suffix[j];
-    tag = tag.substr(0,8);
-    try{
-      tab.readKey(tag,colorZCut[j]);
-    }
-    catch(CCfits::HDU::NoSuchKeyword){
-      printf("Error reading keyword %s\n",tag.c_str());
-      exit(12);
-    }
-  }
-
+  //This sets the number of parameters that are not fixed (i.e. to be fit)
   nparams = param_inds.size();
-  cind = nparams;
-  if(colorEvolution[fixed] == 0){
-    nparams++;
-    vary_cexp = true;
-  }
-  else 
-    vary_cexp = false;
-
-  zbcind = nparams;
-  if(colorZCut[fixed] == 0){
-    nparams++;
-    vary_zbc = true;
-  }
-  else 
-    vary_zbc = false;
   
   burn_num = runs/burn_ratio;
-
 
   //completeness information
   char cnum[2];

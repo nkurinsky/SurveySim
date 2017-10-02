@@ -1,5 +1,5 @@
 //Noah Kurinsky -*-c++-*-
-//7/5/2012
+//First created: 7/5/2012
 //This header file provides the interface for the various functions
 //used for constraining models
 
@@ -44,12 +44,15 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
 
-#define LUMPARS 16
-#define SDEG_PER_STER 3282.8
+#define NSEDS 3
+#define LUMPARS 15
+#define SDEG_PER_STER 3282.806
 
 #define LOG_CRITICAL(ARG) (logflag >= 1 ? ARG : printf(""))
 #define LOG_INFO(ARG) (logflag >= 2 ? ARG : printf(""))
 #define LOG_DEBUG(ARG) (logflag == 3 ? ARG : printf(""))
+
+static string pnames[]    = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FCOM","FA0","T1","T2","ZBT"};
 
 using namespace std;
 
@@ -77,7 +80,7 @@ enum colsel_type{
 };
 
 namespace LF{
-  enum parameter {PHI0,L0,alpha,beta,p,q,p2,q2,zbp,zbq,fa0,t1,t2,zbt,fcomp,fcold};
+  enum parameter {PHI0,L0,alpha,beta,p,q,p2,q2,zbp,zbq,fa0,t1,t2,zbt}; //,fcomp,fcold};
   enum distribution {Schecter,DoublePowerLaw,ModifiedSchecter};
 }
 
@@ -104,8 +107,8 @@ public:
   string modfile;
   string sedfile;
   
-  bool vary_cexp;
-  bool vary_zbc;
+  //bool vary_cexp;
+  //bool vary_zbc;
   bool simflag;
   bool adaptive;
   bool multithread;
@@ -127,7 +130,7 @@ public:
   unsigned nthreads;
   double sigmaSize;
 
-  double AGNexp;
+  int seduseflags[4];
   double area;
   double dz;
   double zmax;
@@ -141,8 +144,6 @@ public:
 
   vector<int> param_inds;
   double LFParameters[LUMPARS][4];
-  double colorEvolution[4];
-  double colorZCut[4];
   short dist;
 
   const short value = 0;

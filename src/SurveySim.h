@@ -1,12 +1,12 @@
 #ifndef SURVEYSIM_H
 #define SURVEYSIM_H
 
-#include "functions.h"
+//#include "functions.h"
 #include "simulator.h"
 #include "mc_util.h"
 
-static string pnames[16]    = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT","FCOMP","FCOLD"};
-static string countnames[3] = {"dnds1","dnds2","dnds3"};
+//static string pnames[14]    = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT"}; //,"FCOMP","FCOLD"};
+//static string countnames[3] = {"dnds1","dnds2","dnds3"};
 
 class SurveySim {
 	private:
@@ -38,7 +38,7 @@ class SurveySim {
         simulator survey;
 
   		products output;
-  		ResultChain final_counts;
+  		//ResultChain final_counts;
 
   		MCChains mcchain;
   		MCChains burnchain;

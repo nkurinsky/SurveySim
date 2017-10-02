@@ -31,7 +31,7 @@ class simulator{
   double skew_errs[3];
   bool hasSkewErr[3];
   double flux_limits[3];
-  double color_exp;
+  int sedflags[NSEDS];
   double area;
   double dz;
   double zmin;
@@ -54,7 +54,7 @@ class simulator{
  public:
   simulator(const Configuration &config);
   void configure(const Configuration &config);
-  void set_color_exp(double val, double zcut=1000);
+  //void set_color_exp(double val, double zcut=1000);
   void set_fagn_pars(double lpars[]);
   void set_lumfunct(lumfunct *lf);
   products simulate();

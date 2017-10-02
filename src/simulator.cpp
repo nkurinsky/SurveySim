@@ -6,14 +6,11 @@ simulator::simulator(const Configuration &config){
   filters[1] = "F2";
   filters[2] = "F3";
   obsFile="";  
-  color_exp=0.0; //default color evolution
-
   configure(config);
 }
 
 void simulator::configure(const Configuration &config){
   logflag=config.oprint;
-
   modelFile = config.modfile;
   double tarea(config.areaSteradian());
 
@@ -37,7 +34,11 @@ void simulator::configure(const Configuration &config){
   
   axes[0] = config.axes[0];
   axes[1] = config.axes[1];
-  fracData.reset(new fracs(seds->get_tnum(), config.sedfile));
+  for(int i=0;i<NSEDS;i++){
+    sedflags[i]=config.seduseflags[i];
+    //printf("%1i",sedflags[i]);
+  }
+  fracData.reset(new fracs(seds->get_tnum(), config.sedfile, sedflags));
   fracData->set_fracs(seds->get_fracs());
   
   simflag = config.simflag;
@@ -81,10 +82,10 @@ void simulator::configure(const Configuration &config){
   }
 }
 
-void simulator::set_color_exp(double val, double zcut){
-  if (seds)
-    seds->set_color_evolution(val,zcut);
-}
+//void simulator::set_color_exp(double val, double zcut){
+//  if (seds)
+//    seds->set_color_evolution(val,zcut);
+//}
 
 void simulator::set_fagn_pars(double lpars[]){
   fracData->set_params(lpars);
@@ -189,12 +190,10 @@ void simulator::initial_simulation(){
     }
 
     for (js=jsmin;js<lnum;js++){
-      nsrcs = num_sources(zarray[is],lums[js],dl);
-      
+      nsrcs = num_sources(zarray[is],lums[js],dl);      
       for (src_iter=0;src_iter<nsrcs;src_iter++){
         detected = true;
-      	//determine sedtype (agn type)
-      	sedtype=fracData->get_sedtype(lums[js],zarray[is]);
+      	sedtype=fracData->get_sedtype(lums[js],zarray[is],sedflags);
       	
       	//get triangular distributed luminosity 
       	if(js == 0)
@@ -381,7 +380,7 @@ products simulator::simulate(){
       	
       	detected = true;
       	//determine sedtype (agn type)
-      	sedtype=fracData->get_sedtype(lums[js],zarray[is]);
+      	sedtype=fracData->get_sedtype(lums[js],zarray[is],sedflags);
       	
       	//get triangular distributed luminosity 
       	if(js == 0)
@@ -532,10 +531,10 @@ bool simulator::save(string outfile){
     pFits->pHDU().addKey("ZBC",seds->get_color_zcut(),"Color Evolution Cutoff");
     pFits->pHDU().addKey("T1",fracData->get_t1(),"AGN Slope 1");
     pFits->pHDU().addKey("T2",fracData->get_t2(),"AGN Slope 2");
-    pFits->pHDU().addKey("FAGN0",fracData->get_frac("agn"),"AGN Knee");
+    pFits->pHDU().addKey("FAGN0",fracData->get_frac("agn"),"AGN fraction");
     pFits->pHDU().addKey("ZBT",fracData->get_zbt(),"AGN Evolution Cutoff");
-    pFits->pHDU().addKey("FCOMP",fracData->get_frac("comp"),"AGN Composite Fraction");
-    pFits->pHDU().addKey("FCOLD",fracData->get_frac("cold"),"Cold SFG Fraction");
+    //pFits->pHDU().addKey("FCOMP",fracData->get_frac("comp"),"AGN Composite Fraction");
+    //pFits->pHDU().addKey("FCOLD",fracData->get_frac("cold"),"Cold SFG Fraction");
     //pFits->pHDU().addKey("AGNEXP",fracData->get_agnPower(),"AGN Fraction Power");
 
     unsigned long size = sources.size();
