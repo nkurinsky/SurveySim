@@ -132,89 +132,90 @@ void SurveySim::initializeChains() {
 }
 
 void SurveySim::burnIn(){
-	for (int i=0;i<q.burn_num;i++){
-		for (m=0;m<q.nchain;m++){
-			vector<double> results;
-
-			for(pi=0;pi<q.nparams;pi++)
-				means[pi] = pcurrent[m][pi];
-
-			rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
-			for(pi = 0;pi<q.nparams;pi++){
-				*(setvars[pi]) = ptemp[m][pi] = results[pi];
-			}
-
-			LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
-			for(pi=0;pi<LUMPARS;pi++)
-				LOG_DEBUG(printf(" %5.2lf",lpars[pi]));
-			LOG_DEBUG(printf(" %5.2lf : ",(q.vary_cexp ? ptemp[m][q.cind] : CE)));
-			LOG_DEBUG(printf(" %5.2lf : ",(q.vary_zbc ? ptemp[m][q.zbcind] : ZBC)));
-
-			lf.set_params(lpars);
-			survey.set_color_exp(CE,ZBC);
-			survey.set_fagn_pars(lpars);
-
-			output=survey.simulate();
-
-			trial=output.chisqr;
-
-			LOG_DEBUG(printf("Iteration Chi-Square: %lf",trial));      
-			if(trial < chi_min){
-				LOG_DEBUG(printf(" -- Current Best Trial"));
-				chi_min=trial;
-				for(pi=0;pi<q.nparams;pi++)
-					pset.best[pi]=ptemp[m][pi];
-			}
-			LOG_DEBUG(printf("\n"));
-
-			accept = metrop.accept(m,trial);
-	  		if(accept) {
-	    		for(pi=0;pi<q.nparams;pi++)
-	      			pcurrent[m][pi]=ptemp[m][pi];
-	    		burnchain.add_link(m,ptemp[m],trial,accept);
-	    	}
-	  		fflush(stdout);
-		}
-	
-		if(((i+1) % q.burn_step) == 0){
-	  		LOG_INFO(printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature()));
-	  		if(not metrop.anneal())
-	    		i = q.runs;
-		}
-		fflush(stdout);
-   	}
-
-   	for(m=0;m<q.nchain;m++)
-		for(pi=0;pi<q.nparams;pi++)
-	  		pcurrent[m][pi] = pset.best[pi];
+  for (int i=0;i<q.burn_num;i++){
+    for (m=0;m<q.nchain;m++){
+      vector<double> results;
       
-    metrop.reset();
+      for(pi=0;pi<q.nparams;pi++)
+	means[pi] = pcurrent[m][pi];
+      
+      rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+      for(pi = 0;pi<q.nparams;pi++){
+	*(setvars[pi]) = ptemp[m][pi] = results[pi];
+      }
+      
+      LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
+      for(pi=0;pi<LUMPARS;pi++)
+	LOG_DEBUG(printf(" %5.2lf",lpars[pi]));
+      LOG_DEBUG(printf(" %5.2lf : ",(q.vary_cexp ? ptemp[m][q.cind] : CE)));
+      LOG_DEBUG(printf(" %5.2lf : ",(q.vary_zbc ? ptemp[m][q.zbcind] : ZBC)));
+      
+      lf.set_params(lpars);
+      survey.set_color_exp(CE,ZBC);
+      survey.set_fagn_pars(lpars);
+      
+      output=survey.simulate();
+      
+      trial=output.chisqr;
+      
+      LOG_DEBUG(printf("Iteration Chi-Square: %lf",trial));      
+      if(trial < chi_min){
+	LOG_DEBUG(printf(" -- Current Best Trial"));
+	chi_min=trial;
+	for(pi=0;pi<q.nparams;pi++)
+	  pset.best[pi]=ptemp[m][pi];
+      }
+      LOG_DEBUG(printf("\n"));
+      
+      accept = metrop.accept(m,trial);
+      if(accept) {
+	for(pi=0;pi<q.nparams;pi++)
+	  pcurrent[m][pi]=ptemp[m][pi];
+	burnchain.add_link(m,ptemp[m],trial,accept);
+      }
+      fflush(stdout);
+    }
+    
+    if(((i+1) % q.burn_step) == 0){
+      LOG_INFO(printf("\nAcceptance: %5.1lf%% (T=%8.2e)\n",metrop.acceptance_rate()*100.0,metrop.temperature()));
+      if(not metrop.anneal())
+	i = q.runs;
+    }
+    fflush(stdout);
+  }
+  
+  for(m=0;m<q.nchain;m++)
+    for(pi=0;pi<q.nparams;pi++)
+      pcurrent[m][pi] = pset.best[pi];
+  
+  metrop.reset();
 }
 
 void SurveySim::fit() {
-	for (i = 0; i < q.runs; i++){
-		for (m=0;m<q.nchain;m++)
-			runOneStep(m);
-	
-		if(((i + 1) % q.conv_step) == 0){
-		  	LOG_INFO(printf("Checking Convergence\n"));
-		  	if (i < q.burn_num)
-		    	metrop.anneal();
-		  	printf("Get Sigma\n");
-		  
-		  	if(q.adaptive){
-		    	mcchain.get_stdev(pset.sigma.data());
-		    	mcchain.get_covariance(pset.covar);
-		  	}
-		  	if(mcchain.converged()){
-		    	LOG_INFO(printf("Chains Converged!\n"));
-			}
-		  	else
-		    	LOG_INFO(printf("Chains Have Not Converged\n"));
-		}
-
-		fflush(stdout);
-	}
+  for (i = 0; i < q.runs; i++){
+    for (m=0;m<q.nchain;m++)
+      runOneStep(m);
+    
+    if(((i + 1) % q.conv_step) == 0){
+      LOG_INFO(printf("Checking Convergence\n"));
+      if (i < q.burn_num)
+	metrop.anneal();
+      printf("Get Sigma\n");
+      
+      if(q.adaptive){
+	mcchain.get_stdev(pset.sigma.data());
+	mcchain.get_covariance(pset.covar);
+      }
+      if(mcchain.converged()){
+	LOG_INFO(printf("Chains Converged!\n"));
+	i = q.runs;
+      }
+      else
+	LOG_INFO(printf("Chains Have Not Converged\n"));
+    }
+    
+    fflush(stdout);
+  }
 }
     
 void SurveySim::runExtra() {
@@ -259,96 +260,96 @@ void SurveySim::bestFit() {
 }
 
 void SurveySim::runOneStep(int m) {
-	vector<double> results;
-
-	for (pi = 0; pi < q.nparams; pi++)
-	    means[pi] = pcurrent[m][pi];
-
-	rng.gaussian_mv(means, pset.covar, pset.min, pset.max, results);
-	
-	for (pi = 0; pi < q.nparams; pi++){
-	    *(setvars[pi]) = ptemp[m][pi] = results[pi];
-	}
-	  
-	LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
-	for(pi=0;pi<q.nparams;pi++)
-		LOG_DEBUG(printf(" %lf",ptemp[m][pi]));
-	LOG_DEBUG(printf(" : "));
-	
-	lf.set_params(lpars);
-	survey.set_color_exp(CE,ZBC);
-	survey.set_fagn_pars(lpars);
-	
-	output = survey.simulate();
-
-	trial = output.chisqr;
-	LOG_DEBUG(printf("Model Chi-Square: %lf", trial));
-	
-	accept = metrop.accept(m, trial);
-
-	//only track accepted steps
-	if (accept){
-	    mcchain.add_link(m, ptemp[m], trial, accept);
-	    //counts.add_link(output.dnds,trial);
-	
-	    LOG_DEBUG(printf(" -- Accepted\n"));
-	    for (pi = 0; pi < q.nparams; pi++)
-	      	pcurrent[m][pi] = ptemp[m][pi];
-	} else
-	    LOG_DEBUG(printf(" -- Rejected\n"));
-
-	fflush(stdout);
+  vector<double> results;
+  
+  for (pi = 0; pi < q.nparams; pi++)
+    means[pi] = pcurrent[m][pi];
+  
+  rng.gaussian_mv(means, pset.covar, pset.min, pset.max, results);
+  
+  for (pi = 0; pi < q.nparams; pi++){
+    *(setvars[pi]) = ptemp[m][pi] = results[pi];
+  }
+  
+  LOG_DEBUG(printf("%lu %lu -",(i+1),(m+1)));
+  for(pi=0;pi<q.nparams;pi++)
+    LOG_DEBUG(printf(" %lf",ptemp[m][pi]));
+  LOG_DEBUG(printf(" : "));
+  
+  lf.set_params(lpars);
+  survey.set_color_exp(CE,ZBC);
+  survey.set_fagn_pars(lpars);
+  
+  output = survey.simulate();
+  
+  trial = output.chisqr;
+  LOG_DEBUG(printf("Model Chi-Square: %lf", trial));
+  
+  accept = metrop.accept(m, trial);
+  
+  //only track accepted steps
+  if (accept){
+    mcchain.add_link(m, ptemp[m], trial, accept);
+    //counts.add_link(output.dnds,trial);
+    
+    LOG_DEBUG(printf(" -- Accepted\n"));
+    for (pi = 0; pi < q.nparams; pi++)
+      pcurrent[m][pi] = ptemp[m][pi];
+  } else
+    LOG_DEBUG(printf(" -- Rejected\n"));
+  
+  fflush(stdout);
 }
 
 void SurveySim::save() {
-	LOG_INFO(printf("Saving Initial Survey\n"));
-    fflush(stdout);
-    saved = survey.save(q.outfile);
-
-    for(pi = 0;pi<q.nparams;pi++)
-      	means[pi] = pset.best[pi];
-
-    for(unsigned long i=1;i<q.nsim;i++){
-      	rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
-      	
-      	for(pi = 0;pi<q.nparams;pi++){
-			*(setvars[pi]) = results[pi];
-      	}
-      	
-      	lf.set_params(lpars);
-      	
-      	survey.set_color_exp(CE,ZBC);
-      	survey.set_fagn_pars(lpars);
-      
-      	output=survey.simulate();
-      	
-      	if(output.chisqr < tchi_min){
-			tchi_min = output.chisqr;
-			LOG_INFO(printf("  Saving new minimum (%lu/%lu)\n",i,q.nsim));
-			saved = survey.save(q.outfile);
-      	}
-      	//final_counts.add_link(output.dnds,output.chisqr);
-      	if( i % 100 == 0){
-			LOG_DEBUG(printf("  (%lu/%lu)\n",i,q.nsim));
-      	}	
-		
-      	fflush(stdout);
+  LOG_INFO(printf("Saving Initial Survey\n"));
+  fflush(stdout);
+  saved = survey.save(q.outfile);
+  
+  for(pi = 0;pi<q.nparams;pi++)
+    means[pi] = pset.best[pi];
+  
+  for(unsigned long i=1;i<q.nsim;i++){
+    rng.gaussian_mv(means,pset.covar,pset.min,pset.max,results);
+    
+    for(pi = 0;pi<q.nparams;pi++){
+      *(setvars[pi]) = results[pi];
     }
     
-    LOG_INFO(printf("Saved Chi2: %lf (%lf)\n",tchi_min,chi_min));
-    vector<int>::const_iterator p;
-    for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
-      	parnames[pi] = pnames[*p];
-    if(q.vary_cexp)
-      	parnames[q.cind] = "CEXP";
-    if(q.vary_zbc)
-      	parnames[q.zbcind] = "ZBC";
+    lf.set_params(lpars);
+    
+    survey.set_color_exp(CE,ZBC);
+    survey.set_fagn_pars(lpars);
+    
+    output=survey.simulate();
+    
+    if(output.chisqr < tchi_min){
+      tchi_min = output.chisqr;
+      LOG_INFO(printf("  Saving new minimum (%lu/%lu)\n",i,q.nsim));
+      saved = survey.save(q.outfile);
+    }
+    //final_counts.add_link(output.dnds,output.chisqr);
+    if( i % 100 == 0){
+      LOG_DEBUG(printf("  (%lu/%lu)\n",i,q.nsim));
+    }	
     
     fflush(stdout);
-    LOG_DEBUG(printf("Saving Chains\n"));
-    saved &= mcchain.save(q.outfile,parnames.get(),"MCMC Chain Record");
-
-    cleanUp();
+  }
+  
+  LOG_INFO(printf("Saved Chi2: %lf (%lf)\n",tchi_min,chi_min));
+  vector<int>::const_iterator p;
+  for(pi=0, p= q.param_inds.begin(); p != q.param_inds.end();pi++,p++)
+    parnames[pi] = pnames[*p];
+  if(q.vary_cexp)
+    parnames[q.cind] = "CEXP";
+  if(q.vary_zbc)
+    parnames[q.zbcind] = "ZBC";
+  
+  fflush(stdout);
+  LOG_DEBUG(printf("Saving Chains\n"));
+  saved &= mcchain.save(q.outfile,parnames.get(),"MCMC Chain Record");
+  
+  cleanUp();
 }
 
 void SurveySim::cleanUp() {
