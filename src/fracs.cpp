@@ -80,8 +80,10 @@ void fracs::set_lumfunct(lumfunct *lf) {
     cout << "ERROR: NULL Pointer Passed to Simulator" << endl;
 }
 
+//set fractions and power law parameters
 void fracs::set_params(double lpars[]) {
   set_frac (lpars[LF::parameter::fa0],"agn");
+  set_frac (lpars[LF::paramter::fcom],"com");
   set_t1  (lpars[LF::parameter::t1]);
   set_t2  (lpars[LF::parameter::t2]);
   set_zbt (lpars[LF::parameter::zbt]);
@@ -155,7 +157,6 @@ int fracs::get_sedtype(double lum, double redshift,int sedflags[NSEDS]) {
   // currently the SED templates are: SFG, COM, AGN, and COLD in that order
   double fracArray[numTypes];
 
-
   //Chase's code -- but added explicit suppression of templates if not used
   float fagn   = get_frac(lum, redshift, "agn");
   if(sedflags[2] == 0) fagn = 0;
@@ -163,7 +164,7 @@ int fracs::get_sedtype(double lum, double redshift,int sedflags[NSEDS]) {
   fracArray[1] = fracData["com"]  * fagn; //COMPOSITES are a fraction of the AGN
   if(sedflags[1] == 0) fracArray[1] = 0;  
   fracArray[2] = fagn;     //AGN
-
+  
   if (!generate) return 0;
 
   float rnd = rng.flat(0, 1);
@@ -171,6 +172,6 @@ int fracs::get_sedtype(double lum, double redshift,int sedflags[NSEDS]) {
     if (rnd < fracArray[i]) return i;
     else rnd -= fracArray[i];
   }
-
+  
   return 0;
 }

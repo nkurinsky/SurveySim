@@ -80,7 +80,7 @@ enum colsel_type{
 };
 
 namespace LF{
-  enum parameter {PHI0,L0,alpha,beta,p,q,p2,q2,zbp,zbq,fa0,t1,t2,zbt}; //,fcomp,fcold};
+  enum parameter {PHI0,L0,alpha,beta,p,q,p2,q2,zbp,zbq,fcom,fa0,t1,t2,zbt};
   enum distribution {Schecter,DoublePowerLaw,ModifiedSchecter};
 }
 
@@ -107,8 +107,6 @@ public:
   string modfile;
   string sedfile;
   
-  //bool vary_cexp;
-  //bool vary_zbc;
   bool simflag;
   bool adaptive;
   bool multithread;

@@ -263,17 +263,17 @@ void Configuration::print(){
   }
   if(oprint >= 2)
     printf("\n");
-    printf("\n SED\tusage\tflags:\n");
-    for(int i=0;i<NSEDS;i++){
-      printf("%1i",seduseflags[i]);
-    }
-    
-    printf("\n");
+  printf("\nSED usage flags:\n");
+  for(int i=0;i<NSEDS;i++){
+    printf("  SED%i: %s\n",i,seduseflags[i] == 1 ? "True" : "False");
+  }
+  
+  printf("\n");
 
   if(oprint >= 2){
     printf("\nLuminosity Function Parameter Settings:\n");
     printf("Parameter\tStart\t Min \t Max \tFit\n");
-   for(int i=0;i<LUMPARS;i++){
+    for(int i=0;i<LUMPARS;i++){
       printf("%9s\t%5.2f\t%5.2f\t%5.2f\t%s\n",
   	     pnames[i].c_str(),
   	     LFParameters[i][value],
@@ -488,7 +488,6 @@ void Configuration::load(){
   //-----------------------------------------------------------------
 
   for(int i=0;i<LUMPARS;i++){
-    std::cout<<pnames[i]<<endl;
     for(int j=0;j<4;j++){
       tag = pnames[i]+suffix[j];
       tag = tag.substr(0,8);
