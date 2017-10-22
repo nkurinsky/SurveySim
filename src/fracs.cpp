@@ -65,7 +65,10 @@ void fracs::load_sedmix(string fitsfile) {
   // Store data from SED_MIX
   for (auto type = types.begin(); type != types.end(); type++) {
     string t = toLower(*type);
-    fracData[t] = 0.0;
+    if(t == "agn")
+      fracData[t] = 0.25; //default AGN fraction to 0.25
+    else
+      fracData[t] = 0.0; //otherwise allow for 0.0 default
     extensions.find("LUMDATA"/*"SED_MIX"*/)->second->column(*type).read(sedmix[t], 0, lnum);
   }
 }
@@ -78,6 +81,7 @@ void fracs::set_lumfunct(lumfunct *lf) {
 }
 
 void fracs::set_params(double lpars[]) {
+  set_frac (lpars[LF::parameter::fa0],"agn");
   set_t1  (lpars[LF::parameter::t1]);
   set_t2  (lpars[LF::parameter::t2]);
   set_zbt (lpars[LF::parameter::zbt]);
