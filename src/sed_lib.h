@@ -52,9 +52,6 @@ class sed_lib{
   double interp_dz;
   //SEDs and evolution
   double brange[2];
-  double color_exp;
-  double color_zcut;
-  double color_evolution;
   //filter convolution and interpolation (for speed)
   filter_lib filters;
   vector<string> types;
@@ -69,9 +66,6 @@ class sed_lib{
   void get_filter_info(string names[], double limits[], double errors[], double skewErrs[]);
   double get_flux(double lum, double redshift, short sedtype, double band);
   double get_filter_flux(double lum, double redshift, short sedtype, short filter_id);
-  void set_color_evolution(double exp, double zcut=1000);
-  double get_color_exp() {return color_exp;}
-  double get_color_zcut() {return color_zcut;}
   int get_lnum() {return lnum;}
   unordered_map<string, double> get_fracs();
   double get_dl();

@@ -85,10 +85,6 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
   typeq=false;
   interp_init=false;
 
-  color_exp = 0;
-  color_zcut = 0;
-  color_evolution = 1;
-
   interp_znum=nz;
   interp_zmin=zmin;
   interp_dz=dz;
@@ -277,7 +273,6 @@ sed_lib::sed_lib(string fitsfile, int nz, double zmin, double dz){
     }
   }
 
-  color_exp = 0;
 }
 
 bool sed_lib::load_filters(string file,int lflag_tmp){
@@ -349,13 +344,6 @@ double sed_lib::get_filter_flux(double lum, double redshift, short sedtype, shor
   return interpolate_flux(lum,redshift,sedtype,filter_id);
 }
 
-void sed_lib::set_color_evolution(double exp, double zcut){
-  if(zcut >= 0)
-    color_zcut = zcut;
-  color_exp = exp;
-  color_evolution = pow(1+zcut,color_exp);
-}
-
 double sed_lib::get_dl(){
   static double res;
   if ((lums != NULL) and (lnum >= 2)){
@@ -425,13 +413,6 @@ double sed_lib::interpolate_flux(double lum, double redshift, short sedtype, sho
   double retval(-1);
   try{
     retval =  alglib::spline2dcalc(flux_interpolator[sedtype*FILTER_NUM+filter_id],lum,redshift);
-    
-    if(color_zcut > 0.0){
-      if(redshift < color_zcut)
-	      retval *= pow((1.0+redshift),color_exp);
-      else
-	      retval *= color_evolution;
-    }
   }
   catch(alglib::ap_error e){
     printf("ERROR: Failed to interpolate for z=%lf, lum=%lf, sed=%i, filter=%i\n",redshift,lum,sedtype,filter_id);
@@ -455,7 +436,7 @@ double sed_lib::convolve_filter(short lum_id, double redshift, short sedtype, sh
     return -1;
   }
 
-  //we use a map here to ensure that a given redshift/SED/filter combination is only convolved once; we recompute color evolution every time as this may change in fitting, while filters/SEDs are static.
+  //we use a map here to ensure that a given redshift/SED/filter combination is only convolved once
   if(fluxes[filter_id].count(params) == 0){
     double scale,result,error;
     double bounds[2];

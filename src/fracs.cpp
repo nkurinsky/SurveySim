@@ -83,7 +83,7 @@ void fracs::set_lumfunct(lumfunct *lf) {
 //set fractions and power law parameters
 void fracs::set_params(double lpars[]) {
   set_frac (lpars[LF::parameter::fa0],"agn");
-  set_frac (lpars[LF::paramter::fcom],"com");
+  set_frac (lpars[LF::parameter::fcom],"com");
   set_t1  (lpars[LF::parameter::t1]);
   set_t2  (lpars[LF::parameter::t2]);
   set_zbt (lpars[LF::parameter::zbt]);

@@ -273,15 +273,15 @@ bool filter_lib::load_filters(string fitsfile, int logflag, vector<string> types
   }
 
   // Read in frac data 
-  for (string type : types) {
-    double frac;
-    try {
-      head.readKey("F" + type, frac);
-      fracs[type] = frac;
-    } catch (...) {
-      LOG_CRITICAL(printf("Error reading keyword \"F%s\". Please specify a fraction for every SED type in filters header.\n", type.c_str()));
-    }
-  }
+  //for (string type : types) {
+  //  double frac;
+  //  try {
+  //    head.readKey("F" + type, frac);
+  //    fracs[type] = frac;
+  //  } catch (...) {
+  //    LOG_CRITICAL(printf("Error reading keyword \"F%s\". Please specify a fraction for every SED type in filters header.\n", type.c_str()));
+  //  }
+  //}
 
   initialized = true;
   return true;

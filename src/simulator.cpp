@@ -82,11 +82,6 @@ void simulator::configure(const Configuration &config){
   }
 }
 
-//void simulator::set_color_exp(double val, double zcut){
-//  if (seds)
-//    seds->set_color_evolution(val,zcut);
-//}
-
 void simulator::set_fagn_pars(double lpars[]){
   fracData->set_params(lpars);
 }
@@ -527,13 +522,11 @@ bool simulator::save(string outfile){
     pFits->pHDU().addKey("Q2",lpars[LF::parameter::q2],"Knee evolution"); 
     pFits->pHDU().addKey("ZBP",lpars[LF::parameter::zbp],"P Evolution Cutoff");
     pFits->pHDU().addKey("ZBQ",lpars[LF::parameter::zbq],"Q Evolution Cutoff");
-    pFits->pHDU().addKey("CEXP",seds->get_color_exp(),"Color Evolution Param");
-    pFits->pHDU().addKey("ZBC",seds->get_color_zcut(),"Color Evolution Cutoff");
     pFits->pHDU().addKey("T1",fracData->get_t1(),"AGN Slope 1");
     pFits->pHDU().addKey("T2",fracData->get_t2(),"AGN Slope 2");
     pFits->pHDU().addKey("FAGN0",fracData->get_frac("agn"),"AGN fraction");
     pFits->pHDU().addKey("ZBT",fracData->get_zbt(),"AGN Evolution Cutoff");
-    //pFits->pHDU().addKey("FCOMP",fracData->get_frac("comp"),"AGN Composite Fraction");
+    pFits->pHDU().addKey("FCOMP",fracData->get_frac("com"),"AGN Composite Fraction");
     //pFits->pHDU().addKey("FCOLD",fracData->get_frac("cold"),"Cold SFG Fraction");
     //pFits->pHDU().addKey("AGNEXP",fracData->get_agnPower(),"AGN Fraction Power");
 

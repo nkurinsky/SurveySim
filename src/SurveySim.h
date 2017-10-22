@@ -5,9 +5,6 @@
 #include "simulator.h"
 #include "mc_util.h"
 
-//static string pnames[14]    = {"PHI0","L0","ALPHA","BETA","P","Q","P2","Q2","ZBP","ZBQ","FA0","T1","T2","ZBT"}; //,"FCOMP","FCOLD"};
-//static string countnames[3] = {"dnds1","dnds2","dnds3"};
-
 class SurveySim {
  private:
   Configuration q;
@@ -21,7 +18,7 @@ class SurveySim {
   unsigned long pi;
   double trial;
   
-  //this array holds phi0,L0,alpha,beta,p, and q
+  //this array holds LF params
   double lpars[LUMPARS];
   double lmin[LUMPARS];
   double lmax[LUMPARS];

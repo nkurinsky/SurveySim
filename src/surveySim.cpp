@@ -254,12 +254,12 @@ void SurveySim::runOneStep(int m) {
   LOG_DEBUG(printf("Model Chi-Square: %lf", trial));
   
   accept = metrop.accept(m, trial);
-  
+
+  mcchain.add_link(m, ptemp[m], trial, accept);
+  //counts.add_link(output.dnds,trial); 
+
   //only track accepted steps
   if (accept){
-    mcchain.add_link(m, ptemp[m], trial, accept);
-    //counts.add_link(output.dnds,trial);
-    
     LOG_DEBUG(printf(" -- Accepted\n"));
     for (pi = 0; pi < q.nparams; pi++)
       pcurrent[m][pi] = ptemp[m][pi];
@@ -297,7 +297,7 @@ void SurveySim::save() {
     }
     //final_counts.add_link(output.dnds,output.chisqr);
     if( i % 100 == 0){
-      LOG_DEBUG(printf("  (%lu/%lu)\n",i,q.nsim));
+      LOG_INFO(printf("  (%lu/%lu)\n",i,q.nsim));
     }	
     
     fflush(stdout);
@@ -309,7 +309,7 @@ void SurveySim::save() {
     parnames[pi] = pnames[*p];
   
   fflush(stdout);
-  LOG_DEBUG(printf("Saving Chains\n"));
+  LOG_INFO(printf("Saving Chains\n"));
   saved &= mcchain.save(q.outfile,parnames.get(),"MCMC Chain Record");
   
   cleanUp();
